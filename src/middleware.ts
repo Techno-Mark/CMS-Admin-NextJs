@@ -31,31 +31,19 @@ const localizedRedirect = (url: string, request: NextRequestWithAuth) => {
 
 export default withAuth(
   async function middleware(request: any, event: NextFetchEvent) {
-    const locale = request;
-
     const pathname = request.nextUrl.pathname;
-    // const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
-
     // const token = request.nextauth.token;
-    // const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
-
-    // const { data: token }  // If the user is logged in, `token` will be an object containing the user's details
-    const token = 'request.nextauth.token';
-    // const token = window.localStorage.getItem('token')
-
-    // console.log(token, "tokentokentokentoken");
-
     // Get the token from the request using next-auth's getToken method
     //  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
-    // const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET  });
-    // const requestForNextAuth = {
-    //   headers: {
-    //     cookie: request.headers.get("cookie"),
-    //   },
-    // };
 
-    // const token = await getSession({ req: requestForNextAuth });
-    console.log("Middleware token",token)
+    const requestForNextAuth = {
+      headers: {
+        cookie: request.headers.get("cookie"),
+      },
+    };
+
+    const token = await getSession({ req: requestForNextAuth });
+    console.log("Middleware token", token);
     // Check if the user is logged in
 
     const isUserLoggedIn = !!token;
@@ -72,14 +60,14 @@ export default withAuth(
     if (!isUserLoggedIn && privateRoute) {
       let redirectUrl = "/login";
 
-      // if (!(pathname === "/")) {
-      //   const searchParamsStr = new URLSearchParams({
-      //     redirectTo: withoutSuffix(pathname, "/"),
-      //   }).toString();
-      //   console.log(redirectUrl,"redirectUrlredirectUrl");
+      if (!(pathname === "/")) {
+        const searchParamsStr = new URLSearchParams({
+          redirectTo: withoutSuffix(pathname, "/"),
+        }).toString();
+        console.log(redirectUrl,"redirectUrlredirectUrl");
 
-      //   redirectUrl += `?${searchParamsStr}`;
-      // }
+        redirectUrl += `?${searchParamsStr}`;
+      }
       console.log("---------------1");
 
       return localizedRedirect(redirectUrl, request);
