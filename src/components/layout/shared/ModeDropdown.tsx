@@ -2,10 +2,12 @@
 
 // React Imports
 import { useRef, useState } from 'react'
+import type { MouseEvent } from 'react'
+
+import { useRouter } from 'next/navigation'
 
 // MUI Imports
-import Tooltip from '@mui/material/Tooltip'
-import IconButton from '@mui/material/IconButton'
+import { styled } from '@mui/material/styles'
 import Badge from '@mui/material/Badge'
 import Popper from '@mui/material/Popper'
 import Fade from '@mui/material/Fade'
@@ -13,9 +15,14 @@ import Paper from '@mui/material/Paper'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 import MenuList from '@mui/material/MenuList'
 import MenuItem from '@mui/material/MenuItem'
+import Typography from '@mui/material/Typography'
+import Divider from '@mui/material/Divider'
+import Avatar from '@mui/material/Avatar'
 
 // Type Imports
 import type { Mode } from '@core/types'
+
+const router = useRouter()
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
@@ -41,6 +48,10 @@ const ModeDropdown = () => {
   // Hooks
   const { settings, updateSettings } = useSettings()
 
+  const handleDropdownOpen = () => {
+    !open ? setOpen(true) : setOpen(false)
+  }
+
   const handleClose = () => {
     setOpen(false)
     setTooltipOpen(false)
@@ -50,12 +61,16 @@ const ModeDropdown = () => {
     setOpen(prevOpen => !prevOpen)
   }
 
-  const handleModeSwitch = (mode: Mode) => {
-    handleClose()
-
-    if (settings.mode !== mode) {
-      updateSettings({ mode: mode })
+  const handleDropdownClose = (event?: MouseEvent<HTMLLIElement> | (MouseEvent | TouchEvent), url?: string) => {
+    if (url) {
+      router.push(url)
     }
+
+    if (anchorRef.current && anchorRef.current.contains(event?.target as HTMLElement)) {
+      return
+    }
+
+    setOpen(false)
   }
 
   const getModeIcon = () => {
@@ -137,19 +152,6 @@ const ModeDropdown = () => {
                     <i className='tabler-help-circle text-[22px]' />
                     <Typography color='text.primary'>FAQ</Typography>
                   </MenuItem>
-                  <div className='flex items-center plb-2 pli-3'>
-                    <Button
-                      fullWidth
-                      variant='contained'
-                      color='error'
-                      size='small'
-                      endIcon={<i className='tabler-logout' />}
-                      onClick={handleUserLogout}
-                      sx={{ '& .MuiButton-endIcon': { marginInlineStart: 1.5 } }}
-                    >
-                      Logout
-                    </Button>
-                  </div>
                 </MenuList>
               </ClickAwayListener>
             </Paper>
