@@ -1,8 +1,7 @@
 import { NextRequestWithAuth, withAuth } from "next-auth/middleware";
 import { ensurePrefix, withoutSuffix } from "./utils/string";
-import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
-import { getSession, useSession } from "next-auth/react";
-import { JWT, getToken } from "next-auth/jwt";
+import { NextFetchEvent, NextResponse } from "next/server";
+import { getSession } from "next-auth/react";
 
 const HOME_PAGE_URL = "/home";
 
@@ -34,7 +33,8 @@ export default withAuth(
     const pathname = request.nextUrl.pathname;
     // const token = request.nextauth.token;
     // Get the token from the request using next-auth's getToken method
-    //  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    // const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    console.log("pathname", pathname);
 
     const requestForNextAuth = {
       headers: {
@@ -60,14 +60,14 @@ export default withAuth(
     if (!isUserLoggedIn && privateRoute) {
       let redirectUrl = "/login";
 
-      if (!(pathname === "/")) {
-        const searchParamsStr = new URLSearchParams({
-          redirectTo: withoutSuffix(pathname, "/"),
-        }).toString();
-        console.log(redirectUrl,"redirectUrlredirectUrl");
+      // if (!(pathname === "/")) {
+      //   const searchParamsStr = new URLSearchParams({
+      //     redirectTo: withoutSuffix(pathname, "/"),
+      //   }).toString();
+      //   console.log(redirectUrl,"redirectUrlredirectUrl");
 
-        redirectUrl += `?${searchParamsStr}`;
-      }
+      //   redirectUrl += `?${searchParamsStr}`;
+      // }
       console.log("---------------1");
 
       return localizedRedirect(redirectUrl, request);
