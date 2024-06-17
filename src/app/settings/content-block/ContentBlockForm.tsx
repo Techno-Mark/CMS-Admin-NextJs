@@ -3,9 +3,7 @@ import { useEffect, useState } from "react";
 
 // MUI Imports
 import Button from "@mui/material/Button";
-import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
-import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 
@@ -123,7 +121,7 @@ const ContentBlockForm = ({
         </div>
       </div>
       <Divider />
-      <div>
+      <div className="h-96 overflow-auto">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
           <CustomTextField
             error={!!formErrors.name}

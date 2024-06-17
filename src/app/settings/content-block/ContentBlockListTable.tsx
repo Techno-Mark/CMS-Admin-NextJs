@@ -36,7 +36,7 @@ import type { RankingInfo } from "@tanstack/match-sorter-utils";
 import type { UsersType } from "@/types/apps/userTypes";
 
 // Component Imports
-import AddUserDrawer from "./AddUserDrawer";
+// import AddUserDrawer from "./AddUserDrawer";
 import TablePaginationComponent from "@components/TablePaginationComponent";
 import CustomTextField from "@core/components/mui/TextField";
 
@@ -336,12 +336,12 @@ const UserListTable = ({ tableData }: { tableData?: UsersType[] }) => {
             }}
           />
         </Card>
-        <AddUserDrawer
+        {/* <AddUserDrawer
           open={addUserOpen}
           editingRow={editingRow}
           setEditingRow={setEditingRow}
           handleClose={() => setAddUserOpen(CLOSE_DRAWER)}
-        />
+        /> */}
         <ConfirmationDialog
           open={isDeleting}
           type="delete-account"

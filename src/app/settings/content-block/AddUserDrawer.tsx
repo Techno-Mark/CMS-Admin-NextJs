@@ -1,190 +1,190 @@
-// React Imports
-import { useEffect, useState } from "react";
+// // React Imports
+// import { useEffect, useState } from "react";
 
-// MUI Imports
-import Button from "@mui/material/Button";
-import Drawer from "@mui/material/Drawer";
-import IconButton from "@mui/material/IconButton";
-import MenuItem from "@mui/material/MenuItem";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
+// // MUI Imports
+// import Button from "@mui/material/Button";
+// import Drawer from "@mui/material/Drawer";
+// import IconButton from "@mui/material/IconButton";
+// import MenuItem from "@mui/material/MenuItem";
+// import Typography from "@mui/material/Typography";
+// import Divider from "@mui/material/Divider";
 
-// Component Imports
-import CustomTextField from "@core/components/mui/TextField";
-import { Switch } from "@mui/material";
-import { UsersType } from "@/types/apps/userTypes";
+// // Component Imports
+// import CustomTextField from "@core/components/mui/TextField";
+// import { Switch } from "@mui/material";
+// import { UsersType } from "@/types/apps/userTypes";
 
-type Props = {
-  open: -1 | 0 | 1;
-  handleClose: () => void;
-  editingRow: UsersType | null;
-  setEditingRow: React.Dispatch<React.SetStateAction<UsersType | null>>;
-};
+// type Props = {
+//   open: -1 | 0 | 1;
+//   handleClose: () => void;
+//   editingRow: UsersType | null;
+//   setEditingRow: React.Dispatch<React.SetStateAction<UsersType | null>>;
+// };
 
-type FormDataType = {
-  id: number;
-  name: string;
-  jsonContent: string;
-  status: boolean;
-};
+// type FormDataType = {
+//   id: number;
+//   name: string;
+//   jsonContent: string;
+//   status: boolean;
+// };
 
-// Vars
-const initialData = {
-  id: 0,
-  name: "",
-  jsonContent: "",
-  status: false,
-};
+// // Vars
+// const initialData = {
+//   id: 0,
+//   name: "",
+//   jsonContent: "",
+//   status: false,
+// };
 
-const initialErrorData = {
-  name: "",
-  jsonContent: "",
-};
+// const initialErrorData = {
+//   name: "",
+//   jsonContent: "",
+// };
 
-const AddUserDrawer = ({
-  open,
-  handleClose,
-  editingRow,
-  setEditingRow,
-}: Props) => {
-  const [formData, setFormData] = useState<FormDataType | UsersType>(
-    initialData
-  );
-  const [formErrors, setFormErrors] = useState<{
-    name: string;
-    jsonContent: string;
-  }>(initialErrorData);
+// const AddUserDrawer = ({
+//   open,
+//   handleClose,
+//   editingRow,
+//   setEditingRow,
+// }: Props) => {
+//   const [formData, setFormData] = useState<FormDataType | UsersType>(
+//     initialData
+//   );
+//   const [formErrors, setFormErrors] = useState<{
+//     name: string;
+//     jsonContent: string;
+//   }>(initialErrorData);
 
-  useEffect(() => {
-    setFormData(!!editingRow ? editingRow : initialData);
-  }, [editingRow]);
+//   useEffect(() => {
+//     setFormData(!!editingRow ? editingRow : initialData);
+//   }, [editingRow]);
 
-  const validateFormData = (arg1: FormDataType) => {
-    if (arg1.name.trim().length === 0) {
-      setFormErrors({ ...formErrors, name: "This field is required" });
-    } else if (arg1.jsonContent.trim().length === 0) {
-      setFormErrors({ ...formErrors, jsonContent: "This field is required" });
-    } else if (!isValidJSON(arg1.jsonContent)) {
-      setFormErrors({
-        ...formErrors,
-        jsonContent: "Given Input is not valid JSON String",
-      });
-    } else {
-      return true;
-    }
+//   const validateFormData = (arg1: FormDataType) => {
+//     if (arg1.name.trim().length === 0) {
+//       setFormErrors({ ...formErrors, name: "This field is required" });
+//     } else if (arg1.jsonContent.trim().length === 0) {
+//       setFormErrors({ ...formErrors, jsonContent: "This field is required" });
+//     } else if (!isValidJSON(arg1.jsonContent)) {
+//       setFormErrors({
+//         ...formErrors,
+//         jsonContent: "Given Input is not valid JSON String",
+//       });
+//     } else {
+//       return true;
+//     }
 
-    return false;
-  };
+//     return false;
+//   };
 
-  const isValidJSON = (jsonContent: string) => {
-    try {
-      JSON.parse(jsonContent);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
+//   const isValidJSON = (jsonContent: string) => {
+//     try {
+//       JSON.parse(jsonContent);
+//       return true;
+//     } catch (error) {
+//       return false;
+//     }
+//   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (
-      validateFormData({
-        id: formData.id,
-        name: formData.name,
-        jsonContent: formData.jsonContent,
-        status: formData.status,
-      })
-    ) {
-      handleClose();
-      setFormData(initialData);
-    }
-  };
+//   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+//     e.preventDefault();
+//     if (
+//       validateFormData({
+//         id: formData.id,
+//         name: formData.name,
+//         jsonContent: formData.jsonContent,
+//         status: formData.status,
+//       })
+//     ) {
+//       handleClose();
+//       setFormData(initialData);
+//     }
+//   };
 
-  const handleReset = () => {
-    handleClose();
-    setFormData(initialData);
-    setFormErrors(initialErrorData);
-    setEditingRow(null);
-  };
+//   const handleReset = () => {
+//     handleClose();
+//     setFormData(initialData);
+//     setFormErrors(initialErrorData);
+//     setEditingRow(null);
+//   };
 
-  return (
-    <Drawer
-      open={open !== 0}
-      anchor="right"
-      variant="temporary"
-      onClose={handleReset}
-      ModalProps={{ keepMounted: true }}
-      sx={{ "& .MuiDrawer-paper": { width: { xs: 300, sm: 400 } } }}
-    >
-      <div className="flex items-center justify-between plb-5 pli-6">
-        <Typography variant="h5">
-          {open === -1 ? "Add" : "Edit"} Content Block
-        </Typography>
-        <IconButton onClick={handleReset}>
-          <i className="tabler-x text-textPrimary" />
-        </IconButton>
-      </div>
-      <Divider />
-      <div>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
-          <CustomTextField
-            error={!!formErrors.name}
-            helperText={formErrors.name}
-            label="Full Name *"
-            fullWidth
-            placeholder="Enter Name"
-            value={formData.name}
-            onChange={(e) => {
-              setFormErrors({ ...formErrors, name: "" });
-              setFormData({ ...formData, name: e.target.value });
-            }}
-          />
-          <CustomTextField
-            fullWidth
-            rows={9}
-            multiline
-            error={!!formErrors.jsonContent}
-            helperText={formErrors.jsonContent}
-            value={formData.jsonContent}
-            onChange={(e) => {
-              setFormErrors({ ...formErrors, jsonContent: "" });
-              setFormData({ ...formData, jsonContent: e.target.value });
-            }}
-            label="JSON Content"
-            placeholder="Enter here..."
-            sx={{
-              "& .MuiInputBase-root.MuiFilledInput-root": {
-                alignItems: "baseline",
-              },
-            }}
-          />
-          <div>
-            <label className="text-[0.8125rem] leading-[1.153]">Status</label>
-            <Switch
-              size="medium"
-              checked={formData.status}
-              onChange={(e) =>
-                setFormData({ ...formData, status: e.target.checked })
-              }
-            />
-          </div>
-          <div className="flex items-center justify-end gap-4">
-            <Button
-              variant="tonal"
-              color="error"
-              type="reset"
-              onClick={() => handleReset()}
-            >
-              Cancel
-            </Button>
-            <Button variant="contained" type="submit">
-              {open === -1 ? "Add" : "Edit"} Content Block
-            </Button>
-          </div>
-        </form>
-      </div>
-    </Drawer>
-  );
-};
+//   return (
+//     <Drawer
+//       open={open !== 0}
+//       anchor="right"
+//       variant="temporary"
+//       onClose={handleReset}
+//       ModalProps={{ keepMounted: true }}
+//       sx={{ "& .MuiDrawer-paper": { width: { xs: 300, sm: 400 } } }}
+//     >
+//       <div className="flex items-center justify-between plb-5 pli-6">
+//         <Typography variant="h5">
+//           {open === -1 ? "Add" : "Edit"} Content Block
+//         </Typography>
+//         <IconButton onClick={handleReset}>
+//           <i className="tabler-x text-textPrimary" />
+//         </IconButton>
+//       </div>
+//       <Divider />
+//       <div>
+//         <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
+//           <CustomTextField
+//             error={!!formErrors.name}
+//             helperText={formErrors.name}
+//             label="Full Name *"
+//             fullWidth
+//             placeholder="Enter Name"
+//             value={formData.name}
+//             onChange={(e) => {
+//               setFormErrors({ ...formErrors, name: "" });
+//               setFormData({ ...formData, name: e.target.value });
+//             }}
+//           />
+//           <CustomTextField
+//             fullWidth
+//             rows={9}
+//             multiline
+//             error={!!formErrors.jsonContent}
+//             helperText={formErrors.jsonContent}
+//             value={formData.jsonContent}
+//             onChange={(e) => {
+//               setFormErrors({ ...formErrors, jsonContent: "" });
+//               setFormData({ ...formData, jsonContent: e.target.value });
+//             }}
+//             label="JSON Content"
+//             placeholder="Enter here..."
+//             sx={{
+//               "& .MuiInputBase-root.MuiFilledInput-root": {
+//                 alignItems: "baseline",
+//               },
+//             }}
+//           />
+//           <div>
+//             <label className="text-[0.8125rem] leading-[1.153]">Status</label>
+//             <Switch
+//               size="medium"
+//               checked={formData.status}
+//               onChange={(e) =>
+//                 setFormData({ ...formData, status: e.target.checked })
+//               }
+//             />
+//           </div>
+//           <div className="flex items-center justify-end gap-4">
+//             <Button
+//               variant="tonal"
+//               color="error"
+//               type="reset"
+//               onClick={() => handleReset()}
+//             >
+//               Cancel
+//             </Button>
+//             <Button variant="contained" type="submit">
+//               {open === -1 ? "Add" : "Edit"} Content Block
+//             </Button>
+//           </div>
+//         </form>
+//       </div>
+//     </Drawer>
+//   );
+// };
 
-export default AddUserDrawer;
+// export default AddUserDrawer;
