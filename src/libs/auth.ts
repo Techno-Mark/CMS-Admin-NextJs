@@ -24,7 +24,6 @@ export const authOptions: NextAuthOptions = {
           });
 
           const data = await res.json();
-          console.log("----",data);
           if(data.status === 'failure'){
             throw new Error(JSON.stringify(data));
           }
@@ -34,7 +33,8 @@ export const authOptions: NextAuthOptions = {
           }
 
           if (res.status === 200) {
-            
+            // console.log("login data",data.data);
+            // localStorage.setItem("token",data.data.token)
             return data.data;
           }
 
@@ -59,28 +59,28 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }: any) {
       if (user) {
+        // console.log(user.token);
+        
         token.id = user.userId;
         token.name = user.userName;
         token.email = user.email;
-        token.access_token = user.token;
+        token.token = user.token;
         token.refresh_token = user.refresh_token;
         token.tokenExpiry = user.tokenExpiry;
         token.refreshTokenExpiry = user.refreshTokenExpiry || 0;
       }
-      // console.log(token, "token");
       return token;
     },
     async session({ session, token }: any) {
-      console.log(token, "12312312312312");
       if (token) {
+        // console.log("token",token);
         session.user.id = token.id || token.sub;
         session.user.name = token.name;
         session.user.email = token.email;
-        session.user.access_token = token.access_token;
+        session.user.token = token.token;
         session.user.refresh_token = token.refresh_token;
         session.user.tokenExpiry = token.tokenExpiry;
         session.user.refreshTokenExpiry = token.refreshTokenExpiry;
-        console.log(session);
       }
 
       return session;

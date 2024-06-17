@@ -22,7 +22,7 @@ import Avatar from '@mui/material/Avatar'
 // Type Imports
 import type { Mode } from '@core/types'
 
-const router = useRouter()
+
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
@@ -44,6 +44,7 @@ const ModeDropdown = () => {
 
   // Refs
   const anchorRef = useRef<HTMLButtonElement>(null)
+  const router = useRouter()
 
   // Hooks
   const { settings, updateSettings } = useSettings()

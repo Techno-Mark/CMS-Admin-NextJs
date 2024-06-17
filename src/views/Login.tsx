@@ -49,6 +49,7 @@ import AppReactToastify from '@/libs/styles/AppReactToastify'
 
 // Third-party Imports
 import { toast } from 'react-toastify'
+import { getToken } from 'next-auth/jwt'
 // Styled Custom Components
 const LoginIllustration = styled('img')(({ theme }) => ({
   zIndex: 2,
