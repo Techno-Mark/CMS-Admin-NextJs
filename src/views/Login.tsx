@@ -42,13 +42,14 @@ import themeConfig from '@configs/themeConfig'
 // Hook Imports
 import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
-import { Locale } from 'date-fns'
-// import { signIn } from '@/app/api/[...nextauth]/route'
 import { signIn } from 'next-auth/react'
-import AppReactToastify from '@/libs/styles/AppReactToastify'
 
 // Third-party Imports
 import { toast } from 'react-toastify'
+import CircularProgress from '@mui/material/CircularProgress'
+import type { CircularProgressProps } from '@mui/material/CircularProgress'
+
+
 // Styled Custom Components
 const LoginIllustration = styled('img')(({ theme }) => ({
   zIndex: 2,
@@ -62,6 +63,17 @@ const LoginIllustration = styled('img')(({ theme }) => ({
   [theme.breakpoints.down('lg')]: {
     maxBlockSize: 450
   }
+}))
+
+const CircularProgressDeterminate = styled(CircularProgress)<CircularProgressProps>({
+  color: 'var(--mui-palette-customColors-trackBg)'
+})
+
+const CircularProgressIndeterminate = styled(CircularProgress)<CircularProgressProps>(({ theme }) => ({
+  left: 0,
+  position: 'absolute',
+  animationDuration: '440ms',
+  color: theme.palette.mode === 'light' ? '#ffffff' : '#30d41a'
 }))
 
 const MaskImg = styled('img')({
@@ -91,6 +103,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
   const [errorState, setErrorState] = useState<ErrorType | null>(null)
+  const [loading, setLoading] = useState(false)
 
   // Vars
   const darkImg = '/images/pages/auth-mask-dark.png'
@@ -103,7 +116,6 @@ const Login = ({ mode }: { mode: SystemMode }) => {
   // Hooks
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { lang: locale } = useParams()
   const { settings } = useSettings()
   const theme = useTheme()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
@@ -132,21 +144,19 @@ const Login = ({ mode }: { mode: SystemMode }) => {
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
+    setLoading(true)
     const res = await signIn('credentials', {
       email: data.email,
       password: data.password,
       redirect: false
     })
-
+    setLoading(false)
     if (res && res.ok && res.error === null) {
       // Vars
-      const redirectURL = searchParams.get('redirectTo') ?? '/';
+      const redirectURL = searchParams.get('redirectTo') ?? '/home';
       router.push(redirectURL);
     } else {
-
-        console.log(res);
       if (res?.error) {
-        
         const error = JSON.parse(res?.error)
         if (error.status === 'failure') {
           toast.error(error.message)
@@ -159,17 +169,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
 
   return (
     <div className='flex bs-full justify-center'>
-      <div
-        className={classnames(
-          'flex bs-full items-center justify-center flex-1 min-bs-[100dvh] relative p-6 max-md:hidden',
-          {
-            'border-ie': settings.skin === 'bordered'
-          }
-        )}
-      >
-        <LoginIllustration src={characterIllustration} alt='character-illustration' />
-        {!hidden && <MaskImg alt='mask' src={authBackground} />}
-      </div>
+   
       <div className='flex justify-center items-center bs-full bg-backgroundPaper !min-is-full p-6 md:!min-is-[unset] md:p-12 md:is-[480px]'>
         <div className='absolute block-start-5 sm:block-start-[33px] inline-start-6 sm:inline-start-[38px]'>
           <Logo />
@@ -244,11 +244,28 @@ const Login = ({ mode }: { mode: SystemMode }) => {
                 Forgot password?
               </Typography>
             </div>
-            <Button fullWidth variant='contained' type='submit'>
-              Login
+            <Button fullWidth variant='contained' type='submit' disabled={loading}>
+              {loading ? <>
+                <div className='relative mr-2'>
+                  <CircularProgressDeterminate variant='determinate' size={20} thickness={4} value={100} />
+                  <CircularProgressIndeterminate variant='indeterminate' disableShrink size={20} thickness={6} />
+                </div>  Please wait</> :
+                'Login'}
             </Button>
           </form>
         </div>
+      </div>
+      <div
+        className={classnames(
+          'flex bs-full items-center justify-center flex-1 min-bs-[100dvh] relative p-6 max-md:hidden',
+          {
+            'border-ie': settings.skin === 'bordered'
+          }
+        )}
+      >
+        <LoginIllustration src={characterIllustration} alt='character-illustration' />
+        {!hidden &&
+          <MaskImg alt='mask' src={authBackground} />}
       </div>
     </div>
   )

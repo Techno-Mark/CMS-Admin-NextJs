@@ -23,6 +23,7 @@ import Button from '@mui/material/Button'
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
+import { useSession ,signOut} from 'next-auth/react'
 
 // Styled component for badge content
 const BadgeContentSpan = styled('span')({
@@ -45,6 +46,12 @@ const UserDropdown = () => {
   const router = useRouter()
 
   const { settings } = useSettings()
+  const { data: session } = useSession()
+
+  // Extract user details from session
+  const userName = session?.user?.name || 'Admin'
+  const userEmail = session?.user?.email || 'Please wait'
+  const avatarText = userName.split(' ').map(n => n[0]).join('')
 
   const handleDropdownOpen = () => {
     !open ? setOpen(true) : setOpen(false)
@@ -64,7 +71,8 @@ const UserDropdown = () => {
 
   const handleUserLogout = async () => {
     // Redirect to login page
-    router.push('/login')
+    // router.push('/login')
+    await signOut({ callbackUrl: '/login' })
   }
 
   return (
@@ -79,18 +87,19 @@ const UserDropdown = () => {
         <div className='flex items-center pli-6' tabIndex={-1}>
           <div className='flex items-start flex-col'>
             <Typography className='font-medium' color='text.primary'>
-              John Doe
+              {userName}
             </Typography>
-            <Typography variant='caption'>admin@cms.com</Typography>
+            <Typography variant='caption'>{userEmail}</Typography>
           </div>
         </div>
         <Avatar
           ref={anchorRef}
-          alt='John Doe'
-          src='/images/avatars/1.png'
+          alt={userName}
           onClick={handleDropdownOpen}
           className='cursor-pointer bs-[38px] is-[38px]'
-        />
+        >
+          {avatarText}
+        </Avatar>
       </Badge>
       <Popper
         open={open}
@@ -111,12 +120,12 @@ const UserDropdown = () => {
               <ClickAwayListener onClickAway={e => handleDropdownClose(e as MouseEvent | TouchEvent)}>
                 <MenuList>
                   <div className='flex items-center plb-2 pli-6 gap-2' tabIndex={-1}>
-                    <Avatar alt='John Doe' src='/images/avatars/1.png' />
+                    <Avatar  ref={anchorRef}  > {avatarText}</Avatar>
                     <div className='flex items-start flex-col'>
                       <Typography className='font-medium' color='text.primary'>
-                        John Doe
+                      {userName}
                       </Typography>
-                      <Typography variant='caption'>admin@cms.com</Typography>
+                      <Typography variant='caption'>{userEmail}</Typography>
                     </div>
                   </div>
                   <Divider className='mlb-1' />
