@@ -144,28 +144,35 @@ const Login = ({ mode }: { mode: SystemMode }) => {
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
-    setLoading(true)
+    setLoading(true);
     const res = await signIn('credentials', {
       email: data.email,
       password: data.password,
       redirect: false
-    })
-    setLoading(false)
+    });
+    setLoading(false);
+    
     if (res && res.ok && res.error === null) {
-      // Vars
       const redirectURL = searchParams.get('redirectTo') ?? '/home';
       router.push(redirectURL);
     } else {
       if (res?.error) {
-        const error = JSON.parse(res?.error)
+        let error;
+        try {
+          error = JSON.parse(res.error);
+        } catch {
+          error = { message: res.error };
+        }
         if (error.status === 'failure') {
-          toast.error(error.message)
+          toast.error(error.message);
         } else {
-          setErrorState(error)
+          toast.error(error.message);
+          setErrorState(error);
         }
       }
     }
-  }
+  };
+  
 
   return (
     <div className='flex bs-full justify-center'>

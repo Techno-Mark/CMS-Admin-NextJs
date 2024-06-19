@@ -18,8 +18,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
 } from "@tanstack/react-table";
-import type { ColumnDef, FilterFn } from "@tanstack/react-table";
-import type { OrganizationsType } from "@/types/apps/organizationsType";
+import type { ColumnDef, FilterFn } from "@tanstack/react-table"; 
 import TablePaginationComponent from "@components/TablePaginationComponent";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
@@ -27,6 +26,8 @@ import ConfirmationDialog from "./ConfirmationDialog";
 import { post } from "@/services/apiService";
 import { organization } from "@/services/endpoint/organization";
 import CustomChip from "@/@core/components/mui/Chip";
+import type { TemplateType } from "@/types/apps/templatetype";
+import { template } from "@/services/endpoint/template";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -37,13 +38,10 @@ declare module "@tanstack/table-core" {
   }
 }
 
-type OrganizationsTypeWithAction = OrganizationsType & {
+type TemplateTypeWithAction = TemplateType & {
   action?: string;
 };
 
-const ADD_DRAWER = -1;
-const CLOSE_DRAWER = 0;
-const EDIT_DRAWER = 1;
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value);
@@ -83,15 +81,15 @@ const DebouncedInput = ({
   );
 };
 
-const columnHelper = createColumnHelper<OrganizationsTypeWithAction>();
+const columnHelper = createColumnHelper<TemplateTypeWithAction>();
 
-const OrganizationsListTable = () => {
+const TemplateListTable = () => {
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
   const router = useRouter();
 
-  const [data, setData] = useState<OrganizationsType[]>([]);
+  const [data, setData] = useState<TemplateType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<number>(0);
@@ -105,14 +103,14 @@ const OrganizationsListTable = () => {
     const getData = async () => {
       setLoading(true);
       try {
-        const result = await post(organization.list, {
+        const result = await post(template.list, {
           page: page + 1,
           limit: pageSize,
           search: globalFilter,
           active: activeFilter,
         });
-        setData(result.data.organizations);
-        setTotalRows(result.data.totalOrganizations);
+        setData(result.data.templates);
+        setTotalRows(result.data.totalTemplates);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -122,7 +120,7 @@ const OrganizationsListTable = () => {
     getData();
   }, [page, pageSize, globalFilter, activeFilter, deletingId]);
 
-  const columns = useMemo<ColumnDef<OrganizationsTypeWithAction, any>[]>(
+  const columns = useMemo<ColumnDef<TemplateTypeWithAction, any>[]>(
     () => [
       columnHelper.accessor("srNo", {
         header: "Sr. No.",
@@ -136,23 +134,20 @@ const OrganizationsListTable = () => {
         header: "Name",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {row.original.name}
+            {row.original.templateName}
           </Typography>
         ),
       }),
-      columnHelper.accessor("prefix", {
-        header: "Prefix",
+      columnHelper.accessor("templateDescription", {
+        header: "Description",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {row.original.prefix}
+            {row.original.templateDescription}
           </Typography>
         ),
       }),
-      // columnHelper.accessor("status", {
-      //   header: "Status",
-      //   cell: ({ row }) => <Switch checked={row.original.active} disabled />,
-      // }),
-      columnHelper.accessor("status", {
+     
+      columnHelper.accessor("active", {
         header: "Status",
         cell: ({ row }) => (
           <div className="flex items-center">
@@ -172,7 +167,7 @@ const OrganizationsListTable = () => {
           <div className="flex items-center">
             <IconButton
               onClick={() =>
-                router.push(`/settings/organizations/edit/${row.original.id}`)
+                router.push(`/settings/templates/edit/${row.original.id}`)
               }
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -217,33 +212,14 @@ const OrganizationsListTable = () => {
   };
 
 
-
-  // const handleDelete = async () => {
-  //   if (deletingId) {
-  //     try {
-  //       await post(organization.delete, { id: deletingId });
-
-  //       toast.success("Organization deleted successfully!");
-  //     } catch (error) {
-  //       toast.error("Failed to delete organization.");
-  //     } finally {
-  //       setIsDeleting(false);
-  //       setDeletingId(null);
-  //     }
-  //   }
-  // };
-
   return (
     <>
       <Card>
         <div className="flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4">
-          <Typography variant="h5">Organizations</Typography>
-
+          <Typography variant="h5">Templates</Typography>
 
           <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-            {/* <IconButton>
-              <i className="tabler-filter text-[22px] text-textSecondary" />
-            </IconButton> */}
+        
             <DebouncedInput
               value={globalFilter ?? ""}
               onChange={(value) => setGlobalFilter(String(value))}
@@ -251,29 +227,13 @@ const OrganizationsListTable = () => {
               className="is-full sm:is-auto"
             />
 
-            <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-              <Typography>Status:</Typography>
-
-              <CustomTextField select fullWidth defaultValue='all'
-                id='custom-select'
-                value={activeFilter === null ? "all" : activeFilter === true ? "active" : "inactive"}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setActiveFilter(value === "active" ? true : value === "inactive" ? false : null);
-                }}>
-                <MenuItem value="all">All</MenuItem>
-                <MenuItem value="active">Active</MenuItem>
-                <MenuItem value="inactive">Inactive</MenuItem>
-              </CustomTextField>
-            </div>
-
             <Button
               variant="contained"
               startIcon={<i className="tabler-plus" />}
-              onClick={() => router.push("/settings/organizations/add")}
+              onClick={() => router.push("/settings/templates/add")}
               className="is-full sm:is-auto"
             >
-              Add Organization
+              Add Template
             </Button>
           </div>
         </div>
@@ -346,26 +306,6 @@ const OrganizationsListTable = () => {
             )}
           </table>
         </div>
-        {/* <TablePagination
-          component={() => <TablePaginationComponent table={table} />}
-          count={totalRows}
-          rowsPerPage={table.getState().pagination.pageSize}
-          page={table.getState().pagination.pageIndex}
-          onPageChange={(_, page) => {
-            table.setPageIndex(page);
-          }}
-        /> */}
-        {/* <TablePagination
-          component="div"
-          count={totalRows}
-          rowsPerPage={pageSize}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          onRowsPerPageChange={(event) => {
-            setPageSize(parseInt(event.target.value, 10));
-            setPage(0);
-          }}
-        /> */}
         <TablePagination
           component="div"
           count={totalRows}
@@ -376,7 +316,6 @@ const OrganizationsListTable = () => {
         />
       </Card>
       <ConfirmationDialog
-
         open={isDeleting}
         deletingId={deletingId}
         setDeletingId={setDeletingId}
@@ -386,4 +325,4 @@ const OrganizationsListTable = () => {
   );
 };
 
-export default OrganizationsListTable;
+export default TemplateListTable;

@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 import { post } from '@/services/apiService';
 import { organization } from '@/services/endpoint/organization';
 import CustomTextField from '@/@core/components/mui/TextField';
+import { TemplateType } from '@/types/apps/templateType';
+import { template } from '@/services/endpoint/template';
 
 type Props = {
   open: -1 | 0 | 1;
@@ -16,17 +18,17 @@ type Props = {
 };
 
 const initialData = {
-  id: 0,
-  name: '',
-  prefix: '',
+  templateId: 0,
+  templateName: '',
+  templateDescription: '',
   active: false,
 };
 
-const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Props) => {
-  const [formData, setFormData] = useState<OrganizationsType>(initialData);
+const TemplateForm = ({ open, handleClose, editingRow, setEditingRow }: Props) => {
+  const [formData, setFormData] = useState<TemplateType>(initialData);
   const [formErrors, setFormErrors] = useState({
-    name: '',
-    prefix: '',
+    templateName: '',
+    templateDescription: '',
     active: '',
   });
 
@@ -42,14 +44,14 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
 
   const validateFormData = (data: OrganizationsType) => {
     let isValid = true;
-    let errors = { name: '', prefix: '', active: '' };
+    let errors = { templateName: '', templateDescription: '', active: '' };
 
-    if (data.name.trim().length < 5) {
-      errors.name = 'Organization Name must be at least 5 characters long';
+    if (data.templateName.trim().length < 5) {
+      errors.templateName = 'Template Name must be at least 5 characters long';
       isValid = false;
     }
-    if (data.prefix.trim().length === 0) {
-      errors.prefix = 'This field is required';
+    if (data.templateDescription.trim().length === 0) {
+      errors.templateDescription = 'This field is required';
       isValid = false;
     }
 
@@ -60,12 +62,12 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
     e.preventDefault();
     if (validateFormData(formData)) {
       try {
-        const endpoint = editingRow ? organization.update : organization.create;
+        const endpoint = editingRow ? template.update : template.create;
 
         const payload = {
           id: editingRow ? formData.id : undefined,
-          name: formData.name,
-          prefix: formData.prefix,
+          templateName: formData.templateName,
+          templateDescription: formData.templateDescription,
           active: formData.active,
         };
 
@@ -116,7 +118,7 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
   return (
     <Box sx={{ p: 3, border: '1px solid #e0e0e0', borderRadius: 2 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h5">{open === -1 ? 'Add' : 'Edit'} Organization</Typography>
+        <Typography variant="h5">{open === -1 ? 'Add' : 'Edit'} Template</Typography>
         <Button onClick={handleClose} color="error">
           Cancel
         </Button>
@@ -128,15 +130,15 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
             <Grid item xs={12} sm={6}>
 
               <CustomTextField
-                error={!!formErrors.name}
-                label='Organization Name *'
-                value={formData.name}
+                error={!!formErrors.templateName}
+                label='Template Name *'
+                value={formData.templateName}
                 fullWidth
-                helperText={formErrors.name}
+                helperText={formErrors.templateName}
                 id='validation-error-helper-text'
                 onChange={(e) => {
-                  setFormErrors((prevErrors) => ({ ...prevErrors, name: '' }));
-                  setFormData((prevData) => ({ ...prevData, name: e.target.value }));
+                  setFormErrors((prevErrors) => ({ ...prevErrors, templateName: '' }));
+                  setFormData((prevData) => ({ ...prevData, templateName: e.target.value }));
                 }}
               />
 
@@ -144,15 +146,15 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
             <Grid item xs={12} sm={4}>
 
               <CustomTextField
-                error={!!formErrors.prefix}
-                helperText={formErrors.prefix}
-                value={formData.prefix}
+                error={!!formErrors.templateDescription}
+                helperText={formErrors.templateDescription}
+                value={formData.templateDescription}
                 fullWidth
-                label="Prefix *"
+                label="Template Description *"
                 id='validation-error-helper-text'
                 onChange={(e) => {
-                  setFormErrors((prevErrors) => ({ ...prevErrors, prefix: '' }));
-                  setFormData((prevData) => ({ ...prevData, prefix: e.target.value }));
+                  setFormErrors((prevErrors) => ({ ...prevErrors, templateDescription: '' }));
+                  setFormData((prevData) => ({ ...prevData, templateDescription: e.target.value }));
                 }}
               />
             </Grid>
@@ -174,7 +176,7 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
                   Cancel
                 </Button>
                 <Button variant="contained" type="submit">
-                  {open === -1 ? 'Add' : 'Edit'} Organization
+                  {open === -1 ? 'Add' : 'Edit'} Template
                 </Button>
               </Box>
             </Grid>
@@ -185,4 +187,4 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
   );
 };
 
-export default OrganizationsForm;
+export default TemplateForm;
