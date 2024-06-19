@@ -1,4 +1,12 @@
-export default function Page() {
-    return <h1>Templates page!</h1>
-}
-  
+import TemplateListTable from "./TemplateListTable";
+
+const page = () => {
+  return (
+    <>
+      <TemplateListTable
+      />
+    </>
+  );
+};
+
+export default page;

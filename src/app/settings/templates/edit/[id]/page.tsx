@@ -3,7 +3,7 @@
 import { OrganizationsType } from '@/types/apps/organizationsType';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import OrganizationsForm from '../../OrganizationsForm';
+import OrganizationsForm from '../../TemplateForm';
 import { post } from '@/services/apiService';
 import { organization } from '@/services/endpoint/organization';
 
