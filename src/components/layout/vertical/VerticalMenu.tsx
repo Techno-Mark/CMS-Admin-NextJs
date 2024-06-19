@@ -74,36 +74,47 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
-        <MenuItem href='/home' icon={<i className='tabler-smart-home' />}>
+        <MenuItem href='/home' icon={<i className='tabler-dashboard' />}>
           Dashboard
         </MenuItem>
-        <MenuItem href='/content-management/blogs' icon={<i className='tabler-smart-home' />}>
-          Blogs Management
+        <MenuItem href='/content-management/blogs' icon={<i className='tabler-brand-blogger' />}>
+          Blogs
         </MenuItem>
-        <MenuItem href='/content-management/contact-us' icon={<i className='tabler-smart-home' />}>
-          Contact Us Management
+        <MenuItem href='/content-management/contact-us' icon={<i className='tabler-address-book' />}>
+          Contact Us
         </MenuItem>
-        <MenuItem href='/content-management/pages' icon={<i className='tabler-smart-home' />}>
-          Pages Management
+        <MenuItem href='/content-management/pages' icon={<i className='tabler-brand-pagekit' />}>
+          Pages
         </MenuItem>
-        <MenuItem href='/content-management/menus' icon={<i className='tabler-smart-home' />}>
-          Menu Management
+        <MenuItem href='/content-management/menus' icon={<i className='tabler-menu-2' />}>
+          Menus
         </MenuItem>
-        <MenuItem href='/content-management/events' icon={<i className='tabler-smart-home' />}>
-          Event Management
+        <MenuItem href='/content-management/popups' icon={<i className='tabler-box-model-2' />}>
+          Popup
         </MenuItem>
-        <MenuItem href='/content-management/recrutments' icon={<i className='tabler-smart-home' />}>
-          Recrutment Management
+        <MenuItem href='/content-management/events' icon={<i className='tabler-calendar-event' />}>
+          Events
         </MenuItem>
+        <MenuItem href='/content-management/recrutments' icon={<i className='tabler-briefcase' />}>
+          Recrutments
+        </MenuItem>
+        <SubMenu
+          label={"Users"}
+          icon={<i className='tabler-users-group' />}
+        >
+          <MenuItem href={`/users/management`} icon={<i className='tabler-users'></i>}>Users</MenuItem>
+          <MenuItem href={`/users/roles`} icon={<i className='tabler-user-cog'></i>}>Roles</MenuItem>
+          <MenuItem href={`/users/permissions`} icon={<i className='tabler-accessible'></i>}>Permissions</MenuItem>
+        </SubMenu>
         <SubMenu
           label={"Settings"}
           icon={<i className='tabler-setting' />}
-          suffix={<CustomChip label='3' size='small' color='error' round='true' />}
         >
-          <MenuItem href={`/settings/organizations`}>Organizations</MenuItem>
-          <MenuItem href={`/settings/content-block`}>Content Block</MenuItem>
-          <MenuItem href={`/settings/pages`}>Pages</MenuItem>
-          <MenuItem href={`/settings/general`}>General</MenuItem>
+          <MenuItem href={`/settings/organizations`} icon={<i className='tabler-affiliate'></i>}>Organizations</MenuItem>
+          <MenuItem href={`/settings/content-blocks`} icon={<i className='tabler-box-margin'></i>}>Content Blocks</MenuItem>
+          <MenuItem href={`/settings/templates`} icon={<i className='tabler-template'></i>}>Templates</MenuItem>
+          <MenuItem href={`/settings/modules`} icon={<i className='tabler-stack-middle'></i>}>Modules</MenuItem>
+          <MenuItem href={`/settings/general`} icon={<i className='tabler-file-settings'></i>}>General</MenuItem>
         </SubMenu>
       </Menu>
       {/* <Menu
