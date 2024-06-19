@@ -1,31 +1,40 @@
-// React Imports
-import { Fragment, useState } from "react";
-
 // MUI Imports
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-
-// Third-party Imports
-import classnames from "classnames";
-
-type ConfirmationType = "delete-account" | "unsubscribe" | "suspend-account";
+import { callAPIwithHeaders } from "@/app/api/common/commonAPI";
+import { deleteSection } from "@/app/api/content-block";
+import { toast } from "react-toastify";
 
 type ConfirmationDialogProps = {
+  deletingId: number;
   open: boolean;
   setOpen: (open: boolean) => void;
-  type: ConfirmationType;
+  setDeletingId: React.Dispatch<React.SetStateAction<number>>;
 };
 
 const ConfirmationDialog = ({
+  deletingId,
   open,
   setOpen,
-  type,
+  setDeletingId,
 }: ConfirmationDialogProps) => {
-  const handleConfirmation = (value: boolean) => {
-    setOpen(false);
+  const deleteContentBlock = async () => {
+    const callBack = (status: boolean, message: string) => {
+      if (status) {
+        toast.success(message);
+      } else {
+        toast.error(message);
+      }
+      setDeletingId(0);
+      setOpen(false);
+    };
+
+    callAPIwithHeaders(deleteSection.pathName, deleteSection.method, callBack, {
+      sectionId: deletingId,
+    });
   };
 
   return (
@@ -37,14 +46,14 @@ const ConfirmationDialog = ({
         </Typography>
       </DialogContent>
       <DialogActions className="justify-center pbs-0 sm:pbe-16 sm:pli-16">
-        <Button variant="contained" onClick={() => handleConfirmation(true)}>
+        <Button variant="contained" onClick={deleteContentBlock}>
           Yes
         </Button>
         <Button
           variant="tonal"
           color="secondary"
           onClick={() => {
-            handleConfirmation(false);
+            setOpen(false);
           }}
         >
           Cancel

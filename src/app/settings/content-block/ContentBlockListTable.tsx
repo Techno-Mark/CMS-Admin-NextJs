@@ -1,19 +1,12 @@
-"use client";
-
 // React Imports
 import { useEffect, useState, useMemo } from "react";
-
 // MUI Imports
 import Card from "@mui/material/Card";
-import { Divider, Switch, Tooltip } from "@mui/material";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-import { styled } from "@mui/material/styles";
 import TablePagination from "@mui/material/TablePagination";
 import type { TextFieldProps } from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
-
 // Third-party Imports
 import classnames from "classnames";
 import { rankItem } from "@tanstack/match-sorter-utils";
@@ -31,19 +24,16 @@ import {
 } from "@tanstack/react-table";
 import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { RankingInfo } from "@tanstack/match-sorter-utils";
-
 // Type Imports
 import type { UsersType } from "@/types/apps/userTypes";
-
 // Component Imports
-// import AddUserDrawer from "./AddUserDrawer";
 import TablePaginationComponent from "@components/TablePaginationComponent";
 import CustomTextField from "@core/components/mui/TextField";
-
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { useRouter } from "next/navigation";
+import BreadCrumbList from "./BreadCrumbList";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -57,11 +47,6 @@ declare module "@tanstack/table-core" {
 type UsersTypeWithAction = UsersType & {
   action?: string;
 };
-
-//Enums
-const ADD_DRAWER = -1;
-const CLOSE_DRAWER = 0;
-const EDIT_DRAWER = 1;
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   // Rank the item
@@ -114,15 +99,27 @@ const DebouncedInput = ({
 // Column Definitions
 const columnHelper = createColumnHelper<UsersTypeWithAction>();
 
-const UserListTable = ({ tableData }: { tableData?: UsersType[] }) => {
-  // States
-  const [addUserOpen, setAddUserOpen] = useState<-1 | 0 | 1>(CLOSE_DRAWER);
-  const [rowSelection, setRowSelection] = useState({});
-  const [data, setData] = useState(...[tableData]);
-  const [globalFilter, setGlobalFilter] = useState("");
-  const [editingRow, setEditingRow] = useState<UsersType | null>(null);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+const UserListTable = ({
+  totalCount,
+  tableData,
+  getList,
+  initialBody,
+}: {
+  totalCount: number;
+  tableData?: UsersType[];
+  getList: (arg1: { page: number; limit: number; search: string }) => void;
+  initialBody: {
+    page: number;
+    limit: number;
+    search: string;
+  };
+}) => {
   const router = useRouter();
+  // States
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [deletingId, setDeletingId] = useState<number>(0);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
   const columns = useMemo<ColumnDef<UsersTypeWithAction, any>[]>(
     () => [
       columnHelper.accessor("srNo", {
@@ -141,18 +138,6 @@ const UserListTable = ({ tableData }: { tableData?: UsersType[] }) => {
           </Typography>
         ),
       }),
-      //   header: "JSON Content",
-      //   cell: ({ row }) => (
-      //     <Tooltip title={row.original.jsonContent}>
-      //       <Typography
-      //         color="text.primary"
-      //         className="w-60 font-medium overflow-hidden text-ellipsis"
-      //       >
-      //         {row.original.jsonContent}
-      //       </Typography>
-      //     </Tooltip>
-      //   ),
-      // }),
       columnHelper.accessor("createdAt", {
         header: "Created At",
         cell: ({ row }) => (
@@ -163,7 +148,12 @@ const UserListTable = ({ tableData }: { tableData?: UsersType[] }) => {
       }),
       columnHelper.accessor("status", {
         header: "Status",
-        cell: ({ row }) => <Switch checked={row.original.status} disabled />,
+        cell: ({ row }) =>
+          row.original.status ? (
+            <div className="text-green-600">Active</div>
+          ) : (
+            <div className="text-red-600">Deactive</div>
+          ),
       }),
       columnHelper.accessor("id", {
         header: "Action",
@@ -174,14 +164,15 @@ const UserListTable = ({ tableData }: { tableData?: UsersType[] }) => {
                 onClick={() =>
                   router.push(`/settings/content-block/edit/${row.original.id}`)
                 }
-                // onClick={() => {
-                //   setEditingRow(row.original);
-                //   setAddUserOpen(EDIT_DRAWER);
-                // }}
               >
                 <i className="tabler-edit text-[22px] text-textSecondary" />
               </IconButton>
-              <IconButton onClick={() => setIsDeleting(true)}>
+              <IconButton
+                onClick={() => {
+                  setIsDeleting(true);
+                  setDeletingId(row.original.id);
+                }}
+              >
                 <i className="tabler-trash text-[22px] text-textSecondary" />
               </IconButton>
             </div>
@@ -195,22 +186,18 @@ const UserListTable = ({ tableData }: { tableData?: UsersType[] }) => {
   );
 
   const table = useReactTable({
-    data: data as UsersType[],
+    data: tableData as UsersType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter,
     },
-    state: {
-      rowSelection,
-      globalFilter,
-    },
     initialState: {
       pagination: {
-        pageSize: 10,
+        pageIndex: initialBody.page,
+        pageSize: initialBody.limit,
       },
     },
     globalFilterFn: fuzzyFilter,
-    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
@@ -220,151 +207,154 @@ const UserListTable = ({ tableData }: { tableData?: UsersType[] }) => {
     getFacetedUniqueValues: getFacetedUniqueValues(),
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
   });
-  if (addUserOpen === CLOSE_DRAWER)
-    return (
-      <>
-        <Card>
-          <div className="flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4">
-            <Typography variant="h5">Content Block</Typography>
-            <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-              <IconButton>
-                <i className="tabler-filter text-[22px] text-textSecondary" />
-              </IconButton>
-              <DebouncedInput
-                value={globalFilter ?? ""}
-                onChange={(value) => setGlobalFilter(String(value))}
-                placeholder="Search"
-                className="is-full sm:is-auto"
-              />
-              <Button
-                variant="contained"
-                startIcon={<i className="tabler-plus" />}
-                // onClick={() => setAddUserOpen(ADD_DRAWER)}
-                onClick={() => router.push("/settings/content-block/add")}
-                className="is-full sm:is-auto"
-              >
-                Add Content Block
-              </Button>
-            </div>
-          </div>
-          <div className="overflow-x-auto h-[325px]">
-            <table className={tableStyles.table}>
-              <thead>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th key={header.id}>
-                        {header.isPlaceholder ? null : (
-                          <>
-                            <div
-                              className={classnames({
-                                "flex items-center":
-                                  header.column.getIsSorted(),
-                                "cursor-pointer select-none":
-                                  header.column.getCanSort(),
-                              })}
-                              onClick={header.column.getToggleSortingHandler()}
-                            >
-                              {flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                              {{
-                                asc: (
-                                  <i className="tabler-chevron-up text-xl" />
-                                ),
-                                desc: (
-                                  <i className="tabler-chevron-down text-xl" />
-                                ),
-                              }[
-                                header.column.getIsSorted() as "asc" | "desc"
-                              ] ?? null}
-                            </div>
-                          </>
-                        )}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              {table.getFilteredRowModel().rows.length === 0 ? (
-                <tbody>
-                  <tr>
-                    <td
-                      colSpan={table.getVisibleFlatColumns().length}
-                      className="text-center"
-                    >
-                      No data available
-                    </td>
-                  </tr>
-                </tbody>
-              ) : (
-                <tbody>
-                  {table
-                    .getRowModel()
-                    .rows.slice(0, table.getState().pagination.pageSize)
-                    .map((row) => {
-                      return (
-                        <tr
-                          key={row.id}
-                          className={classnames({
-                            selected: row.getIsSelected(),
-                          })}
-                        >
-                          {row.getVisibleCells().map((cell) => (
-                            <td key={cell.id}>
-                              {flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext()
-                              )}
-                            </td>
-                          ))}
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              )}
-            </table>
-          </div>
-          <TablePagination
-            component={() => <TablePaginationComponent table={table} />}
-            count={table.getFilteredRowModel().rows.length}
-            rowsPerPage={table.getState().pagination.pageSize}
-            page={table.getState().pagination.pageIndex}
-            onPageChange={(_, page) => {
-              table.setPageIndex(page);
-            }}
+
+  useEffect(() => {
+    getList({
+      page: table.getState().pagination.pageIndex,
+      limit: table.getState().pagination.pageSize,
+      search: globalFilter,
+    });
+  }, [
+    table.getState().pagination.pageSize,
+    table.getState().pagination.pageIndex,
+    globalFilter,
+  ]);
+
+  useEffect(() => {
+    if (deletingId === 0) {
+      getList({
+        page: table.getState().pagination.pageIndex,
+        limit: table.getState().pagination.pageSize,
+        search: globalFilter,
+      });
+    }
+  }, [deletingId]);
+
+  return (
+    <>
+      <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
+        <BreadCrumbList />
+        <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
+          <IconButton>
+            <i className="tabler-filter text-[22px] text-textSecondary" />
+          </IconButton>
+          <DebouncedInput
+            value={globalFilter ?? ""}
+            onChange={(value) => setGlobalFilter(String(value))}
+            placeholder="Search"
+            className="is-full sm:is-auto"
           />
-        </Card>
-        {/* <AddUserDrawer
-          open={addUserOpen}
-          editingRow={editingRow}
-          setEditingRow={setEditingRow}
-          handleClose={() => setAddUserOpen(CLOSE_DRAWER)}
-        /> */}
-        <ConfirmationDialog
-          open={isDeleting}
-          type="delete-account"
-          setOpen={() => setIsDeleting(false)}
-        />
-      </>
-    );
-  if (addUserOpen === EDIT_DRAWER || addUserOpen === ADD_DRAWER)
-    return (
-      <Card>
-        <div className="flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4">
-          <Typography variant="h5">
-            {addUserOpen === -1 ? "Add" : "Edit"} Content Block
-          </Typography>
-          <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-            <IconButton onClick={() => setAddUserOpen(0)}>
-              <i className="tabler-x text-[22px] text-textSecondary" />
-            </IconButton>
-          </div>
+          <Button
+            variant="contained"
+            startIcon={<i className="tabler-plus" />}
+            onClick={() => router.push("/settings/content-block/add")}
+            className="is-full sm:is-auto"
+          >
+            Add Content Block
+          </Button>
         </div>
-        <Divider />
+      </div>
+      <Card>
+        <div className="overflow-x-auto h-[340px]">
+          <table className={tableStyles.table}>
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th key={header.id}>
+                      {header.isPlaceholder ? null : (
+                        <>
+                          <div
+                            className={classnames({
+                              "flex items-center": header.column.getIsSorted(),
+                              "cursor-pointer select-none":
+                                header.column.getCanSort(),
+                            })}
+                            onClick={header.column.getToggleSortingHandler()}
+                          >
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                            {{
+                              asc: <i className="tabler-chevron-up text-xl" />,
+                              desc: (
+                                <i className="tabler-chevron-down text-xl" />
+                              ),
+                            }[header.column.getIsSorted() as "asc" | "desc"] ??
+                              null}
+                          </div>
+                        </>
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            {table.getFilteredRowModel().rows.length === 0 ? (
+              <tbody>
+                <tr>
+                  <td
+                    colSpan={table.getVisibleFlatColumns().length}
+                    className="text-center"
+                  >
+                    No data available
+                  </td>
+                </tr>
+              </tbody>
+            ) : (
+              <tbody>
+                {table
+                  .getRowModel()
+                  .rows.slice(0, table.getState().pagination.pageSize)
+                  .map((row) => {
+                    return (
+                      <tr
+                        key={row.id}
+                        className={classnames({
+                          selected: row.getIsSelected(),
+                        })}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <td key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            )}
+          </table>
+        </div>
+        <TablePagination
+          component={() => <TablePaginationComponent table={table} />}
+          count={totalCount}
+          rowsPerPage={table.getState().pagination.pageSize}
+          page={table.getState().pagination.pageIndex}
+          onPageChange={(_, page) => {
+            table.setPageIndex(page);
+          }}
+        />
       </Card>
-    );
+      <ConfirmationDialog
+        // ={() => {
+        //   getList({
+        //     page: table.getState().pagination.pageIndex,
+        //     limit: table.getState().pagination.pageSize,
+        //     search: globalFilter,
+        //   });
+        // }}
+        open={isDeleting}
+        deletingId={deletingId}
+        setDeletingId={setDeletingId}
+        setOpen={(arg1: boolean) => setIsDeleting(arg1)}
+      />
+    </>
+  );
 };
 
 export default UserListTable;
