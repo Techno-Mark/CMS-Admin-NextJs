@@ -4,11 +4,9 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { callAPIwithHeaders } from "@/app/api/common/commonAPI";
-import { deleteSection } from "@/app/api/content-block";
-import { toast } from "react-toastify";
 import { post } from "@/services/apiService";
 import { organization } from "@/services/endpoint/organization";
+import { toast } from "react-toastify";
 
 type ConfirmationDialogProps = {
   deletingId: number;

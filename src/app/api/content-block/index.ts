@@ -1,23 +1,15 @@
-type Request = {
-    pathName: string, method: "get" | "post"
-}
+//redirections url
+export const redirectToAddPage = "/settings/content-blocks/add"
+export const redirectToEditPage = (slug: number | string) => { return `/settings/content-blocks/edit/${slug}` }
 
 
-export const getSectionList: Request = {
-    pathName: "/api/section/list", method: "post"
-}
+//api endpoints
+export const getSectionList = "section/list"
 
-export const getSectionById = (id: number): Request => {
-    return { pathName: `/api/section/getById/${id}`, method: "post" }
-}
+export const getSectionById = (slug: string | number) => { return `section/getBySlug/${slug}` }
 
-export const createSection: Request = {
-    pathName: "/api/section/create", method: "post"
-}
-export const updateSection: Request = {
-    pathName: "/api/section/update", method: "post"
-}
+export const createSection = "section/create"
 
-export const deleteSection: Request = {
-    pathName: "/api/section/delete", method: "post"
-}
+export const updateSection = "section/update"
+
+export const deleteSection = "section/delete"

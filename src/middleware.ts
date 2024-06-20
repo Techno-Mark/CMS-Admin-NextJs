@@ -89,7 +89,6 @@ export default withAuth(
       return localizedRedirect(HOME_PAGE_URL, request);
     }
     console.log("---------------4", pathname);
-    //  pathname  ? localizedRedirect(pathname, request)  :
     return NextResponse.next();
   },
   {

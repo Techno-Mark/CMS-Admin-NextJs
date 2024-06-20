@@ -26,8 +26,8 @@ import ConfirmationDialog from "./ConfirmationDialog";
 import { post } from "@/services/apiService";
 import { organization } from "@/services/endpoint/organization";
 import CustomChip from "@/@core/components/mui/Chip";
-import type { TemplateType } from "@/types/apps/templatetype";
 import { template } from "@/services/endpoint/template";
+import { TemplateType } from "@/types/apps/templateType";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -111,7 +111,7 @@ const TemplateListTable = () => {
         });
         setData(result.data.templates);
         setTotalRows(result.data.totalTemplates);
-      } catch (error) {
+      } catch (error:any) {
         setError(error.message);
       } finally {
         setLoading(false);
@@ -130,7 +130,7 @@ const TemplateListTable = () => {
           </Typography>
         ), enableSorting: false,
       }),
-      columnHelper.accessor("name", {
+      columnHelper.accessor("templateName", {
         header: "Name",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
@@ -161,13 +161,13 @@ const TemplateListTable = () => {
         enableSorting: false,
       }),
 
-      columnHelper.accessor("id", {
+      columnHelper.accessor("templateId", {
         header: "Action",
         cell: ({ row }) => (
           <div className="flex items-center">
             <IconButton
               onClick={() =>
-                router.push(`/settings/templates/edit/${row.original.id}`)
+                router.push(`/settings/templates/edit/${row.original.templateId}`)
               }
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -198,6 +198,8 @@ const TemplateListTable = () => {
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: true,  // Manual pagination
+    pageCount: Math.ceil(totalRows / pageSize), // Provide total pages
   });
 
   const handlePageChange = (event: unknown, newPage: number) => {

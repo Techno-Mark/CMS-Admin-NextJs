@@ -102,7 +102,7 @@ const OrganizationsListTable = () => {
         });
         setData(result.data.organizations);
         setTotalRows(result.data.totalOrganizations);
-      } catch (error) {
+      } catch (error:any) {
         setError(error.message);
       } finally {
         setLoading(false);
@@ -138,7 +138,7 @@ const OrganizationsListTable = () => {
           </Typography>
         ),
       }),
-      columnHelper.accessor("status", {
+      columnHelper.accessor("active", {
         header: "Status",
         cell: ({ row }) => (
           <div className="flex items-center">
@@ -184,12 +184,14 @@ const OrganizationsListTable = () => {
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    manualPagination: true,  // Manual pagination
-    pageCount: Math.ceil(totalRows / pageSize), // Provide total pages
+    manualPagination: true,
+    pageCount: Math.ceil(totalRows / pageSize),
   });
 
   const handlePageChange = (event: unknown, newPage: number) => {
-    setPage(newPage);
+    if (newPage !== page) {
+      setPage(newPage);
+    }
   };
 
   const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {

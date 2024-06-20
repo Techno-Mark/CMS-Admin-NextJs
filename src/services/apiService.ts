@@ -16,7 +16,7 @@ export const fetchData = async (
 ) => {
   try {
     const session = await getSession();
-    console.log(session?.user.token);
+    // console.log(session?.user.token);
 
     if (!session || !session?.user) {
       throw new Error("No session or access token found");

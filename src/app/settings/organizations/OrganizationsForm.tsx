@@ -96,7 +96,7 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
 
             // Handle second type of response
             if (Array.isArray(errorData.data)) {
-              errorData.data.forEach((errObj: { [s: string]: unknown; } | ArrayLike<unknown>) => {
+              errorData.data.forEach((errObj: { [s: string]: any; } | ArrayLike<unknown>) => {
                 for (const [key, value] of Object.entries(errObj)) {
                   toast.error(value);
                 }
