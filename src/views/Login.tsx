@@ -144,32 +144,39 @@ const Login = ({ mode }: { mode: SystemMode }) => {
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
-    setLoading(true)
+    setLoading(true);
     const res = await signIn('credentials', {
       email: data.email,
       password: data.password,
       redirect: false
-    })
-    setLoading(false)
+    });
+    setLoading(false);
+    
     if (res && res.ok && res.error === null) {
-      // Vars
       const redirectURL = searchParams.get('redirectTo') ?? '/home';
       router.push(redirectURL);
     } else {
       if (res?.error) {
-        const error = JSON.parse(res?.error)
+        let error;
+        try {
+          error = JSON.parse(res.error);
+        } catch {
+          error = { message: res.error };
+        }
         if (error.status === 'failure') {
-          toast.error(error.message)
+          toast.error(error.message);
         } else {
-          setErrorState(error)
+          toast.error(error.message);
+          setErrorState(error);
         }
       }
     }
-  }
+  };
+  
 
   return (
     <div className='flex bs-full justify-center'>
-   
+      
       <div className='flex justify-center items-center bs-full bg-backgroundPaper !min-is-full p-6 md:!min-is-[unset] md:p-12 md:is-[480px]'>
         <div className='absolute block-start-5 sm:block-start-[33px] inline-start-6 sm:inline-start-[38px]'>
           <Logo />
