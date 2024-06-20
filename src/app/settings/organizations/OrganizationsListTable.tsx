@@ -2,25 +2,18 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import Card from "@mui/material/Card";
-import { Avatar, Badge, Chip, Divider, FormControl, InputLabel, MenuItem, Select, Switch, TablePagination, TextFieldProps, Tooltip } from "@mui/material";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
+import {
+  Avatar, Badge, Chip, Divider, FormControl, InputLabel, MenuItem, Select, Switch,
+  TablePagination, TextFieldProps, Tooltip, Card, Button, Typography, IconButton
+} from "@mui/material";
 import classnames from "classnames";
 import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
 import {
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
+  createColumnHelper, flexRender, getCoreRowModel, useReactTable,
+  getFilteredRowModel, getPaginationRowModel, getSortedRowModel
 } from "@tanstack/react-table";
 import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { OrganizationsType } from "@/types/apps/organizationsType";
-import TablePaginationComponent from "@components/TablePaginationComponent";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
 import ConfirmationDialog from "./ConfirmationDialog";
@@ -40,10 +33,6 @@ declare module "@tanstack/table-core" {
 type OrganizationsTypeWithAction = OrganizationsType & {
   action?: string;
 };
-
-const ADD_DRAWER = -1;
-const CLOSE_DRAWER = 0;
-const EDIT_DRAWER = 1;
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value);
@@ -130,7 +119,8 @@ const OrganizationsListTable = () => {
           <Typography color="text.primary" className="font-medium">
             {row.index + 1 + page * pageSize}
           </Typography>
-        ), enableSorting: false,
+        ),
+        enableSorting: false,
       }),
       columnHelper.accessor("name", {
         header: "Name",
@@ -148,24 +138,21 @@ const OrganizationsListTable = () => {
           </Typography>
         ),
       }),
-      // columnHelper.accessor("status", {
-      //   header: "Status",
-      //   cell: ({ row }) => <Switch checked={row.original.active} disabled />,
-      // }),
       columnHelper.accessor("status", {
         header: "Status",
         cell: ({ row }) => (
           <div className="flex items-center">
-            <CustomChip size="small"
-              round='true'
+            <CustomChip
+              size="small"
+              round="true"
               label={row.original.active ? 'Active' : 'Inactive'}
-              variant='tonal'
-              color={row.original.active ? 'success' : 'error'} />
+              variant="tonal"
+              color={row.original.active ? 'success' : 'error'}
+            />
           </div>
         ),
         enableSorting: false,
       }),
-
       columnHelper.accessor("id", {
         header: "Action",
         cell: ({ row }) => (
@@ -177,12 +164,6 @@ const OrganizationsListTable = () => {
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
             </IconButton>
-            {/* <IconButton onClick={() => {
-              setIsDeleting(true);
-              setDeletingId(row.original.id);
-            }}>
-              <i className="tabler-trash text-[22px] text-textSecondary" />
-            </IconButton> */}
           </div>
         ),
         enableSorting: false,
@@ -203,12 +184,12 @@ const OrganizationsListTable = () => {
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: true,  // Manual pagination
+    pageCount: Math.ceil(totalRows / pageSize), // Provide total pages
   });
 
   const handlePageChange = (event: unknown, newPage: number) => {
-    if (newPage !== page) {
-      setPage(newPage);
-    }
+    setPage(newPage);
   };
 
   const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -216,57 +197,36 @@ const OrganizationsListTable = () => {
     setPage(0);
   };
 
-
-
-  // const handleDelete = async () => {
-  //   if (deletingId) {
-  //     try {
-  //       await post(organization.delete, { id: deletingId });
-
-  //       toast.success("Organization deleted successfully!");
-  //     } catch (error) {
-  //       toast.error("Failed to delete organization.");
-  //     } finally {
-  //       setIsDeleting(false);
-  //       setDeletingId(null);
-  //     }
-  //   }
-  // };
-
   return (
     <>
       <Card>
         <div className="flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4">
           <Typography variant="h5">Organizations</Typography>
-
-
           <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-            {/* <IconButton>
-              <i className="tabler-filter text-[22px] text-textSecondary" />
-            </IconButton> */}
             <DebouncedInput
               value={globalFilter ?? ""}
               onChange={(value) => setGlobalFilter(String(value))}
               placeholder="Search"
               className="is-full sm:is-auto"
             />
-
             <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
               <Typography>Status:</Typography>
-
-              <CustomTextField select fullWidth defaultValue='all'
-                id='custom-select'
+              <CustomTextField
+                select
+                fullWidth
+                defaultValue="all"
+                id="custom-select"
                 value={activeFilter === null ? "all" : activeFilter === true ? "active" : "inactive"}
                 onChange={(e) => {
                   const value = e.target.value;
                   setActiveFilter(value === "active" ? true : value === "inactive" ? false : null);
-                }}>
+                }}
+              >
                 <MenuItem value="all">All</MenuItem>
                 <MenuItem value="active">Active</MenuItem>
                 <MenuItem value="inactive">Inactive</MenuItem>
               </CustomTextField>
             </div>
-
             <Button
               variant="contained"
               startIcon={<i className="tabler-plus" />}
@@ -288,21 +248,15 @@ const OrganizationsListTable = () => {
                         <div
                           className={classnames({
                             "flex items-center": header.column.getIsSorted(),
-                            "cursor-pointer select-none":
-                              header.column.getCanSort(),
+                            "cursor-pointer select-none": header.column.getCanSort(),
                           })}
                           onClick={header.column.getToggleSortingHandler()}
                         >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          {flexRender(header.column.columnDef.header, header.getContext())}
                           {{
                             asc: <i className="tabler-chevron-up text-xl" />,
                             desc: <i className="tabler-chevron-down text-xl" />,
-                          }[
-                            header.column.getIsSorted() as "asc" | "desc"
-                          ] ?? null}
+                          }[header.column.getIsSorted() as "asc" | "desc"] ?? null}
                         </div>
                       )}
                     </th>
@@ -313,59 +267,26 @@ const OrganizationsListTable = () => {
             {table.getFilteredRowModel().rows.length === 0 ? (
               <tbody>
                 <tr>
-                  <td
-                    colSpan={table.getVisibleFlatColumns().length}
-                    className="text-center"
-                  >
+                  <td colSpan={table.getVisibleFlatColumns().length} className="text-center">
                     No data available
                   </td>
                 </tr>
               </tbody>
             ) : (
               <tbody>
-                {table
-                  .getRowModel()
-                  .rows.map((row) => (
-                    <tr
-                      key={row.id}
-                      className={classnames({
-                        selected: row.getIsSelected(),
-                      })}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
+                {table.getRowModel().rows.map((row) => (
+                  <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
               </tbody>
             )}
           </table>
         </div>
-        {/* <TablePagination
-          component={() => <TablePaginationComponent table={table} />}
-          count={totalRows}
-          rowsPerPage={table.getState().pagination.pageSize}
-          page={table.getState().pagination.pageIndex}
-          onPageChange={(_, page) => {
-            table.setPageIndex(page);
-          }}
-        /> */}
-        {/* <TablePagination
-          component="div"
-          count={totalRows}
-          rowsPerPage={pageSize}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          onRowsPerPageChange={(event) => {
-            setPageSize(parseInt(event.target.value, 10));
-            setPage(0);
-          }}
-        /> */}
         <TablePagination
           component="div"
           count={totalRows}
@@ -376,7 +297,6 @@ const OrganizationsListTable = () => {
         />
       </Card>
       <ConfirmationDialog
-
         open={isDeleting}
         deletingId={deletingId}
         setDeletingId={setDeletingId}
