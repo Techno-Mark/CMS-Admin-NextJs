@@ -4,9 +4,9 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { callAPIwithHeaders } from "@/app/api/common/commonAPI";
 import { deleteSection } from "@/app/api/content-block";
 import { toast } from "react-toastify";
+import { post } from "@/services/apiService";
 
 type ConfirmationDialogProps = {
   deletingId: number;
@@ -22,19 +22,22 @@ const ConfirmationDialog = ({
   setDeletingId,
 }: ConfirmationDialogProps) => {
   const deleteContentBlock = async () => {
-    const callBack = (status: boolean, message: string) => {
-      if (status) {
-        toast.success(message);
+    try {
+      const result = await post(deleteSection, {
+        sectionId: deletingId,
+      });
+
+      if (result.status === "success") {
+        toast.success(result.message);
       } else {
-        toast.error(message);
+        toast.error(result.message);
       }
+    } catch (error) {
+      console.error(error);
+    } finally {
       setDeletingId(0);
       setOpen(false);
-    };
-
-    callAPIwithHeaders(deleteSection.pathName, deleteSection.method, callBack, {
-      sectionId: deletingId,
-    });
+    }
   };
 
   return (

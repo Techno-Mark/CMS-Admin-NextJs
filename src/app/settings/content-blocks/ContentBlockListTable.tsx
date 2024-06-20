@@ -34,6 +34,7 @@ import tableStyles from "@core/styles/table.module.css";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { useRouter } from "next/navigation";
 import BreadCrumbList from "./BreadCrumbList";
+import { redirectToAddPage, redirectToEditPage } from "@/app/api/content-block";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -152,7 +153,7 @@ const UserListTable = ({
           row.original.status ? (
             <div className="text-green-600">Active</div>
           ) : (
-            <div className="text-red-600">Deactive</div>
+            <div className="text-red-600">Inactive</div>
           ),
       }),
       columnHelper.accessor("id", {
@@ -161,9 +162,9 @@ const UserListTable = ({
           return (
             <div className="flex items-center">
               <IconButton
-                onClick={() =>
-                  router.push(`/settings/content-block/edit/${row.original.id}`)
-                }
+                onClick={() => {
+                  router.push(redirectToEditPage(row.original.slug));
+                }}
               >
                 <i className="tabler-edit text-[22px] text-textSecondary" />
               </IconButton>
@@ -181,7 +182,6 @@ const UserListTable = ({
         enableSorting: false,
       }),
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
@@ -247,7 +247,7 @@ const UserListTable = ({
           <Button
             variant="contained"
             startIcon={<i className="tabler-plus" />}
-            onClick={() => router.push("/settings/content-block/add")}
+            onClick={() => router.push(redirectToAddPage)}
             className="is-full sm:is-auto"
           >
             Add Content Block
@@ -341,13 +341,6 @@ const UserListTable = ({
         />
       </Card>
       <ConfirmationDialog
-        // ={() => {
-        //   getList({
-        //     page: table.getState().pagination.pageIndex,
-        //     limit: table.getState().pagination.pageSize,
-        //     search: globalFilter,
-        //   });
-        // }}
         open={isDeleting}
         deletingId={deletingId}
         setDeletingId={setDeletingId}

@@ -1,24 +1,23 @@
 // React Imports
 import { useEffect, useState } from "react";
-
 // MUI Imports
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-
 // Component Imports
 import CustomTextField from "@core/components/mui/TextField";
 import { Card, Switch } from "@mui/material";
-import { UsersType } from "@/types/apps/userTypes";
-import { useRouter } from "next/navigation";
-import axios from "axios";
+import { ADD_SECTION, EDIT_SECTION, UsersType } from "@/types/apps/userTypes";
 import BreadCrumbList from "./BreadCrumbList";
-import { callAPIwithHeaders } from "@/app/api/common/commonAPI";
-import { createSection } from "@/app/api/content-block";
+import {
+  createSection,
+  getSectionById,
+  updateSection,
+} from "@/app/api/content-block";
+import { get, post } from "@/services/apiService";
+import { usePathname, useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 type Props = {
-  open: -1 | 1;
+  open: ADD_SECTION | EDIT_SECTION;
 };
 
 type FormDataType = {
@@ -27,6 +26,12 @@ type FormDataType = {
   slug: string;
   jsonContent: string;
   status: boolean;
+};
+
+//enum
+const sectionActions = {
+  ADD: -1,
+  EDIT: 1,
 };
 
 // Vars
@@ -46,6 +51,7 @@ const initialErrorData = {
 
 const ContentBlockForm = ({ open }: Props) => {
   const router = useRouter();
+  const query = usePathname().split("/");
   const [formData, setFormData] = useState<FormDataType | UsersType>(
     initialData
   );
@@ -55,10 +61,6 @@ const ContentBlockForm = ({ open }: Props) => {
     jsonContent: string;
   }>(initialErrorData);
 
-  // useEffect(() => {
-  //   setFormData(!!editingRow ? editingRow : initialData);
-  // }, [editingRow]);
-
   const validateFormData = (arg1: FormDataType) => {
     if (arg1.name.trim().length === 0) {
       setFormErrors({ ...formErrors, name: "This field is required" });
@@ -66,11 +68,12 @@ const ContentBlockForm = ({ open }: Props) => {
       setFormErrors({ ...formErrors, slug: "This field is required" });
     } else if (arg1.jsonContent.trim().length === 0) {
       setFormErrors({ ...formErrors, jsonContent: "This field is required" });
-    } else if (!isValidJSON(arg1.jsonContent)) {
+    } else if (!isValidJSON(arg1.jsonContent).isValid) {
       setFormErrors({
         ...formErrors,
-        jsonContent: "Given Input is not valid JSON String",
+        jsonContent: isValidJSON(arg1.jsonContent).errorText,
       });
+    } else if (false) {
     } else {
       return true;
     }
@@ -79,15 +82,39 @@ const ContentBlockForm = ({ open }: Props) => {
   };
 
   const isValidJSON = (jsonContent: string) => {
+    const requiredKeys = [
+      "fieldType",
+      "fieldLabel",
+      "isRequired",
+      "validation",
+      // 'value'
+    ];
+
+    let parsedInput;
     try {
-      JSON.parse(jsonContent);
-      return true;
+      parsedInput = JSON.parse(jsonContent);
     } catch (error) {
-      return false;
+      return {
+        isValid: false,
+        errorText: "Given Input is not valid JSON String",
+      };
     }
+
+    for (let obj of parsedInput) {
+      for (let key of requiredKeys) {
+        if (!(key in obj)) {
+          return { isValid: false, errorText: `Key '${key}' is required` };
+        }
+      }
+    }
+
+    return {
+      isValid: true,
+      errorText: "",
+    };
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (
       validateFormData({
@@ -98,35 +125,59 @@ const ContentBlockForm = ({ open }: Props) => {
         status: formData.status,
       })
     ) {
-      const callBack = (status: boolean, message: string, data: any) => {
-        console.log(status, message, data);
-      };
-
-      callAPIwithHeaders(
-        createSection.pathName,
-        createSection.method,
-        callBack,
-        {
-          sectionName: formData.name,
-          sectionTemplate: formData.jsonContent,
-          active: formData.status,
-        }
+      const result = await post(
+        open === sectionActions.EDIT ? updateSection : createSection,
+        open === sectionActions.EDIT
+          ? {
+              sectionId: formData.id,
+              sectionName: formData.name,
+              sectionTemplate: JSON.parse(formData.jsonContent),
+              active: formData.status,
+            }
+          : {
+              sectionName: formData.name,
+              sectionTemplate: JSON.parse(formData.jsonContent),
+              active: formData.status,
+            }
       );
 
-      // handleClose();
-      setFormData(initialData);
+      if (result.status === "success") {
+        toast.success(result.message);
+        handleReset();
+      } else {
+        toast.error(result.message);
+      }
     }
   };
 
   const handleReset = () => {
     setFormData(initialData);
     setFormErrors(initialErrorData);
-    router.push("/settings/content-block");
+    router.back();
   };
 
-  // const getSectionById = async () => {
-  //   const response = await axios.post(`/api/section/getById/${editingRow?.id}`);
-  // };
+  const getSectionDataById = async (slug: string | number) => {
+    try {
+      const result = await get(getSectionById(slug));
+      const { data } = result;
+      setFormData({
+        ...formData,
+        id: data.sectionId,
+        name: data.sectionName,
+        slug: data.sectionSlug,
+        jsonContent: JSON.stringify(data.sectionTemplate),
+        status: data.active,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (open === sectionActions.EDIT) {
+      getSectionDataById(query[query.length - 1]);
+    }
+  }, []);
 
   return (
     <>
@@ -154,6 +205,7 @@ const ContentBlockForm = ({ open }: Props) => {
               }}
             />
             <CustomTextField
+              disabled={open === sectionActions.EDIT}
               error={!!formErrors.slug}
               helperText={formErrors.slug}
               label="Slug *"
@@ -209,7 +261,7 @@ const ContentBlockForm = ({ open }: Props) => {
                 Cancel
               </Button>
               <Button variant="contained" type="submit">
-                {open === -1 ? "Add" : "Edit"} Content Block
+                {open === sectionActions.ADD ? "Add" : "Edit"} Content Block
               </Button>
             </div>
           </form>
