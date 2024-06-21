@@ -6,6 +6,8 @@ import { VerticalNavProvider } from '@menu/contexts/verticalNavContext'
 import { SettingsProvider } from '@core/contexts/settingsContext'
 import ThemeProvider from '@components/theme'
 import { NextAuthProvider } from '@/contexts/nextAuthProvider'
+import CircularProgress from '@mui/material/CircularProgress'
+import Backdrop from '@mui/material/Backdrop';
 
 // Util Imports
 import { getDemoName, getMode, getSettingsFromCookie, getSystemMode } from '@core/utils/serverHelpers'
@@ -18,7 +20,7 @@ type Props = ChildrenType & {
 
 const Providers = (props: Props) => {
   // Props
-  const { children, direction } = props
+  const { children, direction, isLoading } = props
 
   // Vars
   const mode = getMode()
@@ -33,7 +35,12 @@ const Providers = (props: Props) => {
         <ThemeProvider direction={direction} systemMode={systemMode}>
           {children}
           <AppReactToastify position={themeConfig.toastPosition} hideProgressBar />
-
+          <Backdrop
+            sx={{ color: '#fff', zIndex: 9999 }}
+            open={isLoading}
+          >
+            <CircularProgress className="screen-center" />
+          </Backdrop>
         </ThemeProvider>
       </SettingsProvider>
     </VerticalNavProvider>
