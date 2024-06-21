@@ -124,3 +124,16 @@ code {
   background-color: rgb(var(--mui-palette-info-mainChannel) / 0.08);
   border: 0;
 }
+
+.text-v-center {
+  margin: auto;
+}
+.ml-2{
+  margin-left: 5px;
+}
+.screen-center{
+  position:fixed;
+  margin: auto;
+  left: 50%;
+  top: 50%;
+}

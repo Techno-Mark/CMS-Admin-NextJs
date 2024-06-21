@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 // MUI Imports
 import Tooltip from '@mui/material/Tooltip'
@@ -15,6 +15,8 @@ import ClickAwayListener from '@mui/material/ClickAwayListener'
 import MenuList from '@mui/material/MenuList'
 import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
+import { organization } from "@/services/endpoint/organization";
+import { post } from "@/services/apiService";
 
 // Type Imports
 import type { Mode } from '@core/types'
@@ -25,12 +27,17 @@ import { useSettings } from '@core/hooks/useSettings'
 const ModeDropdown = () => {
   // States
   const [open, setOpen] = useState(false)
+  const [orgs, setOrgs] = useState([])
   const [tooltipOpen, setTooltipOpen] = useState(false)
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Refs
   const anchorRef = useRef<HTMLButtonElement>(null)
 
-  const avatarText = "Techno Mark".split(' ').map(n => n[0]).join('')
+  const generateAvatar = (text) => {
+    return text.split(' ').map(n => n[0]).join('');
+  }
 
   // Hooks
   const { settings, updateSettings } = useSettings()
@@ -58,6 +65,23 @@ const ModeDropdown = () => {
     }
   }
 
+  useEffect(() => {
+    const getData = async () => {
+      setLoading(true);
+      try {
+        const result = await post(organization.active, {});
+        if(result?.data?.organizations){
+          setOrgs(result.data.organizations);
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getData();
+  }, []);
+
   return (
     <>
       <Badge
@@ -71,12 +95,12 @@ const ModeDropdown = () => {
           alt={"Techno Mark"}
           className='cursor-pointer bs-[38px] is-[38px]'
         >
-          {avatarText}
+          {generateAvatar("Technomark")}
         </Avatar>
-        <Typography className='font-medium' color='text.primary' ref={anchorRef}>
+        <Typography className='font-medium text-v-center ml-2' color='text.primary' ref={anchorRef}>
           Techno Mark
         </Typography>
-        <i className='tabler-chevron-down' />
+        <i className='tabler-chevron-down text-v-center' />
       </Badge>
       <Popper
         open={open}
@@ -94,45 +118,22 @@ const ModeDropdown = () => {
             <Paper className={settings.skin === 'bordered' ? 'border shadow-none' : 'shadow-lg'}>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList onKeyDown={handleClose}>
-                  <MenuItem
-                    className='gap-3'
-                    onClick={() => handleModeSwitch('light')}
-                    selected={settings.mode === 'light'}
-                  >
-                    <Avatar
-                      alt={"Techno Mark"}
-                      className='cursor-pointer bs-[38px] is-[38px]'
+                  {orgs.map(org=>(
+                    <MenuItem
+                      className='gap-3'
+                      onClick={() => handleModeSwitch('light')}
+                      selected={settings.mode === 'light'}
+
                     >
-                      {avatarText}
-                    </Avatar>
-                    Technomark
-                  </MenuItem>
-                  <MenuItem
-                    className='gap-3'
-                    onClick={() => handleModeSwitch('dark')}
-                    selected={settings.mode === 'dark'}
-                  >
-                    <Avatar
-                      alt={"Techno Mark"}
-                      className='cursor-pointer bs-[38px] is-[38px]'
-                    >
-                      G
-                    </Avatar>
-                    Gyaata
-                  </MenuItem>
-                  <MenuItem
-                    className='gap-3'
-                    onClick={() => handleModeSwitch('system')}
-                    selected={settings.mode === 'system'}
-                  >
-                    <Avatar
-                      alt={"Techno Mark"}
-                      className='cursor-pointer bs-[38px] is-[38px]'
-                    >
-                      P
-                    </Avatar>
-                    PABS
-                  </MenuItem>
+                      <Avatar
+                        alt={org.name}
+                        className='cursor-pointer bs-[38px] is-[38px]'
+                      >
+                        {generateAvatar(org.name)}
+                      </Avatar>
+                      {org.name}
+                    </MenuItem>
+                  ))}
                 </MenuList>
               </ClickAwayListener>
             </Paper>
