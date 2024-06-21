@@ -20,6 +20,7 @@ import ConfirmationDialog from "./ConfirmationDialog";
 import { post } from "@/services/apiService";
 import { organization } from "@/services/endpoint/organization";
 import CustomChip from "@/@core/components/mui/Chip";
+import BreadCrumbList from "../content-blocks/BreadCrumbList"; 
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -102,7 +103,7 @@ const OrganizationsListTable = () => {
         });
         setData(result.data.organizations);
         setTotalRows(result.data.totalOrganizations);
-      } catch (error:any) {
+      } catch (error: any) {
         setError(error.message);
       } finally {
         setLoading(false);
@@ -201,44 +202,45 @@ const OrganizationsListTable = () => {
 
   return (
     <>
-      <Card>
-        <div className="flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4">
-          <Typography variant="h5">Organizations</Typography>
+      <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
+        <BreadCrumbList />
+        <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
+          <DebouncedInput
+            value={globalFilter ?? ""}
+            onChange={(value) => setGlobalFilter(String(value))}
+            placeholder="Search"
+            className="is-full sm:is-auto"
+          />
           <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-            <DebouncedInput
-              value={globalFilter ?? ""}
-              onChange={(value) => setGlobalFilter(String(value))}
-              placeholder="Search"
-              className="is-full sm:is-auto"
-            />
-            <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-              <Typography>Status:</Typography>
-              <CustomTextField
-                select
-                fullWidth
-                defaultValue="all"
-                id="custom-select"
-                value={activeFilter === null ? "all" : activeFilter === true ? "active" : "inactive"}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setActiveFilter(value === "active" ? true : value === "inactive" ? false : null);
-                }}
-              >
-                <MenuItem value="all">All</MenuItem>
-                <MenuItem value="active">Active</MenuItem>
-                <MenuItem value="inactive">Inactive</MenuItem>
-              </CustomTextField>
-            </div>
-            <Button
-              variant="contained"
-              startIcon={<i className="tabler-plus" />}
-              onClick={() => router.push("/settings/organizations/add")}
-              className="is-full sm:is-auto"
+            <Typography>Status:</Typography>
+            <CustomTextField
+              select
+              fullWidth
+              defaultValue="all"
+              id="custom-select"
+              value={activeFilter === null ? "all" : activeFilter === true ? "active" : "inactive"}
+              onChange={(e) => {
+                const value = e.target.value;
+                setActiveFilter(value === "active" ? true : value === "inactive" ? false : null);
+              }}
             >
-              Add Organization
-            </Button>
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="inactive">Inactive</MenuItem>
+            </CustomTextField>
           </div>
+          <Button
+            variant="contained"
+            startIcon={<i className="tabler-plus" />}
+            onClick={() => router.push("/settings/organizations/add")}
+            className="is-full sm:is-auto"
+          >
+            Add Organization
+          </Button>
         </div>
+      </div>
+      <Card>
+
         <div className="overflow-x-auto h-[325px]">
           <table className={tableStyles.table}>
             <thead>

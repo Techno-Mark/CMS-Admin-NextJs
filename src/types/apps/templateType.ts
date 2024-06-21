@@ -1,3 +1,4 @@
+
 export type TemplateType = {
     srNo?: number;
     templateId: number;
@@ -5,4 +6,5 @@ export type TemplateType = {
     templateDescription:string;
     active: boolean;
     templateSlug:string;
+    sectionIds:[];
 }

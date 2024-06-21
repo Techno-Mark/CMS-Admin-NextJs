@@ -1,5 +1,3 @@
-'use client'
-
 // React Imports
 import { useRef, useState, useEffect } from 'react'
 
@@ -31,117 +29,128 @@ const ModeDropdown = () => {
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Refs
-  const anchorRef = useRef<HTMLButtonElement>(null)
-
-  const generateAvatar = (text) => {
-    return text.split(' ').map(n => n[0]).join('');
+  interface Organization {
+    id: string;
+    name: string;
   }
 
-  // Hooks
-  const { settings, updateSettings } = useSettings()
+  const ModeDropdown = () => {
+    const [open, setOpen] = useState(false);
+    const [organizations, setOrganizations] = useState<Organization[]>([]);
+    const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
+    const anchorRef = useRef<HTMLButtonElement>(null);
+    const { settings, updateSettings } = useSettings();
 
-  const handleClose = () => {
-    setOpen(false)
-    setTooltipOpen(false)
-  }
-
-  const handleToggle = () => {
-    setOpen(prevOpen => !prevOpen)
-  }
-
-  const handleModeSwitch = (mode: Mode) => {
-    handleClose()
-  }
-
-  const getModeIcon = () => {
-    if (settings.mode === 'system') {
-      return 'tabler-device-laptop'
-    } else if (settings.mode === 'dark') {
-      return 'tabler-moon-stars'
-    } else {
-      return 'tabler-sun'
-    }
-  }
-
-  useEffect(() => {
-    const getData = async () => {
-      setLoading(true);
-      try {
-        const result = await post(organization.active, {});
-        if(result?.data?.organizations){
-          setOrgs(result.data.organizations);
+    useEffect(() => {
+      const fetchOrganizations = async () => {
+        try {
+          const response = await post(organization.active, {});
+          setOrganizations(response.data.organizations as Organization[]);
+        } catch (error) {
+          console.error('Error fetching organizations:', error);
         }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+      };
+
+      if (open) {
+        fetchOrganizations();
       }
+    }, [open]);
+
+    const handleClose = () => {
+      setOpen(false);
     };
-    getData();
-  }, []);
 
-  return (
-    <>
-      <Badge
-        ref={anchorRef}
-        overlap='circular'
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        className='mis-2 flex item-center justify-center'
-        onClick={handleToggle}
-      >
-        <Avatar
-          alt={"Techno Mark"}
-          className='cursor-pointer bs-[38px] is-[38px]'
+    const handleToggle = () => {
+      setOpen((prevOpen) => !prevOpen);
+    };
+
+    const handleModeSwitch = (orgId: string) => {
+      setSelectedOrgId(orgId);
+      handleClose();
+    };
+
+    const avatarText = 'Techno Mark'.split(' ').map((n) => n[0]).join('');
+
+    useEffect(() => {
+      const getData = async () => {
+        setLoading(true);
+        try {
+          const result = await post(organization.active, {});
+          if (result?.data?.organizations) {
+            setOrgs(result.data.organizations);
+          }
+        } catch (err: any) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+      getData();
+    }, []);
+
+    return (
+      <>
+        <Badge
+          ref={anchorRef}
+          overlap="circular"
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          className="mis-2 flex items-center justify-center cursor-pointer"
+          onClick={handleToggle}
         >
-          {generateAvatar("Technomark")}
-        </Avatar>
-        <Typography className='font-medium text-v-center ml-2' color='text.primary' ref={anchorRef}>
-          Techno Mark
-        </Typography>
-        <i className='tabler-chevron-down text-v-center' />
-      </Badge>
-      <Popper
-        open={open}
-        transition
-        disablePortal
-        placement='bottom-start'
-        anchorEl={anchorRef.current}
-        className='min-is-[160px] !mbs-3 z-[1]'
-      >
-        {({ TransitionProps, placement }) => (
-          <Fade
-            {...TransitionProps}
-            style={{ transformOrigin: placement === 'bottom-start' ? 'left top' : 'right top' }}
+          <Avatar
+            alt="Techno Mark"
+            className="cursor-pointer bs-[38px] is-[38px]"
           >
-            <Paper className={settings.skin === 'bordered' ? 'border shadow-none' : 'shadow-lg'}>
-              <ClickAwayListener onClickAway={handleClose}>
-                <MenuList onKeyDown={handleClose}>
-                  {orgs.map(org=>(
-                    <MenuItem
-                      className='gap-3'
-                      onClick={() => handleModeSwitch('light')}
-                      selected={settings.mode === 'light'}
-
-                    >
-                      <Avatar
-                        alt={org.name}
-                        className='cursor-pointer bs-[38px] is-[38px]'
+            {selectedOrgId ? organizations.find((org) => org.id === selectedOrgId)?.name.charAt(0) : avatarText.charAt(0)}
+          </Avatar>
+          <Typography className="font-medium ml-2 mr-1" color="text.primary">
+            {selectedOrgId ? organizations.find((org) => org.id === selectedOrgId)?.name : 'Select Organization'}
+          </Typography>
+          <i className={`tabler-chevron-down ${open ? 'transform rotate-180' : ''}`} />
+        </Badge>
+        <Popper
+          open={open}
+          transition
+          disablePortal
+          placement="bottom-start"
+          anchorEl={anchorRef.current}
+          className="min-is-[160px] !mbs-3 z-[1]"
+        >
+          {({ TransitionProps, placement }) => (
+            <Fade
+              {...TransitionProps}
+              style={{
+                transformOrigin: placement === 'bottom-start' ? 'left top' : 'right top',
+              }}
+            >
+              <Paper className={settings.skin === 'bordered' ? 'border shadow-none' : 'shadow-lg'}>
+                <ClickAwayListener onClickAway={handleClose}>
+                  <MenuList onKeyDown={handleClose}>
+                    {organizations.map((org) => (
+                      <MenuItem
+                        key={org.id}
+                        className="gap-3"
+                        onClick={() => handleModeSwitch(org.id)}
+                        selected={selectedOrgId === org.id}
                       >
-                        {generateAvatar(org.name)}
-                      </Avatar>
-                      {org.name}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </ClickAwayListener>
-            </Paper>
-          </Fade>
-        )}
-      </Popper>
-    </>
-  )
+                        <Avatar
+                          alt={org.name}
+                          className="cursor-pointer bs-[38px] is-[38px]"
+                        >
+                          {org.name.charAt(0)}
+                        </Avatar>
+                        {org.name}
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </ClickAwayListener>
+              </Paper>
+            </Fade>
+          )}
+        </Popper>
+      </>
+    );
+  };
 }
 
-export default ModeDropdown
+export default ModeDropdown;

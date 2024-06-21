@@ -107,7 +107,7 @@ const TemplateListTable = () => {
           page: page + 1,
           limit: pageSize,
           search: globalFilter,
-          active: activeFilter,
+          // active: activeFilter,
         });
         setData(result.data.templates);
         setTotalRows(result.data.totalTemplates);
@@ -118,7 +118,8 @@ const TemplateListTable = () => {
       }
     };
     getData();
-  }, [page, pageSize, globalFilter, activeFilter, deletingId]);
+    // activeFilter
+  }, [page, pageSize, globalFilter,  deletingId]);
 
   const columns = useMemo<ColumnDef<TemplateTypeWithAction, any>[]>(
     () => [

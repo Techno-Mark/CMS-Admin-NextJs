@@ -22,6 +22,7 @@ import type { SVGProps } from 'react';
 export function TablerBaselineDensityMedium(props: SVGProps<SVGSVGElement>) {
   return (<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 20h16M4 12h16M4 4h16"></path></svg>);
 }
+
 type SectionType = {
   sectionId: number;
   sectionName: string;
@@ -46,6 +47,7 @@ const initialData: TemplateType = {
   templateDescription: '',
   active: false,
   templateSlug: '',
+  sectionIds:[]
 };
 
 const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditingRow }) => {
@@ -87,7 +89,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
 
   const validateFormData = (data: TemplateType) => {
     let isValid = true;
-    let errors = { templateName: '', templateDescription: '', active: '', templateSlug: '', };
+    let errors = { templateName: '', templateDescription: '', active: '', templateSlug: '' };
 
     if (data.templateName.trim().length < 5) {
       errors.templateName = 'Template Name must be at least 5 characters long';
@@ -118,36 +120,25 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
           templateDescription: formData.templateDescription,
           active: formData.active,
           templateSlug: formData.templateSlug,
+          sectionIds: selectedSections.map(section => ({
+            sectionId: section.sectionId,
+            isCommon: section.isCommon ? 'true' : undefined,
+          })),
         };
 
         const response = await post(endpoint, payload);
         console.log(response);
 
-        if (!editingRow) {
-          const sectionsPayload = {
-            templateId: response.data.templateId,
-            sectionIds: selectedSections.map(section => ({
-              sectionId: section.sectionId,
-              isCommon: section.isCommon ? 'true' : undefined,
-            })),
-          };
-
-          const sectionsResponse = await post(template.save, sectionsPayload);
-          console.log(sectionsResponse);
-
-
-          toast.success(sectionsResponse.message);
-          handleClose();
-          setFormData(response);
-        }
-
+        toast.success(response.message);
+        handleClose();
+        setFormData(response.data);
+        setEditingRow(null);
 
       } catch (error: any) {
         console.error('Error fetching data:', error.message);
       }
     }
   };
-
 
   const handleAddSection = (event: any, newValue: SectionType[]) => {
     setSelectedSections(newValue);

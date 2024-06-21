@@ -3,7 +3,7 @@ import { ensurePrefix, withoutSuffix } from "./utils/string";
 import { NextFetchEvent, NextResponse } from "next/server";
 import { getSession } from "next-auth/react";
 
-const HOME_PAGE_URL = "/home";
+const HOME_PAGE_URL = "/";
 
 const localizedRedirect = (url: string, request: NextRequestWithAuth) => {
   let _url = url;
@@ -78,7 +78,7 @@ export default withAuth(
       pathname.endsWith(route)
     );
 
-    if (isUserLoggedIn && isRequestedRouteIsGuestRoute) {
+    if (isUserLoggedIn &&  (isRequestedRouteIsGuestRoute || pathname === "/")) {
       console.log("---------------2");
       return localizedRedirect(HOME_PAGE_URL, request);
     }

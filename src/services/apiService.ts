@@ -5,18 +5,20 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
+    console.log(response);
+    
     if (response.status === 401) {
       // Unauthorized, log out and redirect to login page
-      await signOut({ redirect: true, callbackUrl: '/login' });
+      await signOut({ redirect: true, callbackUrl: "/login" });
       throw new Error("Unauthorized. Token missing or expired");
     } else if (response.status === 422) {
       // Unprocessable Entity, handle validation errors
       const errorResponse = await response.json();
       const { message, data } = errorResponse;
-      if (message === "validation error" && data) {
+      if (message === "validation error" && data ) {
         const errors = Object.keys(data).map((key) => `${key}: ${data[key]}`);
         toast.error(errors.join("; "));
-        throw new Error("Validation error");
+        throw new Error("Validation error1");
       } else {
         toast.error(message || "Validation error");
         throw new Error(message || "Validation error");
@@ -25,8 +27,8 @@ const handleResponse = async (response: Response) => {
       // Bad Request, handle validation errors
       const errorResponse = await response.json();
       const { message, data } = errorResponse;
-      if (message === "validation error" && Array.isArray(data) && data.length > 0) {
-        const errors = data.map((error) => Object.values(error).join(": "));
+      if (message === "validation error" && data && typeof data === 'object') {
+        const errors = Object.values(data).map((errorMessage) => errorMessage);
         toast.error(errors.join("; "));
         throw new Error("Validation error");
       } else {
@@ -63,9 +65,9 @@ export const fetchData = async (
       },
     });
     return await handleResponse(response);
-  } catch (error:any) {
+  } catch (error: any) {
     console.error("Error fetching data:", error);
-    toast.error(error.message);
+    // toast.error(error.message);
     throw error;
   }
 };
