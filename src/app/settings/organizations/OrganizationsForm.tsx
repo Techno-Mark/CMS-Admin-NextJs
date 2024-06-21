@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import { post } from '@/services/apiService';
 import { organization } from '@/services/endpoint/organization';
 import CustomTextField from '@/@core/components/mui/TextField';
+import { fetchData } from '../../../services/apiService';
 
 type Props = {
   open: -1 | 0 | 1;
@@ -77,38 +78,40 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
         handleClose();
         setFormData(response);
       } catch (error: any) {
-        console.error('Error saving organization:', error);
-        try {
-          const errorData = JSON.parse(error.message);
-          if ((errorData.status === 'error' || errorData.status === 'failure') &&
-            (errorData.message === 'validation' || errorData.message === 'validation error')) {
+        console.error('Error fetching data:', error.message);
+        
+        // console.error('Error saving organization:', error);
+        // try {
+        //   const errorData = JSON.parse(error.message);
+        //   if ((errorData.status === 'error' || errorData.status === 'failure') &&
+        //     (errorData.message === 'validation' || errorData.message === 'validation error')) {
 
-            // Handle first type of response
-            if (errorData.data && typeof errorData.data === 'object' && !Array.isArray(errorData.data)) {
-              for (const [key, value] of Object.entries(errorData.data)) {
-                if (Array.isArray(value)) {
-                  value.forEach((err) => {
-                    toast.error(err);
-                  });
-                }
-              }
-            }
+        //     // Handle first type of response
+        //     if (errorData.data && typeof errorData.data === 'object' && !Array.isArray(errorData.data)) {
+        //       for (const [key, value] of Object.entries(errorData.data)) {
+        //         if (Array.isArray(value)) {
+        //           value.forEach((err) => {
+        //             toast.error(err);
+        //           });
+        //         }
+        //       }
+        //     }
 
-            // Handle second type of response
-            if (Array.isArray(errorData.data)) {
-              errorData.data.forEach((errObj: { [s: string]: any; } | ArrayLike<unknown>) => {
-                for (const [key, value] of Object.entries(errObj)) {
-                  toast.error(value);
-                }
-              });
-            }
-          } else {
-            toast.error('An error occurred while saving the data.');
-          }
-        } catch (parseError: any) {
-          console.error('Error parsing error response:', parseError);
-          toast.error('An error occurred while saving the data.');
-        }
+        //     // Handle second type of response
+        //     if (Array.isArray(errorData.data)) {
+        //       errorData.data.forEach((errObj: { [s: string]: any; } | ArrayLike<unknown>) => {
+        //         for (const [key, value] of Object.entries(errObj)) {
+        //           toast.error(value);
+        //         }
+        //       });
+        //     }
+        //   } else {
+        //     toast.error('An error occurred while saving the data.');
+        //   }
+        // } catch (parseError: any) {
+        //   console.error('Error parsing error response:', parseError);
+        //   toast.error('An error occurred while saving the data.');
+        // }
       }
     }
   };

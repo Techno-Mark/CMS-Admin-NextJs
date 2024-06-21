@@ -4,4 +4,5 @@ export type TemplateType = {
     templateName: string;
     templateDescription:string;
     active: boolean;
+    templateSlug:string;
 }

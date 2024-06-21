@@ -20,11 +20,17 @@ import { section } from '@/services/endpoint/section';
 import type { SVGProps } from 'react';
 
 export function TablerBaselineDensityMedium(props: SVGProps<SVGSVGElement>) {
-	return (<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 20h16M4 12h16M4 4h16"></path></svg>);
+  return (<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 20h16M4 12h16M4 4h16"></path></svg>);
 }
 type SectionType = {
-  id: number;
+  sectionId: number;
   sectionName: string;
+  isCommon?: boolean;
+};
+
+const sectionActions = {
+  ADD: -1,
+  EDIT: 1,
 };
 
 type Props = {
@@ -39,6 +45,7 @@ const initialData: TemplateType = {
   templateName: '',
   templateDescription: '',
   active: false,
+  templateSlug: '',
 };
 
 const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditingRow }) => {
@@ -47,6 +54,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
     templateName: '',
     templateDescription: '',
     active: '',
+    templateSlug: '',
   });
   const [activeData, setActiveData] = useState<SectionType[]>([]);
   const [selectedSections, setSelectedSections] = useState<SectionType[]>([]);
@@ -71,7 +79,6 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
 
   useEffect(() => {
     if (editingRow) {
-      console.log(editingRow);
       setFormData(editingRow);
     } else {
       setFormData(initialData);
@@ -80,10 +87,14 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
 
   const validateFormData = (data: TemplateType) => {
     let isValid = true;
-    let errors = { templateName: '', templateDescription: '', active: '' };
+    let errors = { templateName: '', templateDescription: '', active: '', templateSlug: '', };
 
     if (data.templateName.trim().length < 5) {
       errors.templateName = 'Template Name must be at least 5 characters long';
+      isValid = false;
+    }
+    if (data.templateSlug.trim().length === 0) {
+      errors.templateSlug = 'This field is required';
       isValid = false;
     }
     if (data.templateDescription.trim().length === 0) {
@@ -106,54 +117,37 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
           templateName: formData.templateName,
           templateDescription: formData.templateDescription,
           active: formData.active,
-          sections: selectedSections,
+          templateSlug: formData.templateSlug,
         };
 
         const response = await post(endpoint, payload);
         console.log(response);
 
-        toast.success(response.message);
-        handleClose();
-        setFormData(response);
+        if (!editingRow) {
+          const sectionsPayload = {
+            templateId: response.data.templateId,
+            sectionIds: selectedSections.map(section => ({
+              sectionId: section.sectionId,
+              isCommon: section.isCommon ? 'true' : undefined,
+            })),
+          };
 
-        const payloadJson = JSON.stringify(payload, null, 2);
-        console.log("Payload JSON:", payloadJson);
+          const sectionsResponse = await post(template.save, sectionsPayload);
+          console.log(sectionsResponse);
+
+
+          toast.success(sectionsResponse.message);
+          handleClose();
+          setFormData(response);
+        }
+
 
       } catch (error: any) {
-        console.error('Error saving organization:', error);
-        try {
-          const errorData = JSON.parse(error.message);
-          if (
-            (errorData.status === 'error' || errorData.status === 'failure') &&
-            (errorData.message === 'validation' || errorData.message === 'validation error')
-          ) {
-            if (errorData.data && typeof errorData.data === 'object' && !Array.isArray(errorData.data)) {
-              for (const [key, value] of Object.entries(errorData.data)) {
-                if (Array.isArray(value)) {
-                  value.forEach((err) => {
-                    toast.error(err);
-                  });
-                }
-              }
-            }
-
-            if (Array.isArray(errorData.data)) {
-              errorData.data.forEach((errObj: { [s: string]: any } | ArrayLike<unknown>) => {
-                for (const [key, value] of Object.entries(errObj)) {
-                  toast.error(value);
-                }
-              });
-            }
-          } else {
-            toast.error('An error occurred while saving the data.');
-          }
-        } catch (parseError: any) {
-          console.error('Error parsing error response:', parseError);
-          toast.error('An error occurred while saving the data.');
-        }
+        console.error('Error fetching data:', error.message);
       }
     }
   };
+
 
   const handleAddSection = (event: any, newValue: SectionType[]) => {
     setSelectedSections(newValue);
@@ -173,6 +167,14 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+  };
+
+  const handleSectionIsCommonChange = (sectionId: number) => {
+    setSelectedSections(prevSections =>
+      prevSections.map(section =>
+        section.sectionId === sectionId ? { ...section, isCommon: !section.isCommon } : section
+      )
+    );
   };
 
   return (
@@ -197,11 +199,32 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                 id="validation-error-helper-text"
                 onChange={(e) => {
                   setFormErrors((prevErrors) => ({ ...prevErrors, templateName: '' }));
-                  setFormData((prevData) => ({ ...prevData, templateName: e.target.value }));
+                  setFormData({
+                    ...formData,
+                    templateName: e.target.value,
+                    templateSlug: e.target.value
+                      .replace(/[^\w\s]|_/g, "")
+                      .replace(/\s+/g, "-")
+                      .toLowerCase(),
+                  });
                 }}
               />
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={6}>
+              <CustomTextField
+                disabled={open === sectionActions.EDIT}
+                error={!!formErrors.templateSlug}
+                helperText={formErrors.templateSlug}
+                label="templateSlug *"
+                fullWidth
+                value={formData.templateSlug}
+                onChange={(e) => {
+                  setFormErrors((prevErrors) => ({ ...prevErrors, templateSlug: '' }));
+                  setFormData((prevData) => ({ ...prevData, templateSlug: e.target.value }));
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
               <CustomTextField
                 error={!!formErrors.templateDescription}
                 helperText={formErrors.templateDescription}
@@ -243,7 +266,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
               <div>
                 {selectedSections.map((section, index) => (
                   <Box
-                    key={section.id}
+                    key={section.sectionId}
                     draggable
                     onDragStart={(event) => handleDragStart(event, index)}
                     onDrop={(event) => handleDrop(event, index)}
@@ -259,13 +282,18 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                       alignItems: 'center',
                     }}
                   >
-                   <Typography>
-                   <TablerBaselineDensityMedium />
-                    <FormControlLabel
-                      control={<Checkbox />}
-                      label={<Typography>{section.sectionName}</Typography>}
-                      sx={{ ml: 2 }}
-                    />
+                    <Typography>
+                      <TablerBaselineDensityMedium />
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={section.isCommon || false}
+                            onChange={() => handleSectionIsCommonChange(section.sectionId)}
+                          />
+                        }
+                        label={<Typography>{section.sectionName}</Typography>}
+                        sx={{ ml: 2 }}
+                      />
                     </Typography>
                   </Box>
                 ))}

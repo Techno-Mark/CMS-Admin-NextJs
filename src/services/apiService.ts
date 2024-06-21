@@ -1,11 +1,44 @@
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
+import { toast } from "react-toastify";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(error);
+    if (response.status === 401) {
+      // Unauthorized, log out and redirect to login page
+      await signOut({ redirect: true, callbackUrl: '/login' });
+      throw new Error("Unauthorized. Token missing or expired");
+    } else if (response.status === 422) {
+      // Unprocessable Entity, handle validation errors
+      const errorResponse = await response.json();
+      const { message, data } = errorResponse;
+      if (message === "validation error" && data) {
+        const errors = Object.keys(data).map((key) => `${key}: ${data[key]}`);
+        toast.error(errors.join("; "));
+        throw new Error("Validation error");
+      } else {
+        toast.error(message || "Validation error");
+        throw new Error(message || "Validation error");
+      }
+    } else if (response.status === 400) {
+      // Bad Request, handle validation errors
+      const errorResponse = await response.json();
+      const { message, data } = errorResponse;
+      if (message === "validation error" && Array.isArray(data) && data.length > 0) {
+        const errors = data.map((error) => Object.values(error).join(": "));
+        toast.error(errors.join("; "));
+        throw new Error("Validation error");
+      } else {
+        toast.error(message || "Validation error");
+        throw new Error(message || "Validation error");
+      }
+    } else {
+      // Other errors
+      const error = await response.text();
+      toast.error(error);
+      throw new Error(error);
+    }
   }
   return await response.json();
 };
@@ -16,7 +49,6 @@ export const fetchData = async (
 ) => {
   try {
     const session = await getSession();
-    // console.log(session?.user.token);
 
     if (!session || !session?.user) {
       throw new Error("No session or access token found");
@@ -31,8 +63,9 @@ export const fetchData = async (
       },
     });
     return await handleResponse(response);
-  } catch (error) {
+  } catch (error:any) {
     console.error("Error fetching data:", error);
+    toast.error(error.message);
     throw error;
   }
 };
