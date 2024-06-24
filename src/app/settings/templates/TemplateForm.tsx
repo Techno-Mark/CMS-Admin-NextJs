@@ -17,13 +17,7 @@ import { TemplateType } from '@/types/apps/templateType';
 import { template } from '@/services/endpoint/template';
 import CustomAutocomplete from '@core/components/mui/Autocomplete';
 import { section } from '@/services/endpoint/section';
-
-import type { SVGProps } from 'react';
 import BreadCrumbList from '../content-blocks/BreadCrumbList';
-
-export function TablerBaselineDensityMedium(props: SVGProps<SVGSVGElement>) {
-  return (<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 20h16M4 12h16M4 4h16"></path></svg>);
-}
 
 type SectionType = {
   sectionId: number;
@@ -49,7 +43,8 @@ const initialData: TemplateType = {
   templateDescription: '',
   active: false,
   templateSlug: '',
-  sectionIds: []
+  sectionIds: [],
+  templateSection: []
 };
 
 const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditingRow }) => {
@@ -64,6 +59,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
   const [selectedSections, setSelectedSections] = useState<SectionType[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isSectionsValid, setIsSectionsValid] = useState(true); // State for validation
 
   useEffect(() => {
     const getActiveSection = async () => {
@@ -74,7 +70,6 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
         setLoading(false);
       } catch (error: any) {
         setError(error.message);
-      } finally {
         setLoading(false);
       }
     };
@@ -84,6 +79,12 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
   useEffect(() => {
     if (editingRow) {
       setFormData(editingRow);
+      const sections = editingRow.templateSection.map((section: any) => ({
+        sectionId: section.sectionId,
+        sectionName: section.sectionName,
+        isCommon: section.isCommon,
+      }));
+      setSelectedSections(sections);
     } else {
       setFormData(initialData);
     }
@@ -113,11 +114,17 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateFormData(formData)) {
+      if (selectedSections.length === 0) {
+        setIsSectionsValid(false); // Set validation to false if no sections are selected
+        return; // Exit function if validation fails
+      }
+      
+      setIsSectionsValid(true); // Reset validation status
       try {
         const endpoint = editingRow ? template.update : template.create;
 
         const payload = {
-          id: editingRow ? formData.templateId : undefined,
+          templateId: editingRow ? formData.templateId : undefined,
           templateName: formData.templateName,
           templateDescription: formData.templateDescription,
           active: formData.active,
@@ -129,8 +136,6 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
         };
 
         const response = await post(endpoint, payload);
-        console.log(response);
-
         toast.success(response.message);
         handleClose();
         setFormData(response.data);
@@ -145,6 +150,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
   const handleAddSection = (event: any, newValue: SectionType[]) => {
     setSelectedSections(newValue);
   };
+
 
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>, index: number) => {
     event.dataTransfer.setData('text/plain', index.toString());
@@ -169,15 +175,14 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
       )
     );
   };
-
+  
+  
+  
   return (
     <>
       <BreadCrumbList />
       <Card>
-
-
         <div>
-         
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
             <Box display="flex" alignItems="center">
               <Grid container spacing={3}>
@@ -190,33 +195,38 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                     helperText={formErrors.templateName}
                     id="validation-error-helper-text"
                     onChange={(e) => {
-                      setFormErrors((prevErrors) => ({ ...prevErrors, templateName: '' }));
+                      setFormErrors(prevErrors => ({ ...prevErrors, templateName: '' }));
                       setFormData({
                         ...formData,
                         templateName: e.target.value,
-                        templateSlug: e.target.value
-                          .replace(/[^\w\s]|_/g, "")
-                          .replace(/\s+/g, "-")
-                          .toLowerCase(),
+                        templateSlug: e.target.value.replace(/[^\w\s]|_/g, '').replace(/\s+/g, '-').toLowerCase(),
                       });
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={5}>
                   <CustomTextField
                     disabled={open === sectionActions.EDIT}
                     error={!!formErrors.templateSlug}
                     helperText={formErrors.templateSlug}
-                    label="templateSlug *"
+                    label="Template Slug *"
                     fullWidth
                     value={formData.templateSlug}
                     onChange={(e) => {
-                      setFormErrors((prevErrors) => ({ ...prevErrors, templateSlug: '' }));
-                      setFormData((prevData) => ({ ...prevData, templateSlug: e.target.value }));
+                      setFormErrors(prevErrors => ({ ...prevErrors, templateSlug: '' }));
+                      setFormData(prevData => ({ ...prevData, templateSlug: e.target.value }));
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={1}>
+                  <Typography variant="body1">Status *</Typography>
+                  <Switch
+                    size="medium"
+                    checked={formData.active}
+                    onChange={e => setFormData({ ...formData, active: e.target.checked })}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
                   <CustomTextField
                     error={!!formErrors.templateDescription}
                     helperText={formErrors.templateDescription}
@@ -225,72 +235,69 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                     label="Template Description *"
                     id="validation-error-helper-text"
                     onChange={(e) => {
-                      setFormErrors((prevErrors) => ({ ...prevErrors, templateDescription: '' }));
-                      setFormData((prevData) => ({ ...prevData, templateDescription: e.target.value }));
+                      setFormErrors(prevErrors => ({ ...prevErrors, templateDescription: '' }));
+                      setFormData(prevData => ({ ...prevData, templateDescription: e.target.value }));
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} sm={2}>
-                  <Typography variant="body2" sx={{ mr: 0 }}>
-                    Status
-                  </Typography>
-                  <Switch
-                    size="medium"
-                    checked={formData.active}
-                    onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                  />
-                </Grid>
-                <Grid item xs={12}>
+
+                <Grid item xs={6}>
                   <CustomAutocomplete
                     multiple
-                    disableCloseOnSelect
+                    // disableCloseOnSelect
                     fullWidth
                     options={activeData}
                     id="autocomplete-custom"
                     getOptionLabel={(option: SectionType) => option.sectionName || ''}
                     value={selectedSections}
                     onChange={handleAddSection}
-                    renderInput={(params) => <CustomTextField placeholder="Select Sections" {...params} label="Sections" />}
+                    renderInput={params => <CustomTextField placeholder="Select Sections" {...params} label="Sections *" />}
                   />
+                  {!isSectionsValid && (
+                    <Typography color="error" variant="body2">
+                      Please select at least one section.
+                    </Typography>
+                  )}
                 </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="h6">Selected Sections</Typography>
-                  <div>
-                    {selectedSections.map((section, index) => (
-                      <Box
-                        key={section.sectionId}
-                        draggable
-                        onDragStart={(event) => handleDragStart(event, index)}
-                        onDrop={(event) => handleDrop(event, index)}
-                        onDragOver={handleDragOver}
-                        sx={{
-                          p: 2,
-                          mb: 1,
-                          border: '1px solid #e0e0e0',
-                          borderRadius: 1,
-                          cursor: 'move',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <Typography>
-                          <TablerBaselineDensityMedium />
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={section.isCommon || false}
-                                onChange={() => handleSectionIsCommonChange(section.sectionId)}
-                              />
-                            }
-                            label={<Typography>{section.sectionName}</Typography>}
-                            sx={{ ml: 2 }}
-                          />
-                        </Typography>
-                      </Box>
-                    ))}
-                  </div>
-                </Grid>
+                {selectedSections.length > 0 && (
+                  <Grid item xs={6}>
+                    <Typography variant="body1">Selected Sections</Typography>
+                    <div>
+                      {selectedSections.map((section, index) => (
+                        <Box
+                          key={section.sectionId}
+                          draggable
+                          onDragStart={event => handleDragStart(event, index)}
+                          onDrop={event => handleDrop(event, index)}
+                          onDragOver={handleDragOver}
+                          sx={{
+                            p: 2,
+                            mb: 1,
+                            border: '1px solid #d1d0d4',
+                            borderRadius: 1,
+                            cursor: 'move',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <Typography>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={section.isCommon || false}
+                                  onChange={() => handleSectionIsCommonChange(section.sectionId)}
+                                />
+                              }
+                              label={<Typography>{section.sectionName}</Typography>}
+                              sx={{ ml: 2 }}
+                            />
+                          </Typography>
+                        </Box>
+                      ))}
+                    </div>
+                  </Grid>
+                )}
                 <Grid item xs={12}>
                   <Box display="flex" justifyContent="end" gap={2}>
                     <Button variant="outlined" color="error" onClick={handleClose}>

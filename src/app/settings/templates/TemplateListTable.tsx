@@ -174,12 +174,12 @@ const TemplateListTable = () => {
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
             </IconButton>
-            {/* <IconButton onClick={() => {
+            <IconButton onClick={() => {
               setIsDeleting(true);
-              setDeletingId(row.original.id);
+              setDeletingId(row.original.templateId);
             }}>
               <i className="tabler-trash text-[22px] text-textSecondary" />
-            </IconButton> */}
+            </IconButton>
           </div>
         ),
         enableSorting: false,

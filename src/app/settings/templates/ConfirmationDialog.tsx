@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import { toast } from "react-toastify";
 import { post } from "@/services/apiService";
 import { organization } from "@/services/endpoint/organization";
+import { template } from "@/services/endpoint/template";
 
 type ConfirmationDialogProps = {
   deletingId: number;
@@ -21,11 +22,21 @@ const ConfirmationDialog = ({
   setOpen,
   setDeletingId,
 }: ConfirmationDialogProps) => {
-  const deleteOrganizationBlock = async () => {
-    await post(organization.delete, { id: deletingId });
+  const deleteTemplate = async () => {
+    try {
+      const result = await post(template.delete, { templateId: deletingId });
 
-    toast.success("Organization deleted successfully!");
-
+      if (result.status === "success") {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setDeletingId(0);
+      setOpen(false);
+    }
   };
 
   return (
@@ -33,11 +44,11 @@ const ConfirmationDialog = ({
       <DialogContent className="flex items-center flex-col text-center sm:pbs-16 sm:pbe-6 sm:pli-16">
         <i className="tabler-alert-circle text-[88px] mbe-6 text-warning" />
         <Typography variant="h5">
-          Are you sure you want to delete the organization?
+          Are you sure you want to delete the template?
         </Typography>
       </DialogContent>
       <DialogActions className="justify-center pbs-0 sm:pbe-16 sm:pli-16">
-        <Button variant="contained" onClick={deleteOrganizationBlock}>
+        <Button variant="contained" onClick={deleteTemplate}>
           Yes
         </Button>
         <Button

@@ -165,6 +165,12 @@ const OrganizationsListTable = () => {
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
             </IconButton>
+            <IconButton onClick={() => {
+              setIsDeleting(true);
+              setDeletingId(row.original.id);
+            }}>
+              <i className="tabler-trash text-[22px] text-textSecondary" />
+            </IconButton>
           </div>
         ),
         enableSorting: false,

@@ -7,4 +7,5 @@ export type TemplateType = {
     active: boolean;
     templateSlug:string;
     sectionIds:[];
+    templateSection:[];
 }

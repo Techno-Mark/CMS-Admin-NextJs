@@ -3,7 +3,7 @@ import { ensurePrefix, withoutSuffix } from "./utils/string";
 import { NextFetchEvent, NextResponse } from "next/server";
 import { getSession } from "next-auth/react";
 
-const HOME_PAGE_URL = "/";
+const HOME_PAGE_URL = "/home";
 
 const localizedRedirect = (url: string, request: NextRequestWithAuth) => {
   let _url = url;

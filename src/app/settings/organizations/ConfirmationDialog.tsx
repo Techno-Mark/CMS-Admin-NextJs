@@ -22,9 +22,23 @@ const ConfirmationDialog = ({
   setDeletingId,
 }: ConfirmationDialogProps) => {
   const deleteOrganizationBlock = async () => {
-    await post(organization.delete, { id: deletingId });
+    // await post(organization.delete, { id: deletingId });
 
-    toast.success("Organization deleted successfully!");
+    // toast.success("Organization deleted successfully!");
+    try {
+      const result = await post(organization.delete, { id: deletingId });
+
+      if (result.status === "success") {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setDeletingId(0);
+      setOpen(false);
+    }
 
   };
 
