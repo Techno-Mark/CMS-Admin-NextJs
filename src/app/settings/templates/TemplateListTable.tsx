@@ -18,7 +18,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
 } from "@tanstack/react-table";
-import type { ColumnDef, FilterFn } from "@tanstack/react-table"; 
+import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import TablePaginationComponent from "@components/TablePaginationComponent";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
@@ -26,8 +26,9 @@ import ConfirmationDialog from "./ConfirmationDialog";
 import { post } from "@/services/apiService";
 import { organization } from "@/services/endpoint/organization";
 import CustomChip from "@/@core/components/mui/Chip";
-import type { TemplateType } from "@/types/apps/templatetype";
 import { template } from "@/services/endpoint/template";
+import { TemplateType } from "@/types/apps/templateType";
+import BreadCrumbList from "../content-blocks/BreadCrumbList";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -107,18 +108,19 @@ const TemplateListTable = () => {
           page: page + 1,
           limit: pageSize,
           search: globalFilter,
-          active: activeFilter,
+          // active: activeFilter,
         });
         setData(result.data.templates);
         setTotalRows(result.data.totalTemplates);
-      } catch (error) {
+      } catch (error: any) {
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
     getData();
-  }, [page, pageSize, globalFilter, activeFilter, deletingId]);
+    // activeFilter
+  }, [page, pageSize, globalFilter, deletingId]);
 
   const columns = useMemo<ColumnDef<TemplateTypeWithAction, any>[]>(
     () => [
@@ -130,7 +132,7 @@ const TemplateListTable = () => {
           </Typography>
         ), enableSorting: false,
       }),
-      columnHelper.accessor("name", {
+      columnHelper.accessor("templateName", {
         header: "Name",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
@@ -146,7 +148,7 @@ const TemplateListTable = () => {
           </Typography>
         ),
       }),
-     
+
       columnHelper.accessor("active", {
         header: "Status",
         cell: ({ row }) => (
@@ -161,23 +163,23 @@ const TemplateListTable = () => {
         enableSorting: false,
       }),
 
-      columnHelper.accessor("id", {
+      columnHelper.accessor("templateSlug", {
         header: "Action",
         cell: ({ row }) => (
           <div className="flex items-center">
             <IconButton
               onClick={() =>
-                router.push(`/settings/templates/edit/${row.original.id}`)
+                router.push(`/settings/templates/edit/${row.original.templateSlug}`)
               }
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
             </IconButton>
-            {/* <IconButton onClick={() => {
+            <IconButton onClick={() => {
               setIsDeleting(true);
-              setDeletingId(row.original.id);
+              setDeletingId(row.original.templateId);
             }}>
               <i className="tabler-trash text-[22px] text-textSecondary" />
-            </IconButton> */}
+            </IconButton>
           </div>
         ),
         enableSorting: false,
@@ -198,6 +200,8 @@ const TemplateListTable = () => {
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: true,  // Manual pagination
+    pageCount: Math.ceil(totalRows / pageSize), // Provide total pages
   });
 
   const handlePageChange = (event: unknown, newPage: number) => {
@@ -214,29 +218,30 @@ const TemplateListTable = () => {
 
   return (
     <>
-      <Card>
-        <div className="flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4">
-          <Typography variant="h5">Templates</Typography>
 
-          <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-        
-            <DebouncedInput
-              value={globalFilter ?? ""}
-              onChange={(value) => setGlobalFilter(String(value))}
-              placeholder="Search"
-              className="is-full sm:is-auto"
-            />
+      <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
+        <BreadCrumbList />
+        <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
 
-            <Button
-              variant="contained"
-              startIcon={<i className="tabler-plus" />}
-              onClick={() => router.push("/settings/templates/add")}
-              className="is-full sm:is-auto"
-            >
-              Add Template
-            </Button>
-          </div>
+
+          <DebouncedInput
+            value={globalFilter ?? ""}
+            onChange={(value) => setGlobalFilter(String(value))}
+            placeholder="Search"
+            className="is-full sm:is-auto"
+          />
+
+          <Button
+            variant="contained"
+            startIcon={<i className="tabler-plus" />}
+            onClick={() => router.push("/settings/templates/add")}
+            className="is-full sm:is-auto"
+          >
+            Add Template
+          </Button>
         </div>
+      </div>
+      <Card>
         <div className="overflow-x-auto h-[325px]">
           <table className={tableStyles.table}>
             <thead>
@@ -321,6 +326,7 @@ const TemplateListTable = () => {
         setDeletingId={setDeletingId}
         setOpen={(arg1: boolean) => setIsDeleting(arg1)}
       />
+
     </>
   );
 };

@@ -18,15 +18,20 @@ type Props = ChildrenType & {
   direction: Direction
 }
 
-const Providers = (props: Props) => {
+const Providers = async (props: Props) => {
+
+  
+  
   // Props
-  const { children, direction, isLoading } = props
+  const { children, direction } = props
 
   // Vars
   const mode = getMode()
   const settingsCookie = getSettingsFromCookie()
   const demoName = getDemoName()
   const systemMode = getSystemMode()
+
+  
 
   return (
     <NextAuthProvider basePath={process.env.NEXTAUTH_BASEPATH}>
@@ -37,7 +42,7 @@ const Providers = (props: Props) => {
           <AppReactToastify position={themeConfig.toastPosition} hideProgressBar />
           <Backdrop
             sx={{ color: '#fff', zIndex: 9999 }}
-            open={isLoading}
+            open={false}
           >
             <CircularProgress className="screen-center" />
           </Backdrop>

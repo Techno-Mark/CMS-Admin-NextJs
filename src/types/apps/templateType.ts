@@ -1,7 +1,11 @@
+
 export type TemplateType = {
     srNo?: number;
-    id: number;
+    templateId: number;
     templateName: string;
     templateDescription:string;
     active: boolean;
+    templateSlug:string;
+    sectionIds:[];
+    templateSection:[];
 }
