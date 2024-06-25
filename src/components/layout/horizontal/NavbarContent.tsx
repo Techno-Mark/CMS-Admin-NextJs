@@ -29,7 +29,7 @@ const NavbarContent = () => {
         {!isBreakpointReached && <Logo />}
       </div>
       <div className='flex items-center'>
-        <ModeDropdown />
+        {/* <ModeDropdown /> */}
         <UserDropdown />
       </div>
     </div>

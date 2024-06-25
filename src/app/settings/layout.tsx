@@ -20,14 +20,24 @@ import ScrollToTop from '@core/components/scroll-to-top'
 
 // Util Imports
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
+import { authOptions } from '@/libs/auth'
+import { getServerSession } from 'next-auth'
+import { redirect } from 'next/navigation'
 
 const Layout = async ({ children }: ChildrenType) => {
+  const session = await getServerSession(authOptions);
+
+  if(!session){
+    redirect('/login');
+  } 
   // Vars
   const direction = 'ltr'
   const mode = getMode()
   const systemMode = getSystemMode()
 
   return (
+
+    
     <Providers direction={direction}>
       <LayoutWrapper
         systemMode={systemMode}
