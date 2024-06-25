@@ -100,8 +100,7 @@ const schema = object({
 })
 
 const Login = ({ mode }: { mode: SystemMode }) => {
-  
-  
+
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
   const [errorState, setErrorState] = useState<ErrorType | null>(null)
