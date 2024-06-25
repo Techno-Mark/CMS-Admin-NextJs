@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 // Component Imports
 import CustomTextField from "@core/components/mui/TextField";
-import { Card, Switch } from "@mui/material";
+import { Box, Card, Grid, Switch } from "@mui/material";
 import { ADD_SECTION, EDIT_SECTION, UsersType } from "@/types/apps/userTypes";
 import BreadCrumbList from "./BreadCrumbList";
 import {
@@ -15,6 +15,7 @@ import {
 import { get, post } from "@/services/apiService";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import LoadingBackdrop from "@/components/LoadingBackdrop";
 
 type Props = {
   open: ADD_SECTION | EDIT_SECTION;
@@ -60,6 +61,8 @@ const ContentBlockForm = ({ open }: Props) => {
     slug: string;
     jsonContent: string;
   }>(initialErrorData);
+  
+  const [loading, setLoading] = useState<boolean>(true);
 
   const validateFormData = (arg1: FormDataType) => {
     if (arg1.name.trim().length === 0) {
@@ -116,6 +119,9 @@ const ContentBlockForm = ({ open }: Props) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    setLoading(true);
+
     if (
       validateFormData({
         id: formData.id,
@@ -129,23 +135,25 @@ const ContentBlockForm = ({ open }: Props) => {
         open === sectionActions.EDIT ? updateSection : createSection,
         open === sectionActions.EDIT
           ? {
-              sectionId: formData.id,
-              sectionName: formData.name,
-              sectionTemplate: JSON.parse(formData.jsonContent),
-              active: formData.status,
-            }
+            sectionId: formData.id,
+            sectionName: formData.name,
+            sectionTemplate: JSON.parse(formData.jsonContent),
+            active: formData.status,
+          }
           : {
-              sectionName: formData.name,
-              sectionTemplate: JSON.parse(formData.jsonContent),
-              active: formData.status,
-            }
+            sectionName: formData.name,
+            sectionTemplate: JSON.parse(formData.jsonContent),
+            active: formData.status,
+          }
       );
 
       if (result.status === "success") {
         toast.success(result.message);
         handleReset();
+        setLoading(false);
       } else {
         toast.error(result.message);
+        setLoading(false);
       }
     }
   };
@@ -156,9 +164,11 @@ const ContentBlockForm = ({ open }: Props) => {
     router.back();
   };
 
-  const getSectionDataById = async (slug: string | number) => {
+  const getSectionDataById = async (id: string | number) => {
+    setLoading(true);
     try {
-      const result = await get(getSectionById(slug));
+
+      const result = await get(getSectionById(id));
       const { data } = result;
       setFormData({
         ...formData,
@@ -168,8 +178,10 @@ const ContentBlockForm = ({ open }: Props) => {
         jsonContent: JSON.stringify(data.sectionTemplate),
         status: data.active,
       });
+      setLoading(false);
     } catch (error) {
       console.error(error);
+      setLoading(false);
     }
   };
 
@@ -181,89 +193,108 @@ const ContentBlockForm = ({ open }: Props) => {
 
   return (
     <>
+      {/* <LoadingBackdrop isLoading={loading} /> */}
       <BreadCrumbList />
       <Card>
         <div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
-            <CustomTextField
-              error={!!formErrors.name}
-              helperText={formErrors.name}
-              label="Full Name *"
-              fullWidth
-              placeholder="Enter Name"
-              value={formData.name}
-              onChange={(e) => {
-                setFormErrors({ ...formErrors, name: "" });
-                setFormData({
-                  ...formData,
-                  name: e.target.value,
-                  slug: e.target.value
-                    .replace(/[^\w\s]|_/g, "")
-                    .replace(/\s+/g, "-")
-                    .toLowerCase(),
-                });
-              }}
-            />
-            <CustomTextField
-              disabled={open === sectionActions.EDIT}
-              error={!!formErrors.slug}
-              helperText={formErrors.slug}
-              label="Slug *"
-              fullWidth
-              placeholder="Enter Slug"
-              value={formData.slug}
-              onChange={(e) => {
-                setFormErrors({ ...formErrors, slug: "" });
-                if (/^[A-Za-z0-9-]*$/.test(e.target.value)) {
-                  setFormData({
-                    ...formData,
-                    slug: e.target.value.toLowerCase(),
-                  });
-                }
-              }}
-            />
-            <CustomTextField
-              fullWidth
-              rows={9}
-              multiline
-              error={!!formErrors.jsonContent}
-              helperText={formErrors.jsonContent}
-              value={formData.jsonContent}
-              onChange={(e) => {
-                setFormErrors({ ...formErrors, jsonContent: "" });
-                setFormData({ ...formData, jsonContent: e.target.value });
-              }}
-              label="JSON Content"
-              placeholder="Enter here..."
-              sx={{
-                "& .MuiInputBase-root.MuiFilledInput-root": {
-                  alignItems: "baseline",
-                },
-              }}
-            />
-            <div>
-              <label className="text-[0.8125rem] leading-[1.153]">Status</label>
-              <Switch
-                size="medium"
-                checked={formData.status}
-                onChange={(e) =>
-                  setFormData({ ...formData, status: e.target.checked })
-                }
-              />
-            </div>
-            <div className="flex items-center justify-end gap-4">
-              <Button
-                variant="tonal"
-                color="error"
-                type="reset"
-                onClick={() => handleReset()}
-              >
-                Cancel
-              </Button>
-              <Button variant="contained" type="submit">
-                {open === sectionActions.ADD ? "Add" : "Edit"} Content Block
-              </Button>
-            </div>
+            <Box display="flex" alignItems="center">
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+
+                  <CustomTextField
+                    error={!!formErrors.name}
+                    helperText={formErrors.name}
+                    label="Full Name *"
+                    fullWidth
+                    placeholder="Enter Name"
+                    value={formData.name}
+                    onChange={(e) => {
+                      setFormErrors({ ...formErrors, name: "" });
+                      setFormData({
+                        ...formData,
+                        name: e.target.value,
+                        slug: e.target.value
+                          .replace(/[^\w\s]|_/g, "")
+                          .replace(/\s+/g, "-")
+                          .toLowerCase(),
+                      });
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={5}>
+                  <CustomTextField
+                    disabled={open === sectionActions.EDIT}
+                    error={!!formErrors.slug}
+                    helperText={formErrors.slug}
+                    label="Slug *"
+                    fullWidth
+                    placeholder="Enter Slug"
+                    value={formData.slug}
+                    onChange={(e) => {
+                      setFormErrors({ ...formErrors, slug: "" });
+                      if (/^[A-Za-z0-9-]*$/.test(e.target.value)) {
+                        setFormData({
+                          ...formData,
+                          slug: e.target.value.toLowerCase(),
+                        });
+                      }
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={1}>
+                  <label className="text-[0.8125rem] leading-[1.153]">Status</label>
+                  <Switch
+                    size="medium"
+                    checked={formData.status}
+                    onChange={(e) =>
+                      setFormData({ ...formData, status: e.target.checked })
+                    }
+                  />
+                </Grid>
+
+
+                <Grid item xs={12} sm={12}>
+                  <CustomTextField
+                    fullWidth
+                    rows={9}
+                    multiline
+                    error={!!formErrors.jsonContent}
+                    helperText={formErrors.jsonContent}
+                    value={formData.jsonContent}
+                    onChange={(e) => {
+                      setFormErrors({ ...formErrors, jsonContent: "" });
+                      setFormData({ ...formData, jsonContent: e.target.value });
+                    }}
+                    label="JSON Content"
+                    placeholder="Enter here..."
+                    sx={{
+                      "& .MuiInputBase-root.MuiFilledInput-root": {
+                        alignItems: "baseline",
+                      },
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Box p={2} display="flex" gap={2} justifyContent="end" bgcolor="background.paper" position="sticky" bottom={0} zIndex={10}>
+
+                    <Button
+                      variant="tonal"
+                      color="error"
+                      type="reset"
+                      onClick={() => handleReset()}
+                    >
+                      Cancel
+                    </Button>
+                    <Button variant="contained" type="submit">
+                      {open === sectionActions.ADD ? "Add" : "Edit"} Content Block
+                    </Button>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Box>
           </form>
         </div>
       </Card>

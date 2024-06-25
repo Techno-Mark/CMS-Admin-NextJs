@@ -35,6 +35,7 @@ import ConfirmationDialog from "./ConfirmationDialog";
 import { useRouter } from "next/navigation";
 import BreadCrumbList from "./BreadCrumbList";
 import { redirectToAddPage, redirectToEditPage } from "@/app/api/content-block";
+import { MenuItem } from "@mui/material";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -108,11 +109,12 @@ const UserListTable = ({
 }: {
   totalCount: number;
   tableData?: UsersType[];
-  getList: (arg1: { page: number; limit: number; search: string }) => void;
+  getList: (arg1: { page: number; limit: number; search: string, active: any }) => void;
   initialBody: {
     page: number;
     limit: number;
     search: string;
+    active: any
   };
 }) => {
   const router = useRouter();
@@ -120,6 +122,7 @@ const UserListTable = ({
   const [globalFilter, setGlobalFilter] = useState("");
   const [deletingId, setDeletingId] = useState<number>(0);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
 
   const columns = useMemo<ColumnDef<UsersTypeWithAction, any>[]>(
     () => [
@@ -157,13 +160,13 @@ const UserListTable = ({
           ),
       }),
       columnHelper.accessor("id", {
-        header: "Action",
+        header: "Actions",
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
               <IconButton
                 onClick={() => {
-                  router.push(redirectToEditPage(row.original.slug));
+                  router.push(redirectToEditPage(row.original.id));
                 }}
               >
                 <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -213,11 +216,13 @@ const UserListTable = ({
       page: table.getState().pagination.pageIndex,
       limit: table.getState().pagination.pageSize,
       search: globalFilter,
+      active: activeFilter,
     });
   }, [
     table.getState().pagination.pageSize,
     table.getState().pagination.pageIndex,
     globalFilter,
+    activeFilter
   ]);
 
   useEffect(() => {
@@ -226,34 +231,71 @@ const UserListTable = ({
         page: table.getState().pagination.pageIndex,
         limit: table.getState().pagination.pageSize,
         search: globalFilter,
+        active: activeFilter,
       });
     }
   }, [deletingId]);
 
   return (
     <>
+
       <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
         <BreadCrumbList />
+        {/* <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4"> */}
+        {/* <BreadCrumbList /> */}
         <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-          <IconButton>
-            <i className="tabler-filter text-[22px] text-textSecondary" />
-          </IconButton>
           <DebouncedInput
             value={globalFilter ?? ""}
             onChange={(value) => setGlobalFilter(String(value))}
             placeholder="Search"
             className="is-full sm:is-auto"
           />
+          <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
+            <Typography>Status:</Typography>
+            <CustomTextField
+              select
+              fullWidth
+              defaultValue="all"
+              id="custom-select"
+              value={activeFilter === null ? "all" : activeFilter === true ? "active" : "inactive"}
+              onChange={(e) => {
+                const value = e.target.value;
+                setActiveFilter(value === "active" ? true : value === "inactive" ? false : null);
+              }}
+            >
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="inactive">Inactive</MenuItem>
+            </CustomTextField>
+          </div>
           <Button
-            variant="contained"
-            startIcon={<i className="tabler-plus" />}
-            onClick={() => router.push(redirectToAddPage)}
-            className="is-full sm:is-auto"
-          >
-            Add Content Block
-          </Button>
+          variant="contained"
+          startIcon={<i className="tabler-plus" />}
+          onClick={() => router.push(redirectToAddPage)}
+          className="is-full sm:is-auto"
+        >
+          Add Content Block
+        </Button>
         </div>
       </div>
+
+      {/* <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
+        <DebouncedInput
+          value={globalFilter ?? ""}
+          onChange={(value) => setGlobalFilter(String(value))}
+          placeholder="Search"
+          className="is-full sm:is-auto"
+        />
+        <Button
+          variant="contained"
+          startIcon={<i className="tabler-plus" />}
+          onClick={() => router.push(redirectToAddPage)}
+          className="is-full sm:is-auto"
+        >
+          Add Content Block
+        </Button>
+        
+      </div> */}
       <Card>
         <div className="overflow-x-auto h-[340px]">
           <table className={tableStyles.table}>

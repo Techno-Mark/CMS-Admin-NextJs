@@ -13,25 +13,23 @@ import Backdrop from '@mui/material/Backdrop';
 import { getDemoName, getMode, getSettingsFromCookie, getSystemMode } from '@core/utils/serverHelpers'
 import themeConfig from '@/configs/themeConfig'
 import AppReactToastify from '@/libs/styles/AppReactToastify'
+import LoadingBackdrop from './LoadingBackdrop'
 
 type Props = ChildrenType & {
-  direction: Direction
+  direction: Direction,
+  isLoading :boolean
 }
 
 const Providers = async (props: Props) => {
 
-  
-  
   // Props
-  const { children, direction } = props
+  const { children, direction ,isLoading} = props
 
   // Vars
   const mode = getMode()
   const settingsCookie = getSettingsFromCookie()
   const demoName = getDemoName()
   const systemMode = getSystemMode()
-
-  
 
   return (
     <NextAuthProvider basePath={process.env.NEXTAUTH_BASEPATH}>
@@ -40,12 +38,7 @@ const Providers = async (props: Props) => {
         <ThemeProvider direction={direction} systemMode={systemMode}>
           {children}
           <AppReactToastify position={themeConfig.toastPosition} hideProgressBar />
-          <Backdrop
-            sx={{ color: '#fff', zIndex: 9999 }}
-            open={false}
-          >
-            <CircularProgress className="screen-center" />
-          </Backdrop>
+          <LoadingBackdrop isLoading={isLoading} />
         </ThemeProvider>
       </SettingsProvider>
     </VerticalNavProvider>

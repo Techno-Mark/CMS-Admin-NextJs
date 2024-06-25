@@ -9,6 +9,7 @@ import { organization } from '@/services/endpoint/organization';
 import CustomTextField from '@/@core/components/mui/TextField';
 import { fetchData } from '../../../services/apiService';
 import BreadCrumbList from '../content-blocks/BreadCrumbList';
+import LoadingBackdrop from '@/components/LoadingBackdrop';
 
 type Props = {
   open: -1 | 0 | 1;
@@ -25,6 +26,8 @@ const initialData = {
 };
 
 const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Props) => {
+  const [loading, setLoading] = useState<boolean>(true);
+
   const [formData, setFormData] = useState<OrganizationsType>(initialData);
   const [formErrors, setFormErrors] = useState({
     name: '',
@@ -33,12 +36,13 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
   });
 
   useEffect(() => {
+    setLoading(true);
     if (editingRow) {
-      console.log(editingRow);
-
       setFormData(editingRow);
+      setLoading(false);
     } else {
       setFormData(initialData);
+      setLoading(false);
     }
   }, [editingRow]);
 
@@ -62,6 +66,7 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
     e.preventDefault();
     if (validateFormData(formData)) {
       try {
+        setLoading(true);
         const endpoint = editingRow ? organization.update : organization.create;
 
         const payload = {
@@ -78,9 +83,10 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
         toast.success(response.message);
         handleClose();
         setFormData(response);
+        setLoading(false);
       } catch (error: any) {
         console.error('Error fetching data:', error.message);
-
+        setLoading(false);
         // console.error('Error saving organization:', error);
         // try {
         //   const errorData = JSON.parse(error.message);
@@ -119,10 +125,11 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
 
   return (
     <>
+      <LoadingBackdrop isLoading={loading} />
       <BreadCrumbList />
       <Card>
 
-        
+
         <div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
             <Box display="flex" alignItems="center">

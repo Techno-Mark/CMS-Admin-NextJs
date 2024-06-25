@@ -18,6 +18,7 @@ import { template } from '@/services/endpoint/template';
 import CustomAutocomplete from '@core/components/mui/Autocomplete';
 import { section } from '@/services/endpoint/section';
 import BreadCrumbList from '../content-blocks/BreadCrumbList';
+import LoadingBackdrop from '@/components/LoadingBackdrop';
 
 type SectionType = {
   sectionId: number;
@@ -77,6 +78,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
   }, []);
 
   useEffect(() => {
+    setLoading(true);
     if (editingRow) {
       setFormData(editingRow);
       const sections = editingRow.templateSection.map((section: any) => ({
@@ -85,8 +87,10 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
         isCommon: section.isCommon,
       }));
       setSelectedSections(sections);
+      setLoading(false);
     } else {
       setFormData(initialData);
+      setLoading(false);
     }
   }, [editingRow]);
 
@@ -113,13 +117,15 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     if (validateFormData(formData)) {
       if (selectedSections.length === 0) {
-        setIsSectionsValid(false); // Set validation to false if no sections are selected
-        return; // Exit function if validation fails
+        setIsSectionsValid(false);
+        setLoading(false);
+        return;
       }
 
-      setIsSectionsValid(true); // Reset validation status
+      setIsSectionsValid(true);
       try {
         const endpoint = editingRow ? template.update : template.create;
 
@@ -140,9 +146,10 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
         handleClose();
         setFormData(response.data);
         setEditingRow(null);
-
+        setLoading(false);
       } catch (error: any) {
         console.error('Error fetching data:', error.message);
+        setLoading(false);
       }
     }
   };
@@ -180,6 +187,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
 
   return (
     <>
+      <LoadingBackdrop isLoading={loading} />
       <BreadCrumbList />
       <Card>
         <div>
@@ -316,7 +324,8 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                     <Button variant="contained" type="submit">
                       {open === -1 ? 'Add' : 'Edit'} Template
                     </Button>
-                  </Box></Grid>
+                  </Box>
+                </Grid>
               </Grid>
             </Box>
           </form>

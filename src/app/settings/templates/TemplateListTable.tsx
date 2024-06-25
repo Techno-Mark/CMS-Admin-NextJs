@@ -29,6 +29,7 @@ import CustomChip from "@/@core/components/mui/Chip";
 import { template } from "@/services/endpoint/template";
 import { TemplateType } from "@/types/apps/templateType";
 import BreadCrumbList from "../content-blocks/BreadCrumbList";
+import LoadingBackdrop from "@/components/LoadingBackdrop";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -108,7 +109,7 @@ const TemplateListTable = () => {
           page: page + 1,
           limit: pageSize,
           search: globalFilter,
-          // active: activeFilter,
+          active: activeFilter,
         });
         setData(result.data.templates);
         setTotalRows(result.data.totalTemplates);
@@ -119,8 +120,8 @@ const TemplateListTable = () => {
       }
     };
     getData();
-    // activeFilter
-  }, [page, pageSize, globalFilter, deletingId]);
+    
+  }, [page, pageSize, globalFilter, deletingId,activeFilter]);
 
   const columns = useMemo<ColumnDef<TemplateTypeWithAction, any>[]>(
     () => [
@@ -141,10 +142,10 @@ const TemplateListTable = () => {
         ),
       }),
       columnHelper.accessor("templateDescription", {
-        header: "Description",
+        header: "Created At",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {row.original.templateDescription}
+            {row.original.createdAt}
           </Typography>
         ),
       }),
@@ -164,12 +165,12 @@ const TemplateListTable = () => {
       }),
 
       columnHelper.accessor("templateSlug", {
-        header: "Action",
+        header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
             <IconButton
               onClick={() =>
-                router.push(`/settings/templates/edit/${row.original.templateSlug}`)
+                router.push(`/settings/templates/edit/${row.original.templateId}`)
               }
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -218,7 +219,7 @@ const TemplateListTable = () => {
 
   return (
     <>
-
+      <LoadingBackdrop isLoading={loading} />
       <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
         <BreadCrumbList />
         <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
@@ -230,7 +231,24 @@ const TemplateListTable = () => {
             placeholder="Search"
             className="is-full sm:is-auto"
           />
-
+<div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
+            <Typography>Status:</Typography>
+            <CustomTextField
+              select
+              fullWidth
+              defaultValue="all"
+              id="custom-select"
+              value={activeFilter === null ? "all" : activeFilter === true ? "active" : "inactive"}
+              onChange={(e) => {
+                const value = e.target.value;
+                setActiveFilter(value === "active" ? true : value === "inactive" ? false : null);
+              }}
+            >
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="inactive">Inactive</MenuItem>
+            </CustomTextField>
+          </div>
           <Button
             variant="contained"
             startIcon={<i className="tabler-plus" />}

@@ -20,7 +20,8 @@ import ConfirmationDialog from "./ConfirmationDialog";
 import { post } from "@/services/apiService";
 import { organization } from "@/services/endpoint/organization";
 import CustomChip from "@/@core/components/mui/Chip";
-import BreadCrumbList from "../content-blocks/BreadCrumbList"; 
+import BreadCrumbList from "../content-blocks/BreadCrumbList";
+import LoadingBackdrop from "@/components/LoadingBackdrop";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -76,6 +77,7 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<OrganizationsTypeWithAction>();
 
 const OrganizationsListTable = () => {
+
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -83,6 +85,7 @@ const OrganizationsListTable = () => {
 
   const [data, setData] = useState<OrganizationsType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -208,6 +211,7 @@ const OrganizationsListTable = () => {
 
   return (
     <>
+      <LoadingBackdrop isLoading={loading} />
       <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
         <BreadCrumbList />
         <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">

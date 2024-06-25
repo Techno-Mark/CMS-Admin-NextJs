@@ -14,7 +14,7 @@ const EditTemplatePage = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await get(template.getBySlug+'/'+params.id);
+        const response = await get(template.getById+'/'+params.id);
         if (response.statusCode !== 200) {
           throw new Error('Failed to fetch data');
         }

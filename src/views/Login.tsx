@@ -152,7 +152,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
       redirect: false
     });
     setLoading(false);
-    
+
     if (res && res.ok && res.error === null) {
       const redirectURL = searchParams.get('redirectTo') ?? '/home';
       router.push(redirectURL);
@@ -173,11 +173,22 @@ const Login = ({ mode }: { mode: SystemMode }) => {
       }
     }
   };
-  
+
 
   return (
     <div className='flex bs-full justify-center'>
-     
+      <div
+        className={classnames(
+          'flex bs-full items-center justify-center flex-1 min-bs-[100dvh] relative p-6 max-md:hidden',
+          {
+            'border-ie': settings.skin === 'bordered'
+          }
+        )}
+      >
+        <LoginIllustration src={characterIllustration} alt='character-illustration' />
+        {!hidden &&
+          <MaskImg alt='mask' src={authBackground} />}
+      </div>
       <div className='flex justify-center items-center bs-full bg-backgroundPaper !min-is-full p-6 md:!min-is-[unset] md:p-12 md:is-[480px]'>
         <div className='absolute block-start-5 sm:block-start-[33px] inline-start-6 sm:inline-start-[38px]'>
           <Logo />
@@ -263,18 +274,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
           </form>
         </div>
       </div>
-      <div
-        className={classnames(
-          'flex bs-full items-center justify-center flex-1 min-bs-[100dvh] relative p-6 max-md:hidden',
-          {
-            'border-ie': settings.skin === 'bordered'
-          }
-        )}
-      >
-        <LoginIllustration src={characterIllustration} alt='character-illustration' />
-        {!hidden &&
-          <MaskImg alt='mask' src={authBackground} />}
-      </div>
+
     </div>
   )
 }
