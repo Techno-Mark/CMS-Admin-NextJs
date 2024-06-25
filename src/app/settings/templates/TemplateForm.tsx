@@ -118,7 +118,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
         setIsSectionsValid(false); // Set validation to false if no sections are selected
         return; // Exit function if validation fails
       }
-      
+
       setIsSectionsValid(true); // Reset validation status
       try {
         const endpoint = editingRow ? template.update : template.create;
@@ -175,9 +175,9 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
       )
     );
   };
-  
-  
-  
+
+
+
   return (
     <>
       <BreadCrumbList />
@@ -298,8 +298,8 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                     </div>
                   </Grid>
                 )}
-                <Grid item xs={12}>
-                  <Box display="flex" justifyContent="end" gap={2}>
+                {/* <Grid item xs={12}>
+                  <Box display="flex" position="sticky"  justifyContent="end" gap={2} bottom={0} zIndex={10}>
                     <Button variant="outlined" color="error" onClick={handleClose}>
                       Cancel
                     </Button>
@@ -307,12 +307,22 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                       {open === -1 ? 'Add' : 'Edit'} Template
                     </Button>
                   </Box>
-                </Grid>
+                </Grid> */}
+                <Grid item xs={12}>
+                  <Box p={2} display="flex" gap={2} justifyContent="end" bgcolor="background.paper" position="sticky" bottom={0} zIndex={10}>
+                    <Button variant="outlined" color="error" onClick={handleClose}>
+                      Cancel
+                    </Button>
+                    <Button variant="contained" type="submit">
+                      {open === -1 ? 'Add' : 'Edit'} Template
+                    </Button>
+                  </Box></Grid>
               </Grid>
             </Box>
           </form>
         </div>
       </Card>
+
     </>
   );
 };
