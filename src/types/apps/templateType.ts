@@ -8,4 +8,5 @@ export type TemplateType = {
     templateSlug:string;
     sectionIds:[];
     templateSection:[];
+    createdAt:string;
 }

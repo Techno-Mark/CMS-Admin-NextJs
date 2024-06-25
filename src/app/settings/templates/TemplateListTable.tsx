@@ -24,7 +24,6 @@ import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { post } from "@/services/apiService";
-import { organization } from "@/services/endpoint/organization";
 import CustomChip from "@/@core/components/mui/Chip";
 import { template } from "@/services/endpoint/template";
 import { TemplateType } from "@/types/apps/templateType";
@@ -120,8 +119,8 @@ const TemplateListTable = () => {
       }
     };
     getData();
-    
-  }, [page, pageSize, globalFilter, deletingId,activeFilter]);
+
+  }, [page, pageSize, globalFilter, deletingId, activeFilter]);
 
   const columns = useMemo<ColumnDef<TemplateTypeWithAction, any>[]>(
     () => [
@@ -141,7 +140,7 @@ const TemplateListTable = () => {
           </Typography>
         ),
       }),
-      columnHelper.accessor("templateDescription", {
+      columnHelper.accessor("createdAt", {
         header: "Created At",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
@@ -231,7 +230,7 @@ const TemplateListTable = () => {
             placeholder="Search"
             className="is-full sm:is-auto"
           />
-<div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
+          <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
             <Typography>Status:</Typography>
             <CustomTextField
               select
