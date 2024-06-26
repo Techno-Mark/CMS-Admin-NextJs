@@ -200,8 +200,8 @@ const TemplateListTable = () => {
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    manualPagination: true,  // Manual pagination
-    pageCount: Math.ceil(totalRows / pageSize), // Provide total pages
+    manualPagination: true,
+    pageCount: Math.ceil(totalRows / pageSize), 
   });
 
   const handlePageChange = (event: unknown, newPage: number) => {

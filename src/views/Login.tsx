@@ -48,6 +48,7 @@ import { signIn } from 'next-auth/react'
 import { toast } from 'react-toastify'
 import CircularProgress from '@mui/material/CircularProgress'
 import type { CircularProgressProps } from '@mui/material/CircularProgress'
+import LoadingBackdrop from '@/components/LoadingBackdrop'
 
 
 // Styled Custom Components
@@ -151,12 +152,15 @@ const Login = ({ mode }: { mode: SystemMode }) => {
       password: data.password,
       redirect: false
     });
-    setLoading(false);
+   
 
     if (res && res.ok && res.error === null) {
       const redirectURL = searchParams.get('redirectTo') ?? '/home';
       router.push(redirectURL);
+      toast.success("Login Successfull");
+      setLoading(false);
     } else {
+      setLoading(false);
       if (res?.error) {
         let error;
         try {
@@ -170,12 +174,15 @@ const Login = ({ mode }: { mode: SystemMode }) => {
           toast.error(error.message);
           setErrorState(error);
         }
+        
       }
     }
   };
 
 
   return (
+    <>
+    <LoadingBackdrop isLoading={loading} />
     <div className='flex bs-full justify-center'>
       <div
         className={classnames(
@@ -276,6 +283,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
       </div>
 
     </div>
+    </>
   )
 }
 

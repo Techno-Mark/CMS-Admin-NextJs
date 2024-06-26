@@ -5,10 +5,10 @@ import {
   Grid,
   Switch,
   Button,
-  Divider,
   Checkbox,
   FormControlLabel,
   Card,
+  IconButton,
 } from '@mui/material';
 import { toast } from 'react-toastify';
 import { post } from '@/services/apiService';
@@ -19,6 +19,7 @@ import CustomAutocomplete from '@core/components/mui/Autocomplete';
 import { section } from '@/services/endpoint/section';
 import BreadCrumbList from '../content-blocks/BreadCrumbList';
 import LoadingBackdrop from '@/components/LoadingBackdrop';
+// import DeleteIcon from '@mui/icons-material/Delete';
 
 type SectionType = {
   sectionId: number;
@@ -45,7 +46,8 @@ const initialData: TemplateType = {
   active: false,
   templateSlug: '',
   sectionIds: [],
-  templateSection: []
+  templateSection: [],
+  createdAt: ''
 };
 
 const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditingRow }) => {
@@ -101,6 +103,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
     if (data.templateName.trim().length < 5) {
       errors.templateName = 'Template Name must be at least 5 characters long';
       isValid = false;
+
     }
     if (data.templateSlug.trim().length === 0) {
       errors.templateSlug = 'This field is required';
@@ -112,6 +115,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
     }
 
     setFormErrors(errors);
+    setLoading(false);
     return isValid;
   };
 
@@ -155,9 +159,14 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
   };
 
   const handleAddSection = (event: any, newValue: SectionType[]) => {
-    setSelectedSections(newValue);
+    setSelectedSections([...selectedSections, ...newValue]);
   };
 
+  const handleRemoveSection = (index: number) => {
+    const updatedSections = [...selectedSections];
+    updatedSections.splice(index, 1);
+    setSelectedSections(updatedSections);
+  };
 
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>, index: number) => {
     event.dataTransfer.setData('text/plain', index.toString());
@@ -175,20 +184,38 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
     event.preventDefault();
   };
 
-  const handleSectionIsCommonChange = (sectionId: number) => {
+  // const handleSectionIsCommonChange = (sectionId: number) => {
+  //   setSelectedSections(prevSections =>
+  //     prevSections.map(section =>
+  //       section.sectionId === sectionId ? { ...section, isCommon: !section.isCommon } : section
+  //     )
+  //   );
+  // };
+  const handleSectionIsCommonChange = (index: number) => {
     setSelectedSections(prevSections =>
-      prevSections.map(section =>
-        section.sectionId === sectionId ? { ...section, isCommon: !section.isCommon } : section
+      prevSections.map((section, i) =>
+        i === index ? { ...section, isCommon: !section.isCommon } : section
       )
     );
   };
 
-
-
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
-      <BreadCrumbList />
+      <Box display="flex" alignItems="center">
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={11}>
+            <BreadCrumbList />
+          </Grid>
+          <Grid item xs={12} sm={1}>
+            <IconButton color='info'
+              onClick={() => {
+              }}>
+              <i className="tabler-external-link text-textSecondary"></i>
+            </IconButton>
+          </Grid>
+        </Grid>
+      </Box>
       <Card>
         <div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
@@ -207,7 +234,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                       setFormData({
                         ...formData,
                         templateName: e.target.value,
-                        templateSlug: e.target.value.replace(/[^\w\s]|_/g, '').replace(/\s+/g, '-').toLowerCase(),
+                        templateSlug: open === sectionActions.ADD ? e.target.value.replace(/[^\w\s]|_/g, '').replace(/\s+/g, '-').toLowerCase() : formData.templateSlug,
                       });
                     }}
                   />
@@ -252,14 +279,14 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                 <Grid item xs={6}>
                   <CustomAutocomplete
                     multiple
-                    // disableCloseOnSelect
+                    disableCloseOnSelect
                     fullWidth
                     options={activeData}
                     id="autocomplete-custom"
                     getOptionLabel={(option: SectionType) => option.sectionName || ''}
-                    value={selectedSections}
+                    value={[]}
                     onChange={handleAddSection}
-                    renderInput={params => <CustomTextField placeholder="Select Sections" {...params} label="Sections *" />}
+                    renderInput={params => <CustomTextField placeholder="" {...params} label="Content Block *" />}
                   />
                   {!isSectionsValid && (
                     <Typography color="error" variant="body2">
@@ -273,7 +300,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                     <div>
                       {selectedSections.map((section, index) => (
                         <Box
-                          key={section.sectionId}
+                          key={`${section.sectionId}-${index}`}
                           draggable
                           onDragStart={event => handleDragStart(event, index)}
                           onDrop={event => handleDrop(event, index)}
@@ -290,33 +317,30 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                           }}
                         >
                           <Typography>
+                            <IconButton color='inherit'>
+                              <i className="tabler-baseline-density-medium text-[18px]" />
+                            </IconButton>
                             <FormControlLabel
                               control={
                                 <Checkbox
                                   checked={section.isCommon || false}
-                                  onChange={() => handleSectionIsCommonChange(section.sectionId)}
+                                  onChange={() => handleSectionIsCommonChange(index)}
                                 />
                               }
                               label={<Typography>{section.sectionName}</Typography>}
                               sx={{ ml: 2 }}
                             />
                           </Typography>
+                          <IconButton onClick={() => handleRemoveSection(index)} color='error'>
+                            <i className="tabler-trash text-[18px] text-textDanger" />
+                          </IconButton>
                         </Box>
                       ))}
                     </div>
                   </Grid>
                 )}
+
                 {/* <Grid item xs={12}>
-                  <Box display="flex" position="sticky"  justifyContent="end" gap={2} bottom={0} zIndex={10}>
-                    <Button variant="outlined" color="error" onClick={handleClose}>
-                      Cancel
-                    </Button>
-                    <Button variant="contained" type="submit">
-                      {open === -1 ? 'Add' : 'Edit'} Template
-                    </Button>
-                  </Box>
-                </Grid> */}
-                <Grid item xs={12}>
                   <Box p={2} display="flex" gap={2} justifyContent="end" bgcolor="background.paper" position="sticky" bottom={0} zIndex={10}>
                     <Button variant="outlined" color="error" onClick={handleClose}>
                       Cancel
@@ -325,13 +349,28 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                       {open === -1 ? 'Add' : 'Edit'} Template
                     </Button>
                   </Box>
-                </Grid>
+                </Grid> */}
               </Grid>
             </Box>
           </form>
         </div>
       </Card>
-
+      <Grid item xs={12} style={{ position: 'sticky', bottom: 0, zIndex: 10, }} >
+        <Box
+          p={7}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button variant="outlined" color="error" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="contained" type="submit" onClick={handleSubmit}>
+            {open === -1 ? 'Add' : 'Edit'} Template
+          </Button>
+        </Box>
+      </Grid>
     </>
   );
 };

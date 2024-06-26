@@ -1,15 +1,9 @@
-// Type Imports
-import type { ChildrenType, Direction } from '@core/types'
 
-// Context Imports
+import type { ChildrenType, Direction } from '@core/types'
 import { VerticalNavProvider } from '@menu/contexts/verticalNavContext'
 import { SettingsProvider } from '@core/contexts/settingsContext'
 import ThemeProvider from '@components/theme'
 import { NextAuthProvider } from '@/contexts/nextAuthProvider'
-import CircularProgress from '@mui/material/CircularProgress'
-import Backdrop from '@mui/material/Backdrop';
-
-// Util Imports
 import { getDemoName, getMode, getSettingsFromCookie, getSystemMode } from '@core/utils/serverHelpers'
 import themeConfig from '@/configs/themeConfig'
 import AppReactToastify from '@/libs/styles/AppReactToastify'
@@ -17,13 +11,14 @@ import LoadingBackdrop from './LoadingBackdrop'
 
 type Props = ChildrenType & {
   direction: Direction,
-  isLoading :boolean
+  // isLoading :boolean
 }
 
 const Providers = async (props: Props) => {
 
   // Props
-  const { children, direction ,isLoading} = props
+  // isLoading
+  const { children, direction } = props
 
   // Vars
   const mode = getMode()
@@ -38,7 +33,7 @@ const Providers = async (props: Props) => {
         <ThemeProvider direction={direction} systemMode={systemMode}>
           {children}
           <AppReactToastify position={themeConfig.toastPosition} hideProgressBar />
-          <LoadingBackdrop isLoading={isLoading} />
+          {/* <LoadingBackdrop isLoading={isLoading} /> */}
         </ThemeProvider>
       </SettingsProvider>
     </VerticalNavProvider>

@@ -1,158 +1,180 @@
-// React Imports
-import { useEffect, useState } from "react";
-// MUI Imports
-import Button from "@mui/material/Button";
-// Component Imports
-import CustomTextField from "@core/components/mui/TextField";
-import { Box, Card, Grid, Switch } from "@mui/material";
-import { ADD_SECTION, EDIT_SECTION, UsersType } from "@/types/apps/userTypes";
-import BreadCrumbList from "./BreadCrumbList";
+import React, { useEffect, useState } from "react";
 import {
-  createSection,
-  getSectionById,
-  updateSection,
-} from "@/app/api/content-block";
+  Button,
+  Box,
+  Card,
+  Grid,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import CustomTextField from "@/@core/components/mui/TextField";
+import CustomAutocomplete from "@/@core/components/mui/Autocomplete";
 import { get, post } from "@/services/apiService";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import LoadingBackdrop from "@/components/LoadingBackdrop";
+import { section } from "@/services/endpoint/section";
+import { UsersType } from "@/types/apps/userTypes";
+
+const tooltipContent = {
+  "pattern": "[A-Za-z]{3,10}",
+  "maxlength": 10,
+  "minlength": 3,
+  "min": "01",
+  "max": "100",
+  "accept": ".jpg, .jpeg, .png",
+};
+
+const fieldTypeOptions = [
+  { label: 'email', value: 'email' },
+  { label: 'file', value: 'file' },
+  { label: 'text', value: 'text' },
+  { label: 'url', value: 'url' },
+  { label: 'date', value: 'date' },
+  { label: 'number', value: 'number' },
+  { label: 'textarea', value: 'textarea' }
+];
+
+const sectionActions = {
+  ADD: -1,
+  EDIT: 1,
+};
+
+const initialData = {
+  id: 0,
+  name: "",
+  slug: "",
+  jsonContent: [{ fieldType: "", fieldLabel: "", isRequired: false, validation: "" }],
+  status: false,
+};
 
 type Props = {
-  open: ADD_SECTION | EDIT_SECTION;
+  open: number;
+};
+
+const initialErrorData = {
+  name: "",
+  slug: "",
+  jsonContent: [],
 };
 
 type FormDataType = {
   id: number;
   name: string;
   slug: string;
-  jsonContent: string;
+  jsonContent: any[];
   status: boolean;
-};
-
-//enum
-const sectionActions = {
-  ADD: -1,
-  EDIT: 1,
-};
-
-// Vars
-const initialData = {
-  id: 0,
-  name: "",
-  slug: "",
-  jsonContent: "",
-  status: false,
-};
-
-const initialErrorData = {
-  name: "",
-  slug: "",
-  jsonContent: "",
 };
 
 const ContentBlockForm = ({ open }: Props) => {
   const router = useRouter();
-  const query = usePathname().split("/");
-  const [formData, setFormData] = useState<FormDataType | UsersType>(
-    initialData
-  );
+  const [formData, setFormData] = useState<FormDataType>(initialData);
   const [formErrors, setFormErrors] = useState<{
     name: string;
     slug: string;
-    jsonContent: string;
+    jsonContent: string[];
   }>(initialErrorData);
-  
   const [loading, setLoading] = useState<boolean>(true);
+  const query = usePathname().split("/");
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false); 
 
-  const validateFormData = (arg1: FormDataType) => {
-    if (arg1.name.trim().length === 0) {
-      setFormErrors({ ...formErrors, name: "This field is required" });
-    } else if (arg1.slug.trim().length === 0) {
-      setFormErrors({ ...formErrors, slug: "This field is required" });
-    } else if (arg1.jsonContent.trim().length === 0) {
-      setFormErrors({ ...formErrors, jsonContent: "This field is required" });
-    } else if (!isValidJSON(arg1.jsonContent).isValid) {
-      setFormErrors({
-        ...formErrors,
-        jsonContent: isValidJSON(arg1.jsonContent).errorText,
-      });
-    } else if (false) {
-    } else {
-      return true;
+  useEffect(() => {
+    if (formData.jsonContent.length === 0) {
+      handleAddRow();
     }
+  }, []);
 
-    return false;
+  const handleAddRow = () => {
+    const newField = { fieldType: "", fieldLabel: "", isRequired: false, validation: "" };
+    setFormData({ ...formData, jsonContent: [...formData.jsonContent, newField] });
   };
 
-  const isValidJSON = (jsonContent: string) => {
-    const requiredKeys = [
-      "fieldType",
-      "fieldLabel",
-      "isRequired",
-      "validation",
-      // 'value'
-    ];
-
-    let parsedInput;
-    try {
-      parsedInput = JSON.parse(jsonContent);
-    } catch (error) {
-      return {
-        isValid: false,
-        errorText: "Given Input is not valid JSON String",
-      };
+  const handleRemoveRow = (index: number) => {
+    if (formData.jsonContent.length > 1) {
+      const updatedFields = formData.jsonContent.filter((_, idx) => idx !== index);
+      setFormData({ ...formData, jsonContent: updatedFields });
     }
+  };
 
-    for (let obj of parsedInput) {
-      for (let key of requiredKeys) {
-        if (!(key in obj)) {
-          return { isValid: false, errorText: `Key '${key}' is required` };
-        }
+  const handleChangeField = (index: number, field: string, value: any) => {
+    const updatedFields = [...formData.jsonContent];
+    updatedFields[index][field] = value;
+    setFormData({ ...formData, jsonContent: updatedFields });
+
+    if (field === "validation") {
+      try {
+        JSON.parse(value);
+        setFormErrors({
+          ...formErrors,
+          jsonContent: {
+            ...formErrors.jsonContent,
+            [index]: "",
+          },
+        });
+      } catch (error) {
+        setFormErrors({
+          ...formErrors,
+          jsonContent: {
+            ...formErrors.jsonContent,
+            [index]: "Validation should be a valid JSON object.", // Set error message for invalid JSON
+          },
+        });
       }
     }
+  };
 
-    return {
-      isValid: true,
-      errorText: "",
+  const validateFormData = (data: FormDataType) => {
+    let isValid = true;
+    let errors = {
+      name: '',
+      slug: '',
     };
+
+    if (data.name.trim().length < 5) {
+      errors.name = 'Section Name must be at least 5 characters long';
+      isValid = false;
+    }
+
+    if (data.slug.trim().length === 0) {
+      errors.slug = 'Slug is required';
+      isValid = false;
+    }
+
+    setFormErrors({ ...formErrors, ...errors });
+    setLoading(false);
+    return isValid;
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setLoading(true);
+    if (validateFormData(formData)) {
+      try {
+        setLoading(true);
+        const endpoint = open === sectionActions.EDIT ? section.update : section.create;
 
-    if (
-      validateFormData({
-        id: formData.id,
-        name: formData.name,
-        slug: formData.slug,
-        jsonContent: formData.jsonContent,
-        status: formData.status,
-      })
-    ) {
-      const result = await post(
-        open === sectionActions.EDIT ? updateSection : createSection,
-        open === sectionActions.EDIT
-          ? {
-            sectionId: formData.id,
-            sectionName: formData.name,
-            sectionTemplate: JSON.parse(formData.jsonContent),
-            active: formData.status,
-          }
-          : {
-            sectionName: formData.name,
-            sectionTemplate: JSON.parse(formData.jsonContent),
-            active: formData.status,
-          }
-      );
+        const payload = {
+          sectionId: open === sectionActions.EDIT ? formData.id : undefined,
+          sectionName: formData.name,
+          sectionSlug: formData.slug,
+          sectionTemplate: formData.jsonContent,
+          active: formData.status,
+        };
 
-      if (result.status === "success") {
-        toast.success(result.message);
+        const response = await post(endpoint, payload);
+
+        toast.success(response.message);
         handleReset();
         setLoading(false);
-      } else {
-        toast.error(result.message);
+      } catch (error: any) {
+        console.error('Error fetching data:', error.message);
         setLoading(false);
       }
     }
@@ -164,24 +186,24 @@ const ContentBlockForm = ({ open }: Props) => {
     router.back();
   };
 
-  const getSectionDataById = async (id: string | number) => {
-    setLoading(true);
+  const getSectionDataById = async (slug: string | number) => {
     try {
-
-      const result = await get(getSectionById(id));
+      const result = await get(`${section.getById}/${slug}`);
       const { data } = result;
+      // const selectedFieldTypeOption = fieldTypeOptions.find(option => option.value === data.sectionTemplate.fieldType);
+
       setFormData({
         ...formData,
         id: data.sectionId,
         name: data.sectionName,
         slug: data.sectionSlug,
-        jsonContent: JSON.stringify(data.sectionTemplate),
+        jsonContent: data.sectionTemplate,
         status: data.active,
+
       });
-      setLoading(false);
+      setIsSlugManuallyEdited(false); 
     } catch (error) {
       console.error(error);
-      setLoading(false);
     }
   };
 
@@ -190,36 +212,51 @@ const ContentBlockForm = ({ open }: Props) => {
       getSectionDataById(query[query.length - 1]);
     }
   }, []);
+  
+  const handleSectionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value;
+    setFormErrors({ ...formErrors, name: "" });
+    setFormData((prevData) => ({
+      ...prevData,
+      name: newName,
+      slug: !isSlugManuallyEdited && open === sectionActions.ADD ? newName.replace(/[^\w\s]|_/g, "").replace(/\s+/g, "-").toLowerCase() : prevData.slug,
+    }));
+  };
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSlug = e.target.value.toLowerCase();
+    setFormErrors({ ...formErrors, slug: "" });
+    setFormData((prevData) => ({
+      ...prevData,
+      slug: newSlug,
+    }));
+    setIsSlugManuallyEdited(true); // Set manual slug editing flag
+  };
 
   return (
     <>
-      {/* <LoadingBackdrop isLoading={loading} /> */}
-      <BreadCrumbList />
       <Card>
         <div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
             <Box display="flex" alignItems="center">
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
-
                   <CustomTextField
                     error={!!formErrors.name}
                     helperText={formErrors.name}
-                    label="Full Name *"
+                    label="Section Name *"
                     fullWidth
-                    placeholder="Enter Name"
+                    placeholder=""
                     value={formData.name}
-                    onChange={(e) => {
-                      setFormErrors({ ...formErrors, name: "" });
-                      setFormData({
-                        ...formData,
-                        name: e.target.value,
-                        slug: e.target.value
-                          .replace(/[^\w\s]|_/g, "")
-                          .replace(/\s+/g, "-")
-                          .toLowerCase(),
-                      });
-                    }}
+                    onChange={handleSectionNameChange}
+                  // onChange={(e: { target: { value: string; }; }) => {
+                  //   setFormErrors({ ...formErrors, name: "" });
+                  //   setFormData({
+                  //     ...formData,
+                  //     name: e.target.value,
+                  //     slug: open === sectionActions.ADD ? e.target.value.replace(/[^\w\s]|_/g, "").replace(/\s+/g, "-").toLowerCase() : formData.slug,
+                  //   });
+                  // }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={5}>
@@ -229,59 +266,130 @@ const ContentBlockForm = ({ open }: Props) => {
                     helperText={formErrors.slug}
                     label="Slug *"
                     fullWidth
-                    placeholder="Enter Slug"
+                    placeholder=""
                     value={formData.slug}
-                    onChange={(e) => {
-                      setFormErrors({ ...formErrors, slug: "" });
-                      if (/^[A-Za-z0-9-]*$/.test(e.target.value)) {
-                        setFormData({
-                          ...formData,
-                          slug: e.target.value.toLowerCase(),
-                        });
-                      }
-                    }}
+                    onChange={handleSlugChange}
+                  // onChange={(e: { target: { value: string; }; }) => {
+                  //   setFormErrors({ ...formErrors, slug: "" });
+                  //   if (/^[A-Za-z0-9-]*$/.test(e.target.value)) {
+                  //     setFormData({
+                  //       ...formData,
+                  //       slug: e.target.value.toLowerCase(),
+                  //     });
+                  //   }
+                  // }}
                   />
                 </Grid>
-
                 <Grid item xs={12} sm={1}>
-                  <label className="text-[0.8125rem] leading-[1.153]">Status</label>
+                  <Typography variant="body2" sx={{ mr: 0 }}>
+                    Status
+                  </Typography>
                   <Switch
-                    size="medium"
+                    size='medium'
                     checked={formData.status}
                     onChange={(e) =>
                       setFormData({ ...formData, status: e.target.checked })
                     }
                   />
                 </Grid>
-
-
                 <Grid item xs={12} sm={12}>
-                  <CustomTextField
-                    fullWidth
-                    rows={9}
-                    multiline
-                    error={!!formErrors.jsonContent}
-                    helperText={formErrors.jsonContent}
-                    value={formData.jsonContent}
-                    onChange={(e) => {
-                      setFormErrors({ ...formErrors, jsonContent: "" });
-                      setFormData({ ...formData, jsonContent: e.target.value });
-                    }}
-                    label="JSON Content"
-                    placeholder="Enter here..."
-                    sx={{
-                      "& .MuiInputBase-root.MuiFilledInput-root": {
-                        alignItems: "baseline",
-                      },
-                    }}
-                  />
+                  <label className="text-[0.8125rem] leading-[1.153]">Section Template *</label>
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Field Type</TableCell>
+                          <TableCell>Field Label</TableCell>
+                          <TableCell>Is Required</TableCell>
+                          <TableCell>Validation
+                            <Tooltip placement="top" title={<pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(tooltipContent, null, 2)}</pre>}>
+                              <IconButton>
+                                <i className="tabler-alert-square-filled" />
+                              </IconButton>
+                            </Tooltip>
+                          </TableCell>
+                          <TableCell>Actions </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {formData.jsonContent.map((field, index) => (
+                          <TableRow key={index}>
+                            <TableCell>
+                              <CustomAutocomplete
+                                fullWidth
+                                options={fieldTypeOptions}
+                                id={`autocomplete-custom-${index}`}
+                                getOptionLabel={(option) => option.label || ''}
+                                renderInput={(params) => (
+                                  <CustomTextField
+                                    {...params}
+                                    placeholder=''
+                                  />
+                                )}
+                                value={sectionActions.EDIT ? field.fieldType
+                                  : fieldTypeOptions.find(option => option.value === field.fieldType)}
+                                onChange={(e, newValue) => handleChangeField(index, "fieldType", newValue ? newValue.value : '')}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <CustomTextField
+                                fullWidth
+                                value={field.fieldLabel}
+                                onChange={(e: { target: { value: any; }; }) => handleChangeField(index, "fieldLabel", e.target.value)}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Switch
+                                checked={field.isRequired}
+                                onChange={(e) => handleChangeField(index, "isRequired", e.target.checked)}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <CustomTextField
+                                fullWidth
+                                value={field.validation}
+                                onChange={(e: { target: { value: any; }; }) => handleChangeField(index, "validation", e.target.value)}
+                                error={!!formErrors.jsonContent[index]}
+                                helperText={formErrors.jsonContent[index]}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleRemoveRow(index)}
+                                aria-label="minus"
+                                color="error"
+                              >
+                                <i className="tabler-minus" />
+                              </IconButton>
+                              {index === formData.jsonContent.length - 1 && (
+                                <IconButton
+                                  size="small"
+                                  onClick={handleAddRow}
+                                  aria-label="plus"
+                                  color="success"
+                                  style={{ marginLeft: 8 }}
+                                >
+                                  <i className="tabler-plus" />
+                                </IconButton>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 </Grid>
-
-                <Grid item xs={12}>
-                  <Box p={2} display="flex" gap={2} justifyContent="end" bgcolor="background.paper" position="sticky" bottom={0} zIndex={10}>
-
+                <Grid item xs={12} style={{ position: 'sticky', bottom: 0, zIndex: 10, }}>
+                  <Box
+                    p={7}
+                    display="flex"
+                    gap={2}
+                    justifyContent="end"
+                    bgcolor="background.paper"
+                  >
                     <Button
-                      variant="tonal"
+                      variant="contained"
                       color="error"
                       type="reset"
                       onClick={() => handleReset()}

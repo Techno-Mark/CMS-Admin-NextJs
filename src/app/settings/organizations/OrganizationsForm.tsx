@@ -50,7 +50,7 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
     let isValid = true;
     let errors = { name: '', prefix: '', active: '' };
 
-    if (data.name.trim().length < 0) {
+    if (data.name.trim().length < 5) {
       errors.name = 'Organization Name must be at least 5 characters long';
       isValid = false;
     }
@@ -76,9 +76,7 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
           active: formData.active,
         };
 
-        // Call API service to submit form data
         const response = await post(endpoint, payload);
-        console.log(response);
 
         toast.success(response.message);
         handleClose();
@@ -87,38 +85,6 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
       } catch (error: any) {
         console.error('Error fetching data:', error.message);
         setLoading(false);
-        // console.error('Error saving organization:', error);
-        // try {
-        //   const errorData = JSON.parse(error.message);
-        //   if ((errorData.status === 'error' || errorData.status === 'failure') &&
-        //     (errorData.message === 'validation' || errorData.message === 'validation error')) {
-
-        //     // Handle first type of response
-        //     if (errorData.data && typeof errorData.data === 'object' && !Array.isArray(errorData.data)) {
-        //       for (const [key, value] of Object.entries(errorData.data)) {
-        //         if (Array.isArray(value)) {
-        //           value.forEach((err) => {
-        //             toast.error(err);
-        //           });
-        //         }
-        //       }
-        //     }
-
-        //     // Handle second type of response
-        //     if (Array.isArray(errorData.data)) {
-        //       errorData.data.forEach((errObj: { [s: string]: any; } | ArrayLike<unknown>) => {
-        //         for (const [key, value] of Object.entries(errObj)) {
-        //           toast.error(value);
-        //         }
-        //       });
-        //     }
-        //   } else {
-        //     toast.error('An error occurred while saving the data.');
-        //   }
-        // } catch (parseError: any) {
-        //   console.error('Error parsing error response:', parseError);
-        //   toast.error('An error occurred while saving the data.');
-        // }
       }
     }
   };
@@ -128,10 +94,8 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
       <LoadingBackdrop isLoading={loading} />
       <BreadCrumbList />
       <Card>
-
-
-        <div>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
+          <div>
             <Box display="flex" alignItems="center">
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
@@ -165,6 +129,7 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
                     }}
                   />
                 </Grid>
+
                 <Grid item xs={12} sm={2}>
                   <Typography variant="body2" sx={{ mr: 0 }}>
                     Status
@@ -177,20 +142,40 @@ const OrganizationsForm = ({ open, handleClose, editingRow, setEditingRow }: Pro
                     }
                   />
                 </Grid>
-                <Grid item xs={12}>
+                {/* <Grid item xs={12}>
                   <Box display="flex" justifyContent="end" gap={2}>
                     <Button variant="outlined" color="error" onClick={handleClose}>
                       Cancel
                     </Button>
-                    <Button variant="contained" type="submit">
+                    <Button variant="contained" type="submit"  onSubmit={handleSubmit} >
                       {open === -1 ? 'Add' : 'Edit'} Organization
                     </Button>
                   </Box>
-                </Grid>
+                </Grid> */}
               </Grid>
             </Box>
-          </form>
-        </div>
+          
+
+
+          <Grid item xs={12} style={{ position: 'sticky', bottom: 0, zIndex: 10, }}>
+            <Box
+              p={7}
+              display="flex"
+              gap={2}
+              justifyContent="end"
+              bgcolor="background.paper"
+            >
+              <Button variant="outlined" color="error" onClick={handleClose}>
+                Cancel
+              </Button>
+              <Button variant="contained" type="submit" onSubmit={handleSubmit} >
+                {open === -1 ? 'Add' : 'Edit'} Organization
+              </Button>
+            </Box>
+          </Grid>
+          </div>
+        </form>
+
       </Card>
     </>);
 };
