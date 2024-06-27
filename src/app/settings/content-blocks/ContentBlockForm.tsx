@@ -316,7 +316,7 @@ const ContentBlockForm = ({ open }: Props) => {
                           <TableRow key={index}>
                             <TableCell>
                               <CustomAutocomplete
-                                // fullWidth
+                                fullWidth
                                 // disableCloseOnSelect
                                 options={fieldTypeOptions}
                                 id={`autocomplete-custom-${index}`}
@@ -331,27 +331,15 @@ const ContentBlockForm = ({ open }: Props) => {
                                 onChange={(e, newValue) => handleChangeField(index, "fieldType", newValue ? newValue.value : '')}
                               />
 
-                              {/* <CustomAutocomplete
-                                fullWidth
-                                options={fieldTypeOptions}
-                                id={`autocomplete-custom-${index}`}
-                                getOptionLabel={(option) => option.label || ''}
-                                renderInput={(params) => (
-                                  <CustomTextField
-                                    {...params}
-                                    placeholder=''
-                                  />
-                                )}
-                                value={fieldTypeOptions.find(option => option.value === field.fieldType)}
-                                onChange={(e, newValue) => handleChangeField(index, "fieldType", newValue ? newValue.value : '')}
-                              /> */}
+                              
                             </TableCell>
                             <TableCell>
                               <CustomTextField
                                 fullWidth
                                 value={field.fieldLabel}
                                 onChange={(e: { target: { value: any; }; }) => handleChangeField(index, "fieldLabel", e.target.value)}
-                              />
+                           
+                           />
                             </TableCell>
                             <TableCell>
                               <Switch
