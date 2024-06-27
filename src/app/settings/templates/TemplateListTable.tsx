@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@mui/material/Card";
-import { Avatar, Badge, Chip, Divider, FormControl, InputLabel, MenuItem, Select, Switch, TablePagination, TextFieldProps, Tooltip } from "@mui/material";
+import { Avatar, Badge, Chip, Divider,FormControl, InputLabel, MenuItem, Select, Switch, TablePagination, TextFieldProps, Tooltip } from "@mui/material";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
@@ -18,16 +18,17 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
 } from "@tanstack/react-table";
-import type { ColumnDef, FilterFn } from "@tanstack/react-table"; 
-import TablePaginationComponent from "@components/TablePaginationComponent";
+import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { post } from "@/services/apiService";
-import { organization } from "@/services/endpoint/organization";
 import CustomChip from "@/@core/components/mui/Chip";
-import type { TemplateType } from "@/types/apps/templatetype";
 import { template } from "@/services/endpoint/template";
+import { TemplateType } from "@/types/apps/templateType";
+import BreadCrumbList from "../content-blocks/BreadCrumbList";
+import LoadingBackdrop from "@/components/LoadingBackdrop";
+import { truncateText } from "@/utils/common";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -111,14 +112,15 @@ const TemplateListTable = () => {
         });
         setData(result.data.templates);
         setTotalRows(result.data.totalTemplates);
-      } catch (error) {
+      } catch (error: any) {
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
     getData();
-  }, [page, pageSize, globalFilter, activeFilter, deletingId]);
+
+  }, [page, pageSize, globalFilter, deletingId, activeFilter]);
 
   const columns = useMemo<ColumnDef<TemplateTypeWithAction, any>[]>(
     () => [
@@ -130,7 +132,7 @@ const TemplateListTable = () => {
           </Typography>
         ), enableSorting: false,
       }),
-      columnHelper.accessor("name", {
+      columnHelper.accessor("templateName", {
         header: "Name",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
@@ -142,11 +144,20 @@ const TemplateListTable = () => {
         header: "Description",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {row.original.templateDescription}
+              {truncateText(row.original.templateDescription, 25)}
+          </Typography>
+        ),
+        enableSorting: false,
+      }),
+      columnHelper.accessor("createdAt", {
+        header: "Created At",
+        cell: ({ row }) => (
+          <Typography color="text.primary" className="font-medium">
+            {row.original.createdAt}
           </Typography>
         ),
       }),
-     
+
       columnHelper.accessor("active", {
         header: "Status",
         cell: ({ row }) => (
@@ -161,23 +172,23 @@ const TemplateListTable = () => {
         enableSorting: false,
       }),
 
-      columnHelper.accessor("id", {
-        header: "Action",
+      columnHelper.accessor("templateSlug", {
+        header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
             <IconButton
               onClick={() =>
-                router.push(`/settings/templates/edit/${row.original.id}`)
+                router.push(`/settings/templates/edit/${row.original.templateId}`)
               }
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
             </IconButton>
-            {/* <IconButton onClick={() => {
+            <IconButton onClick={() => {
               setIsDeleting(true);
-              setDeletingId(row.original.id);
+              setDeletingId(row.original.templateId);
             }}>
               <i className="tabler-trash text-[22px] text-textSecondary" />
-            </IconButton> */}
+            </IconButton>
           </div>
         ),
         enableSorting: false,
@@ -198,6 +209,8 @@ const TemplateListTable = () => {
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: true,
+    pageCount: Math.ceil(totalRows / pageSize),
   });
 
   const handlePageChange = (event: unknown, newPage: number) => {
@@ -214,29 +227,47 @@ const TemplateListTable = () => {
 
   return (
     <>
-      <Card>
-        <div className="flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4">
-          <Typography variant="h5">Templates</Typography>
+      <LoadingBackdrop isLoading={loading} />
+      <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
+        <BreadCrumbList />
+        <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
 
+
+          <DebouncedInput
+            value={globalFilter ?? ""}
+            onChange={(value) => setGlobalFilter(String(value))}
+            placeholder="Search"
+            className="is-full sm:is-auto"
+          />
           <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-        
-            <DebouncedInput
-              value={globalFilter ?? ""}
-              onChange={(value) => setGlobalFilter(String(value))}
-              placeholder="Search"
-              className="is-full sm:is-auto"
-            />
-
-            <Button
-              variant="contained"
-              startIcon={<i className="tabler-plus" />}
-              onClick={() => router.push("/settings/templates/add")}
-              className="is-full sm:is-auto"
+            <Typography>Status:</Typography>
+            <CustomTextField
+              select
+              fullWidth
+              defaultValue="all"
+              id="custom-select"
+              value={activeFilter === null ? "all" : activeFilter === true ? "active" : "inactive"}
+              onChange={(e) => {
+                const value = e.target.value;
+                setActiveFilter(value === "active" ? true : value === "inactive" ? false : null);
+              }}
             >
-              Add Template
-            </Button>
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="inactive">Inactive</MenuItem>
+            </CustomTextField>
           </div>
+          <Button
+            variant="contained"
+            startIcon={<i className="tabler-plus" />}
+            onClick={() => router.push("/settings/templates/add")}
+            className="is-full sm:is-auto"
+          >
+            Add Template
+          </Button>
         </div>
+      </div>
+      <Card>
         <div className="overflow-x-auto h-[325px]">
           <table className={tableStyles.table}>
             <thead>
@@ -321,6 +352,7 @@ const TemplateListTable = () => {
         setDeletingId={setDeletingId}
         setOpen={(arg1: boolean) => setIsDeleting(arg1)}
       />
+
     </>
   );
 };

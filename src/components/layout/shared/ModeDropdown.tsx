@@ -1,9 +1,4 @@
-'use client'
-
-// React Imports
-import { useRef, useState } from 'react'
-
-// MUI Imports
+import { useRef, useState, useEffect } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import Badge from '@mui/material/Badge'
 import Avatar from '@mui/material/Avatar'
@@ -22,117 +17,107 @@ import type { Mode } from '@core/types'
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
 
+// API Imports
+import { organization } from "@/services/endpoint/organization";
+import { post } from "@/services/apiService";
+
+interface Organization {
+  id: string;
+  name: string;
+}
+
 const ModeDropdown = () => {
-  // States
-  const [open, setOpen] = useState(false)
-  const [tooltipOpen, setTooltipOpen] = useState(false)
+  const [open, setOpen] = useState(false);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
+  const anchorRef1 = useRef<HTMLButtonElement>(null);
+  const { settings } = useSettings();
 
-  // Refs
-  const anchorRef = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    const fetchOrganizations = async () => {
+      try {
+        const response = await post(organization.active, {});
+        setOrganizations(response.data.organizations as Organization[]);
+      } catch (error) {
+        console.error('Error fetching organizations:', error);
+      }
+    };
 
-  const avatarText = "Techno Mark".split(' ').map(n => n[0]).join('')
-
-  // Hooks
-  const { settings, updateSettings } = useSettings()
+    if (open) {
+      fetchOrganizations();
+    }
+  }, [open]);
 
   const handleClose = () => {
-    setOpen(false)
-    setTooltipOpen(false)
-  }
+    setOpen(false);
+  };
 
-  const handleToggle = () => {
-    setOpen(prevOpen => !prevOpen)
-  }
+  const handleToggle1 = () => {
+    setOpen((prevOpen) => !prevOpen);
+  };
 
-  const handleModeSwitch = (mode: Mode) => {
-    handleClose()
-  }
+  const handleModeSwitch = (orgId: string) => {
+    setSelectedOrgId(orgId);
+    handleClose();
+  };
 
-  const getModeIcon = () => {
-    if (settings.mode === 'system') {
-      return 'tabler-device-laptop'
-    } else if (settings.mode === 'dark') {
-      return 'tabler-moon-stars'
-    } else {
-      return 'tabler-sun'
-    }
-  }
+  const avatarText = 'Techno Mark'.split(' ').map((n) => n[0]).join('');
 
   return (
     <>
       <Badge
-        ref={anchorRef}
-        overlap='circular'
+        ref={anchorRef1}
+        overlap="circular"
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        className='mis-2 flex item-center justify-center'
-        onClick={handleToggle}
+        className="mis-2 flex items-center justify-center cursor-pointer"
+        onClick={handleToggle1}
       >
         <Avatar
-          alt={"Techno Mark"}
-          className='cursor-pointer bs-[38px] is-[38px]'
+          alt="Techno Mark"
+          className="cursor-pointer bs-[38px] is-[38
+          bs-[38px] is-[38px]"
         >
-          {avatarText}
+          {selectedOrgId ? organizations.find((org) => org.id === selectedOrgId)?.name.charAt(0) : avatarText.charAt(0)}
         </Avatar>
-        <Typography className='font-medium' color='text.primary' ref={anchorRef}>
-          Techno Mark
+        <Typography className="font-medium ml-2 mr-1" color="text.primary">
+          {selectedOrgId ? organizations.find((org) => org.id === selectedOrgId)?.name : 'Select Organization'}
         </Typography>
-        <i className='tabler-chevron-down' />
+        <i className={`tabler-chevron-down ${open ? 'transform rotate-180' : ''}`} />
       </Badge>
       <Popper
         open={open}
         transition
         disablePortal
-        placement='bottom-start'
-        anchorEl={anchorRef.current}
-        className='min-is-[160px] !mbs-3 z-[1]'
+        placement="bottom-start"
+        anchorEl={anchorRef1.current}
+        className="min-is-[160px] !mbs-3 z-[1]"
       >
         {({ TransitionProps, placement }) => (
           <Fade
             {...TransitionProps}
-            style={{ transformOrigin: placement === 'bottom-start' ? 'left top' : 'right top' }}
+            style={{
+              transformOrigin: placement === 'bottom-start' ? 'left top' : 'right top',
+            }}
           >
             <Paper className={settings.skin === 'bordered' ? 'border shadow-none' : 'shadow-lg'}>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList onKeyDown={handleClose}>
-                  <MenuItem
-                    className='gap-3'
-                    onClick={() => handleModeSwitch('light')}
-                    selected={settings.mode === 'light'}
-                  >
-                    <Avatar
-                      alt={"Techno Mark"}
-                      className='cursor-pointer bs-[38px] is-[38px]'
+                  {organizations.map((org) => (
+                    <MenuItem
+                      key={org.id}
+                      className="gap-3"
+                      onClick={() => handleModeSwitch(org.id)}
+                      selected={selectedOrgId === org.id}
                     >
-                      {avatarText}
-                    </Avatar>
-                    Technomark
-                  </MenuItem>
-                  <MenuItem
-                    className='gap-3'
-                    onClick={() => handleModeSwitch('dark')}
-                    selected={settings.mode === 'dark'}
-                  >
-                    <Avatar
-                      alt={"Techno Mark"}
-                      className='cursor-pointer bs-[38px] is-[38px]'
-                    >
-                      G
-                    </Avatar>
-                    Gyaata
-                  </MenuItem>
-                  <MenuItem
-                    className='gap-3'
-                    onClick={() => handleModeSwitch('system')}
-                    selected={settings.mode === 'system'}
-                  >
-                    <Avatar
-                      alt={"Techno Mark"}
-                      className='cursor-pointer bs-[38px] is-[38px]'
-                    >
-                      P
-                    </Avatar>
-                    PABS
-                  </MenuItem>
+                      <Avatar
+                        alt={org.name}
+                        className="cursor-pointer bs-[38px] is-[38px]"
+                      >
+                        {org.name.charAt(0)}
+                      </Avatar>
+                      {org.name}
+                    </MenuItem>
+                  ))}
                 </MenuList>
               </ClickAwayListener>
             </Paper>
@@ -140,7 +125,7 @@ const ModeDropdown = () => {
         )}
       </Popper>
     </>
-  )
+  );
 }
 
-export default ModeDropdown
+export default ModeDropdown;

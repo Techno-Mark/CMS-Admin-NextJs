@@ -1,11 +1,16 @@
 export type UsersType = {
+    sectionName: any;
+    sectionSlug:any;
+    templateSlug: any;
+    templateDescription: any;
     srNo?: number;
     id: number;
     name: string;
     slug: string;
-    jsonContent: string;
+    jsonContent: any;
     status: boolean;
-    createdAt: string
+    createdAt: string;
+    sectionId:string;
 }
 
 export type ADD_SECTION = -1
