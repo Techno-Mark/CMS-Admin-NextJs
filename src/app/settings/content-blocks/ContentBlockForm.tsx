@@ -83,7 +83,7 @@ const ContentBlockForm = ({ open }: Props) => {
   }>(initialErrorData);
   const [loading, setLoading] = useState<boolean>(true);
   const query = usePathname().split("/");
-  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false); 
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false);
 
   useEffect(() => {
     if (formData.jsonContent.length === 0) {
@@ -197,11 +197,11 @@ const ContentBlockForm = ({ open }: Props) => {
         id: data.sectionId,
         name: data.sectionName,
         slug: data.sectionSlug,
-        jsonContent: data.sectionTemplate,
+        jsonContent: JSON.parse(data.sectionTemplate),
         status: data.active,
 
       });
-      setIsSlugManuallyEdited(false); 
+      setIsSlugManuallyEdited(false);
     } catch (error) {
       console.error(error);
     }
@@ -212,7 +212,7 @@ const ContentBlockForm = ({ open }: Props) => {
       getSectionDataById(query[query.length - 1]);
     }
   }, []);
-  
+
   const handleSectionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
     setFormErrors({ ...formErrors, name: "" });
@@ -230,7 +230,7 @@ const ContentBlockForm = ({ open }: Props) => {
       ...prevData,
       slug: newSlug,
     }));
-    setIsSlugManuallyEdited(true); // Set manual slug editing flag
+    setIsSlugManuallyEdited(true);
   };
 
   return (
@@ -316,6 +316,22 @@ const ContentBlockForm = ({ open }: Props) => {
                           <TableRow key={index}>
                             <TableCell>
                               <CustomAutocomplete
+                                // fullWidth
+                                // disableCloseOnSelect
+                                options={fieldTypeOptions}
+                                id={`autocomplete-custom-${index}`}
+                                getOptionLabel={(option) => option.label || ''}
+                                renderInput={(params) => (
+                                  <CustomTextField
+                                    {...params}
+                                    placeholder=''
+                                  />
+                                )}
+                                value={fieldTypeOptions.find(option => option.value === field.fieldType) || null}
+                                onChange={(e, newValue) => handleChangeField(index, "fieldType", newValue ? newValue.value : '')}
+                              />
+
+                              {/* <CustomAutocomplete
                                 fullWidth
                                 options={fieldTypeOptions}
                                 id={`autocomplete-custom-${index}`}
@@ -326,10 +342,9 @@ const ContentBlockForm = ({ open }: Props) => {
                                     placeholder=''
                                   />
                                 )}
-                                value={sectionActions.EDIT ? field.fieldType
-                                  : fieldTypeOptions.find(option => option.value === field.fieldType)}
+                                value={fieldTypeOptions.find(option => option.value === field.fieldType)}
                                 onChange={(e, newValue) => handleChangeField(index, "fieldType", newValue ? newValue.value : '')}
-                              />
+                              /> */}
                             </TableCell>
                             <TableCell>
                               <CustomTextField

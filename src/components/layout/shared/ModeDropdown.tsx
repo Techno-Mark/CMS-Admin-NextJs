@@ -1,7 +1,4 @@
-// React Imports
 import { useRef, useState, useEffect } from 'react'
-
-// MUI Imports
 import Tooltip from '@mui/material/Tooltip'
 import Badge from '@mui/material/Badge'
 import Avatar from '@mui/material/Avatar'
@@ -33,7 +30,7 @@ const ModeDropdown = () => {
   const [open, setOpen] = useState(false);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
-  const anchorRef = useRef<HTMLButtonElement>(null);
+  const anchorRef1 = useRef<HTMLButtonElement>(null);
   const { settings } = useSettings();
 
   useEffect(() => {
@@ -55,7 +52,7 @@ const ModeDropdown = () => {
     setOpen(false);
   };
 
-  const handleToggle = () => {
+  const handleToggle1 = () => {
     setOpen((prevOpen) => !prevOpen);
   };
 
@@ -69,11 +66,11 @@ const ModeDropdown = () => {
   return (
     <>
       <Badge
-        ref={anchorRef}
+        ref={anchorRef1}
         overlap="circular"
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         className="mis-2 flex items-center justify-center cursor-pointer"
-        onClick={handleToggle}
+        onClick={handleToggle1}
       >
         <Avatar
           alt="Techno Mark"
@@ -92,7 +89,7 @@ const ModeDropdown = () => {
         transition
         disablePortal
         placement="bottom-start"
-        anchorEl={anchorRef.current}
+        anchorEl={anchorRef1.current}
         className="min-is-[160px] !mbs-3 z-[1]"
       >
         {({ TransitionProps, placement }) => (

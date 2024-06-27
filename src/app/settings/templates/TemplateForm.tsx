@@ -101,7 +101,12 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
     let errors = { templateName: '', templateDescription: '', active: '', templateSlug: '' };
 
     if (data.templateName.trim().length < 5) {
-      errors.templateName = 'Template Name must be at least 5 characters long';
+      errors.templateName = 'Template Name should allow a minimum of 5 characters';
+      isValid = false;
+
+    }
+    if (data.templateName.trim().length > 50) {
+      errors.templateName = 'Template Name should allow a maximum of 50 character';
       isValid = false;
 
     }
@@ -198,6 +203,26 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
       )
     );
   };
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false); 
+  const handleSectionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value;
+    setFormErrors({ ...formErrors, templateName: "" });
+    setFormData((prevData) => ({
+      ...prevData,
+      templateName: newName,
+      templateSlug: !isSlugManuallyEdited && open === sectionActions.ADD ? newName.replace(/[^\w\s]|_/g, "").replace(/\s+/g, "-").toLowerCase() : prevData.templateSlug,
+    }));
+  };
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSlug = e.target.value.toLowerCase();
+    setFormErrors({ ...formErrors, templateSlug: "" });
+    setFormData((prevData) => ({
+      ...prevData,
+      templateSlug: newSlug,
+    }));
+    setIsSlugManuallyEdited(true); 
+  };
 
   return (
     <>
@@ -229,14 +254,15 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                     fullWidth
                     helperText={formErrors.templateName}
                     id="validation-error-helper-text"
-                    onChange={(e) => {
-                      setFormErrors(prevErrors => ({ ...prevErrors, templateName: '' }));
-                      setFormData({
-                        ...formData,
-                        templateName: e.target.value,
-                        templateSlug: open === sectionActions.ADD ? e.target.value.replace(/[^\w\s]|_/g, '').replace(/\s+/g, '-').toLowerCase() : formData.templateSlug,
-                      });
-                    }}
+                    // onChange={(e) => {
+                    //   setFormErrors(prevErrors => ({ ...prevErrors, templateName: '' }));
+                    //   setFormData({
+                    //     ...formData,
+                    //     templateName: e.target.value,
+                    //     templateSlug: open === sectionActions.ADD ? e.target.value.replace(/[^\w\s]|_/g, '').replace(/\s+/g, '-').toLowerCase() : formData.templateSlug,
+                    //   });
+                    // }}
+                    onChange={handleSectionNameChange}
                   />
                 </Grid>
                 <Grid item xs={12} sm={5}>
@@ -247,10 +273,11 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                     label="Template Slug *"
                     fullWidth
                     value={formData.templateSlug}
-                    onChange={(e) => {
-                      setFormErrors(prevErrors => ({ ...prevErrors, templateSlug: '' }));
-                      setFormData(prevData => ({ ...prevData, templateSlug: e.target.value }));
-                    }}
+                    // onChange={(e) => {
+                    //   setFormErrors(prevErrors => ({ ...prevErrors, templateSlug: '' }));
+                    //   setFormData(prevData => ({ ...prevData, templateSlug: e.target.value }));
+                    // }}
+                    onChange={handleSlugChange}
                   />
                 </Grid>
                 <Grid item xs={12} sm={1}>

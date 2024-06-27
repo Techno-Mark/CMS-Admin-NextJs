@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@mui/material/Card";
-import { Avatar, Badge, Chip, Divider, FormControl, InputLabel, MenuItem, Select, Switch, TablePagination, TextFieldProps, Tooltip } from "@mui/material";
+import { Avatar, Badge, Chip, Divider,FormControl, InputLabel, MenuItem, Select, Switch, TablePagination, TextFieldProps, Tooltip } from "@mui/material";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
@@ -19,7 +19,6 @@ import {
   getSortedRowModel,
 } from "@tanstack/react-table";
 import type { ColumnDef, FilterFn } from "@tanstack/react-table";
-import TablePaginationComponent from "@components/TablePaginationComponent";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
 import ConfirmationDialog from "./ConfirmationDialog";
@@ -29,6 +28,7 @@ import { template } from "@/services/endpoint/template";
 import { TemplateType } from "@/types/apps/templateType";
 import BreadCrumbList from "../content-blocks/BreadCrumbList";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
+import { truncateText } from "@/utils/common";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -140,6 +140,15 @@ const TemplateListTable = () => {
           </Typography>
         ),
       }),
+      columnHelper.accessor("templateDescription", {
+        header: "Description",
+        cell: ({ row }) => (
+          <Typography color="text.primary" className="font-medium">
+              {truncateText(row.original.templateDescription, 25)}
+          </Typography>
+        ),
+        enableSorting: false,
+      }),
       columnHelper.accessor("createdAt", {
         header: "Created At",
         cell: ({ row }) => (
@@ -201,7 +210,7 @@ const TemplateListTable = () => {
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     manualPagination: true,
-    pageCount: Math.ceil(totalRows / pageSize), 
+    pageCount: Math.ceil(totalRows / pageSize),
   });
 
   const handlePageChange = (event: unknown, newPage: number) => {

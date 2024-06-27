@@ -28,7 +28,7 @@ const Layout = async ({ children }: ChildrenType) => {
   const systemMode = getSystemMode()
 
   return (
-    <Providers direction={direction} children={undefined} isLoading={false}>
+    <Providers direction={direction}>
       <LayoutWrapper
         systemMode={systemMode}
         verticalLayout={

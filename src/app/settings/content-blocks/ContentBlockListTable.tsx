@@ -36,6 +36,7 @@ import { useRouter } from "next/navigation";
 import BreadCrumbList from "./BreadCrumbList";
 import { redirectToAddPage, redirectToEditPage } from "@/app/api/content-block";
 import { MenuItem } from "@mui/material";
+import CustomChip from "@/@core/components/mui/Chip";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -153,11 +154,13 @@ const UserListTable = ({
       columnHelper.accessor("status", {
         header: "Status",
         cell: ({ row }) =>
-          row.original.status ? (
-            <div className="text-green-600">Active</div>
-          ) : (
-            <div className="text-red-600">Inactive</div>
-          ),
+          <CustomChip
+              size="small"
+              round="true"
+              label={row.original.status ? 'Active' : 'Inactive'}
+              variant="tonal"
+              color={row.original.status ? 'success' : 'error'}
+            />
       }),
       columnHelper.accessor("id", {
         header: "Actions",
