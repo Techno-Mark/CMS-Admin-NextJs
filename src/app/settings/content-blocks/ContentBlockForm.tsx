@@ -124,7 +124,7 @@ const ContentBlockForm = ({ open }: Props) => {
           ...formErrors,
           jsonContent: {
             ...formErrors.jsonContent,
-            [index]: "Validation should be a valid JSON object.", 
+            [index]: "Validation should be a valid JSON object.",
           },
         });
       }
@@ -136,6 +136,7 @@ const ContentBlockForm = ({ open }: Props) => {
     let errors = {
       name: '',
       slug: '',
+      // jsonContent: data.jsonContent.map(() => ''), 
     };
 
     if (data.name.trim().length === 0) {
@@ -147,6 +148,13 @@ const ContentBlockForm = ({ open }: Props) => {
       errors.slug = 'Section Slug is required';
       isValid = false;
     }
+
+    // data.jsonContent.forEach((field, index) => {
+    //   if (field.fieldLabel.trim().length === 0) {
+    //     errors.jsonContent[index] = 'required';
+    //     isValid = false;
+    //   }
+    // });
 
     setFormErrors({ ...formErrors, ...errors });
     setLoading(false);
@@ -211,7 +219,7 @@ const ContentBlockForm = ({ open }: Props) => {
   useEffect(() => {
     if (open === sectionActions.EDIT) {
       getSectionDataById(query[query.length - 1]);
-    } else{
+    } else {
       setLoading(false);
     }
   }, []);
@@ -238,7 +246,7 @@ const ContentBlockForm = ({ open }: Props) => {
 
   return (
     <>
-    <LoadingBackdrop isLoading={loading} />
+      <LoadingBackdrop isLoading={loading} />
       <Card>
         <div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
@@ -253,14 +261,7 @@ const ContentBlockForm = ({ open }: Props) => {
                     placeholder=""
                     value={formData.name}
                     onChange={handleSectionNameChange}
-                  // onChange={(e: { target: { value: string; }; }) => {
-                  //   setFormErrors({ ...formErrors, name: "" });
-                  //   setFormData({
-                  //     ...formData,
-                  //     name: e.target.value,
-                  //     slug: open === sectionActions.ADD ? e.target.value.replace(/[^\w\s]|_/g, "").replace(/\s+/g, "-").toLowerCase() : formData.slug,
-                  //   });
-                  // }}
+
                   />
                 </Grid>
                 <Grid item xs={12} sm={5}>
@@ -273,15 +274,7 @@ const ContentBlockForm = ({ open }: Props) => {
                     placeholder=""
                     value={formData.slug}
                     onChange={handleSlugChange}
-                  // onChange={(e: { target: { value: string; }; }) => {
-                  //   setFormErrors({ ...formErrors, slug: "" });
-                  //   if (/^[A-Za-z0-9-]*$/.test(e.target.value)) {
-                  //     setFormData({
-                  //       ...formData,
-                  //       slug: e.target.value.toLowerCase(),
-                  //     });
-                  //   }
-                  // }}
+
                   />
                 </Grid>
                 <Grid item xs={12} sm={1}>
@@ -335,15 +328,16 @@ const ContentBlockForm = ({ open }: Props) => {
                                 onChange={(e, newValue) => handleChangeField(index, "fieldType", newValue ? newValue.value : '')}
                               />
 
-                              
+
                             </TableCell>
                             <TableCell>
                               <CustomTextField
                                 fullWidth
                                 value={field.fieldLabel}
                                 onChange={(e: { target: { value: any; }; }) => handleChangeField(index, "fieldLabel", e.target.value)}
-                           
-                           />
+                                // error={!!formErrors.jsonContent[index]}  
+                                // helperText={formErrors.jsonContent[index] || ' '} 
+                              />
                             </TableCell>
                             <TableCell>
                               <Switch
