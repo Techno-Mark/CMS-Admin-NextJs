@@ -95,7 +95,7 @@ function BlogForm({ action }: any) {
       alt={file.name}
       className="single-file-image"
       src={URL.createObjectURL(file as any)}
-      width={"400px"}
+      width={"450px"}
       height={"400px"}
     />
   ));
@@ -187,11 +187,15 @@ function BlogForm({ action }: any) {
                     {files.length ? (
                       img
                     ) : (
-                      <div className="flex items-center flex-col">
+                      <div className="flex items-center flex-col border-dashed border-2 p-16">
+                        <Typography variant="h4" className="mbe-2.5">
+                          Banner Image*
+                        </Typography>
                         <Avatar variant="rounded" className="bs-12 is-12 mbe-9">
                           <i className="tabler-upload" />
                         </Avatar>
-                        <Typography variant="h4" className="mbe-2.5">
+
+                        <Typography variant="h5" className="mbe-2.5">
                           Drop files here or click to upload.
                         </Typography>
                         <Typography>
@@ -219,11 +223,14 @@ function BlogForm({ action }: any) {
                     {files.length ? (
                       img
                     ) : (
-                      <div className="flex items-center flex-col">
+                      <div className="flex items-center justify-center flex-col border-dashed border-2 p-16">
+                        <Typography variant="h4" className="mbe-2.5">
+                          Thumbnail Image*
+                        </Typography>
                         <Avatar variant="rounded" className="bs-12 is-12 mbe-9">
                           <i className="tabler-upload" />
                         </Avatar>
-                        <Typography variant="h4" className="mbe-2.5">
+                        <Typography variant="h5" className="mbe-2.5">
                           Drop files here or click to upload.
                         </Typography>
                         <Typography>
