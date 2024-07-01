@@ -108,7 +108,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         </SubMenu>
         <SubMenu
           label={"Settings"}
-          icon={<i className='tabler-setting' />}
+          icon={<i className='tabler-settings' />}
         >
           <MenuItem href={`/settings/organizations`} icon={<i className='tabler-affiliate'></i>}>Organizations</MenuItem>
           <MenuItem href={`/settings/content-blocks`} icon={<i className='tabler-box-margin'></i>}>Content Blocks</MenuItem>
