@@ -14,9 +14,9 @@ import CustomTextField from "@/@core/components/mui/TextField";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import CustomAutocomplete from "@/@core/components/mui/Autocomplete";
 import { useRouter } from "next/navigation";
-
 import { useDropzone } from "react-dropzone";
-import { toast } from "react-toastify";
+import { post } from "@/services/apiService";
+import { template } from "@/services/endpoint/template";
 
 type FileProp = {
   name: string;
@@ -41,7 +41,7 @@ const options = [
 ];
 
 const initialFormData = {
-  templateId: 1,
+  templateId: -1,
   title: "",
   slug: "",
   categories: ["category1", "category2", "category3"] as string[],
@@ -74,9 +74,9 @@ function BlogForm({ action }: any) {
   const [formErrors, setFormErrors] =
     useState<typeof initialErrorData>(initialErrorData);
   const [templateList, setTemplateList] = useState<
-    [{ templateName: string; id: number }] | []
+    [{ templateName: string; templateId: number }] | []
   >([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   //Custom Hooks
   const { getRootProps, getInputProps } = useDropzone({
@@ -102,11 +102,24 @@ function BlogForm({ action }: any) {
 
   //Effects
   useEffect(() => {
-    async function getTemplate() {}
+    async function getTemplate() {
+      await getActiveTemplateList();
+    }
+    getTemplate();
   }, []);
 
   // Methods
-
+  const getActiveTemplateList = async () => {
+    try {
+      setLoading(true);
+      const result = await post(`${template.active}`, {});
+      const { data } = result;
+      setTemplateList(data.templates);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -143,9 +156,18 @@ function BlogForm({ action }: any) {
                     <MenuItem value={-1}>
                       <em>Select Template</em>
                     </MenuItem>
-                    <MenuItem value={1}>Template 1</MenuItem>
-                    <MenuItem value={2}>Template 3</MenuItem>
-                    <MenuItem value={3}>Template 2</MenuItem>
+                    {!loading &&
+                      !!templateList.length &&
+                      templateList.map((template) => {
+                        return (
+                          <MenuItem
+                            value={template.templateId}
+                            key={template.templateName}
+                          >
+                            {template.templateName}
+                          </MenuItem>
+                        );
+                      })}
                   </CustomTextField>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -259,7 +281,7 @@ function BlogForm({ action }: any) {
                     label="Description *"
                     fullWidth
                     placeholder="Enter Detail About Blog Post"
-                    value={""}
+                    value={formData.description}
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
@@ -343,7 +365,7 @@ function BlogForm({ action }: any) {
                     label="Meta Keywords* (maximum-character: 160 )"
                     fullWidth
                     placeholder=""
-                    value={formErrors.metaKeywords}
+                    value={formData.metaKeywords}
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setFormData({ ...formData, metaKeywords: e.target.value })
                     }
