@@ -18,6 +18,11 @@ import { useDropzone } from "react-dropzone";
 import { post } from "@/services/apiService";
 import { template } from "@/services/endpoint/template";
 
+const sectionActions = {
+  ADD: -1,
+  EDIT: 1,
+};
+
 type FileProp = {
   name: string;
   type: string;
@@ -44,6 +49,7 @@ const initialFormData = {
   templateId: -1,
   title: "",
   slug: "",
+  authorName: "",
   categories: ["category1", "category2", "category3"] as string[],
   tags: ["tag1", "tag2", "tag3"] as string[],
   description: "",
@@ -57,6 +63,7 @@ const initialErrorData = {
   templateId: "",
   title: "",
   slug: "",
+  authorName: "",
   categories: "",
   tags: "",
   description: "",
@@ -199,7 +206,23 @@ function BlogForm({ action }: any) {
                     }
                   />
                 </Grid>
-
+                <Grid item xs={12} sm={12}>
+                  <Grid item xs={12} sm={6}>
+                    <CustomTextField
+                      // disabled={open === sectionActions.EDIT}
+                      // error={!!formErrors.slug}
+                      error={!!formErrors.authorName}
+                      helperText={formErrors.authorName}
+                      label="Author Name *"
+                      fullWidth
+                      placeholder=""
+                      value={formData.authorName}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setFormData({ ...formData, authorName: e.target.value })
+                      }
+                    />
+                  </Grid>
+                </Grid>
                 <Grid item xs={12} sm={6}>
                   <Box
                     {...getRootProps({ className: "dropzone" })}
