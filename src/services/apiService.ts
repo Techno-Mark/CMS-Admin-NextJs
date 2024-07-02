@@ -8,7 +8,7 @@ const handleResponse = async (response: Response) => {
     console.log(response);
     
     if (response.status === 401) {
-      await signOut({ redirect: true, callbackUrl: "/login" });
+      // await signOut({ redirect: true, callbackUrl: "/login" });
       throw new Error("Unauthorized. Token missing or expired");
     } else if (response.status === 422) {
       const errorResponse = await response.json();
@@ -59,7 +59,7 @@ export const fetchData = async (
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session?.user.token}`,
-        ...(orgId ? { "organizationId": orgId } : {}),
+        ...(orgId ? { "organization-id": orgId } : {}),
         ...options.headers,
       },
     });

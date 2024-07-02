@@ -24,7 +24,7 @@ interface Organization {
 const ModeDropdown = () => {
   const [open, setOpen] = useState(false);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
+  const [selectedOrgId, setSelectedOrgId] = useState<any | null>(null);
   const anchorRef1 = useRef<HTMLDivElement>(null);
   const { settings } = useSettings();
 
@@ -34,13 +34,11 @@ const ModeDropdown = () => {
         const response = await post(organization.active, {});
         const orgs = response.data.organizations as Organization[];
         setOrganizations(orgs);
-        
         const storedOrgId = localStorage.getItem('selectedOrgId');
         console.log(storedOrgId);
         if (storedOrgId) {
-          
-          
-          setSelectedOrgId(storedOrgId);
+          const parsedOrgId = parseInt(storedOrgId, 10); 
+          setSelectedOrgId(parsedOrgId);
         } else if (orgs.length > 0) {
           setSelectedOrgId(orgs[0].id);
           localStorage.setItem('selectedOrgId', orgs[0].id);

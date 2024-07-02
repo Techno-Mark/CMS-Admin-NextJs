@@ -1,137 +1,103 @@
-// React Imports
-import { useEffect, useState } from "react";
-// MUI Imports
-import Button from "@mui/material/Button";
-// Component Imports
-import CustomTextField from "@core/components/mui/TextField";
-import { Box, Card, Grid, Switch } from "@mui/material";
-import { ADD_SECTION, EDIT_SECTION, UsersType } from "@/types/apps/userTypes";
-import BreadCrumbList from "./BreadCrumbList";
+"use client";
+
+import LoadingBackdrop from "@/components/LoadingBackdrop";
+import {
+  Button,
+  Box,
+  Card,
+  Grid,
+  MenuItem,
+  Typography,
+  TextField,
+} from "@mui/material";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useDropzone } from "react-dropzone";
 import { get, post } from "@/services/apiService";
-import { usePathname, useRouter } from "next/navigation";
-import { toast } from "react-toastify";
-import { pages } from "@/services/endpoint/pages";
+import { template } from "@/services/endpoint/template";
+import CustomTextField from "@/@core/components/mui/TextField";
 
-type Props = {
-  open: ADD_SECTION | EDIT_SECTION;
-};
-
-type FormDataType = {
-  id: number;
+type FileProp = {
   name: string;
-  slug: string;
-  status: boolean;
+  type: string;
+  size: number;
 };
 
-//enum
-const sectionActions = {
-  ADD: -1,
-  EDIT: 1,
-};
-
-// Vars
-const initialData = {
-  id: 0,
-  name: "",
+const initialFormData = {
+  templateId: -1,
+  title: "",
   slug: "",
-  jsonContent: "",
-  status: false,
+  authorName: "",
+  categories: ["category1", "category2", "category3"] as string[],
+  tags: ["tag1", "tag2", "tag3"] as string[],
+  description: "",
+  status: 0,
+  metaTitle: "",
+  metaDescription: "",
+  metaKeywords: "",
 };
 
 const initialErrorData = {
-  name: "",
+  templateId: "",
+  title: "",
   slug: "",
-  jsonContent: "",
+  authorName: "",
+  categories: "",
+  tags: "",
+  description: "",
+  status: "",
+  metaTitle: "",
+  metaDescription: "",
+  metaKeywords: "",
 };
 
-const PagesForm = ({ open }: Props) => {
+function PagesForm({ open }: any) {
   const router = useRouter();
-  const query = usePathname().split("/");
-  const [formData, setFormData] = useState<FormDataType | UsersType>(
-    initialData
-  );
-  const [formErrors, setFormErrors] = useState<{
-    name: string;
-    slug: string;
-  }>(initialErrorData);
-
+  const [files, setFiles] = useState<File[]>([]);
+  const [formData, setFormData] =
+    useState<typeof initialFormData>(initialFormData);
+  const [formErrors, setFormErrors] =
+    useState<typeof initialErrorData>(initialErrorData);
+  const [templateList, setTemplateList] = useState<
+    [{ templateName: string; templateId: number }] | []
+  >([]);
+  const [sections, setSections] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const validateFormData = (arg1: FormDataType) => {
-    if (arg1.name.trim().length === 0) {
-      setFormErrors({ ...formErrors, name: "This field is required" });
-    } else if (arg1.slug.trim().length === 0) {
-      setFormErrors({ ...formErrors, slug: "This field is required" });
-    } else if (false) {
-    } else {
-      return true;
+  const { getRootProps, getInputProps } = useDropzone({
+    multiple: false,
+    accept: {
+      "image/*": [".png", ".jpg", ".jpeg", ".gif"],
+    },
+    onDrop: (acceptedFiles: File[]) => {
+      setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
+    },
+  });
+
+  const img = files.map((file: FileProp) => (
+    <img
+      key={file.name}
+      alt={file.name}
+      className="single-file-image"
+      src={URL.createObjectURL(file as any)}
+      width={"450px"}
+      height={"400px"}
+    />
+  ));
+
+  useEffect(() => {
+    async function getTemplate() {
+      await getActiveTemplateList();
     }
+    getTemplate();
+  }, []);
 
-    return false;
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    setLoading(true);
-
-    if (
-      validateFormData({
-        id: formData.id,
-        name: formData.name,
-        slug: formData.slug,
-        status: formData.status,
-      })
-    ) {
-      const result = await post(
-        open === sectionActions.EDIT ? pages.update : pages.create,
-        open === sectionActions.EDIT
-          ? {
-              sectionId: formData.id,
-              sectionName: formData.name,
-              active: formData.status,
-            }
-          : {
-              sectionName: formData.name,
-              active: formData.status,
-            }
-      );
-
-      if (result.status === "success") {
-        toast.success(result.message);
-        handleReset();
-        setLoading(false);
-      } else {
-        toast.error(result.message);
-        setLoading(false);
-      }
-    }
-  };
-
-  const handleReset = () => {
-    setFormData(initialData);
-    setFormErrors(initialErrorData);
-    router.back();
-  };
-
-  const getSectionDataById = async (id: string | number) => {
-    setLoading(true);
-    const org = localStorage.getItem("orgName");
+  const getActiveTemplateList = async () => {
     try {
-      const result = await post(pages.getById, {
-        organizationName: !!org ? org : "pabs",
-        id: id,
-      });
+      setLoading(true);
+      const result = await post(`${template.active}`, {});
       const { data } = result;
-
-      setFormData({
-        ...formData,
-        id: data.pageId,
-        name: data.title,
-        slug: data.slug,
-        jsonContent: JSON.stringify(data.content),
-        status: data.active,
-      });
+      setTemplateList(data.templates);
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -139,99 +105,207 @@ const PagesForm = ({ open }: Props) => {
     }
   };
 
-  useEffect(() => {
-    if (open === sectionActions.EDIT) {
-      getSectionDataById(query[query.length - 1]);
+  const getTemplateIdWiseForm = async (templateId: number) => {
+    setLoading(true);
+    try {
+      const result = await get(
+        `${template.getTemplateSectionsById}/${templateId}`
+      );
+      if (result.statusCode === 200) {
+        setSections(result.data);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
     }
-  }, []);
+  };
+
+  const validateField = (value: string, validation: any) => {
+    if (validation.required && !value) {
+      return "This field is required";
+    }
+    if (validation.maxLength && value.length > validation.maxLength) {
+      return `Maximum length is ${validation.maxLength}`;
+    }
+    if (validation.minLength && value.length < validation.minLength) {
+      return `Minimum length is ${validation.minLength}`;
+    }
+    if (validation.pattern && !new RegExp(validation.pattern).test(value)) {
+      return "Invalid format";
+    }
+    return "";
+  };
+
+  const validateForm = () => {
+    let valid = true;
+    let errors = { ...initialErrorData };
+
+    if (formData.templateId === -1) {
+      errors.templateId = "Please select a template";
+      valid = false;
+    }
+
+    const sectionErrors = sections.map((section) => {
+      const sectionError: any = {};
+      section.sectionTemplate.forEach(
+        (
+          field: { fieldLabel: string; fieldType: string; validation: any },
+          fieldIndex: number
+        ) => {
+          const value = section.sectionTemplate[fieldIndex][field.fieldType];
+          const error = validateField(value, field.validation);
+          if (error) {
+            sectionError[field.fieldType] = error;
+            valid = false;
+          }
+        }
+      );
+      return sectionError;
+    });
+
+    setFormErrors(errors);
+    setSections((prevSections) =>
+      prevSections.map((section, index) => ({
+        ...section,
+        errors: sectionErrors[index],
+      }))
+    );
+    return valid;
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (validateForm()) {
+      try {
+        setLoading(true);
+        const result = await post("/api/blog/create", formData);
+        setLoading(false);
+        if (result.status === 200) {
+          router.push("/blogs");
+        }
+      } catch (error) {
+        console.error(error);
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleInputChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    sectionId: number,
+    fieldIndex: number
+  ) => {
+    const { name, value } = event.target;
+    setSections((prevSections) => {
+      const updatedSections = [...prevSections];
+      updatedSections.forEach((section) => {
+        if (section.sectionId === sectionId) {
+          section.sectionTemplate[fieldIndex][name] = value;
+        }
+      });
+      return updatedSections;
+    });
+  };
 
   return (
     <>
-      {/* <LoadingBackdrop isLoading={loading} /> */}
-      <BreadCrumbList />
+      <LoadingBackdrop isLoading={loading} />
       <Card>
         <div>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
+          <form className="flex flex-col gap-6 p-6" onSubmit={handleSubmit}>
             <Box display="flex" alignItems="center">
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    error={!!formErrors.name}
-                    helperText={formErrors.name}
-                    label="Full Name *"
+              <Grid container spacing={4}>
+                <Grid item xs={12} sm={12}>
+                  <TextField
+                    error={!!formErrors.templateId}
+                    helperText={formErrors.templateId}
+                    select
                     fullWidth
-                    placeholder="Enter Name"
-                    value={formData.name}
-                    onChange={(e) => {
-                      setFormErrors({ ...formErrors, name: "" });
-                      setFormData({
-                        ...formData,
-                        name: e.target.value,
-                        slug: e.target.value
-                          .replace(/[^\w\s]|_/g, "")
-                          .replace(/\s+/g, "-")
-                          .toLowerCase(),
-                      });
+                    defaultValue=""
+                    value={formData.templateId}
+                    label="Select Template"
+                    id="custom-select"
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                      const templateId = Number(e.target.value);
+                      setFormData({ ...formData, templateId });
+                      getTemplateIdWiseForm(templateId);
                     }}
-                  />
+                  >
+                    {!loading &&
+                      !!templateList.length &&
+                      templateList.map((template) => {
+                        return (
+                          <MenuItem
+                            value={template.templateId}
+                            key={template.templateName}
+                          >
+                            {template.templateName}
+                          </MenuItem>
+                        );
+                      })}
+                  </TextField>
                 </Grid>
-                <Grid item xs={12} sm={5}>
-                  <CustomTextField
-                    disabled={open === sectionActions.EDIT}
-                    error={!!formErrors.slug}
-                    helperText={formErrors.slug}
-                    label="Slug *"
-                    fullWidth
-                    placeholder="Enter Slug"
-                    value={formData.slug}
-                    onChange={(e) => {
-                      setFormErrors({ ...formErrors, slug: "" });
-                      if (/^[A-Za-z0-9-]*$/.test(e.target.value)) {
-                        setFormData({
-                          ...formData,
-                          slug: e.target.value.toLowerCase(),
-                        });
-                      }
-                    }}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={1}>
-                  <label className="text-[0.8125rem] leading-[1.153]">
-                    Status
-                  </label>
-                  <Switch
-                    size="medium"
-                    checked={formData.status}
-                    onChange={(e) =>
-                      setFormData({ ...formData, status: e.target.checked })
-                    }
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={12}></Grid>
-
-                <Grid item xs={12}>
+                {sections.map((section) => (
+                  <Grid item xs={6} key={section.sectionId}>
+                    <Typography variant="h6">{section.sectionName}</Typography>
+                    {section.sectionTemplate.map(
+                      (
+                        field: {
+                          fieldLabel: string;
+                          fieldType: string;
+                          isRequired: boolean;
+                          validation: any;
+                        },
+                        fieldIndex: number
+                      ) => (
+                        <div key={fieldIndex}>
+                          <CustomTextField
+                            label={field.fieldLabel}
+                            type={field.fieldType}
+                            required={field.isRequired}
+                            name={field.fieldType}
+                            onChange={(e:any) =>
+                              handleInputChange(
+                                e,
+                                section.sectionId,
+                                fieldIndex
+                              )
+                            }
+                            fullWidth
+                            margin="normal"
+                            inputProps={JSON.parse(field.validation)} // Add dynamic validation here
+                          />
+                          {section.errors && section.errors[field.fieldType] && (
+                            <Typography color="error" variant="body2">
+                              {section.errors[field.fieldType]}
+                            </Typography>
+                          )}
+                        </div>
+                      )
+                    )}
+                  </Grid>
+                ))}
+                <Grid
+                  item
+                  xs={12}
+                  style={{ position: "sticky", bottom: 0, zIndex: 10 }}
+                >
                   <Box
-                    p={2}
+                    p={7}
                     display="flex"
                     gap={2}
                     justifyContent="end"
                     bgcolor="background.paper"
-                    position="sticky"
-                    bottom={0}
-                    zIndex={10}
                   >
-                    <Button
-                      variant="tonal"
-                      color="error"
-                      type="reset"
-                      onClick={() => handleReset()}
-                    >
+                    <Button variant="contained" color="error" type="reset">
                       Cancel
                     </Button>
+                    <Button color="warning" variant="contained">
+                      Save as Draft
+                    </Button>
                     <Button variant="contained" type="submit">
-                      {open === sectionActions.ADD ? "Add" : "Edit"} Page
+                      Save & Publish
                     </Button>
                   </Box>
                 </Grid>
@@ -242,6 +316,6 @@ const PagesForm = ({ open }: Props) => {
       </Card>
     </>
   );
-};
+}
 
 export default PagesForm;

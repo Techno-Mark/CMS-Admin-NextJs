@@ -136,7 +136,7 @@ const ContentBlockForm = ({ open }: Props) => {
     let errors = {
       name: '',
       slug: '',
-      // jsonContent: data.jsonContent.map(() => ''), 
+      jsonContent: data.jsonContent.map(() => ''), 
     };
 
     if (data.name.trim().length === 0) {
