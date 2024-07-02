@@ -80,7 +80,7 @@ const initialErrorData = {
   metaKeywords: "",
 };
 
-function BlogForm({ action }: any) {
+function BlogForm({ open }: any) {
   const router = useRouter();
 
   //state management hook
