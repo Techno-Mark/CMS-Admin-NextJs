@@ -5,7 +5,7 @@ const BreadCrumbList = () => {
   const router = useRouter();
   const pathSplits: string[] = usePathname().substring(1).split("/");
 
-  const breadCrumbClick = (clickedItemIndex: number) => {
+  const breadCrumbClick = (clickedItemIndex: number): void => {
     const pathSegments = pathSplits.slice(0, clickedItemIndex + 1).join("/");
     router.push(`/${pathSegments}`);
   };

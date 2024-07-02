@@ -23,7 +23,7 @@ import Button from '@mui/material/Button'
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
-import { useSession ,signOut} from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 
 // Styled component for badge content
 const BadgeContentSpan = styled('span')({
@@ -32,7 +32,7 @@ const BadgeContentSpan = styled('span')({
   borderRadius: '50%',
   cursor: 'pointer',
   backgroundColor: 'var(--mui-palette-success-main)',
-  boxShadow: '0 0 0 2px var(--mui-palette-background-paper)'
+  boxShadow: '0 0 0 2px var(--mui-palette-background-paper)',
 })
 
 const UserDropdown = () => {
@@ -54,7 +54,7 @@ const UserDropdown = () => {
   const avatarText = userName.split(' ').map(n => n[0]).join('')
 
   const handleDropdownOpen = () => {
-    !open ? setOpen(true) : setOpen(false)
+    setOpen((prevOpen) => !prevOpen)
   }
 
   const handleDropdownClose = (event?: MouseEvent<HTMLLIElement> | (MouseEvent | TouchEvent), url?: string) => {
@@ -70,15 +70,12 @@ const UserDropdown = () => {
   }
 
   const handleUserLogout = async () => {
-    // Redirect to login page
-    // router.push('/login')
     await signOut({ callbackUrl: '/login' })
   }
 
   return (
     <>
       <Badge
-        ref={anchorRef}
         overlap='circular'
         badgeContent={<BadgeContentSpan onClick={handleDropdownOpen} />}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -113,38 +110,30 @@ const UserDropdown = () => {
           <Fade
             {...TransitionProps}
             style={{
-              transformOrigin: placement === 'bottom-end' ? 'right top' : 'left top'
+              transformOrigin: placement === 'bottom-end' ? 'right top' : 'left top',
             }}
           >
             <Paper className={settings.skin === 'bordered' ? 'border shadow-none' : 'shadow-lg'}>
-              <ClickAwayListener onClickAway={e => handleDropdownClose(e as MouseEvent | TouchEvent)}>
+              <ClickAwayListener onClickAway={(e) => handleDropdownClose(e as MouseEvent | TouchEvent)}>
                 <MenuList>
                   <div className='flex items-center plb-2 pli-6 gap-2' tabIndex={-1}>
-                    <Avatar  ref={anchorRef}  > {avatarText}</Avatar>
+                    <Avatar>{avatarText}</Avatar>
                     <div className='flex items-start flex-col'>
                       <Typography className='font-medium' color='text.primary'>
-                      {userName}
+                        {userName}
                       </Typography>
                       <Typography variant='caption'>{userEmail}</Typography>
                     </div>
                   </div>
                   <Divider className='mlb-1' />
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e)}>
+                  {/* <MenuItem className='mli-2 gap-3' onClick={(e) => handleDropdownClose(e)}>
                     <i className='tabler-user text-[22px]' />
                     <Typography color='text.primary'>My Profile</Typography>
-                  </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e)}>
+                  </MenuItem> */}
+                  {/* <MenuItem className='mli-2 gap-3' onClick={(e) => handleDropdownClose(e)}>
                     <i className='tabler-settings text-[22px]' />
                     <Typography color='text.primary'>Settings</Typography>
-                  </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e)}>
-                    <i className='tabler-currency-dollar text-[22px]' />
-                    <Typography color='text.primary'>Pricing</Typography>
-                  </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e)}>
-                    <i className='tabler-help-circle text-[22px]' />
-                    <Typography color='text.primary'>FAQ</Typography>
-                  </MenuItem>
+                  </MenuItem> */}
                   <div className='flex items-center plb-2 pli-3'>
                     <Button
                       fullWidth
