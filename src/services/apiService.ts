@@ -8,11 +8,9 @@ const handleResponse = async (response: Response) => {
     console.log(response);
     
     if (response.status === 401) {
-      // Unauthorized, log out and redirect to login page
       await signOut({ redirect: true, callbackUrl: "/login" });
       throw new Error("Unauthorized. Token missing or expired");
     } else if (response.status === 422) {
-      // Unprocessable Entity, handle validation errors
       const errorResponse = await response.json();
       const { message, data } = errorResponse;
       if (message === "validation error" && data ) {
@@ -24,7 +22,6 @@ const handleResponse = async (response: Response) => {
         throw new Error(message || "Validation error");
       }
     } else if (response.status === 400) {
-      // Bad Request, handle validation errors
       const errorResponse = await response.json();
       const { message, data } = errorResponse;
       if (message === "validation error" && data && typeof data === 'object') {
@@ -55,12 +52,14 @@ export const fetchData = async (
     if (!session || !session?.user) {
       throw new Error("No session or access token found");
     }
-
+    
+    const orgId = localStorage.getItem('selectedOrgId'); 
     const response = await fetch(`${API_URL}/${endpoint}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session?.user.token}`,
+        ...(orgId ? { "organizationId": orgId } : {}), 
         ...options.headers,
       },
     });
