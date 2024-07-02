@@ -17,7 +17,7 @@ import { TemplateType } from '@/types/apps/templateType';
 import { template } from '@/services/endpoint/template';
 import CustomAutocomplete from '@core/components/mui/Autocomplete';
 import { section } from '@/services/endpoint/section';
-import BreadCrumbList from '../content-blocks/BreadCrumbList';
+import BreadCrumbList from '@/components/BreadCrumbList';
 import LoadingBackdrop from '@/components/LoadingBackdrop';
 // import DeleteIcon from '@mui/icons-material/Delete';
 

@@ -26,7 +26,7 @@ import { post } from "@/services/apiService";
 import CustomChip from "@/@core/components/mui/Chip";
 import { template } from "@/services/endpoint/template";
 import { TemplateType } from "@/types/apps/templateType";
-import BreadCrumbList from "../content-blocks/BreadCrumbList";
+import BreadCrumbList from "@/components/BreadCrumbList";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import { truncateText } from "@/utils/common";
 
