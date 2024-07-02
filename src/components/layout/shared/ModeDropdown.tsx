@@ -1,21 +1,16 @@
-import { useRef, useState, useEffect } from 'react'
-import Tooltip from '@mui/material/Tooltip'
-import Badge from '@mui/material/Badge'
-import Avatar from '@mui/material/Avatar'
-import IconButton from '@mui/material/IconButton'
-import Popper from '@mui/material/Popper'
-import Fade from '@mui/material/Fade'
-import Paper from '@mui/material/Paper'
-import ClickAwayListener from '@mui/material/ClickAwayListener'
-import MenuList from '@mui/material/MenuList'
-import MenuItem from '@mui/material/MenuItem'
-import Typography from '@mui/material/Typography'
-
-// Type Imports
-import type { Mode } from '@core/types'
+import { useRef, useState, useEffect } from 'react';
+import Badge from '@mui/material/Badge';
+import Avatar from '@mui/material/Avatar';
+import Popper from '@mui/material/Popper';
+import Fade from '@mui/material/Fade';
+import Paper from '@mui/material/Paper';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import MenuList from '@mui/material/MenuList';
+import MenuItem from '@mui/material/MenuItem';
+import Typography from '@mui/material/Typography';
 
 // Hook Imports
-import { useSettings } from '@core/hooks/useSettings'
+import { useSettings } from '@core/hooks/useSettings';
 
 // API Imports
 import { organization } from "@/services/endpoint/organization";
@@ -29,24 +24,59 @@ interface Organization {
 const ModeDropdown = () => {
   const [open, setOpen] = useState(false);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
-  const anchorRef1 = useRef<HTMLButtonElement>(null);
+  const [selectedOrgId, setSelectedOrgId] = useState<any | null>(null);
+  const anchorRef1 = useRef<HTMLDivElement>(null);
   const { settings } = useSettings();
+  const selectedOrgName = organizations.find((org) => org.id === selectedOrgId)?.name || 'Select Organization';
+  const avatarText = selectedOrgName.split(' ').map((n) => n[0]).join('');
+
+  // useEffect(() => {
+  //   const fetchOrganizations = async () => {
+  //     try {
+  //       const response = await post(organization.active, {});
+  //       const orgs = response.data.organizations as Organization[];
+  //       setOrganizations(orgs);
+  //     } catch (error) {
+  //       console.error('Error fetching organizations:', error);
+  //     }
+  //   };
+
+  //   fetchOrganizations();
+  // }, []);
 
   useEffect(() => {
     const fetchOrganizations = async () => {
       try {
         const response = await post(organization.active, {});
-        setOrganizations(response.data.organizations as Organization[]);
+        const orgs = response.data.organizations as Organization[];
+        setOrganizations(orgs);
+
+        // Check if selectedOrgId is in localStorage
+        const storedOrgId = localStorage.getItem('selectedOrgId');
+
+
+        if (storedOrgId) {
+          const parsedOrgId = parseInt(storedOrgId, 10);
+          // const selectedOrg = orgs.find((org) => org.id === parsedOrgId.toString());
+          if (storedOrgId) {
+            setSelectedOrgId(parsedOrgId);
+          } 
+          // else {
+
+          //   setSelectedOrgId(orgs[0]?.id || null);
+          // }
+          // setSelectedOrgId(parsedOrgId);
+        } else {
+          setSelectedOrgId(orgs[0]?.id || null);
+          localStorage.setItem('selectedOrgId', orgs[0]?.id);
+        }
       } catch (error) {
         console.error('Error fetching organizations:', error);
       }
     };
+    fetchOrganizations();
+  }, []);
 
-    if (open) {
-      fetchOrganizations();
-    }
-  }, [open]);
 
   const handleClose = () => {
     setOpen(false);
@@ -58,10 +88,9 @@ const ModeDropdown = () => {
 
   const handleModeSwitch = (orgId: string) => {
     setSelectedOrgId(orgId);
+    localStorage.setItem('selectedOrgId', orgId);
     handleClose();
   };
-
-  const avatarText = 'Techno Mark'.split(' ').map((n) => n[0]).join('');
 
   return (
     <>
@@ -72,15 +101,11 @@ const ModeDropdown = () => {
         className="mis-2 flex items-center justify-center cursor-pointer"
         onClick={handleToggle1}
       >
-        <Avatar
-          alt="Techno Mark"
-          className="cursor-pointer bs-[38px] is-[38
-          bs-[38px] is-[38px]"
-        >
-          {selectedOrgId ? organizations.find((org) => org.id === selectedOrgId)?.name.charAt(0) : avatarText.charAt(0)}
+        <Avatar alt={selectedOrgName} className="cursor-pointer bs-[38px] is-[38px]">
+          {avatarText}
         </Avatar>
         <Typography className="font-medium ml-2 mr-1" color="text.primary">
-          {selectedOrgId ? organizations.find((org) => org.id === selectedOrgId)?.name : 'Select Organization'}
+          {selectedOrgName}
         </Typography>
         <i className={`tabler-chevron-down ${open ? 'transform rotate-180' : ''}`} />
       </Badge>
@@ -126,6 +151,6 @@ const ModeDropdown = () => {
       </Popper>
     </>
   );
-}
+};
 
 export default ModeDropdown;
