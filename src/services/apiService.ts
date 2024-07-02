@@ -1,11 +1,43 @@
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
+import { toast } from "react-toastify";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(error);
+    console.log(response);
+    
+    if (response.status === 401) {
+      await signOut({ redirect: true, callbackUrl: "/login" });
+      throw new Error("Unauthorized. Token missing or expired");
+    } else if (response.status === 422) {
+      const errorResponse = await response.json();
+      const { message, data } = errorResponse;
+      if (message === "validation error" && data ) {
+        const errors = Object.keys(data).map((key) => `${key}: ${data[key]}`);
+        toast.error(errors.join("; "));
+        throw new Error("Validation error1");
+      } else {
+        toast.error(message || "Validation error");
+        throw new Error(message || "Validation error");
+      }
+    } else if (response.status === 400) {
+      const errorResponse = await response.json();
+      const { message, data } = errorResponse;
+      if (message === "validation error" && data && typeof data === 'object') {
+        const errors = Object.values(data).map((errorMessage) => errorMessage);
+        toast.error(errors.join("; "));
+        throw new Error("Validation error");
+      } else {
+        toast.error(message || "Validation error");
+        throw new Error(message || "Validation error");
+      }
+    } else {
+      // Other errors
+      const error = await response.text();
+      toast.error(error);
+      throw new Error(error);
+    }
   }
   return await response.json();
 };
@@ -16,23 +48,25 @@ export const fetchData = async (
 ) => {
   try {
     const session = await getSession();
-    console.log(session?.user.token);
 
     if (!session || !session?.user) {
       throw new Error("No session or access token found");
     }
-
+    
+    const orgId = localStorage.getItem('selectedOrgId'); 
     const response = await fetch(`${API_URL}/${endpoint}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session?.user.token}`,
+        ...(orgId ? { "orgId": orgId } : {}), 
         ...options.headers,
       },
     });
     return await handleResponse(response);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching data:", error);
+    // toast.error(error.message);
     throw error;
   }
 };
