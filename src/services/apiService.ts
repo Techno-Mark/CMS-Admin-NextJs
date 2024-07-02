@@ -59,7 +59,7 @@ export const fetchData = async (
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session?.user.token}`,
-        ...(orgId ? { "organizationId": orgId } : {}), 
+        ...(orgId ? { "organizationId": orgId } : {}),
         ...options.headers,
       },
     });
