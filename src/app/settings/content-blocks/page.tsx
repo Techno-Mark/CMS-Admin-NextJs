@@ -1,8 +1,8 @@
 "use client";
-import UserListTable from "./ContentBlockListTable";
 import { useEffect, useState } from "react";
-import { getSectionList } from "@/app/api/content-block";
+import { getSectionList } from "@/services/endpoint/content-block";
 import { post } from "@/services/apiService";
+import ContentBlockListTable from "./ContentBlockListTable";
 
 const initialBody = {
   page: 0,
@@ -40,7 +40,7 @@ const page = () => {
 
   return (
     <>
-      <UserListTable
+      <ContentBlockListTable
         totalCount={totalCount}
         tableData={contentBlockData}
         getList={getList}

@@ -6,12 +6,12 @@ import Button from "@mui/material/Button";
 import CustomTextField from "@core/components/mui/TextField";
 import { Card, Switch } from "@mui/material";
 import { ADD_SECTION, EDIT_SECTION, UsersType } from "@/types/apps/userTypes";
-import BreadCrumbList from "./BreadCrumbList";
+import BreadCrumbList from "../../../components/BreadCrumbList";
 import {
   createSection,
   getSectionById,
   updateSection,
-} from "@/app/api/content-block";
+} from "@/services/endpoint/content-block";
 import { get, post } from "@/services/apiService";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -100,6 +100,10 @@ const ContentBlockForm = ({ open }: Props) => {
       };
     }
 
+    if (!Array.isArray(parsedInput)) {
+      parsedInput = [parsedInput];
+    }
+
     for (let obj of parsedInput) {
       for (let key of requiredKeys) {
         if (!(key in obj)) {
@@ -131,11 +135,13 @@ const ContentBlockForm = ({ open }: Props) => {
           ? {
               sectionId: formData.id,
               sectionName: formData.name,
+              sectionSlug: formData.slug,
               sectionTemplate: JSON.parse(formData.jsonContent),
               active: formData.status,
             }
           : {
               sectionName: formData.name,
+              sectionSlug: formData.slug,
               sectionTemplate: JSON.parse(formData.jsonContent),
               active: formData.status,
             }

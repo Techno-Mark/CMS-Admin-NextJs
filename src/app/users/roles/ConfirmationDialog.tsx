@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { toast } from "react-toastify";
 import { post } from "@/services/apiService";
-import { deleteSection } from "@/services/endpoint/content-block";
+import { deleteRole } from "@/services/endpoint/users/roles";
 
 type ConfirmationDialogProps = {
   open: boolean;
@@ -21,9 +21,9 @@ const ConfirmationDialog = ({
   setDeletingId,
   deletePayload,
 }: ConfirmationDialogProps) => {
-  const deleteContentBlock = async () => {
+  const handleDeletePermission = async () => {
     try {
-      const result = await post(deleteSection, deletePayload);
+      const result = await post(deleteRole, deletePayload);
 
       if (result.status === "success") {
         toast.success(result.message);
@@ -47,7 +47,7 @@ const ConfirmationDialog = ({
         </Typography>
       </DialogContent>
       <DialogActions className="justify-center pbs-0 sm:pbe-16 sm:pli-16">
-        <Button variant="contained" onClick={deleteContentBlock}>
+        <Button variant="contained" onClick={handleDeletePermission}>
           Yes
         </Button>
         <Button

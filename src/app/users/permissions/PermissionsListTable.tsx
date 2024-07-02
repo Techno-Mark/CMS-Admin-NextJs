@@ -2,7 +2,7 @@
 import { useEffect, useState, useMemo } from "react";
 // MUI Imports
 import Card from "@mui/material/Card";
-import Button from "@mui/material/Button";
+import Button, { ButtonProps } from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import TablePagination from "@mui/material/TablePagination";
@@ -24,22 +24,25 @@ import {
 } from "@tanstack/react-table";
 import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { RankingInfo } from "@tanstack/match-sorter-utils";
-// Type Imports
-import type { UsersType } from "@/types/apps/userTypes";
 // Component Imports
 import TablePaginationComponent from "@components/TablePaginationComponent";
 import CustomTextField from "@core/components/mui/TextField";
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
 import ConfirmationDialog from "./ConfirmationDialog";
+
 import { useRouter } from "next/navigation";
-import BreadCrumbList from "../../../components/BreadCrumbList";
+import BreadCrumbList from "@components/BreadCrumbList";
+// Type Imports
+import { PermissionsType } from "@/types/apps/permissionsType";
 import {
   redirectToAddPage,
   redirectToEditPage,
-} from "@/services/endpoint/content-block";
+} from "@/services/endpoint/users/roles";
 import { formatDate } from "@/utils/formatDate";
 import { Chip } from "@mui/material";
+import OpenDialogOnElementClick from "@/components/Dialogs/OpenDialogOnElementClick";
+import PermissionDialog from "@/components/Dialogs/PermissionDialog";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -50,7 +53,7 @@ declare module "@tanstack/table-core" {
   }
 }
 
-type UsersTypeWithAction = UsersType & {
+type PermissionsTypeWithAction = PermissionsType & {
   action?: string;
 };
 
@@ -90,7 +93,6 @@ const DebouncedInput = ({
     }, debounce);
 
     return () => clearTimeout(timeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   return (
@@ -103,16 +105,16 @@ const DebouncedInput = ({
 };
 
 // Column Definitions
-const columnHelper = createColumnHelper<UsersTypeWithAction>();
+const columnHelper = createColumnHelper<PermissionsTypeWithAction>();
 
-const ContentBlockListTable = ({
+const PermissionsListTable = ({
   totalCount,
   tableData,
   getList,
   initialBody,
 }: {
   totalCount: number;
-  tableData?: UsersType[];
+  tableData?: PermissionsType[];
   getList: (arg1: { page: number; limit: number; search: string }) => void;
   initialBody: {
     page: number;
@@ -122,25 +124,27 @@ const ContentBlockListTable = ({
 }) => {
   const router = useRouter();
   // States
+  const [open, setOpen] = useState(false);
   const [globalFilter, setGlobalFilter] = useState("");
   const [deletingId, setDeletingId] = useState<number>(0);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [editValue, setEditValue] = useState<string | number>("");
+  //vars
+  const buttonProps: ButtonProps = {
+    variant: "contained",
+    children: "Add Permission",
+    onClick: () => handleAddPermission(),
+    className: "is-full sm:is-auto",
+    startIcon: <i className="tabler-plus" />,
+  };
 
-  const columns = useMemo<ColumnDef<UsersTypeWithAction, any>[]>(
+  const columns = useMemo<ColumnDef<PermissionsTypeWithAction, any>[]>(
     () => [
-      columnHelper.accessor("srNo", {
-        header: "Sr. No.",
+      columnHelper.accessor("permissionName", {
+        header: "Name",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {row.index + 1}
-          </Typography>
-        ),
-      }),
-      columnHelper.accessor("name", {
-        header: "Content Block",
-        cell: ({ row }) => (
-          <Typography color="text.primary" className="font-medium">
-            {row.original.name}
+            {row.original.permissionName}
           </Typography>
         ),
       }),
@@ -152,28 +156,29 @@ const ContentBlockListTable = ({
           </Typography>
         ),
       }),
-      columnHelper.accessor("status", {
+      columnHelper.accessor("active", {
         header: "Status",
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
             <Chip
               variant="tonal"
               className="capitalize"
-              label={row.original.status ? "Active" : "Inactive"}
-              color={row.original.status ? "success" : "error"}
+              label={row.original.active ? "Active" : "Inactive"}
+              color={row.original.active ? "success" : "error"}
               size="small"
             />
           </div>
         ),
       }),
-      columnHelper.accessor("id", {
+      columnHelper.accessor("permissionId", {
         header: "Action",
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
               <IconButton
                 onClick={() => {
-                  router.push(redirectToEditPage(row.original.slug));
+                  setOpen(true);
+                  setEditValue(row.original.permissionId);
                 }}
               >
                 <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -181,7 +186,7 @@ const ContentBlockListTable = ({
               <IconButton
                 onClick={() => {
                   setIsDeleting(true);
-                  setDeletingId(row.original.id);
+                  setDeletingId(row.original.permissionId);
                 }}
               >
                 <i className="tabler-trash text-[22px] text-textSecondary" />
@@ -196,7 +201,7 @@ const ContentBlockListTable = ({
   );
 
   const table = useReactTable({
-    data: tableData as UsersType[],
+    data: tableData as PermissionsType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter,
@@ -218,8 +223,13 @@ const ContentBlockListTable = ({
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
   });
 
+  const handleAddPermission = () => {
+    setEditValue("");
+  };
+
   useEffect(() => {
     getList({
+      ...initialBody,
       page: table.getState().pagination.pageIndex,
       limit: table.getState().pagination.pageSize,
       search: globalFilter,
@@ -233,6 +243,7 @@ const ContentBlockListTable = ({
   useEffect(() => {
     if (deletingId === 0) {
       getList({
+        ...initialBody,
         page: table.getState().pagination.pageIndex,
         limit: table.getState().pagination.pageSize,
         search: globalFilter,
@@ -254,14 +265,12 @@ const ContentBlockListTable = ({
             placeholder="Search"
             className="is-full sm:is-auto"
           />
-          <Button
-            variant="contained"
-            startIcon={<i className="tabler-plus" />}
-            onClick={() => router.push(redirectToAddPage)}
-            className="is-full sm:is-auto"
-          >
-            Add Content Block
-          </Button>
+          <OpenDialogOnElementClick
+            element={Button}
+            elementProps={buttonProps}
+            dialog={PermissionDialog}
+            dialogProps={{ editValue }}
+          />
         </div>
       </div>
       <Card>
@@ -355,11 +364,12 @@ const ContentBlockListTable = ({
         setDeletingId={setDeletingId}
         setOpen={(arg1: boolean) => setIsDeleting(arg1)}
         deletePayload={{
-          sectionId: deletingId,
+          permissionId: deletingId,
         }}
       />
+      <PermissionDialog open={open} setOpen={setOpen} editId={editValue} />
     </>
   );
 };
 
-export default ContentBlockListTable;
+export default PermissionsListTable;
