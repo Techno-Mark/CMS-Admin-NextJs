@@ -73,7 +73,7 @@ const initialErrorData = {
   metaKeywords: "",
 };
 
-function BlogForm({ action }: any) {
+function BlogForm({ open }: any) {
   const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
   const [formData, setFormData] =
@@ -116,6 +116,7 @@ function BlogForm({ action }: any) {
   }, []);
 
   // Methods
+  // Get Active Template List
   const getActiveTemplateList = async () => {
     try {
       setLoading(true);
@@ -127,6 +128,68 @@ function BlogForm({ action }: any) {
       console.error(error);
     }
   };
+
+  //validation before submit
+  const validateForm = () => {
+    let valid = true;
+    let errors = { ...initialErrorData };
+
+    if (formData.templateId === -1) {
+      errors.templateId = "Please select a template";
+      valid = false;
+    }
+    if (!formData.title) {
+      errors.title = "Please enter a blog title";
+      valid = false;
+    }
+    if (!formData.slug) {
+      errors.slug = "Please enter a slug";
+      valid = false;
+    }
+    if (!formData.authorName) {
+      errors.authorName = "Please enter an author name";
+      valid = false;
+    }
+    if (!formData.description) {
+      errors.description = "Please enter a description";
+      valid = false;
+    }
+    if (!formData.metaTitle) {
+      errors.metaTitle = "Please enter a meta title";
+      valid = false;
+    }
+    if (!formData.metaDescription) {
+      errors.metaDescription = "Please enter a meta description";
+      valid = false;
+    }
+    if (!formData.metaKeywords) {
+      errors.metaKeywords = "Please enter meta keywords";
+      valid = false;
+    }
+    setFormErrors(errors);
+    return valid;
+  };
+
+  // handle submit
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (validateForm()) {
+      try {
+        setLoading(true);
+        // Handle file uploads and form submission
+        const result = await post("/api/blog/create", formData);
+        setLoading(false);
+        if (result.status === 200) {
+          // Redirect or show success message
+          router.push("/blogs");
+        }
+      } catch (error) {
+        console.error(error);
+        setLoading(false);
+      }
+    }
+  };
+
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
