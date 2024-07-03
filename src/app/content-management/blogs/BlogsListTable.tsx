@@ -35,7 +35,11 @@ import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
 // import ConfirmationDialog from "./ConfirmationDialog";
-import { post, postContentBlock } from "@/services/apiService";
+import {
+  post,
+  postContentBlock,
+  postDataToOrganizationAPIs,
+} from "@/services/apiService";
 import CustomChip from "@/@core/components/mui/Chip";
 import { template } from "@/services/endpoint/template";
 import { TemplateType } from "@/types/apps/templateType";
@@ -119,15 +123,12 @@ const BlogListTable = () => {
     const getData = async () => {
       setLoading(true);
       try {
-        const result = await postContentBlock(
-          blogPost.list,
-          JSON.stringify({
-            page: page + 1,
-            limit: pageSize,
-            search: globalFilter,
-            active: activeFilter,
-          })
-        );
+        const result = await postDataToOrganizationAPIs(blogPost.list, {
+          page: page + 1,
+          limit: pageSize,
+          search: globalFilter,
+          active: activeFilter,
+        });
         setData(result.data.blogs);
         setTotalRows(result.data.totalBlogs);
       } catch (error: any) {
@@ -163,6 +164,15 @@ const BlogListTable = () => {
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
             {truncateText(row.original.blogSlug, 25)}
+          </Typography>
+        ),
+        enableSorting: false,
+      }),
+      columnHelper.accessor("authorName", {
+        header: "Author Name",
+        cell: ({ row }) => (
+          <Typography color="text.primary" className="font-medium">
+            {truncateText(row.original.authorName, 25)}
           </Typography>
         ),
         enableSorting: false,

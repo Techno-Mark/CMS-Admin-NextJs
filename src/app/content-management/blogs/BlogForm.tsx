@@ -9,6 +9,7 @@ import {
   MenuItem,
   Typography,
   Avatar,
+  IconButton,
 } from "@mui/material";
 import CustomTextField from "@/@core/components/mui/TextField";
 import React, { ChangeEvent, useEffect, useState } from "react";
@@ -25,6 +26,8 @@ import { blogPost } from "@/services/endpoint/blogpost";
 import { category } from "@/services/endpoint/category";
 import { tag } from "@/services/endpoint/tag";
 import { toast } from "react-toastify";
+import BreadCrumbList from "@/components/BreadCrumbList";
+import EditorCustom from "./RichEditor";
 
 type blogFormPropsTypes = {
   open: number;
@@ -325,6 +328,18 @@ function BlogForm({ open, handleClose }: blogFormPropsTypes) {
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
+      <Box display="flex" alignItems="center">
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={11}>
+            <BreadCrumbList />
+          </Grid>
+          <Grid item xs={12} sm={1}>
+            <IconButton color="info" onClick={() => {}}>
+              <i className="tabler-external-link text-textSecondary"></i>
+            </IconButton>
+          </Grid>
+        </Grid>
+      </Box>
       <Card>
         <div>
           <div className="flex flex-col gap-2 p-4">
@@ -362,7 +377,7 @@ function BlogForm({ open, handleClose }: blogFormPropsTypes) {
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
-                  <CustomTextField
+                  {/* <CustomTextField
                     // disabled={true}
                     multiline
                     maxRows={10}
@@ -379,7 +394,9 @@ function BlogForm({ open, handleClose }: blogFormPropsTypes) {
                         setFormErrors({ ...formErrors, description: "" });
                       }
                     }}
-                  />
+                  /> */}
+                  <p className="text-[#4e4b5a]">Description *</p>
+                  <EditorCustom />
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CustomTextField

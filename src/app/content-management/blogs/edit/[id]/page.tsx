@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import BlogForm from "../BlogForm";
+import BlogForm from "../../BlogForm";
 
 const ADD_CONTENT_BLOCK = -1;
 
