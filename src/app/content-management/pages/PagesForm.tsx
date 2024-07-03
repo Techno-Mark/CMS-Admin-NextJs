@@ -8,6 +8,8 @@ import {
   Typography,
   TextField,
   Switch,
+  CardContent,
+  CardActions,
 } from "@mui/material";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -17,7 +19,9 @@ import CustomTextField from "@/@core/components/mui/TextField";
 import { useRouter } from "next/navigation";
 import { boolean } from "valibot";
 import AppReactDatepicker from "@/libs/styles/AppReactDatepicker";
-
+import { pages } from "@/services/endpoint/pages";
+import { PagesType } from "./pagesType";
+import { toast } from 'react-toastify';
 type FileProp = {
   name: string;
   type: string;
@@ -34,13 +38,12 @@ const initialFormData = {
   title: "",
   slug: "",
   content: "",
-  categories: ["category1", "category2", "category3"] as string[],
-  tags: ["tag1", "tag2", "tag3"] as string[],
-  description: "",
-  status: false,
+  active: false,
   metaTitle: "",
   metaDescription: "",
   metaKeywords: "",
+  scheduleDate: new Date().toISOString().split('T')[0],
+  templateData: {} as Record<string, any>,
 };
 
 const initialErrorData = {
@@ -48,16 +51,21 @@ const initialErrorData = {
   title: "",
   slug: "",
   content: "",
-  categories: "",
-  tags: "",
-  description: "",
-  status: "",
+  active: "",
   metaTitle: "",
   metaDescription: "",
   metaKeywords: "",
+  scheduleDate: ""
 };
 
-function PagesForm({ open }: any) {
+type Props = {
+  open: -1 | 0 | 1;
+  handleClose: () => void;
+  editingRow: PagesType | null;
+  setEditingRow: React.Dispatch<React.SetStateAction<PagesType | null>>;
+};
+
+function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
   const [formData, setFormData] = useState<typeof initialFormData>(
@@ -71,7 +79,19 @@ function PagesForm({ open }: any) {
   >([]);
   const [sections, setSections] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [date, setDate] = useState<Date | null | undefined>(new Date());
+
+
+  useEffect(() => {
+    setLoading(true);
+    if (editingRow) {
+      setFormData(editingRow);
+      getTemplateIdWiseForm(editingRow.templateId);
+      setLoading(false);
+    } else {
+      setFormData(initialFormData);
+      setLoading(false);
+    }
+  }, [editingRow]);
 
   const { getRootProps, getInputProps } = useDropzone({
     multiple: false,
@@ -104,6 +124,7 @@ function PagesForm({ open }: any) {
   };
 
   const getTemplateIdWiseForm = async (templateId: number) => {
+
     setLoading(true);
     try {
       const result = await get(
@@ -117,6 +138,14 @@ function PagesForm({ open }: any) {
       console.error(error);
       setLoading(false);
     }
+  };
+
+  const resetSectionsAndData = () => {
+    setSections([]);
+    setFormData((prevData) => ({
+      ...prevData,
+      templateData: {},
+    }));
   };
 
   const validateField = (value: string, validation: any) => {
@@ -174,6 +203,11 @@ function PagesForm({ open }: any) {
       valid = false;
     }
 
+    if (!formData.scheduleDate) {
+      errors.scheduleDate = "Schedule Date are required";
+      valid = false;
+    }
+
     const sectionErrors = sections.map((section) => {
       const sectionError: any = {};
       section.sectionTemplate.forEach(
@@ -213,16 +247,30 @@ function PagesForm({ open }: any) {
     return valid;
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent, status: string) => {
     event.preventDefault();
+
+    console.log(formData);
+
+
+
+
     if (validateForm()) {
       try {
         setLoading(true);
-        const result = await post("/api/blog/create", formData);
+        const endpoint = editingRow ? pages.update : pages.create;
+
+
+        const result = await post(endpoint, {
+          ...formData,
+          pageId: editingRow ? formData.pageId : undefined,
+          templateData: formData.templateData,
+          status
+        });
+        toast.success(result.message);
+        handleClose();
+        setFormData(result);
         setLoading(false);
-        if (result.status === 200) {
-          router.push("/blogs");
-        }
       } catch (error) {
         console.error(error);
         setLoading(false);
@@ -230,22 +278,172 @@ function PagesForm({ open }: any) {
     }
   };
 
+
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement>,
     sectionId: number,
     fieldIndex: number
   ) => {
-    const { name, value } = event.target;
-    setSections((prevSections) => {
-      const updatedSections = [...prevSections];
-      updatedSections.forEach((section) => {
-        if (section.sectionId === sectionId) {
-          section.sectionTemplate[fieldIndex][name] = value;
-        }
+    const { name, value, files } = event.target;
+
+    if (files && files[0]) {
+      const file = files[0];
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        setSections((prevSections) => {
+          const updatedSections = [...prevSections];
+          updatedSections.forEach((section) => {
+            if (section.sectionId === sectionId) {
+              const sectionName = section.sectionName;
+
+              setFormData((prevData) => ({
+                ...prevData,
+                templateData: {
+                  ...prevData.templateData,
+                  [sectionName]: {
+                    ...prevData.templateData[sectionName],
+                    [name]: {
+                      file,
+                      preview: reader.result as string,
+                    },
+                  },
+                },
+              }));
+
+              section.sectionTemplate[fieldIndex][name] = {
+                file,
+                preview: reader.result as string,
+              };
+
+              // Validate field based on validation rules
+              const validation = section.sectionTemplate[fieldIndex].validation;
+              let error = validateField(value, validation);
+              section.errors = {
+                ...section.errors,
+                [name]: error,
+              };
+            }
+          });
+          return updatedSections;
+        });
+      };
+
+      reader.readAsDataURL(file);
+    } else {
+      // For non-file inputs
+      setSections((prevSections) => {
+        const updatedSections = [...prevSections];
+        updatedSections.forEach((section) => {
+          if (section.sectionId === sectionId) {
+            section.sectionTemplate[fieldIndex][name] = value;
+
+            // Update templateData dynamically with section names
+            const sectionName = section.sectionName;
+            setFormData((prevData) => ({
+              ...prevData,
+              templateData: {
+                ...prevData.templateData,
+                [sectionName]: {
+                  ...prevData.templateData[sectionName],
+                  [name]: value,
+                },
+              },
+            }));
+
+            // Validate field based on validation rules
+            const validation = section.sectionTemplate[fieldIndex].validation;
+            let error = validateField(value, validation);
+            section.errors = {
+              ...section.errors,
+              [name]: error,
+            };
+          }
+        });
+        return updatedSections;
       });
-      return updatedSections;
-    });
+    }
   };
+
+
+  // const handleInputChange = (
+  //   event: ChangeEvent<HTMLInputElement>,
+  //   sectionId: number,
+  //   fieldIndex: number
+  // ) => {
+  //   const { name, value } = event.target;
+
+  //   // Update formData dynamically
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     updatedSections.forEach((section) => {
+  //       if (section.sectionId === sectionId) {
+  //         section.sectionTemplate[fieldIndex][name] = value;
+
+  //         // Update templateData dynamically with section names
+  //         const sectionName = section.sectionName;
+  //         setFormData((prevData) => ({
+  //           ...prevData,
+  //           templateData: {
+  //             ...prevData.templateData,
+  //             [sectionName]: {
+  //               ...prevData.templateData[sectionName],
+  //               [name]: value,
+  //             },
+  //           },
+  //         }));
+
+  //         // Validate field based on validation rules
+  //         const validation = section.sectionTemplate[fieldIndex].validation;
+  //         let error = validateField(value, validation);
+  //         section.errors = {
+  //           ...section.errors,
+  //           [name]: error,
+  //         };
+  //       }
+  //     });
+  //     return updatedSections;
+  //   });
+  // };
+
+
+  // const handleInputChange = (
+  //   event: ChangeEvent<HTMLInputElement>,
+  //   sectionId: number,
+  //   fieldIndex: number
+  // ) => {
+  //   const { name, value } = event.target;
+
+  //   // Update formData dynamically
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     updatedSections.forEach((section) => {
+  //       if (section.sectionId === sectionId) {
+  //         section.sectionTemplate[fieldIndex][name] = value;
+
+  //         // Update templateData dynamically
+  //         const fieldLabel = section.sectionTemplate[fieldIndex].fieldLabel;
+  //         setFormData((prevData) => ({
+  //           ...prevData,
+  //           templateData: {
+  //             ...prevData.templateData,
+  //             [fieldLabel]: value,
+  //           },
+  //         }));
+
+  //         // Validate field based on validation rules
+  //         const validation = section.sectionTemplate[fieldIndex].validation;
+  //         let error = validateField(value, validation);
+  //         section.errors = {
+  //           ...section.errors,
+  //           [name]: error,
+  //         };
+  //       }
+  //     });
+  //     return updatedSections;
+  //   });
+  // };
+
 
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(
     false
@@ -260,9 +458,9 @@ function PagesForm({ open }: any) {
       slug:
         !isSlugManuallyEdited && open === sectionActions.ADD
           ? newName
-              .replace(/[^\w\s]|_/g, "")
-              .replace(/\s+/g, "-")
-              .toLowerCase()
+            .replace(/[^\w\s]|_/g, "")
+            .replace(/\s+/g, "-")
+            .toLowerCase()
           : prevData.slug,
     }));
   };
@@ -277,12 +475,23 @@ function PagesForm({ open }: any) {
     setIsSlugManuallyEdited(true);
   };
 
+  const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedTemplateId = parseInt(e.target.value);
+    setFormErrors({ ...formErrors, templateId: "" });
+    setFormData((prevData) => ({
+      ...prevData,
+      templateId: selectedTemplateId,
+    }));
+    resetSectionsAndData(); // Clear sections and section-wise data
+    getTemplateIdWiseForm(selectedTemplateId); // Fetch new sections based on the selected template
+  };
+
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
       <Card>
         <div>
-          <form className="flex flex-col gap-6 p-6" onSubmit={handleSubmit}>
+          <form className="flex flex-col gap-6 p-6" >
             <Box display="flex" alignItems="center">
               <Grid container spacing={4}>
                 <Grid item xs={12} sm={6}>
@@ -314,22 +523,27 @@ function PagesForm({ open }: any) {
                   </Typography>
                   <Switch
                     size="medium"
-                    checked={formData.status}
+                    checked={formData.active}
                     onChange={(e: any) =>
-                      setFormData({ ...formData, status: e.target.checked })
+                      setFormData({ ...formData, active: e.target.checked })
                     }
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
                   <CustomTextField
-                    disabled={open === sectionActions.EDIT}
                     error={!!formErrors.content}
                     helperText={formErrors.content}
                     label="Content *"
                     fullWidth
                     placeholder=""
                     value={formData.content}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                      setFormData({ ...formData, content: e.target.value });
+                      if (e.target?.value?.length) {
+                        setFormErrors({ ...formErrors, content: "" });
+                      }
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
@@ -403,14 +617,45 @@ function PagesForm({ open }: any) {
                 </Grid>
                 <Grid item xs={12} md={4}>
                   <AppReactDatepicker
-                    selected={date}
+                    selected={formData.scheduleDate}
                     id="basic-input"
-                    onChange={(date: Date) => setDate(date)}
-                    placeholderText="Click to select a date"
+
+                    onChange={(date: Date) => {
+                      const formattedDate = date ? date.toISOString().split('T')[0] : null;
+                      setFormData({
+                        ...formData,
+                        scheduleDate: formattedDate,
+                      });
+                      if (date) {
+                        setFormErrors({ ...formErrors, scheduleDate: "" });
+                      }
+                    }}
+
                     customInput={
-                      <CustomTextField label="Schedule Date" fullWidth />
+                      <CustomTextField label="Schedule Date" fullWidth
+                        error={!!formErrors.scheduleDate}
+                        helperText={formErrors.scheduleDate}
+                      />
                     }
                   />
+                  {/* <AppReactDatepicker
+                    selected={formData.scheduleDate.toString()}
+                    id="basic-input"
+                    onChange={(date: Date) => {
+                      setFormData({
+                        ...formData,
+                        scheduleDate: date,
+                      });
+                      if (date) {
+                        setFormErrors({ ...formErrors, scheduleDate: null });
+                      }
+                    }}
+                    placeholderText="Click to select a date"
+                    customInput={
+                      <CustomTextField label="Schedule Date" fullWidth
+                       />
+                    }
+                  /> */}
                 </Grid>
                 <Grid item xs={12} sm={8}>
                   <CustomTextField
@@ -422,11 +667,12 @@ function PagesForm({ open }: any) {
                     value={formData.templateId}
                     label="Select Template"
                     id="custom-select"
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      const templateId = Number(e.target.value);
-                      setFormData({ ...formData, templateId });
-                      getTemplateIdWiseForm(templateId);
-                    }}
+                    onChange={handleTemplateChange}
+                    // onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                    //   const templateId = Number(e.target.value);
+                    //   setFormData({ ...formData, templateId });
+                    //   getTemplateIdWiseForm(templateId);
+                    // }}
                     inputProps={{}}
                   >
                     {!loading &&
@@ -441,12 +687,17 @@ function PagesForm({ open }: any) {
                       ))}
                   </CustomTextField>
                 </Grid>
+
                 {sections.map((section) => (
                   <Grid item xs={6} key={section.sectionId}>
-                    <Typography variant="h6">
-                      {section.sectionName}
-                    </Typography>
-                    {section.sectionTemplate.map(
+                    <Card>
+                      <CardContent>
+                        <Typography variant="h6">
+                          {section.sectionName}
+                        </Typography>
+
+
+                        {/* {section.sectionTemplate.map(
                       (
                         field: {
                           fieldLabel: string;
@@ -463,30 +714,19 @@ function PagesForm({ open }: any) {
                             required={field.isRequired}
                             name={field.fieldType}
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                              handleInputChange(
-                                e,
-                                section.sectionId,
-                                fieldIndex
-                              )
+                              handleInputChange(e, section.sectionId, fieldIndex)
                             }
                             fullWidth
                             margin="normal"
-                            error={
-                              section.errors &&
-                              section.errors[field.fieldType]
-                            }
-                            helperText={
-                              section.errors &&
-                              section.errors[field.fieldType]
-                            }
+                            error={section.errors && section.errors[field.fieldType]}
+                            helperText={section.errors && section.errors[field.fieldType]}
                             inputProps={
-                              field.validation
-                                ? JSON.parse(field.validation)
-                                : {}
+                              field.validation ? JSON.parse(field.validation) : {}
                             }
+                            
                           />
-
-                          {section.errors &&
+                          {field.validation &&
+                            section.errors &&
                             section.errors[field.fieldType] && (
                               <Typography
                                 variant="body2"
@@ -496,9 +736,158 @@ function PagesForm({ open }: any) {
                                 {section.errors[field.fieldType]}
                               </Typography>
                             )}
+
+
                         </div>
                       )
-                    )}
+                    )} */}
+                        {/* {section.sectionTemplate.map((field: any,
+                    
+                     fieldIndex: number) => (
+                    
+                        
+                          <CustomTextField
+                            label={field.fieldLabel}
+                            name={field.fieldType}
+                            required={field.isRequired}
+                            type={field.fieldType}
+                            value={
+                              formData.templateData && formData.templateData[section.sectionName]?.[field.fieldType] || ""
+                            }
+                            fullWidth
+                            margin="normal"
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                              handleInputChange(e, section.sectionId, fieldIndex)
+                            }
+                            error={Boolean(
+                              section.errors?.[field.fieldType]
+                            )}
+                            helperText={
+                              section.errors?.[field.fieldType]
+                            }
+                            InputLabelProps={
+                              field.fieldType === "date"
+                                ? { shrink: true }
+                                : undefined
+                            }
+                          />
+                       
+                   
+                    ))} */}
+
+                        {section.sectionTemplate.map(
+                          (
+                            field: {
+                              fieldLabel: string;
+                              fieldType: string;
+                              isRequired: boolean;
+                              validation: string;
+                            },
+                            fieldIndex: number
+                          ) => (
+
+                            <div key={fieldIndex}>
+
+                              {field.fieldType === "file" ? (
+                                <>
+                                  <CustomTextField
+                                    label={field.fieldLabel}
+                                    name={field.fieldType}
+                                    required={field.isRequired}
+                                    type="file"
+                                    fullWidth
+                                    margin="normal"
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                      handleInputChange(e, section.sectionId, fieldIndex)
+                                    }
+                                    error={Boolean(
+                                      section.errors?.[field.fieldType]
+                                    )}
+                                    helperText={
+                                      section.errors?.[field.fieldType]
+                                    }
+                                    InputLabelProps={{ shrink: true }}
+                                  />
+                                  {formData.templateData &&
+                                    formData.templateData[section.sectionName]?.[field.fieldType]?.preview && (
+                                      <Box mt={2}>
+                                        <img
+                                          src={
+                                            formData.templateData[section.sectionName][field.fieldType].preview
+                                          }
+                                          alt="Preview"
+                                          style={{ width: "100%", maxHeight: "200px", objectFit: "contain" }}
+                                        />
+                                      </Box>
+                                    )}
+                                </>
+                              ) : (
+                                <CustomTextField
+                                  label={field.fieldLabel}
+                                  type={field.fieldType}
+                                  required={true}
+                                  name={field.fieldType}
+                                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                    handleInputChange(
+                                      e,
+                                      section.sectionId,
+                                      fieldIndex
+                                    )
+                                  }
+                                  fullWidth
+                                  margin="normal"
+                                  error={
+                                    section.errors &&
+                                    section.errors[field.fieldType]
+                                  }
+                                  helperText={
+                                    section.errors &&
+                                    section.errors[field.fieldType]
+                                  }
+                                  inputProps={
+                                    field.validation
+                                      ? JSON.parse(field.validation)
+                                      : {}
+                                  }
+
+                                value={
+                                  formData.templateData && formData.templateData[section.sectionName]?.[field.fieldType] || ""
+                                }
+
+
+                                // label={field.fieldLabel}
+                                // type={field.fieldType}
+                                // name={field.fieldType}
+                                // required={field.isRequired}
+
+                                // value={
+                                //   formData.templateData && formData.templateData[section.sectionName]?.[field.fieldType] || ""
+                                // }
+                                // fullWidth
+                                // margin="normal"
+                                // onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                //   handleInputChange(e, section.sectionId, fieldIndex)
+                                // }
+                                // error={Boolean(
+                                //   section.errors?.[field.fieldType]
+                                // )}
+                                // helperText={
+                                //   section.errors?.[field.fieldType]
+                                // }
+                                // InputLabelProps={
+                                //   field.fieldType === "date"
+                                //     ? { shrink: true }
+                                //     : undefined
+                                // }
+                                />
+                              )}
+                            </div>
+                          )
+                        )}
+
+                      </CardContent>
+
+                    </Card>
                   </Grid>
                 ))}
                 <Grid
@@ -513,13 +902,14 @@ function PagesForm({ open }: any) {
                     justifyContent="end"
                     bgcolor="background.paper"
                   >
-                    <Button variant="contained" color="error" type="reset">
+                    <Button variant="contained" color="error" type="reset" onClick={handleClose}>
                       Cancel
                     </Button>
-                    <Button color="warning" variant="contained">
+                    <Button color="warning" variant="contained"
+                      onClick={(event) => handleSubmit(event, 'Draft')}>
                       Save as Draft
                     </Button>
-                    <Button variant="contained" type="submit">
+                    <Button variant="contained" type="submit" onClick={(event) => handleSubmit(event, 'Publish')} >
                       Save & Publish
                     </Button>
                   </Box>

@@ -32,6 +32,7 @@ import BreadCrumbList from "./BreadCrumbList";
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
 import { redirectToAddPage, redirectToEditPage } from "@/services/endpoint/pages";
+import CustomChip from "@/@core/components/mui/Chip";
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   // Rank the item
@@ -145,11 +146,13 @@ const PageListTable = ({
       columnHelper.accessor("status", {
         header: "Status",
         cell: ({ row }) =>
-          row.original.status ? (
-            <div className="text-green-600">Active</div>
-          ) : (
-            <div className="text-red-600">Inactive</div>
-          ),
+          <CustomChip
+            size="small"
+            round="true"
+            label={row.original.status ? 'Active' : 'Inactive'}
+            variant="tonal"
+            color={row.original.status ? 'success' : 'error'}
+          />
       }),
       columnHelper.accessor("id", {
         header: "Actions",
@@ -284,7 +287,7 @@ const PageListTable = ({
         </div>
       </div>
       <Card>
-        <div className="overflow-x-auto h-[340px]">
+        <div className="overflow-x-auto">
           <table className={tableStyles.table}>
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
