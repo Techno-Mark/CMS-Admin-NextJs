@@ -1,5 +1,3 @@
-"use client";
-
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import {
   Button,
@@ -9,13 +7,16 @@ import {
   MenuItem,
   Typography,
   TextField,
+  Switch,
 } from "@mui/material";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
 import { get, post } from "@/services/apiService";
 import { template } from "@/services/endpoint/template";
 import CustomTextField from "@/@core/components/mui/TextField";
+import { useRouter } from "next/navigation";
+import { boolean } from "valibot";
+import AppReactDatepicker from "@/libs/styles/AppReactDatepicker";
 
 type FileProp = {
   name: string;
@@ -23,15 +24,20 @@ type FileProp = {
   size: number;
 };
 
+const sectionActions = {
+  ADD: -1,
+  EDIT: 1,
+};
+
 const initialFormData = {
   templateId: -1,
   title: "",
   slug: "",
-  authorName: "",
+  content: "",
   categories: ["category1", "category2", "category3"] as string[],
   tags: ["tag1", "tag2", "tag3"] as string[],
   description: "",
-  status: 0,
+  status: false,
   metaTitle: "",
   metaDescription: "",
   metaKeywords: "",
@@ -41,7 +47,7 @@ const initialErrorData = {
   templateId: "",
   title: "",
   slug: "",
-  authorName: "",
+  content: "",
   categories: "",
   tags: "",
   description: "",
@@ -54,15 +60,18 @@ const initialErrorData = {
 function PagesForm({ open }: any) {
   const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
-  const [formData, setFormData] =
-    useState<typeof initialFormData>(initialFormData);
-  const [formErrors, setFormErrors] =
-    useState<typeof initialErrorData>(initialErrorData);
+  const [formData, setFormData] = useState<typeof initialFormData>(
+    initialFormData
+  );
+  const [formErrors, setFormErrors] = useState<typeof initialErrorData>(
+    initialErrorData
+  );
   const [templateList, setTemplateList] = useState<
-    [{ templateName: string; templateId: number }] | []
+    { templateName: string; templateId: number }[]
   >([]);
   const [sections, setSections] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [date, setDate] = useState<Date | null | undefined>(new Date());
 
   const { getRootProps, getInputProps } = useDropzone({
     multiple: false,
@@ -73,17 +82,6 @@ function PagesForm({ open }: any) {
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
     },
   });
-
-  const img = files.map((file: FileProp) => (
-    <img
-      key={file.name}
-      alt={file.name}
-      className="single-file-image"
-      src={URL.createObjectURL(file as any)}
-      width={"450px"}
-      height={"400px"}
-    />
-  ));
 
   useEffect(() => {
     async function getTemplate() {
@@ -146,15 +144,56 @@ function PagesForm({ open }: any) {
       valid = false;
     }
 
+    if (!formData.title) {
+      errors.title = "Title is required";
+      valid = false;
+    }
+
+    if (!formData.slug) {
+      errors.slug = "Slug is required";
+      valid = false;
+    }
+
+    if (!formData.content) {
+      errors.content = "Content is required";
+      valid = false;
+    }
+
+    if (!formData.metaTitle) {
+      errors.metaTitle = "Meta Title is required";
+      valid = false;
+    }
+
+    if (!formData.metaDescription) {
+      errors.metaDescription = "Meta Description is required";
+      valid = false;
+    }
+
+    if (!formData.metaKeywords) {
+      errors.metaKeywords = "Meta Keywords are required";
+      valid = false;
+    }
+
     const sectionErrors = sections.map((section) => {
       const sectionError: any = {};
       section.sectionTemplate.forEach(
         (
-          field: { fieldLabel: string; fieldType: string; validation: any },
+          field: {
+            fieldLabel: string;
+            fieldType: string;
+            isRequired: boolean;
+            validation: string;
+          },
           fieldIndex: number
         ) => {
           const value = section.sectionTemplate[fieldIndex][field.fieldType];
-          const error = validateField(value, field.validation);
+          let validationObj = {};
+          try {
+            validationObj = JSON.parse(field.validation);
+          } catch (error) {
+            console.error(`Error parsing validation JSON: ${error}`);
+          }
+          const error = validateField(value, validationObj);
           if (error) {
             sectionError[field.fieldType] = error;
             valid = false;
@@ -208,6 +247,36 @@ function PagesForm({ open }: any) {
     });
   };
 
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(
+    false
+  );
+
+  const handleSectionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value;
+    setFormErrors({ ...formErrors, title: "" });
+    setFormData((prevData) => ({
+      ...prevData,
+      title: newName,
+      slug:
+        !isSlugManuallyEdited && open === sectionActions.ADD
+          ? newName
+              .replace(/[^\w\s]|_/g, "")
+              .replace(/\s+/g, "-")
+              .toLowerCase()
+          : prevData.slug,
+    }));
+  };
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSlug = e.target.value.toLowerCase();
+    setFormErrors({ ...formErrors, slug: "" });
+    setFormData((prevData) => ({
+      ...prevData,
+      slug: newSlug,
+    }));
+    setIsSlugManuallyEdited(true);
+  };
+
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -216,8 +285,135 @@ function PagesForm({ open }: any) {
           <form className="flex flex-col gap-6 p-6" onSubmit={handleSubmit}>
             <Box display="flex" alignItems="center">
               <Grid container spacing={4}>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    error={!!formErrors.title}
+                    helperText={formErrors.title}
+                    label="Title *"
+                    fullWidth
+                    placeholder=""
+                    value={formData.title}
+                    onChange={handleSectionNameChange}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={5}>
+                  <CustomTextField
+                    disabled={open === sectionActions.EDIT}
+                    error={!!formErrors.slug}
+                    helperText={formErrors.slug}
+                    label="Slug *"
+                    fullWidth
+                    placeholder=""
+                    value={formData.slug}
+                    onChange={handleSlugChange}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={1}>
+                  <Typography variant="body2" sx={{ mr: 0 }}>
+                    Status
+                  </Typography>
+                  <Switch
+                    size="medium"
+                    checked={formData.status}
+                    onChange={(e: any) =>
+                      setFormData({ ...formData, status: e.target.checked })
+                    }
+                  />
+                </Grid>
+
                 <Grid item xs={12} sm={12}>
-                  <TextField
+                  <CustomTextField
+                    disabled={open === sectionActions.EDIT}
+                    error={!!formErrors.content}
+                    helperText={formErrors.content}
+                    label="Content *"
+                    fullWidth
+                    placeholder=""
+                    value={formData.content}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <CustomTextField
+                    // disabled={true}
+                    multiline
+                    maxRows={2}
+                    minRows={2}
+                    error={!!formErrors.metaTitle}
+                    helperText={formErrors.metaTitle}
+                    label="Meta Title* (maximum-character: 60 )"
+                    fullWidth
+                    placeholder=""
+                    value={formData.metaTitle}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                      setFormData({ ...formData, metaTitle: e.target.value });
+                      if (e.target?.value?.length) {
+                        setFormErrors({ ...formErrors, metaTitle: "" });
+                      }
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <CustomTextField
+                    // disabled={true}
+                    multiline
+                    maxRows={10}
+                    minRows={7}
+                    error={!!formErrors.metaDescription}
+                    helperText={formErrors.metaDescription}
+                    label="Meta Description* (maximum-character: 160 )"
+                    fullWidth
+                    placeholder=""
+                    value={formData.metaDescription}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                      setFormData({
+                        ...formData,
+                        metaDescription: e.target.value,
+                      });
+                      if (e.target?.value?.length) {
+                        setFormErrors({
+                          ...formErrors,
+                          metaDescription: "",
+                        });
+                      }
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <CustomTextField
+                    // disabled={true}
+                    multiline
+                    maxRows={4}
+                    minRows={4}
+                    error={!!formErrors.metaKeywords}
+                    helperText={formErrors.metaKeywords}
+                    label="Meta Keywords* (maximum-character: 160 )"
+                    fullWidth
+                    placeholder=""
+                    value={formData.metaKeywords}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                      setFormData({
+                        ...formData,
+                        metaKeywords: e.target.value,
+                      });
+                      if (e.target?.value?.length) {
+                        setFormErrors({ ...formErrors, metaKeywords: "" });
+                      }
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <AppReactDatepicker
+                    selected={date}
+                    id="basic-input"
+                    onChange={(date: Date) => setDate(date)}
+                    placeholderText="Click to select a date"
+                    customInput={
+                      <CustomTextField label="Schedule Date" fullWidth />
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <CustomTextField
                     error={!!formErrors.templateId}
                     helperText={formErrors.templateId}
                     select
@@ -231,31 +427,32 @@ function PagesForm({ open }: any) {
                       setFormData({ ...formData, templateId });
                       getTemplateIdWiseForm(templateId);
                     }}
+                    inputProps={{}}
                   >
                     {!loading &&
                       !!templateList.length &&
-                      templateList.map((template) => {
-                        return (
-                          <MenuItem
-                            value={template.templateId}
-                            key={template.templateName}
-                          >
-                            {template.templateName}
-                          </MenuItem>
-                        );
-                      })}
-                  </TextField>
+                      templateList.map((template) => (
+                        <MenuItem
+                          key={template.templateId}
+                          value={template.templateId}
+                        >
+                          {template.templateName}
+                        </MenuItem>
+                      ))}
+                  </CustomTextField>
                 </Grid>
                 {sections.map((section) => (
                   <Grid item xs={6} key={section.sectionId}>
-                    <Typography variant="h6">{section.sectionName}</Typography>
+                    <Typography variant="h6">
+                      {section.sectionName}
+                    </Typography>
                     {section.sectionTemplate.map(
                       (
                         field: {
                           fieldLabel: string;
                           fieldType: string;
                           isRequired: boolean;
-                          validation: any;
+                          validation: string;
                         },
                         fieldIndex: number
                       ) => (
@@ -265,7 +462,7 @@ function PagesForm({ open }: any) {
                             type={field.fieldType}
                             required={field.isRequired}
                             name={field.fieldType}
-                            onChange={(e:any) =>
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
                               handleInputChange(
                                 e,
                                 section.sectionId,
@@ -274,13 +471,31 @@ function PagesForm({ open }: any) {
                             }
                             fullWidth
                             margin="normal"
-                            inputProps={JSON.parse(field.validation)} // Add dynamic validation here
+                            error={
+                              section.errors &&
+                              section.errors[field.fieldType]
+                            }
+                            helperText={
+                              section.errors &&
+                              section.errors[field.fieldType]
+                            }
+                            inputProps={
+                              field.validation
+                                ? JSON.parse(field.validation)
+                                : {}
+                            }
                           />
-                          {section.errors && section.errors[field.fieldType] && (
-                            <Typography color="error" variant="body2">
-                              {section.errors[field.fieldType]}
-                            </Typography>
-                          )}
+
+                          {section.errors &&
+                            section.errors[field.fieldType] && (
+                              <Typography
+                                variant="body2"
+                                color="error"
+                                style={{ marginTop: "0.5rem" }}
+                              >
+                                {section.errors[field.fieldType]}
+                              </Typography>
+                            )}
                         </div>
                       )
                     )}

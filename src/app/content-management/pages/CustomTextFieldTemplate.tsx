@@ -1,8 +1,18 @@
-import React from "react";
-import { TextField } from "@mui/material";
-import CustomTextField from "@/@core/components/mui/TextField";
+import React from 'react';
+import { TextField, Typography } from '@mui/material';
 
-const CustomTextFieldTemplate = ({
+type CustomTextFieldProps = {
+  label: string;
+  type: string;
+  required: boolean;
+  name: string;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  fullWidth: boolean;
+  margin: "none" | "dense" | "normal" | undefined;
+  error: boolean;
+}
+
+const CustomTextFieldTM: React.FC<CustomTextFieldProps> = ({
   label,
   type,
   required,
@@ -10,22 +20,27 @@ const CustomTextFieldTemplate = ({
   onChange,
   fullWidth,
   margin,
-  inputProps,
-  ...props
-}: any) => {
+  error,
+}) => {
   return (
-    <CustomTextField
-      label={label}
-      type={type}
-      required={required}
-      name={name}
-      onChange={onChange}
-      fullWidth={fullWidth}
-      margin={margin}
-      InputProps={{ inputProps }}
-      {...props}
-    />
+    <div>
+      <TextField
+        label={label}
+        type={type}
+        required={required}
+        name={name}
+        onChange={onChange}
+        fullWidth={fullWidth}
+        margin={margin}
+        error={error}
+      />
+      {error && (
+        <Typography variant="body2" color="error">
+          {error}
+        </Typography>
+      )}
+    </div>
   );
 };
 
-export default CustomTextFieldTemplate;
+export default CustomTextFieldTM;
