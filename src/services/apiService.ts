@@ -5,8 +5,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
-    console.log(response);
-
     if (response.status === 401) {
       await signOut({ redirect: true, callbackUrl: "/login" });
       throw new Error("Unauthorized. Token missing or expired");
@@ -52,14 +50,14 @@ export const fetchData = async (
     if (!session || !session?.user) {
       throw new Error("No session or access token found");
     }
-    
-    const orgId = localStorage.getItem('selectedOrgId'); 
+
+    const orgId = localStorage.getItem("selectedOrgId");
     const response = await fetch(`${API_URL}/${endpoint}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session?.user.token}`,
-        ...(orgId ? { "orgId": orgId } : {}), 
+        ...(orgId ? { orgId: orgId } : {}),
         ...options.headers,
       },
     });
@@ -108,8 +106,7 @@ export const postContentBlock = async (endpoint: string, data: any) => {
       },
       body: data,
     });
-    console.log(response);
-    debugger;
+
     return await handleResponse(response);
   } catch (error: any) {
     console.error("Error fetching data:", error);
