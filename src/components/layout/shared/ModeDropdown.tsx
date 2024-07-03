@@ -25,7 +25,6 @@ const ModeDropdown = () => {
   const [open, setOpen] = useState(false);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [selectedOrgId, setSelectedOrgId] = useState<any | null>(null);
-  const [selectedOrgId, setSelectedOrgId] = useState<any | null>(null);
   const anchorRef1 = useRef<HTMLDivElement>(null);
   const { settings } = useSettings();
   const selectedOrgName = organizations.find((org) => org.id === selectedOrgId)?.name || 'Select Organization';

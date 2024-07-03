@@ -7,5 +7,4 @@ export const template = {
   active: `template/active`,
   save: `template/save`,
   getTemplateSectionsById: `template/getTemplateSectionsById`,
-  active: `template/active`
 };
