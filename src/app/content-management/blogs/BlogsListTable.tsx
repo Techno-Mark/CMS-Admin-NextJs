@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import Card from "@mui/material/Card";
 import {
   Avatar,
   Badge,
@@ -15,11 +16,10 @@ import {
   TablePagination,
   TextFieldProps,
   Tooltip,
-  Card,
-  Button,
-  Typography,
-  IconButton,
 } from "@mui/material";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
 import classnames from "classnames";
 import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
 import {
@@ -32,15 +32,19 @@ import {
   getSortedRowModel,
 } from "@tanstack/react-table";
 import type { ColumnDef, FilterFn } from "@tanstack/react-table";
-import type { OrganizationsType } from "@/types/apps/organizationsType";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
 // import ConfirmationDialog from "./ConfirmationDialog";
-import { post } from "@/services/apiService";
-import { organization } from "@/services/endpoint/organization";
+import { post, postContentBlock } from "@/services/apiService";
 import CustomChip from "@/@core/components/mui/Chip";
+import { template } from "@/services/endpoint/template";
+import { TemplateType } from "@/types/apps/templateType";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
+import { truncateText } from "@/utils/common";
+import { blogsType } from "@/types/apps/blogsType";
+import { blogPost } from "@/services/endpoint/blogpost";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -51,7 +55,7 @@ declare module "@tanstack/table-core" {
   }
 }
 
-type OrganizationsTypeWithAction = OrganizationsType & {
+type BlogTypeWithAction = blogsType & {
   action?: string;
 };
 
@@ -93,17 +97,16 @@ const DebouncedInput = ({
   );
 };
 
-const columnHelper = createColumnHelper<OrganizationsTypeWithAction>();
+const columnHelper = createColumnHelper<BlogTypeWithAction>();
 
-const BlogsListTable = () => {
+const BlogListTable = () => {
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
   const router = useRouter();
 
-  const [data, setData] = useState<OrganizationsType[]>([]);
+  const [data, setData] = useState<TemplateType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -116,14 +119,17 @@ const BlogsListTable = () => {
     const getData = async () => {
       setLoading(true);
       try {
-        const result = await post(organization.list, {
-          page: page + 1,
-          limit: pageSize,
-          search: globalFilter,
-          active: activeFilter,
-        });
-        setData(result.data.organizations);
-        setTotalRows(result.data.totalOrganizations);
+        const result = await postContentBlock(
+          blogPost.list,
+          JSON.stringify({
+            page: page + 1,
+            limit: pageSize,
+            search: globalFilter,
+            active: activeFilter,
+          })
+        );
+        setData(result.data.blogs);
+        setTotalRows(result.data.totalBlogs);
       } catch (error: any) {
         setError(error.message);
       } finally {
@@ -131,9 +137,9 @@ const BlogsListTable = () => {
       }
     };
     getData();
-  }, [page, pageSize, globalFilter, activeFilter, deletingId]);
+  }, [page, pageSize, globalFilter, deletingId, activeFilter]);
 
-  const columns = useMemo<ColumnDef<OrganizationsTypeWithAction, any>[]>(
+  const columns = useMemo<ColumnDef<BlogTypeWithAction, any>[]>(
     () => [
       columnHelper.accessor("srNo", {
         header: "Sr. No.",
@@ -144,22 +150,32 @@ const BlogsListTable = () => {
         ),
         enableSorting: false,
       }),
-      columnHelper.accessor("name", {
-        header: "Name",
+      columnHelper.accessor("blogTitle", {
+        header: "Blog Title",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {row.original.name}
+            {row.original.blogTitle}
           </Typography>
         ),
       }),
-      columnHelper.accessor("prefix", {
-        header: "Prefix",
+      columnHelper.accessor("blogSlug", {
+        header: "Slug",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {row.original.prefix}
+            {truncateText(row.original.blogSlug, 25)}
+          </Typography>
+        ),
+        enableSorting: false,
+      }),
+      columnHelper.accessor("createdAt", {
+        header: "Created At",
+        cell: ({ row }) => (
+          <Typography color="text.primary" className="font-medium">
+            {row.original.createdAt}
           </Typography>
         ),
       }),
+
       columnHelper.accessor("active", {
         header: "Status",
         cell: ({ row }) => (
@@ -175,13 +191,16 @@ const BlogsListTable = () => {
         ),
         enableSorting: false,
       }),
-      columnHelper.accessor("id", {
-        header: "Action",
+
+      columnHelper.accessor("blogId", {
+        header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
             <IconButton
               onClick={() =>
-                router.push(`/settings/organizations/edit/${row.original.id}`)
+                router.push(
+                  `/content-management/blogs/edit/${row.original.blogId}`
+                )
               }
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -189,7 +208,7 @@ const BlogsListTable = () => {
             <IconButton
               onClick={() => {
                 setIsDeleting(true);
-                setDeletingId(row.original.id);
+                setDeletingId(row.original.blogId);
               }}
             >
               <i className="tabler-trash text-[22px] text-textSecondary" />
@@ -280,10 +299,10 @@ const BlogsListTable = () => {
           <Button
             variant="contained"
             startIcon={<i className="tabler-plus" />}
-            onClick={() => router.push("/settings/organizations/add")}
+            onClick={() => router.push("/content-management/blogs/add")}
             className="is-full sm:is-auto"
           >
-            Add Organization
+            Add Blog
           </Button>
         </div>
       </div>
@@ -336,7 +355,9 @@ const BlogsListTable = () => {
                 {table.getRowModel().rows.map((row) => (
                   <tr
                     key={row.id}
-                    className={classnames({ selected: row.getIsSelected() })}
+                    className={classnames({
+                      selected: row.getIsSelected(),
+                    })}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id}>
@@ -361,14 +382,14 @@ const BlogsListTable = () => {
           onRowsPerPageChange={handleRowsPerPageChange}
         />
       </Card>
-      {/* <ConfirmationDialog
+      <ConfirmationDialog
         open={isDeleting}
         deletingId={deletingId}
         setDeletingId={setDeletingId}
         setOpen={(arg1: boolean) => setIsDeleting(arg1)}
-      /> */}
+      />
     </>
   );
 };
 
-export default BlogsListTable;
+export default BlogListTable;

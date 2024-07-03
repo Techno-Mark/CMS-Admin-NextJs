@@ -26,6 +26,11 @@ import { category } from "@/services/endpoint/category";
 import { tag } from "@/services/endpoint/tag";
 import { toast } from "react-toastify";
 
+type blogFormPropsTypes = {
+  open: number;
+  handleClose: Function;
+};
+
 const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
 
 const sectionActions = {
@@ -64,7 +69,7 @@ const initialErrorData = {
   metaKeywords: "",
 };
 
-function BlogForm({ open }: any) {
+function BlogForm({ open, handleClose }: blogFormPropsTypes) {
   const router = useRouter();
 
   //state management hook
@@ -692,7 +697,7 @@ function BlogForm({ open }: any) {
                   variant="contained"
                   color="error"
                   type="reset"
-                  // onClick={() => handleReset()}
+                  onClick={() => handleClose()}
                 >
                   Cancel
                 </Button>
