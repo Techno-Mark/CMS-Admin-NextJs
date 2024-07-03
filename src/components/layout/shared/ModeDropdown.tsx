@@ -25,8 +25,25 @@ const ModeDropdown = () => {
   const [open, setOpen] = useState(false);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [selectedOrgId, setSelectedOrgId] = useState<any | null>(null);
+  const [selectedOrgId, setSelectedOrgId] = useState<any | null>(null);
   const anchorRef1 = useRef<HTMLDivElement>(null);
   const { settings } = useSettings();
+  const selectedOrgName = organizations.find((org) => org.id === selectedOrgId)?.name || 'Select Organization';
+  const avatarText = selectedOrgName.split(' ').map((n) => n[0]).join('');
+
+  // useEffect(() => {
+  //   const fetchOrganizations = async () => {
+  //     try {
+  //       const response = await post(organization.active, {});
+  //       const orgs = response.data.organizations as Organization[];
+  //       setOrganizations(orgs);
+  //     } catch (error) {
+  //       console.error('Error fetching organizations:', error);
+  //     }
+  //   };
+
+  //   fetchOrganizations();
+  // }, []);
 
   useEffect(() => {
     const fetchOrganizations = async () => {
@@ -34,8 +51,10 @@ const ModeDropdown = () => {
         const response = await post(organization.active, {});
         const orgs = response.data.organizations as Organization[];
         setOrganizations(orgs);
+        
         const storedOrgId = localStorage.getItem('selectedOrgId');
-        console.log(storedOrgId);
+
+
         if (storedOrgId) {
           const parsedOrgId = parseInt(storedOrgId, 10); 
           setSelectedOrgId(parsedOrgId);
@@ -47,9 +66,9 @@ const ModeDropdown = () => {
         console.error('Error fetching organizations:', error);
       }
     };
-
     fetchOrganizations();
   }, []);
+
 
   const handleClose = () => {
     setOpen(false);
@@ -64,9 +83,6 @@ const ModeDropdown = () => {
     localStorage.setItem('selectedOrgId', orgId);
     handleClose();
   };
-
-  const selectedOrgName = organizations.find((org) => org.id === selectedOrgId)?.name || 'Select Organization';
-  const avatarText = selectedOrgName.split(' ').map((n) => n[0]).join('');
 
   return (
     <>

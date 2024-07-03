@@ -24,8 +24,6 @@ import {
 } from "@tanstack/react-table";
 import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { RankingInfo } from "@tanstack/match-sorter-utils";
-// Type Imports
-import type { UsersType } from "@/types/apps/userTypes";
 // Component Imports
 import TablePaginationComponent from "@components/TablePaginationComponent";
 import CustomTextField from "@core/components/mui/TextField";
@@ -33,10 +31,16 @@ import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { useRouter } from "next/navigation";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import { redirectToAddPage, redirectToEditPage } from "@/services/endpoint/content-block";
-import { MenuItem } from "@mui/material";
-import CustomChip from "@/@core/components/mui/Chip";
+import BreadCrumbList from "@components/BreadCrumbList";
+// Type Imports
+import { RolesType } from "@/types/apps/rolesType";
+import {
+  redirectToAddPage,
+  redirectToEditPage,
+} from "@/services/endpoint/users/roles";
+import RoleCards from "./RolesCard";
+import { Chip } from "@mui/material";
+import { formatDate } from "@/utils/formatDate";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -47,7 +51,7 @@ declare module "@tanstack/table-core" {
   }
 }
 
-type UsersTypeWithAction = UsersType & {
+type RolesTypeWithAction = RolesType & {
   action?: string;
 };
 
@@ -87,7 +91,6 @@ const DebouncedInput = ({
     }, debounce);
 
     return () => clearTimeout(timeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   return (
@@ -100,22 +103,27 @@ const DebouncedInput = ({
 };
 
 // Column Definitions
-const columnHelper = createColumnHelper<UsersTypeWithAction>();
+const columnHelper = createColumnHelper<RolesTypeWithAction>();
 
-const UserListTable = ({
+const RolesListTable = ({
   totalCount,
   tableData,
   getList,
   initialBody,
 }: {
   totalCount: number;
-  tableData?: UsersType[];
-  getList: (arg1: { page: number; limit: number; search: string, active: any }) => void;
+  tableData?: RolesType[];
+  getList: (arg1: {
+    page: number;
+    limit: number;
+    search: string;
+    organizationId: string | number;
+  }) => void;
   initialBody: {
     page: number;
     limit: number;
     search: string;
-    active: any
+    organizationId: number | string;
   };
 }) => {
   const router = useRouter();
@@ -123,9 +131,8 @@ const UserListTable = ({
   const [globalFilter, setGlobalFilter] = useState("");
   const [deletingId, setDeletingId] = useState<number>(0);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
-  const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
 
-  const columns = useMemo<ColumnDef<UsersTypeWithAction, any>[]>(
+  const columns = useMemo<ColumnDef<RolesTypeWithAction, any>[]>(
     () => [
       columnHelper.accessor("srNo", {
         header: "Sr. No.",
@@ -135,11 +142,19 @@ const UserListTable = ({
           </Typography>
         ),
       }),
-      columnHelper.accessor("name", {
-        header: "Content Block",
+      columnHelper.accessor("roleName", {
+        header: "Role Name",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {row.original.name}
+            {row.original.roleName}
+          </Typography>
+        ),
+      }),
+      columnHelper.accessor("roleDescription", {
+        header: "Description",
+        cell: ({ row }) => (
+          <Typography color="text.primary" className="font-medium">
+            {row.original.roleDescription}
           </Typography>
         ),
       }),
@@ -147,29 +162,32 @@ const UserListTable = ({
         header: "Created At",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {row.original.createdAt}
+            {formatDate(row.original.createdAt)}
           </Typography>
         ),
       }),
-      columnHelper.accessor("status", {
+      columnHelper.accessor("active", {
         header: "Status",
-        cell: ({ row }) =>
-          <CustomChip
-              size="small"
-              round="true"
-              label={row.original.status ? 'Active' : 'Inactive'}
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3">
+            <Chip
               variant="tonal"
-              color={row.original.status ? 'success' : 'error'}
+              className="capitalize"
+              label={row.original.active ? "Active" : "Inactive"}
+              color={row.original.active ? "success" : "error"}
+              size="small"
             />
+          </div>
+        ),
       }),
-      columnHelper.accessor("id", {
-        header: "Actions",
+      columnHelper.accessor("roleId", {
+        header: "Action",
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
               <IconButton
                 onClick={() => {
-                  router.push(redirectToEditPage(row.original.id));
+                  router.push(redirectToEditPage(row.original.roleId));
                 }}
               >
                 <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -177,7 +195,7 @@ const UserListTable = ({
               <IconButton
                 onClick={() => {
                   setIsDeleting(true);
-                  setDeletingId(row.original.id);
+                  setDeletingId(row.original.roleId);
                 }}
               >
                 <i className="tabler-trash text-[22px] text-textSecondary" />
@@ -192,7 +210,7 @@ const UserListTable = ({
   );
 
   const table = useReactTable({
-    data: tableData as UsersType[],
+    data: tableData as RolesType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter,
@@ -216,89 +234,56 @@ const UserListTable = ({
 
   useEffect(() => {
     getList({
+      ...initialBody,
       page: table.getState().pagination.pageIndex,
       limit: table.getState().pagination.pageSize,
       search: globalFilter,
-      active: activeFilter,
     });
   }, [
     table.getState().pagination.pageSize,
     table.getState().pagination.pageIndex,
     globalFilter,
-    activeFilter
   ]);
 
   useEffect(() => {
     if (deletingId === 0) {
       getList({
+        ...initialBody,
         page: table.getState().pagination.pageIndex,
         limit: table.getState().pagination.pageSize,
         search: globalFilter,
-        active: activeFilter,
       });
     }
   }, [deletingId]);
 
   return (
     <>
-
+      <div className="my-2">
+        <RoleCards />
+      </div>
       <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
         <BreadCrumbList />
-        {/* <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4"> */}
-        {/* <BreadCrumbList /> */}
         <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
+          <IconButton>
+            <i className="tabler-filter text-[22px] text-textSecondary" />
+          </IconButton>
           <DebouncedInput
             value={globalFilter ?? ""}
             onChange={(value) => setGlobalFilter(String(value))}
             placeholder="Search"
             className="is-full sm:is-auto"
           />
-          <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-            <Typography>Status:</Typography>
-            <CustomTextField
-              select
-              fullWidth
-              defaultValue="all"
-              id="custom-select"
-              value={activeFilter === null ? "all" : activeFilter === true ? "active" : "inactive"}
-              onChange={(e) => {
-                const value = e.target.value;
-                setActiveFilter(value === "active" ? true : value === "inactive" ? false : null);
-              }}
-            >
-              <MenuItem value="all">All</MenuItem>
-              <MenuItem value="active">Active</MenuItem>
-              <MenuItem value="inactive">Inactive</MenuItem>
-            </CustomTextField>
-          </div>
-          <Button
-          variant="contained"
-          startIcon={<i className="tabler-plus" />}
-          onClick={() => router.push(redirectToAddPage)}
-          className="is-full sm:is-auto"
-        >
-          Add Content Block
-        </Button>
+          {/* <Button
+            variant="contained"
+            startIcon={<i className="tabler-plus" />}
+            onClick={() => router.push(redirectToAddPage)}
+            className="is-full sm:is-auto"
+          >
+            Add Role
+          </Button> */}
         </div>
       </div>
 
-      {/* <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-        <DebouncedInput
-          value={globalFilter ?? ""}
-          onChange={(value) => setGlobalFilter(String(value))}
-          placeholder="Search"
-          className="is-full sm:is-auto"
-        />
-        <Button
-          variant="contained"
-          startIcon={<i className="tabler-plus" />}
-          onClick={() => router.push(redirectToAddPage)}
-          className="is-full sm:is-auto"
-        >
-          Add Content Block
-        </Button>
-        
-      </div> */}
       <Card>
         <div className="overflow-x-auto h-[340px]">
           <table className={tableStyles.table}>
@@ -387,12 +372,15 @@ const UserListTable = ({
       </Card>
       <ConfirmationDialog
         open={isDeleting}
-        deletingId={deletingId}
         setDeletingId={setDeletingId}
         setOpen={(arg1: boolean) => setIsDeleting(arg1)}
+        deletePayload={{
+          roleId: deletingId,
+          organizationId: 1, // will be dynamic in future
+        }}
       />
     </>
   );
 };
 
-export default UserListTable;
+export default RolesListTable;

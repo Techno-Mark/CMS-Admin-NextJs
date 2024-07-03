@@ -54,6 +54,8 @@ export const fetchData = async (
     }
     
     const orgId = localStorage.getItem('selectedOrgId'); 
+    
+    const orgId = localStorage.getItem('selectedOrgId'); 
     const response = await fetch(`${API_URL}/${endpoint}`, {
       ...options,
       headers: {
