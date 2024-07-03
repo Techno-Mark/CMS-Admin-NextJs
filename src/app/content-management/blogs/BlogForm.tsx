@@ -140,8 +140,8 @@ function BlogForm({ open }: any) {
       alt={bannerImage.name}
       className="single-file-image"
       src={URL.createObjectURL(bannerImage)}
-      width={"350px"}
-      height={"350px"}
+      width={"500px"}
+      height={"380px"}
     />
   ) : null;
 
@@ -151,8 +151,8 @@ function BlogForm({ open }: any) {
       alt={thumbnailImage.name}
       className="single-file-image"
       src={URL.createObjectURL(thumbnailImage)}
-      width={"350px"}
-      height={"350px"}
+      width={"500px"}
+      height={"380px"}
     />
   ) : null;
 
@@ -529,27 +529,6 @@ function BlogForm({ open }: any) {
                       setFormData({ ...formData, tags: [...newVal] });
                     }}
                   />
-
-                  <div className="w-full border border-gray-400 rounded-md p-0.5 flex items-center flex-wrap">
-                    <div className="bg-[#efeef0] flex items-center p-0.5 rounded-sm space-x-1.5">
-                      <p className="text-[14px]"> tag 1</p>
-                      <svg
-                        className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiChip-deleteIcon MuiChip-deleteIconSmall MuiChip-deleteIconColorDefault MuiChip-deleteIconFilledColorDefault mui-1buxjf4-MuiSvgIcon-root w-4 h-4 cursor-pointer"
-                        focusable="false"
-                        aria-hidden="true"
-                        viewBox="0 0 24 24"
-                        data-testid="CancelIcon"
-                      >
-                        <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"></path>
-                      </svg>
-                    </div>
-
-                    <input
-                      type="text"
-                      placeholder="search..."
-                      className="p-2 flex-1 focus:outline-none text-[#4b4a4d]"
-                    />
-                  </div>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <CustomAutocomplete
