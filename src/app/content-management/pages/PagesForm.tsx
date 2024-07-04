@@ -124,14 +124,18 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   };
 
   const getTemplateIdWiseForm = async (templateId: number) => {
-
     setLoading(true);
     try {
-      const result = await get(
-        `${template.getTemplateSectionsById}/${templateId}`
-      );
+      const result = await get(`${template.getTemplateSectionsById}/${templateId}`);
       if (result.statusCode === 200) {
-        setSections(result.data);
+        const sectionsWithErrors = result.data.map((section: any) => ({
+          ...section,
+          errors: section.sectionTemplate.reduce((acc: any, field: any) => {
+            acc[field.fieldType] = "";
+            return acc;
+          }, {}),
+        }));
+        setSections(sectionsWithErrors);
         setLoading(false);
       }
     } catch (error) {
@@ -140,6 +144,22 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }
   };
 
+  // const getTemplateIdWiseForm = async (templateId: number) => {
+  //   setLoading(true);
+  //   try {
+  //     const result = await get(
+  //       `${template.getTemplateSectionsById}/${templateId}`
+  //     );
+  //     if (result.statusCode === 200) {
+  //       setSections(result.data);
+  //       setLoading(false);
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     setLoading(false);
+  //   }
+  // };
+
   const resetSectionsAndData = () => {
     setSections([]);
     setFormData((prevData) => ({
@@ -147,93 +167,181 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       templateData: {},
     }));
   };
+  const validateField = (value: string | undefined | null, validation: any,sectionIndex:any) => {
 
-  const validateField = (value: string, validation: any) => {
-    if (validation.required && !value) {
+    console.log("validateField",sectionIndex);
+    console.log("validateField",validation);
+    console.log(value);
+    
+    
+    
+    if (validation.required && (!value || value.trim() === "")) {
       return "This field is required";
     }
-    if (validation.maxLength && value.length > validation.maxLength) {
-      return `Maximum length is ${validation.maxLength}`;
+
+    if (value && typeof value === "string") {
+      if (validation.min && value.length < validation.min) {
+        return `Minimum length is ${validation.min}`;
+      }
+      if (validation.max && value.length > validation.max) {
+        return `Maximum length is ${validation.max}`;
+      }
+      if (validation.pattern && !new RegExp(validation.pattern).test(value)) {
+        return "Invalid format";
+      }
     }
-    if (validation.minLength && value.length < validation.minLength) {
-      return `Minimum length is ${validation.minLength}`;
-    }
-    if (validation.pattern && !new RegExp(validation.pattern).test(value)) {
-      return "Invalid format";
-    }
-    return "";
+
+    return null; // Return null if no error
   };
+
+
+  // const validateField = (value: string, validation: any) => {
+  //   if (validation.required && !value) {
+  //     return "This field is required";
+  //   }
+  //   if (validation.maxLength && value.length > validation.maxLength) {
+  //     return `Maximum length is ${validation.maxLength}`;
+  //   }
+  //   if (validation.minLength && value.length < validation.minLength) {
+  //     return `Minimum length is ${validation.minLength}`;
+  //   }
+  //   if (validation.pattern && !new RegExp(validation.pattern).test(value)) {
+  //     return "Invalid format";
+  //   }
+  //   return "";
+  // };
+
+  // const validateForm = () => {
+  //   let valid = true;
+  //   let errors = { ...initialErrorData };
+
+  //   if (formData.templateId === -1) {
+  //     errors.templateId = "Please select a template";
+  //     valid = false;
+  //   }
+
+  //   if (!formData.title) {
+  //     errors.title = "Title is required";
+  //     valid = false;
+  //   }
+  //   if (!formData.slug) {
+  //     errors.slug = "Slug is required";
+  //     valid = false;
+  //   }
+  //   if (!formData.content) {
+  //     errors.content = "Content is required";
+  //     valid = false;
+  //   }
+
+  //   if (!formData.metaTitle) {
+  //     errors.metaTitle = "Meta Title is required";
+  //     valid = false;
+  //   }
+
+  //   if (!formData.metaDescription) {
+  //     errors.metaDescription = "Meta Description is required";
+  //     valid = false;
+  //   }
+
+  //   if (!formData.metaKeywords) {
+  //     errors.metaKeywords = "Meta Keywords are required";
+  //     valid = false;
+  //   }
+
+  //   if (!formData.scheduleDate) {
+  //     errors.scheduleDate = "Schedule Date are required";
+  //     valid = false;
+  //   }
+
+  //   const sectionErrors = sections.map((section) => {
+  //     const sectionError: any = {};
+  //     section.sectionTemplate.forEach(
+  //       (
+  //         field: {
+  //           fieldLabel: string;
+  //           fieldType: string;
+  //           isRequired: boolean;
+  //           validation: string;
+  //         },
+  //         fieldIndex: number
+  //       ) => {
+  //         const value = section.sectionTemplate[fieldIndex][field.fieldType];
+  //         let validationObj = {};
+  //         try {
+  //           validationObj = JSON.parse(field.validation);
+  //         } catch (error) {
+  //           console.error(`Error parsing validation JSON: ${error}`);
+  //         }
+  //         const error = validateField(value, validationObj);
+  //         if (error) {
+  //           sectionError[field.fieldType] = error;
+  //           valid = false;
+  //         }
+  //       }
+  //     );
+  //     return sectionError;
+  //   });
+
+  //   setFormErrors(errors);
+  //   setSections((prevSections) =>
+  //     prevSections.map((section, index) => ({
+  //       ...section,
+  //       errors: sectionErrors[index],
+  //     }))
+  //   );
+  //   return valid;
+  // };
 
   const validateForm = () => {
     let valid = true;
     let errors = { ...initialErrorData };
 
+    // Form-wide validations
     if (formData.templateId === -1) {
       errors.templateId = "Please select a template";
       valid = false;
     }
-
     if (!formData.title) {
       errors.title = "Title is required";
       valid = false;
     }
-
     if (!formData.slug) {
       errors.slug = "Slug is required";
       valid = false;
     }
-
     if (!formData.content) {
       errors.content = "Content is required";
       valid = false;
     }
-
     if (!formData.metaTitle) {
       errors.metaTitle = "Meta Title is required";
       valid = false;
     }
-
     if (!formData.metaDescription) {
       errors.metaDescription = "Meta Description is required";
       valid = false;
     }
-
     if (!formData.metaKeywords) {
       errors.metaKeywords = "Meta Keywords are required";
       valid = false;
     }
-
     if (!formData.scheduleDate) {
       errors.scheduleDate = "Schedule Date are required";
       valid = false;
     }
 
+    // Section map validations
     const sectionErrors = sections.map((section) => {
       const sectionError: any = {};
-      section.sectionTemplate.forEach(
-        (
-          field: {
-            fieldLabel: string;
-            fieldType: string;
-            isRequired: boolean;
-            validation: string;
-          },
-          fieldIndex: number
-        ) => {
-          const value = section.sectionTemplate[fieldIndex][field.fieldType];
-          let validationObj = {};
-          try {
-            validationObj = JSON.parse(field.validation);
-          } catch (error) {
-            console.error(`Error parsing validation JSON: ${error}`);
-          }
-          const error = validateField(value, validationObj);
-          if (error) {
-            sectionError[field.fieldType] = error;
-            valid = false;
-          }
+      section.sectionTemplate.forEach((field: any, fieldIndex: number) => {
+        const value = section.sectionTemplate[fieldIndex][field.fieldType];
+        const validationObj = field.validation ? JSON.parse(field.validation) : {};
+        const error = validateField(value, validationObj);
+        if (error) {
+          sectionError[field.fieldType] = error;
+          valid = false;
         }
-      );
+      });
       return sectionError;
     });
 
@@ -247,20 +355,14 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     return valid;
   };
 
+
   const handleSubmit = async (event: React.FormEvent, status: string) => {
     event.preventDefault();
-
     console.log(formData);
-
-
-
-
     if (validateForm()) {
       try {
         setLoading(true);
         const endpoint = editingRow ? pages.update : pages.create;
-
-
         const result = await post(endpoint, {
           ...formData,
           pageId: editingRow ? formData.pageId : undefined,
@@ -292,10 +394,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
 
       reader.onloadend = () => {
         setSections((prevSections) => {
-          const updatedSections = [...prevSections];
-          updatedSections.forEach((section) => {
-            if (section.sectionId === sectionId) {
-              const sectionName = section.sectionName;
+          const updatedSections = prevSections.map((sec) => {
+            if (sec.sectionId === sectionId) {
+              const sectionName = sec.sectionName;
 
               setFormData((prevData) => ({
                 ...prevData,
@@ -311,35 +412,47 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 },
               }));
 
-              section.sectionTemplate[fieldIndex][name] = {
+              sec.sectionTemplate[fieldIndex][name] = {
                 file,
                 preview: reader.result as string,
               };
 
-              // Validate field based on validation rules
-              const validation = section.sectionTemplate[fieldIndex].validation;
-              let error = validateField(value, validation);
-              section.errors = {
-                ...section.errors,
-                [name]: error,
+              const validation = JSON.parse(
+                sec.sectionTemplate[fieldIndex].validation || "{}"
+              );
+              const error = validateField(file.name, validation);
+
+              return {
+                ...sec,
+                errors: {
+                  ...sec.errors,
+                  [name]: error,
+                },
               };
             }
+            return sec;
           });
+
           return updatedSections;
         });
       };
 
       reader.readAsDataURL(file);
     } else {
-      // For non-file inputs
       setSections((prevSections) => {
-        const updatedSections = [...prevSections];
-        updatedSections.forEach((section) => {
-          if (section.sectionId === sectionId) {
-            section.sectionTemplate[fieldIndex][name] = value;
+        const updatedSections = prevSections.map((sec) => {
+        
+          
+          if (sec.sectionId === sectionId) {
+            console.log(sectionId);
+            console.log(sec.sectionTemplate[fieldIndex]);
+            console.log(value);
+            
+            sec.sectionTemplate[fieldIndex][name] = value;
+            console.log(sec.sectionTemplate[fieldIndex][name]);
+            
 
-            // Update templateData dynamically with section names
-            const sectionName = section.sectionName;
+            const sectionName = sec.sectionName;
             setFormData((prevData) => ({
               ...prevData,
               templateData: {
@@ -351,99 +464,107 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
               },
             }));
 
-            // Validate field based on validation rules
-            const validation = section.sectionTemplate[fieldIndex].validation;
-            let error = validateField(value, validation);
-            section.errors = {
-              ...section.errors,
-              [name]: error,
+            const validation = JSON.parse(
+              sec.sectionTemplate[fieldIndex].validation || "{}"
+            );
+            console.log(sec.sectionTemplate[fieldIndex].validation,validation);
+            
+            const error = validateField(value, validation,sec.sectionTemplate[fieldIndex]);
+            console.log(error);
+            return {
+              ...sec,
+              errors: {
+                ...sec.errors,
+                [name]: error,
+              },
             };
           }
+          return sec;
         });
+
         return updatedSections;
       });
     }
   };
 
 
+
   // const handleInputChange = (
   //   event: ChangeEvent<HTMLInputElement>,
   //   sectionId: number,
   //   fieldIndex: number
   // ) => {
-  //   const { name, value } = event.target;
+  //   const { name, value, files } = event.target;
+  //   if (files && files[0]) {
+  //     const file = files[0];
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       setSections((prevSections) => {
+  //         const updatedSections = [...prevSections];
+  //         updatedSections.forEach((section) => {
+  //           if (section.sectionId === sectionId) {
+  //             const sectionName = section.sectionName;
 
-  //   // Update formData dynamically
-  //   setSections((prevSections) => {
-  //     const updatedSections = [...prevSections];
-  //     updatedSections.forEach((section) => {
-  //       if (section.sectionId === sectionId) {
-  //         section.sectionTemplate[fieldIndex][name] = value;
+  //             setFormData((prevData) => ({
+  //               ...prevData,
+  //               templateData: {
+  //                 ...prevData.templateData,
+  //                 [sectionName]: {
+  //                   ...prevData.templateData[sectionName],
+  //                   [name]: {
+  //                     file,
+  //                     preview: reader.result as string,
+  //                   },
+  //                 },
+  //               },
+  //             }));
+  //             section.sectionTemplate[fieldIndex][name] = {
+  //               file,
+  //               preview: reader.result as string,
+  //             };
 
-  //         // Update templateData dynamically with section names
-  //         const sectionName = section.sectionName;
-  //         setFormData((prevData) => ({
-  //           ...prevData,
-  //           templateData: {
-  //             ...prevData.templateData,
-  //             [sectionName]: {
-  //               ...prevData.templateData[sectionName],
-  //               [name]: value,
+  //             const validation = section.sectionTemplate[fieldIndex].validation;
+  //             let error = validateField(value, validation);
+  //             section.errors = {
+  //               ...section.errors,
+  //               [name]: error,
+  //             };
+  //           }
+  //         });
+  //         return updatedSections;
+  //       });
+  //     };
+  //     reader.readAsDataURL(file);
+  //   } else {
+  //     setSections((prevSections) => {
+  //       const updatedSections = [...prevSections];
+  //       updatedSections.forEach((section) => {
+  //         if (section.sectionId === sectionId) {
+  //           section.sectionTemplate[fieldIndex][name] = value;
+
+  //           const sectionName = section.sectionName;
+  //           setFormData((prevData) => ({
+  //             ...prevData,
+  //             templateData: {
+  //               ...prevData.templateData,
+  //               [sectionName]: {
+  //                 ...prevData.templateData[sectionName],
+  //                 [name]: value,
+  //               },
   //             },
-  //           },
-  //         }));
-
-  //         // Validate field based on validation rules
-  //         const validation = section.sectionTemplate[fieldIndex].validation;
-  //         let error = validateField(value, validation);
-  //         section.errors = {
-  //           ...section.errors,
-  //           [name]: error,
-  //         };
-  //       }
+  //           }));
+  //           const validation = section.sectionTemplate[fieldIndex].validation;
+  //           let error = validateField(value, validation);
+  //           section.errors = {
+  //             ...section.errors,
+  //             [name]: error,
+  //           };
+  //         }
+  //       });
+  //       return updatedSections;
   //     });
-  //     return updatedSections;
-  //   });
+  //   }
   // };
-
-
-  // const handleInputChange = (
-  //   event: ChangeEvent<HTMLInputElement>,
-  //   sectionId: number,
-  //   fieldIndex: number
-  // ) => {
-  //   const { name, value } = event.target;
-
-  //   // Update formData dynamically
-  //   setSections((prevSections) => {
-  //     const updatedSections = [...prevSections];
-  //     updatedSections.forEach((section) => {
-  //       if (section.sectionId === sectionId) {
-  //         section.sectionTemplate[fieldIndex][name] = value;
-
-  //         // Update templateData dynamically
-  //         const fieldLabel = section.sectionTemplate[fieldIndex].fieldLabel;
-  //         setFormData((prevData) => ({
-  //           ...prevData,
-  //           templateData: {
-  //             ...prevData.templateData,
-  //             [fieldLabel]: value,
-  //           },
-  //         }));
-
-  //         // Validate field based on validation rules
-  //         const validation = section.sectionTemplate[fieldIndex].validation;
-  //         let error = validateField(value, validation);
-  //         section.errors = {
-  //           ...section.errors,
-  //           [name]: error,
-  //         };
-  //       }
-  //     });
-  //     return updatedSections;
-  //   });
-  // };
-
 
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(
     false
@@ -482,10 +603,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       ...prevData,
       templateId: selectedTemplateId,
     }));
-    resetSectionsAndData(); // Clear sections and section-wise data
-    getTemplateIdWiseForm(selectedTemplateId); // Fetch new sections based on the selected template
+    resetSectionsAndData();
+    getTemplateIdWiseForm(selectedTemplateId);
   };
-
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -529,7 +649,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     }
                   />
                 </Grid>
-
                 <Grid item xs={12} sm={12}>
                   <CustomTextField
                     error={!!formErrors.content}
@@ -548,7 +667,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CustomTextField
-                    // disabled={true}
                     multiline
                     maxRows={2}
                     minRows={2}
@@ -568,7 +686,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CustomTextField
-                    // disabled={true}
                     multiline
                     maxRows={10}
                     minRows={7}
@@ -594,7 +711,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CustomTextField
-                    // disabled={true}
                     multiline
                     maxRows={4}
                     minRows={4}
@@ -619,7 +735,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                   <AppReactDatepicker
                     selected={formData.scheduleDate}
                     id="basic-input"
-
                     onChange={(date: Date) => {
                       const formattedDate = date ? date.toISOString().split('T')[0] : null;
                       setFormData({
@@ -630,7 +745,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                         setFormErrors({ ...formErrors, scheduleDate: "" });
                       }
                     }}
-
                     customInput={
                       <CustomTextField label="Schedule Date" fullWidth
                         error={!!formErrors.scheduleDate}
@@ -638,24 +752,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                       />
                     }
                   />
-                  {/* <AppReactDatepicker
-                    selected={formData.scheduleDate.toString()}
-                    id="basic-input"
-                    onChange={(date: Date) => {
-                      setFormData({
-                        ...formData,
-                        scheduleDate: date,
-                      });
-                      if (date) {
-                        setFormErrors({ ...formErrors, scheduleDate: null });
-                      }
-                    }}
-                    placeholderText="Click to select a date"
-                    customInput={
-                      <CustomTextField label="Schedule Date" fullWidth
-                       />
-                    }
-                  /> */}
                 </Grid>
                 <Grid item xs={12} sm={8}>
                   <CustomTextField
@@ -668,11 +764,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     label="Select Template"
                     id="custom-select"
                     onChange={handleTemplateChange}
-                    // onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    //   const templateId = Number(e.target.value);
-                    //   setFormData({ ...formData, templateId });
-                    //   getTemplateIdWiseForm(templateId);
-                    // }}
                     inputProps={{}}
                   >
                     {!loading &&
@@ -687,7 +778,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                       ))}
                   </CustomTextField>
                 </Grid>
-
                 {sections.map((section) => (
                   <Grid item xs={6} key={section.sectionId}>
                     <Card>
@@ -695,86 +785,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                         <Typography variant="h6">
                           {section.sectionName}
                         </Typography>
-
-
-                        {/* {section.sectionTemplate.map(
-                      (
-                        field: {
-                          fieldLabel: string;
-                          fieldType: string;
-                          isRequired: boolean;
-                          validation: string;
-                        },
-                        fieldIndex: number
-                      ) => (
-                        <div key={fieldIndex}>
-                          <CustomTextField
-                            label={field.fieldLabel}
-                            type={field.fieldType}
-                            required={field.isRequired}
-                            name={field.fieldType}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                              handleInputChange(e, section.sectionId, fieldIndex)
-                            }
-                            fullWidth
-                            margin="normal"
-                            error={section.errors && section.errors[field.fieldType]}
-                            helperText={section.errors && section.errors[field.fieldType]}
-                            inputProps={
-                              field.validation ? JSON.parse(field.validation) : {}
-                            }
-                            
-                          />
-                          {field.validation &&
-                            section.errors &&
-                            section.errors[field.fieldType] && (
-                              <Typography
-                                variant="body2"
-                                color="error"
-                                style={{ marginTop: "0.5rem" }}
-                              >
-                                {section.errors[field.fieldType]}
-                              </Typography>
-                            )}
-
-
-                        </div>
-                      )
-                    )} */}
-                        {/* {section.sectionTemplate.map((field: any,
-                    
-                     fieldIndex: number) => (
-                    
-                        
-                          <CustomTextField
-                            label={field.fieldLabel}
-                            name={field.fieldType}
-                            required={field.isRequired}
-                            type={field.fieldType}
-                            value={
-                              formData.templateData && formData.templateData[section.sectionName]?.[field.fieldType] || ""
-                            }
-                            fullWidth
-                            margin="normal"
-                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                              handleInputChange(e, section.sectionId, fieldIndex)
-                            }
-                            error={Boolean(
-                              section.errors?.[field.fieldType]
-                            )}
-                            helperText={
-                              section.errors?.[field.fieldType]
-                            }
-                            InputLabelProps={
-                              field.fieldType === "date"
-                                ? { shrink: true }
-                                : undefined
-                            }
-                          />
-                       
-                   
-                    ))} */}
-
                         {section.sectionTemplate.map(
                           (
                             field: {
@@ -785,9 +795,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                             },
                             fieldIndex: number
                           ) => (
-
                             <div key={fieldIndex}>
-
                               {field.fieldType === "file" ? (
                                 <>
                                   <CustomTextField
@@ -825,62 +833,22 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                 <CustomTextField
                                   label={field.fieldLabel}
                                   type={field.fieldType}
-                                  required={true}
+                                  required={field.isRequired}
                                   name={field.fieldType}
                                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                    handleInputChange(
-                                      e,
-                                      section.sectionId,
-                                      fieldIndex
-                                    )
+                                    handleInputChange(e, section.sectionId, fieldIndex)
                                   }
                                   fullWidth
                                   margin="normal"
-                                  error={
-                                    section.errors &&
-                                    section.errors[field.fieldType]
-                                  }
-                                  helperText={
-                                    section.errors &&
-                                    section.errors[field.fieldType]
-                                  }
+                                  error={Boolean(section.errors?.[field.fieldType])}
+                                  helperText={section.errors?.[field.fieldType]}
                                   inputProps={
-                                    field.validation
-                                      ? JSON.parse(field.validation)
-                                      : {}
+                                    field.validation ? JSON.parse(field.validation) : {}
                                   }
-
-                                value={
-                                  formData.templateData && formData.templateData[section.sectionName]?.[field.fieldType] || ""
-                                }
-
-
-                                // label={field.fieldLabel}
-                                // type={field.fieldType}
-                                // name={field.fieldType}
-                                // required={field.isRequired}
-
-                                // value={
-                                //   formData.templateData && formData.templateData[section.sectionName]?.[field.fieldType] || ""
-                                // }
-                                // fullWidth
-                                // margin="normal"
-                                // onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                //   handleInputChange(e, section.sectionId, fieldIndex)
-                                // }
-                                // error={Boolean(
-                                //   section.errors?.[field.fieldType]
-                                // )}
-                                // helperText={
-                                //   section.errors?.[field.fieldType]
-                                // }
-                                // InputLabelProps={
-                                //   field.fieldType === "date"
-                                //     ? { shrink: true }
-                                //     : undefined
-                                // }
                                 />
+
                               )}
+                             
                             </div>
                           )
                         )}
@@ -895,13 +863,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                   xs={12}
                   style={{ position: "sticky", bottom: 0, zIndex: 10 }}
                 >
-                  <Box
-                    p={7}
-                    display="flex"
-                    gap={2}
-                    justifyContent="end"
-                    bgcolor="background.paper"
-                  >
+                  <Box p={7} display="flex" gap={2} justifyContent="end" bgcolor="background.paper">
                     <Button variant="contained" color="error" type="reset" onClick={handleClose}>
                       Cancel
                     </Button>
