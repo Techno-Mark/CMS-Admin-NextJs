@@ -357,7 +357,7 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
         </Grid>
       </Box>
       <Card className="p-4">
-        <Box display="flex" rowGap={4} columnGap={4}>
+        <Box display="flex" rowGap={4} columnGap={4} alignItems="flex-start">
           <Grid container spacing={4} sm={7}>
             <Grid item xs={12} sm={12}>
               <CustomTextField
