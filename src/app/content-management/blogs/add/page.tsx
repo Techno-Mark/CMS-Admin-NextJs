@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import BlogForm from "../BlogForm";
+import BlogForm from "@/app/content-management/blogs/BlogForm";
 import { ADD_BLOG } from "@/types/apps/blogsType";
 
 const Page = () => {
