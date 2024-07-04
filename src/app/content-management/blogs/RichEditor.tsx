@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 // MUI Imports
 import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
@@ -19,13 +20,8 @@ const EditorToolbar = () => {
     return null;
   }
 
-  const getRichTextEditorData = async () => {
-    const content = editor.getHTML();
-    console.log(content);
-  };
-
   return (
-    <div className="flex flex-wrap gap-x-4 gap-y-2 p-6">
+    <div className="flex flex-wrap gap-x-4 gap-y-2 p-6 sticky top-0 bg-white z-10">
       <Chip
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
@@ -203,19 +199,21 @@ const extensions = [
   }),
 ];
 
-const content = `
-<br/>
-<br/>
-<br/>
+const EditorCustom = ({
+  setContent,
+  content,
+}: {
+  setContent: Function;
+  content: string;
+}) => {
+  const handleEditorUpdate = ({ editor }: any) => {
+    const html = editor.getHTML();
+    setContent((prev: Object) => ({
+      ...prev,
+      description: html,
+    }));
+  };
 
-<br/>
-<br/>
-<br/>
-<br/><br/>
-<br/>
-`;
-
-const EditorCustom = () => {
   return (
     <div className="border rounded-md">
       <EditorProvider
@@ -227,6 +225,7 @@ const EditorCustom = () => {
         }
         extensions={extensions}
         content={content}
+        onUpdate={handleEditorUpdate}
       />
     </div>
   );

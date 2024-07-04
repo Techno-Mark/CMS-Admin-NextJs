@@ -31,6 +31,7 @@ import EditorCustom from "./RichEditor";
 import { blogDetailType, EDIT_BLOCK } from "@/types/apps/blogsType";
 import Tiptap from "./TipTapEditor";
 import TipTapEditor from "./TipTapEditor";
+import NotePicker from "./_tiptapEditorFiles/NotePicker";
 
 type blogFormPropsTypes = {
   open: number;
@@ -128,24 +129,6 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
     },
   });
 
-  const bannerImg = bannerImage ? (
-    <img
-      key={bannerImage.name}
-      alt={bannerImage.name}
-      className="border border-gray-200 object-contain w-full h-full"
-      src={URL.createObjectURL(bannerImage)}
-    />
-  ) : null;
-
-  const thumbnailImg = thumbnailImage ? (
-    <img
-      key={thumbnailImage.name}
-      alt={thumbnailImage.name}
-      className="border border-gray-200 object-contain w-full h-full"
-      src={URL.createObjectURL(thumbnailImage)}
-    />
-  ) : null;
-
   //Effects
   useEffect(() => {
     async function getTemplate() {
@@ -156,6 +139,7 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
         formData.authorName = editingRow.authorName;
         formData.categories = editingRow.categories.split(",");
         formData.tags = editingRow.tags.split(",");
+        formData.description = editingRow.description;
         formData.metaDescription = editingRow.metaDescription;
         formData.metaTitle = editingRow.metaTitle;
         formData.metaKeywords = editingRow.metaKeywords;
@@ -391,7 +375,7 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
               />
             </Grid>
             <Grid item xs={12} sm={12}>
-              <CustomTextField
+              {/* <CustomTextField
                 // disabled={true}
                 multiline
                 maxRows={10}
@@ -408,9 +392,13 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
                     setFormErrors({ ...formErrors, description: "" });
                   }
                 }}
-              />
+              /> */}
               <p className="text-[#4e4b5a]">Description *</p>
-              <EditorCustom />
+
+              <EditorCustom
+                setContent={setFormData}
+                content={formData.description}
+              />
             </Grid>
             <Grid item xs={12} sm={12}>
               <CustomTextField
