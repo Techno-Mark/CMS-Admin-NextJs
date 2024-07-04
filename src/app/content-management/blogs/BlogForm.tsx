@@ -356,179 +356,182 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
           </Grid>
         </Grid>
       </Box>
-      <Card>
-        <div>
-          <div className="flex flex-col gap-2 p-4">
-            <Box display="flex" gap={4}>
-              <Grid container spacing={1} sm={7}>
-                <Grid item xs={12} sm={12}>
-                  <CustomTextField
-                    // disabled={true}
-                    error={!!formErrors.title}
-                    helperText={formErrors.title}
-                    label="Blog Title *"
-                    fullWidth
-                    placeholder="Enter Blog Title"
-                    value={formData.title}
-                    onChange={handleBlogTitleChange}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={12}>
-                  <CustomTextField
-                    // disabled={open === sectionActions.EDIT}
-                    // error={!!formErrors.slug}
-                    error={!!formErrors.slug}
-                    helperText={formErrors.slug}
-                    label="Slug *"
-                    fullWidth
-                    placeholder=""
-                    value={formData.slug}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      setFormData({ ...formData, slug: e.target.value });
-                      setIsSlugManuallyEdited(true);
-                      if (e.target?.value?.length) {
-                        setFormErrors({ ...formErrors, slug: "" });
-                      }
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={12}>
-                  <CustomTextField
-                    // disabled={true}
-                    multiline
-                    maxRows={10}
-                    minRows={7}
-                    error={!!formErrors.description}
-                    helperText={formErrors.description}
-                    label="Description *"
-                    fullWidth
-                    placeholder="Enter Detail About Blog Post"
-                    value={formData.description}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      setFormData({ ...formData, description: e.target.value });
-                      if (e.target?.value?.length) {
-                        setFormErrors({ ...formErrors, description: "" });
-                      }
-                    }}
-                  />
-                  <p className="text-[#4e4b5a]">Description *</p>
-                  <EditorCustom />
-                </Grid>
-                <Grid item xs={12} sm={12}>
-                  <CustomTextField
-                    // disabled={true}
-                    multiline
-                    maxRows={2}
-                    minRows={2}
-                    error={!!formErrors.metaTitle}
-                    helperText={formErrors.metaTitle}
-                    label="Meta Title* (maximum-character: 60 )"
-                    fullWidth
-                    placeholder=""
-                    value={formData.metaTitle}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      setFormData({ ...formData, metaTitle: e.target.value });
-                      if (e.target?.value?.length) {
-                        setFormErrors({ ...formErrors, metaTitle: "" });
-                      }
-                    }}
-                  />
-                  {formData.metaTitle.length <= 60 ? (
-                    <p className="text-yellow-500">
-                      {60 - formData.metaTitle.length} character left
-                    </p>
-                  ) : (
-                    <p className="text-red-500">
-                      you exceeds maximum limit of characters**
-                    </p>
-                  )}
-                </Grid>
-                <Grid item xs={12} sm={12}>
-                  <CustomTextField
-                    // disabled={true}
-                    multiline
-                    maxRows={10}
-                    minRows={7}
-                    error={!!formErrors.metaDescription}
-                    helperText={formErrors.metaDescription}
-                    label="Meta Description* (maximum-character: 160 )"
-                    fullWidth
-                    placeholder=""
-                    value={formData.metaDescription}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      setFormData({
-                        ...formData,
-                        metaDescription: e.target.value,
-                      });
-                      if (e.target?.value?.length) {
-                        setFormErrors({ ...formErrors, metaDescription: "" });
-                      }
-                    }}
-                  />
-                  {formData.metaDescription.length <= 160 ? (
-                    <p className="text-yellow-500">
-                      {" "}
-                      {160 - formData.metaDescription.length} character left
-                    </p>
-                  ) : (
-                    <p className="text-red-500">
-                      you exceeds maximum limit of characters**
-                    </p>
-                  )}
-                </Grid>
-                <Grid item xs={12} sm={12}>
-                  <CustomTextField
-                    // disabled={true}
-                    multiline
-                    maxRows={4}
-                    minRows={4}
-                    error={!!formErrors.metaKeywords}
-                    helperText={formErrors.metaKeywords}
-                    label="Meta Keywords* (maximum-character: 160 )"
-                    fullWidth
-                    placeholder=""
-                    value={formData.metaKeywords}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      setFormData({
-                        ...formData,
-                        metaKeywords: e.target.value,
-                      });
-                      if (e.target?.value?.length) {
-                        setFormErrors({ ...formErrors, metaKeywords: "" });
-                      }
-                    }}
-                  />
-                  {formData.metaKeywords.length <= 160 ? (
-                    <p className="text-yellow-500">
-                      {" "}
-                      {160 - formData.metaKeywords.length} character left
-                    </p>
-                  ) : (
-                    <p className="text-red-500">
-                      you exceeds maximum limit of characters**
-                    </p>
-                  )}
-                </Grid>
-              </Grid>
-              <Grid container spacing={2} sm={5}>
-                <Grid item xs={12} sm={12}>
-                  <Box
-                    sx={{ height: 250, width: 350 }}
-                    {...getBannerRootProps({ className: "dropzone" })}
-                    {...bannerImage}
-                  >
-                    <p className="text-[#4e4b5a]"> Banner Image * </p>
-                    <input {...getBannerInputProps()} />
+      <Card className="p-4">
+        <Box display="flex" rowGap={4} columnGap={4}>
+          <Grid container spacing={4} sm={7}>
+            <Grid item xs={12} sm={12}>
+              <CustomTextField
+                // disabled={true}
+                error={!!formErrors.title}
+                helperText={formErrors.title}
+                label="Blog Title *"
+                fullWidth
+                placeholder="Enter Blog Title"
+                value={formData.title}
+                onChange={handleBlogTitleChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <CustomTextField
+                // disabled={open === sectionActions.EDIT}
+                // error={!!formErrors.slug}
+                error={!!formErrors.slug}
+                helperText={formErrors.slug}
+                label="Slug *"
+                fullWidth
+                placeholder=""
+                value={formData.slug}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  setFormData({ ...formData, slug: e.target.value });
+                  setIsSlugManuallyEdited(true);
+                  if (e.target?.value?.length) {
+                    setFormErrors({ ...formErrors, slug: "" });
+                  }
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <CustomTextField
+                // disabled={true}
+                multiline
+                maxRows={10}
+                minRows={7}
+                error={!!formErrors.description}
+                helperText={formErrors.description}
+                label="Description *"
+                fullWidth
+                placeholder="Enter Detail About Blog Post"
+                value={formData.description}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  setFormData({ ...formData, description: e.target.value });
+                  if (e.target?.value?.length) {
+                    setFormErrors({ ...formErrors, description: "" });
+                  }
+                }}
+              />
+              <p className="text-[#4e4b5a]">Description *</p>
+              <EditorCustom />
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <CustomTextField
+                // disabled={true}
+                multiline
+                maxRows={2}
+                minRows={2}
+                error={!!formErrors.metaTitle}
+                helperText={formErrors.metaTitle}
+                label="Meta Title* (maximum-character: 60 )"
+                fullWidth
+                placeholder=""
+                value={formData.metaTitle}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  setFormData({ ...formData, metaTitle: e.target.value });
+                  if (e.target?.value?.length) {
+                    setFormErrors({ ...formErrors, metaTitle: "" });
+                  }
+                }}
+              />
+              {formData.metaTitle.length <= 60 ? (
+                <p className="text-yellow-500">
+                  {60 - formData.metaTitle.length} character left
+                </p>
+              ) : (
+                <p className="text-red-500">
+                  you exceeds maximum limit of characters**
+                </p>
+              )}
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <CustomTextField
+                // disabled={true}
+                multiline
+                maxRows={10}
+                minRows={7}
+                error={!!formErrors.metaDescription}
+                helperText={formErrors.metaDescription}
+                label="Meta Description* (maximum-character: 160 )"
+                fullWidth
+                placeholder=""
+                value={formData.metaDescription}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  setFormData({
+                    ...formData,
+                    metaDescription: e.target.value,
+                  });
+                  if (e.target?.value?.length) {
+                    setFormErrors({ ...formErrors, metaDescription: "" });
+                  }
+                }}
+              />
+              {formData.metaDescription.length <= 160 ? (
+                <p className="text-yellow-500">
+                  {" "}
+                  {160 - formData.metaDescription.length} character left
+                </p>
+              ) : (
+                <p className="text-red-500">
+                  you exceeds maximum limit of characters**
+                </p>
+              )}
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <CustomTextField
+                // disabled={true}
+                multiline
+                maxRows={4}
+                minRows={4}
+                error={!!formErrors.metaKeywords}
+                helperText={formErrors.metaKeywords}
+                label="Meta Keywords* (maximum-character: 160 )"
+                fullWidth
+                placeholder=""
+                value={formData.metaKeywords}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  setFormData({
+                    ...formData,
+                    metaKeywords: e.target.value,
+                  });
+                  if (e.target?.value?.length) {
+                    setFormErrors({ ...formErrors, metaKeywords: "" });
+                  }
+                }}
+              />
+              {formData.metaKeywords.length <= 160 ? (
+                <p className="text-yellow-500">
+                  {" "}
+                  {160 - formData.metaKeywords.length} character left
+                </p>
+              ) : (
+                <p className="text-red-500">
+                  you exceeds maximum limit of characters**
+                </p>
+              )}
+            </Grid>
+          </Grid>
+          <Grid container spacing={4} sm={5}>
+            <Grid item xs={12} sm={12}>
+              <p className="text-[#4e4b5a] my-2"> Banner Image * </p>
+              <div
+                className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md ${!!formErrors.bannerImageError && "border-red-400"}`}
+              >
+                <Box
+                  {...getBannerRootProps({ className: "dropzone" })}
+                  {...bannerImage}
+                >
+                  <input {...getBannerInputProps()} />
+                  <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
                     {bannerImage ? (
-                      bannerImg
+                      <img
+                        key={bannerImage.name}
+                        alt={bannerImage.name}
+                        className="object-contain w-full h-full"
+                        src={URL.createObjectURL(bannerImage)}
+                      />
                     ) : (
-                      <div
-                        className={`flex items-center flex-col border border-dashed border-gray-300 rounded-md  p-10 ${!!formErrors.bannerImageError && "border-red-400"}`}
-                      >
+                      <>
                         <Avatar variant="rounded" className="bs-12 is-12 mbe-9">
                           <i className="tabler-upload" />
                         </Avatar>
-
                         <Typography variant="h5" className="mbe-2.5">
                           Drop files here or click to upload.
                         </Typography>
@@ -543,55 +546,35 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
                           </a>{" "}
                           through your machine
                         </Typography>
-                      </div>
+                      </>
                     )}
-                    {!!formErrors.bannerImageError && (
-                      <p className="text-[#ff5054]">
-                        {formErrors.bannerImageError}
-                      </p>
-                    )}
-                  </Box>
-                  {/* <div className="p-2 border border-dashed border-gray-300 rounded-md text-center h-[250px] w-[300px]">
-                    <div
-                      {...getBannerRootProps({ className: "dropzone" })}
-                      className={`p-2`}
-                    >
-                      <input {...getBannerInputProps()} />
-                      {bannerImage ? (
-                        <div className="flex flex-col items-center">
-                          <img
-                            src={URL.createObjectURL(bannerImage)}
-                            alt="preview"
-                            className="w-full h-full object-cover mb-2"
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center">
-                          <p className="text-gray-500">Featured image</p>
-                          <div className="mt-2 text-gray-500 border border-dashed border-gray-400 w-32 h-32 flex items-center justify-center">
-                            <span>Add image</span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div> */}
-                </Grid>
-                <Grid item xs={12} sm={12}>
-                  <Box
-                    {...getThumbnailRootProps({ className: "dropzone" })}
-                    {...thumbnailImage}
-                  >
-                    <p className="text-[#4e4b5a]"> Thumbnail Image * </p>
-                    <input {...getThumbnailInputProps()} />
+                  </div>
+                  {!!formErrors.bannerImageError && (
+                    <p className="text-[#ff5054]">
+                      {formErrors.bannerImageError}
+                    </p>
+                  )}
+                </Box>
+              </div>
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <p className="text-[#4e4b5a] my-2"> Thumbnail Image * </p>
+              <div className="flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md">
+                <Box
+                  {...getThumbnailRootProps({ className: "dropzone" })}
+                  {...thumbnailImage}
+                >
+                  <input {...getThumbnailInputProps()} />
+                  <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
                     {thumbnailImage ? (
-                      thumbnailImg
+                      <img
+                        key={thumbnailImage.name}
+                        alt={thumbnailImage.name}
+                        className="object-contain w-full h-full"
+                        src={URL.createObjectURL(thumbnailImage)}
+                      />
                     ) : (
-                      <div
-                        className={`flex items-center justify-center flex-col border-dashed border-2 p-16 ${!!formErrors.thumbnailImageError && "border-red-400"}`}
-                      >
-                        <Typography variant="h4" className="mbe-2.5">
-                          Thumbnail Image*
-                        </Typography>
+                      <>
                         <Avatar variant="rounded" className="bs-12 is-12 mbe-9">
                           <i className="tabler-upload" />
                         </Avatar>
@@ -609,131 +592,131 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
                           </a>{" "}
                           through your machine
                         </Typography>
-                      </div>
+                      </>
                     )}
-                    {!!formErrors.thumbnailImageError && (
-                      <p className="text-[#ff5054]">
-                        {" "}
-                        {formErrors.thumbnailImageError}
-                      </p>
-                    )}
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={12}>
-                  <Grid item xs={12} sm={12}>
-                    <CustomTextField
-                      // disabled={open === sectionActions.EDIT}
-                      // error={!!formErrors.slug}
-                      error={!!formErrors.authorName}
-                      helperText={formErrors.authorName}
-                      label="Author Name *"
-                      fullWidth
-                      placeholder=""
-                      value={formData.authorName}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                        setFormData({
-                          ...formData,
-                          authorName: e.target.value,
-                        });
-                        if (e.target?.value?.length) {
-                          setFormErrors({ ...formErrors, authorName: "" });
-                        }
-                      }}
-                    />
-                  </Grid>
-                </Grid>
-                <Grid item xs={12} sm={12}>
-                  <CustomAutocomplete
-                    id="autocomplete-limit-tags"
-                    freeSolo
-                    multiple
-                    limitTags={3}
-                    options={tagsList}
-                    value={formData.tags}
-                    getOptionLabel={(option) => option || ""}
-                    renderInput={(params) => (
-                      <CustomTextField {...params} label="Tags" />
-                    )}
-                    onChange={(e: any, newVal: string[]) => {
-                      setFormData({ ...formData, tags: [...newVal] });
-                      if (newVal.length) {
-                        setFormErrors({ ...formErrors, tags: "" });
-                      }
-                    }}
-                  />
-                  {!!formErrors.tags && (
-                    <p className="text-[#ff5054]">{formErrors.tags}</p>
+                  </div>
+                  {!!formErrors.thumbnailImageError && (
+                    <p className="text-[#ff5054]">
+                      {" "}
+                      {formErrors.thumbnailImageError}
+                    </p>
                   )}
-                </Grid>
-                <Grid item xs={12} sm={12}>
-                  <CustomAutocomplete
-                    id="autocomplete-limit-categories"
-                    freeSolo
-                    multiple
-                    limitTags={3}
-                    options={categoryList}
-                    value={formData.categories}
-                    getOptionLabel={(option) => option || ""}
-                    renderInput={(params) => (
-                      <CustomTextField {...params} label="Categories" />
-                    )}
-                    onChange={(e: any, newVal: string[]) => {
-                      setFormData({ ...formData, categories: [...newVal] });
-                      if (newVal.length) {
-                        setFormErrors({ ...formErrors, categories: "" });
-                      }
-                    }}
-                  />
-                  {!!formErrors.categories && (
-                    <p className="text-[#ff5054]">{formErrors.categories}</p>
-                  )}
-                </Grid>
-                <Grid item xs={12} sm={12}>
-                  <CustomTextField
-                    error={!!formErrors.templateId}
-                    helperText={formErrors.templateId}
-                    select
-                    fullWidth
-                    defaultValue=""
-                    value={formData.templateId}
-                    label="Select Template"
-                    id="custom-select"
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      if (Number(e.target.value) <= 0) {
-                        setFormErrors({
-                          ...formErrors,
-                          templateId: "please select template",
-                        });
-                      } else {
-                        setFormErrors({ ...formErrors, templateId: "" });
-                      }
-                      setFormData({
-                        ...formData,
-                        templateId: Number(e.target.value),
-                      });
-                    }}
-                  >
-                    <MenuItem value={-1}>
-                      <em>Select Template</em>
-                    </MenuItem>
-                    {!loading &&
-                      !!templateList.length &&
-                      templateList.map((template) => {
-                        return (
-                          <MenuItem
-                            value={template.templateId}
-                            key={template.templateName}
-                          >
-                            {template.templateName}
-                          </MenuItem>
-                        );
-                      })}
-                  </CustomTextField>
-                </Grid>
+                </Box>
+              </div>
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <Grid item xs={12} sm={12}>
+                <CustomTextField
+                  // disabled={open === sectionActions.EDIT}
+                  // error={!!formErrors.slug}
+                  error={!!formErrors.authorName}
+                  helperText={formErrors.authorName}
+                  label="Author Name *"
+                  fullWidth
+                  placeholder=""
+                  value={formData.authorName}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                    setFormData({
+                      ...formData,
+                      authorName: e.target.value,
+                    });
+                    if (e.target?.value?.length) {
+                      setFormErrors({ ...formErrors, authorName: "" });
+                    }
+                  }}
+                />
               </Grid>
-            </Box>
-          </div>
-        </div>
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <CustomAutocomplete
+                id="autocomplete-limit-tags"
+                freeSolo
+                multiple
+                limitTags={3}
+                options={tagsList}
+                value={formData.tags}
+                getOptionLabel={(option) => option || ""}
+                renderInput={(params) => (
+                  <CustomTextField {...params} label="Tags" />
+                )}
+                onChange={(e: any, newVal: string[]) => {
+                  setFormData({ ...formData, tags: [...newVal] });
+                  if (newVal.length) {
+                    setFormErrors({ ...formErrors, tags: "" });
+                  }
+                }}
+              />
+              {!!formErrors.tags && (
+                <p className="text-[#ff5054]">{formErrors.tags}</p>
+              )}
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <CustomAutocomplete
+                id="autocomplete-limit-categories"
+                freeSolo
+                multiple
+                limitTags={3}
+                options={categoryList}
+                value={formData.categories}
+                getOptionLabel={(option) => option || ""}
+                renderInput={(params) => (
+                  <CustomTextField {...params} label="Categories" />
+                )}
+                onChange={(e: any, newVal: string[]) => {
+                  setFormData({ ...formData, categories: [...newVal] });
+                  if (newVal.length) {
+                    setFormErrors({ ...formErrors, categories: "" });
+                  }
+                }}
+              />
+              {!!formErrors.categories && (
+                <p className="text-[#ff5054]">{formErrors.categories}</p>
+              )}
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <CustomTextField
+                error={!!formErrors.templateId}
+                helperText={formErrors.templateId}
+                select
+                fullWidth
+                defaultValue=""
+                value={formData.templateId}
+                label="Select Template"
+                id="custom-select"
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  if (Number(e.target.value) <= 0) {
+                    setFormErrors({
+                      ...formErrors,
+                      templateId: "please select template",
+                    });
+                  } else {
+                    setFormErrors({ ...formErrors, templateId: "" });
+                  }
+                  setFormData({
+                    ...formData,
+                    templateId: Number(e.target.value),
+                  });
+                }}
+              >
+                <MenuItem value={-1}>
+                  <em>Select Template</em>
+                </MenuItem>
+                {!loading &&
+                  !!templateList.length &&
+                  templateList.map((template) => {
+                    return (
+                      <MenuItem
+                        value={template.templateId}
+                        key={template.templateName}
+                      >
+                        {template.templateName}
+                      </MenuItem>
+                    );
+                  })}
+              </CustomTextField>
+            </Grid>
+          </Grid>
+        </Box>
         <Box display="flex" gap={4}>
           <Grid container spacing={2} sm={12}>
             <Grid
