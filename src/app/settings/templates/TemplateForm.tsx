@@ -203,7 +203,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
       )
     );
   };
-  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false); 
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false);
   const handleSectionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
     setFormErrors({ ...formErrors, templateName: "" });
@@ -221,7 +221,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
       ...prevData,
       templateSlug: newSlug,
     }));
-    setIsSlugManuallyEdited(true); 
+    setIsSlugManuallyEdited(true);
   };
 
   return (
