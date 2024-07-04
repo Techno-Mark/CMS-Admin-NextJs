@@ -29,6 +29,8 @@ import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import EditorCustom from "./RichEditor";
 import { blogDetailType, EDIT_BLOCK } from "@/types/apps/blogsType";
+import Tiptap from "./TipTapEditor";
+import TipTapEditor from "./TipTapEditor";
 
 type blogFormPropsTypes = {
   open: number;
@@ -511,7 +513,7 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
               <Grid container spacing={2} sm={5}>
                 <Grid item xs={12} sm={12}>
                   <Box
-                    sx={{ height: 300, width: 400 }}
+                    sx={{ height: 250, width: 350 }}
                     {...getBannerRootProps({ className: "dropzone" })}
                     {...bannerImage}
                   >
@@ -521,11 +523,8 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
                       bannerImg
                     ) : (
                       <div
-                        className={`flex items-center flex-col border-dashed border-2 p-5 ${!!formErrors.bannerImageError && "border-red-400"}`}
+                        className={`flex items-center flex-col border border-dashed border-gray-300 rounded-md  p-10 ${!!formErrors.bannerImageError && "border-red-400"}`}
                       >
-                        <Typography variant="h4" className="mbe-2.5">
-                          Banner Image*
-                        </Typography>
                         <Avatar variant="rounded" className="bs-12 is-12 mbe-9">
                           <i className="tabler-upload" />
                         </Avatar>
@@ -552,6 +551,30 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
                       </p>
                     )}
                   </Box>
+                  {/* <div className="p-2 border border-dashed border-gray-300 rounded-md text-center h-[250px] w-[300px]">
+                    <div
+                      {...getBannerRootProps({ className: "dropzone" })}
+                      className={`p-2`}
+                    >
+                      <input {...getBannerInputProps()} />
+                      {bannerImage ? (
+                        <div className="flex flex-col items-center">
+                          <img
+                            src={URL.createObjectURL(bannerImage)}
+                            alt="preview"
+                            className="w-full h-full object-cover mb-2"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center">
+                          <p className="text-gray-500">Featured image</p>
+                          <div className="mt-2 text-gray-500 border border-dashed border-gray-400 w-32 h-32 flex items-center justify-center">
+                            <span>Add image</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div> */}
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <Box
