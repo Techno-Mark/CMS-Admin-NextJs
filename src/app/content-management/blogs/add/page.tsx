@@ -2,16 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import BlogForm from "../BlogForm";
-
-const ADD_CONTENT_BLOCK = -1;
+import { ADD_BLOG } from "@/types/apps/blogsType";
 
 const Page = () => {
   const router = useRouter();
 
   return (
     <BlogForm
-      open={ADD_CONTENT_BLOCK}
+      open={ADD_BLOG}
       handleClose={() => router.push("/content-management/blogs")}
+      editingRow={null}
     />
   );
 };

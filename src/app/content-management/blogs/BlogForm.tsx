@@ -28,10 +28,12 @@ import { tag } from "@/services/endpoint/tag";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import EditorCustom from "./RichEditor";
+import { blogDetailType, EDIT_BLOCK } from "@/types/apps/blogsType";
 
 type blogFormPropsTypes = {
   open: number;
   handleClose: Function;
+  editingRow: blogDetailType | null;
 };
 
 const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
@@ -72,7 +74,7 @@ const initialErrorData = {
   metaKeywords: "",
 };
 
-function BlogForm({ open, handleClose }: blogFormPropsTypes) {
+function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
   const router = useRouter();
 
   //state management hook
@@ -146,6 +148,18 @@ function BlogForm({ open, handleClose }: blogFormPropsTypes) {
   useEffect(() => {
     async function getTemplate() {
       await getRequiredData();
+      if (editingRow && open == EDIT_BLOCK) {
+        formData.templateId = editingRow.templateId;
+        formData.id = editingRow.blogId;
+        formData.authorName = editingRow.authorName;
+        formData.categories = editingRow.categories.split(",");
+        formData.tags = editingRow.tags.split(",");
+        formData.metaDescription = editingRow.metaDescription;
+        formData.metaTitle = editingRow.metaTitle;
+        formData.metaKeywords = editingRow.metaKeywords;
+        formData.title = editingRow.title;
+        formData.slug = editingRow.slug;
+      }
     }
     getTemplate();
   }, []);
@@ -377,7 +391,7 @@ function BlogForm({ open, handleClose }: blogFormPropsTypes) {
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
-                  {/* <CustomTextField
+                  <CustomTextField
                     // disabled={true}
                     multiline
                     maxRows={10}
@@ -394,7 +408,7 @@ function BlogForm({ open, handleClose }: blogFormPropsTypes) {
                         setFormErrors({ ...formErrors, description: "" });
                       }
                     }}
-                  /> */}
+                  />
                   <p className="text-[#4e4b5a]">Description *</p>
                   <EditorCustom />
                 </Grid>
@@ -497,6 +511,7 @@ function BlogForm({ open, handleClose }: blogFormPropsTypes) {
               <Grid container spacing={2} sm={5}>
                 <Grid item xs={12} sm={12}>
                   <Box
+                    sx={{ height: 300, width: 400 }}
                     {...getBannerRootProps({ className: "dropzone" })}
                     {...bannerImage}
                   >
@@ -506,7 +521,7 @@ function BlogForm({ open, handleClose }: blogFormPropsTypes) {
                       bannerImg
                     ) : (
                       <div
-                        className={`flex items-center flex-col border-dashed border-2 p-16 ${!!formErrors.bannerImageError && "border-red-400"}`}
+                        className={`flex items-center flex-col border-dashed border-2 p-5 ${!!formErrors.bannerImageError && "border-red-400"}`}
                       >
                         <Typography variant="h4" className="mbe-2.5">
                           Banner Image*
@@ -714,7 +729,9 @@ function BlogForm({ open, handleClose }: blogFormPropsTypes) {
                   variant="contained"
                   color="error"
                   type="reset"
-                  onClick={() => handleClose()}
+                  onClick={() => {
+                    handleClose();
+                  }}
                 >
                   Cancel
                 </Button>
