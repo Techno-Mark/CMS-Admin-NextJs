@@ -34,6 +34,7 @@ const sectionActions = {
 };
 
 const initialFormData = {
+  pageId:"",
   templateId: -1,
   title: "",
   slug: "",
@@ -144,22 +145,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }
   };
 
-  // const getTemplateIdWiseForm = async (templateId: number) => {
-  //   setLoading(true);
-  //   try {
-  //     const result = await get(
-  //       `${template.getTemplateSectionsById}/${templateId}`
-  //     );
-  //     if (result.statusCode === 200) {
-  //       setSections(result.data);
-  //       setLoading(false);
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     setLoading(false);
-  //   }
-  // };
-
   const resetSectionsAndData = () => {
     setSections([]);
     setFormData((prevData) => ({
@@ -167,14 +152,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       templateData: {},
     }));
   };
-  const validateField = (value: string | undefined | null, validation: any,sectionIndex:any) => {
+  const validateField = (value: string | undefined | null, validation: any) => {
 
-    console.log("validateField",sectionIndex);
-    console.log("validateField",validation);
-    console.log(value);
-    
-    
-    
+   
     if (validation.required && (!value || value.trim() === "")) {
       return "This field is required";
     }
@@ -191,106 +171,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       }
     }
 
-    return null; // Return null if no error
+    return null; 
   };
 
-
-  // const validateField = (value: string, validation: any) => {
-  //   if (validation.required && !value) {
-  //     return "This field is required";
-  //   }
-  //   if (validation.maxLength && value.length > validation.maxLength) {
-  //     return `Maximum length is ${validation.maxLength}`;
-  //   }
-  //   if (validation.minLength && value.length < validation.minLength) {
-  //     return `Minimum length is ${validation.minLength}`;
-  //   }
-  //   if (validation.pattern && !new RegExp(validation.pattern).test(value)) {
-  //     return "Invalid format";
-  //   }
-  //   return "";
-  // };
-
-  // const validateForm = () => {
-  //   let valid = true;
-  //   let errors = { ...initialErrorData };
-
-  //   if (formData.templateId === -1) {
-  //     errors.templateId = "Please select a template";
-  //     valid = false;
-  //   }
-
-  //   if (!formData.title) {
-  //     errors.title = "Title is required";
-  //     valid = false;
-  //   }
-  //   if (!formData.slug) {
-  //     errors.slug = "Slug is required";
-  //     valid = false;
-  //   }
-  //   if (!formData.content) {
-  //     errors.content = "Content is required";
-  //     valid = false;
-  //   }
-
-  //   if (!formData.metaTitle) {
-  //     errors.metaTitle = "Meta Title is required";
-  //     valid = false;
-  //   }
-
-  //   if (!formData.metaDescription) {
-  //     errors.metaDescription = "Meta Description is required";
-  //     valid = false;
-  //   }
-
-  //   if (!formData.metaKeywords) {
-  //     errors.metaKeywords = "Meta Keywords are required";
-  //     valid = false;
-  //   }
-
-  //   if (!formData.scheduleDate) {
-  //     errors.scheduleDate = "Schedule Date are required";
-  //     valid = false;
-  //   }
-
-  //   const sectionErrors = sections.map((section) => {
-  //     const sectionError: any = {};
-  //     section.sectionTemplate.forEach(
-  //       (
-  //         field: {
-  //           fieldLabel: string;
-  //           fieldType: string;
-  //           isRequired: boolean;
-  //           validation: string;
-  //         },
-  //         fieldIndex: number
-  //       ) => {
-  //         const value = section.sectionTemplate[fieldIndex][field.fieldType];
-  //         let validationObj = {};
-  //         try {
-  //           validationObj = JSON.parse(field.validation);
-  //         } catch (error) {
-  //           console.error(`Error parsing validation JSON: ${error}`);
-  //         }
-  //         const error = validateField(value, validationObj);
-  //         if (error) {
-  //           sectionError[field.fieldType] = error;
-  //           valid = false;
-  //         }
-  //       }
-  //     );
-  //     return sectionError;
-  //   });
-
-  //   setFormErrors(errors);
-  //   setSections((prevSections) =>
-  //     prevSections.map((section, index) => ({
-  //       ...section,
-  //       errors: sectionErrors[index],
-  //     }))
-  //   );
-  //   return valid;
-  // };
 
   const validateForm = () => {
     let valid = true;
@@ -469,7 +352,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
             );
             console.log(sec.sectionTemplate[fieldIndex].validation,validation);
             
-            const error = validateField(value, validation,sec.sectionTemplate[fieldIndex]);
+            const error = validateField(value, validation);
             console.log(error);
             return {
               ...sec,
@@ -486,85 +369,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       });
     }
   };
-
-
-
-  // const handleInputChange = (
-  //   event: ChangeEvent<HTMLInputElement>,
-  //   sectionId: number,
-  //   fieldIndex: number
-  // ) => {
-  //   const { name, value, files } = event.target;
-  //   if (files && files[0]) {
-  //     const file = files[0];
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       setSections((prevSections) => {
-  //         const updatedSections = [...prevSections];
-  //         updatedSections.forEach((section) => {
-  //           if (section.sectionId === sectionId) {
-  //             const sectionName = section.sectionName;
-
-  //             setFormData((prevData) => ({
-  //               ...prevData,
-  //               templateData: {
-  //                 ...prevData.templateData,
-  //                 [sectionName]: {
-  //                   ...prevData.templateData[sectionName],
-  //                   [name]: {
-  //                     file,
-  //                     preview: reader.result as string,
-  //                   },
-  //                 },
-  //               },
-  //             }));
-  //             section.sectionTemplate[fieldIndex][name] = {
-  //               file,
-  //               preview: reader.result as string,
-  //             };
-
-  //             const validation = section.sectionTemplate[fieldIndex].validation;
-  //             let error = validateField(value, validation);
-  //             section.errors = {
-  //               ...section.errors,
-  //               [name]: error,
-  //             };
-  //           }
-  //         });
-  //         return updatedSections;
-  //       });
-  //     };
-  //     reader.readAsDataURL(file);
-  //   } else {
-  //     setSections((prevSections) => {
-  //       const updatedSections = [...prevSections];
-  //       updatedSections.forEach((section) => {
-  //         if (section.sectionId === sectionId) {
-  //           section.sectionTemplate[fieldIndex][name] = value;
-
-  //           const sectionName = section.sectionName;
-  //           setFormData((prevData) => ({
-  //             ...prevData,
-  //             templateData: {
-  //               ...prevData.templateData,
-  //               [sectionName]: {
-  //                 ...prevData.templateData[sectionName],
-  //                 [name]: value,
-  //               },
-  //             },
-  //           }));
-  //           const validation = section.sectionTemplate[fieldIndex].validation;
-  //           let error = validateField(value, validation);
-  //           section.errors = {
-  //             ...section.errors,
-  //             [name]: error,
-  //           };
-  //         }
-  //       });
-  //       return updatedSections;
-  //     });
-  //   }
-  // };
 
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(
     false
@@ -736,7 +540,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     selected={formData.scheduleDate}
                     id="basic-input"
                     onChange={(date: Date) => {
-                      const formattedDate = date ? date.toISOString().split('T')[0] : null;
+                      const formattedDate = date ? date.toISOString().split('T')[0] : "";
                       setFormData({
                         ...formData,
                         scheduleDate: formattedDate,
@@ -842,8 +646,16 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                   margin="normal"
                                   error={Boolean(section.errors?.[field.fieldType])}
                                   helperText={section.errors?.[field.fieldType]}
+                                  // inputProps={
+                                  //   field.validation ? JSON.parse(field.validation) : {}
+                                  // }
+                                  value={
+                                    formData.templateData && formData.templateData[section.sectionName]?.[field.fieldType] || ""
+                                  }
                                   inputProps={
-                                    field.validation ? JSON.parse(field.validation) : {}
+                                    field.validation
+                                      ? JSON.parse(field.validation)
+                                      : {}
                                   }
                                 />
 

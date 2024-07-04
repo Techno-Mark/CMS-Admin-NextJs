@@ -53,7 +53,6 @@ export const fetchData = async (
       throw new Error("No session or access token found");
     }
     
-    
     const orgId = localStorage.getItem('selectedOrgId'); 
     const response = await fetch(`${API_URL}/${endpoint}`, {
       ...options,
