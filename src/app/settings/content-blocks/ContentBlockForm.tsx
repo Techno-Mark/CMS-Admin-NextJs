@@ -22,6 +22,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { section } from "@/services/endpoint/section";
 import { UsersType } from "@/types/apps/userTypes";
+import LoadingBackdrop from "@/components/LoadingBackdrop";
 
 const tooltipContent = {
   "pattern": "[A-Za-z]{3,10}",
@@ -123,7 +124,7 @@ const ContentBlockForm = ({ open }: Props) => {
           ...formErrors,
           jsonContent: {
             ...formErrors.jsonContent,
-            [index]: "Validation should be a valid JSON object.", // Set error message for invalid JSON
+            [index]: "Validation should be a valid JSON object.",
           },
         });
       }
@@ -135,17 +136,25 @@ const ContentBlockForm = ({ open }: Props) => {
     let errors = {
       name: '',
       slug: '',
+      jsonContent: data.jsonContent.map(() => ''), 
     };
 
-    if (data.name.trim().length < 5) {
-      errors.name = 'Section Name must be at least 5 characters long';
+    if (data.name.trim().length === 0) {
+      errors.name = 'Full Name is required';
       isValid = false;
     }
 
     if (data.slug.trim().length === 0) {
-      errors.slug = 'Slug is required';
+      errors.slug = 'Section Slug is required';
       isValid = false;
     }
+
+    // data.jsonContent.forEach((field, index) => {
+    //   if (field.fieldLabel.trim().length === 0) {
+    //     errors.jsonContent[index] = 'required';
+    //     isValid = false;
+    //   }
+    // });
 
     setFormErrors({ ...formErrors, ...errors });
     setLoading(false);
@@ -190,18 +199,18 @@ const ContentBlockForm = ({ open }: Props) => {
     try {
       const result = await get(`${section.getById}/${slug}`);
       const { data } = result;
-      // const selectedFieldTypeOption = fieldTypeOptions.find(option => option.value === data.sectionTemplate.fieldType);
 
       setFormData({
         ...formData,
         id: data.sectionId,
         name: data.sectionName,
         slug: data.sectionSlug,
-        jsonContent: JSON.parse(data.sectionTemplate),
+        jsonContent: data.sectionTemplate,
         status: data.active,
 
       });
       setIsSlugManuallyEdited(false);
+      setLoading(false);
     } catch (error) {
       console.error(error);
     }
@@ -210,6 +219,8 @@ const ContentBlockForm = ({ open }: Props) => {
   useEffect(() => {
     if (open === sectionActions.EDIT) {
       getSectionDataById(query[query.length - 1]);
+    } else {
+      setLoading(false);
     }
   }, []);
 
@@ -235,6 +246,7 @@ const ContentBlockForm = ({ open }: Props) => {
 
   return (
     <>
+      <LoadingBackdrop isLoading={loading} />
       <Card>
         <div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
@@ -244,19 +256,12 @@ const ContentBlockForm = ({ open }: Props) => {
                   <CustomTextField
                     error={!!formErrors.name}
                     helperText={formErrors.name}
-                    label="Section Name *"
+                    label="Full Name *"
                     fullWidth
                     placeholder=""
                     value={formData.name}
                     onChange={handleSectionNameChange}
-                  // onChange={(e: { target: { value: string; }; }) => {
-                  //   setFormErrors({ ...formErrors, name: "" });
-                  //   setFormData({
-                  //     ...formData,
-                  //     name: e.target.value,
-                  //     slug: open === sectionActions.ADD ? e.target.value.replace(/[^\w\s]|_/g, "").replace(/\s+/g, "-").toLowerCase() : formData.slug,
-                  //   });
-                  // }}
+
                   />
                 </Grid>
                 <Grid item xs={12} sm={5}>
@@ -269,15 +274,7 @@ const ContentBlockForm = ({ open }: Props) => {
                     placeholder=""
                     value={formData.slug}
                     onChange={handleSlugChange}
-                  // onChange={(e: { target: { value: string; }; }) => {
-                  //   setFormErrors({ ...formErrors, slug: "" });
-                  //   if (/^[A-Za-z0-9-]*$/.test(e.target.value)) {
-                  //     setFormData({
-                  //       ...formData,
-                  //       slug: e.target.value.toLowerCase(),
-                  //     });
-                  //   }
-                  // }}
+
                   />
                 </Grid>
                 <Grid item xs={12} sm={1}>
@@ -293,7 +290,7 @@ const ContentBlockForm = ({ open }: Props) => {
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
-                  <label className="text-[0.8125rem] leading-[1.153]">Section Template *</label>
+                  <label className="text-[0.8125rem] leading-[1.153]">JSON Content *</label>
                   <TableContainer>
                     <Table>
                       <TableHead>
@@ -331,15 +328,16 @@ const ContentBlockForm = ({ open }: Props) => {
                                 onChange={(e, newValue) => handleChangeField(index, "fieldType", newValue ? newValue.value : '')}
                               />
 
-                              
+
                             </TableCell>
                             <TableCell>
                               <CustomTextField
                                 fullWidth
                                 value={field.fieldLabel}
                                 onChange={(e: { target: { value: any; }; }) => handleChangeField(index, "fieldLabel", e.target.value)}
-                           
-                           />
+                                // error={!!formErrors.jsonContent[index]}  
+                                // helperText={formErrors.jsonContent[index] || ' '} 
+                              />
                             </TableCell>
                             <TableCell>
                               <Switch

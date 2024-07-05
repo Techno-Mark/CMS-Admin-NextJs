@@ -4,9 +4,9 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { post } from "@/services/apiService";
-import { organization } from "@/services/endpoint/organization";
 import { toast } from "react-toastify";
+import { post } from "@/services/apiService";
+import { pages } from "@/services/endpoint/pages";
 
 type ConfirmationDialogProps = {
   deletingId: number;
@@ -21,12 +21,12 @@ const ConfirmationDialog = ({
   setOpen,
   setDeletingId,
 }: ConfirmationDialogProps) => {
-  const deleteOrganizationBlock = async () => {
-    // await post(organization.delete, { id: deletingId });
-
-    // toast.success("Organization deleted successfully!");
+  const deleteContentBlock = async () => {
     try {
-      const result = await post(organization.delete, { id: deletingId });
+      const result = await post(pages.delete, {
+        pageId: deletingId,
+        organizationName: localStorage.getItem("orgName") || "",
+      });
 
       if (result.status === "success") {
         toast.success(result.message);
@@ -39,7 +39,6 @@ const ConfirmationDialog = ({
       setDeletingId(0);
       setOpen(false);
     }
-
   };
 
   return (
@@ -47,11 +46,11 @@ const ConfirmationDialog = ({
       <DialogContent className="flex items-center flex-col text-center sm:pbs-16 sm:pbe-6 sm:pli-16">
         <i className="tabler-alert-circle text-[88px] mbe-6 text-warning" />
         <Typography variant="h5">
-          Are you sure you want to delete the organization?
+          Are you sure you want to delete this content block?
         </Typography>
       </DialogContent>
       <DialogActions className="justify-center pbs-0 sm:pbe-16 sm:pli-16">
-        <Button variant="contained" onClick={deleteOrganizationBlock}>
+        <Button variant="contained" onClick={deleteContentBlock}>
           Yes
         </Button>
         <Button

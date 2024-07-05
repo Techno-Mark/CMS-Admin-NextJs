@@ -20,7 +20,7 @@ import ConfirmationDialog from "./ConfirmationDialog";
 import { post } from "@/services/apiService";
 import { organization } from "@/services/endpoint/organization";
 import CustomChip from "@/@core/components/mui/Chip";
-import BreadCrumbList from "../content-blocks/BreadCrumbList";
+import BreadCrumbList from "@/components/BreadCrumbList";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 
 declare module "@tanstack/table-core" {
@@ -251,7 +251,7 @@ const OrganizationsListTable = () => {
       </div>
       <Card>
 
-        <div className="overflow-x-auto h-[325px]">
+        <div className="overflow-x-auto">
           <table className={tableStyles.table}>
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -282,7 +282,7 @@ const OrganizationsListTable = () => {
               <tbody>
                 <tr>
                   <td colSpan={table.getVisibleFlatColumns().length} className="text-center">
-                    No data available
+                  Currently there is no record found, you may Add Organization to continue
                   </td>
                 </tr>
               </tbody>
