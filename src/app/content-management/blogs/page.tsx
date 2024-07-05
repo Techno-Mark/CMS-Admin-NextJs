@@ -1,4 +1,5 @@
+import BlogsListTable from "./BlogsListTable";
+
 export default function Page() {
-    return <h1>Blogs page!</h1>
-  }
-  
+  return <BlogsListTable />;
+}
