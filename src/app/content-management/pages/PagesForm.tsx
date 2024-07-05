@@ -1,3 +1,4 @@
+
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import {
   Button,
@@ -8,8 +9,6 @@ import {
   Typography,
   TextField,
   Switch,
-  CardContent,
-  CardActions,
 } from "@mui/material";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -19,9 +18,10 @@ import CustomTextField from "@/@core/components/mui/TextField";
 import { useRouter } from "next/navigation";
 import { boolean } from "valibot";
 import AppReactDatepicker from "@/libs/styles/AppReactDatepicker";
-import { pages } from "@/services/endpoint/pages";
 import { PagesType } from "./pagesType";
-import { toast } from 'react-toastify';
+import { pages } from "@/services/endpoint/pages";
+import { toast } from "react-toastify";
+
 type FileProp = {
   name: string;
   type: string;
@@ -34,7 +34,7 @@ const sectionActions = {
 };
 
 const initialFormData = {
-  pageId:"",
+  pageId: "",
   templateId: -1,
   title: "",
   slug: "",
@@ -45,6 +45,7 @@ const initialFormData = {
   metaKeywords: "",
   scheduleDate: new Date().toISOString().split('T')[0],
   templateData: {} as Record<string, any>,
+  status: false
 };
 
 const initialErrorData = {
@@ -58,14 +59,12 @@ const initialErrorData = {
   metaKeywords: "",
   scheduleDate: ""
 };
-
 type Props = {
   open: -1 | 0 | 1;
   handleClose: () => void;
   editingRow: PagesType | null;
   setEditingRow: React.Dispatch<React.SetStateAction<PagesType | null>>;
 };
-
 function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
@@ -80,7 +79,17 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   >([]);
   const [sections, setSections] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
+  const [date, setDate] = useState<Date | null | undefined>(new Date());
+  const [PDStatus, setPDStatus] = useState("");
+  const { getRootProps, getInputProps } = useDropzone({
+    multiple: false,
+    accept: {
+      "image/*": [".png", ".jpg", ".jpeg", ".gif"],
+    },
+    onDrop: (acceptedFiles: File[]) => {
+      setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
+    },
+  });
 
   useEffect(() => {
     setLoading(true);
@@ -93,17 +102,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       setLoading(false);
     }
   }, [editingRow]);
-
-  const { getRootProps, getInputProps } = useDropzone({
-    multiple: false,
-    accept: {
-      "image/*": [".png", ".jpg", ".jpeg", ".gif"],
-    },
-    onDrop: (acceptedFiles: File[]) => {
-      setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
-    },
-  });
-
   useEffect(() => {
     async function getTemplate() {
       await getActiveTemplateList();
@@ -123,6 +121,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       setLoading(false);
     }
   };
+
+
 
   const getTemplateIdWiseForm = async (templateId: number) => {
     setLoading(true);
@@ -152,79 +152,88 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       templateData: {},
     }));
   };
-  const validateField = (value: string | undefined | null, validation: any) => {
 
-   
-    if (validation.required && (!value || value.trim() === "")) {
+  const validateField = (value: string, validation: any) => {
+    if (validation.required && !value) {
       return "This field is required";
     }
-
-    if (value && typeof value === "string") {
-      if (validation.min && value.length < validation.min) {
-        return `Minimum length is ${validation.min}`;
-      }
-      if (validation.max && value.length > validation.max) {
-        return `Maximum length is ${validation.max}`;
-      }
-      if (validation.pattern && !new RegExp(validation.pattern).test(value)) {
-        return "Invalid format";
-      }
+    if (validation.maxLength && value.length > validation.maxLength) {
+      return `Maximum length is ${validation.maxLength}`;
     }
-
-    return null; 
+    if (validation.minLength && value.length < validation.minLength) {
+      return `Minimum length is ${validation.minLength}`;
+    }
+    if (validation.pattern && !new RegExp(validation.pattern).test(value)) {
+      return "Invalid format";
+    }
+    return "";
   };
-
 
   const validateForm = () => {
     let valid = true;
     let errors = { ...initialErrorData };
 
-    // Form-wide validations
     if (formData.templateId === -1) {
       errors.templateId = "Please select a template";
       valid = false;
     }
+
     if (!formData.title) {
       errors.title = "Title is required";
       valid = false;
     }
+
     if (!formData.slug) {
       errors.slug = "Slug is required";
       valid = false;
     }
+
     if (!formData.content) {
       errors.content = "Content is required";
       valid = false;
     }
+
     if (!formData.metaTitle) {
       errors.metaTitle = "Meta Title is required";
       valid = false;
     }
+
     if (!formData.metaDescription) {
       errors.metaDescription = "Meta Description is required";
       valid = false;
     }
+
     if (!formData.metaKeywords) {
       errors.metaKeywords = "Meta Keywords are required";
       valid = false;
     }
-    if (!formData.scheduleDate) {
-      errors.scheduleDate = "Schedule Date are required";
-      valid = false;
-    }
 
-    // Section map validations
     const sectionErrors = sections.map((section) => {
       const sectionError: any = {};
-      section.sectionTemplate.forEach((field: any, fieldIndex: number) => {
-        const value = section.sectionTemplate[fieldIndex][field.fieldType];
-        const validationObj = field.validation ? JSON.parse(field.validation) : {};
-        const error = validateField(value, validationObj);
-        if (error) {
-          sectionError[field.fieldType] = error;
-          valid = false;
+      section.sectionTemplate.forEach(
+        (
+          field: {
+            fieldLabel: string;
+            fieldType: string;
+            isRequired: boolean;
+            validation: string;
+          },
+          fieldIndex: number
+        ) => {
+          const value = section.sectionTemplate[fieldIndex][field.fieldType];
+          let validationObj = {};
+          try {
+            validationObj = JSON.parse(field.validation);
+          } catch (error) {
+            console.error(`Error parsing validation JSON: ${error}`);
+          }
+          const error = validateField(value, validationObj);
+          if (error) {
+            sectionError[field.fieldType] = error;
+            valid = false;
+          }
         }
-      });
+      );
       return sectionError;
     });
 
@@ -239,8 +248,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   };
 
 
-  const handleSubmit = async (event: React.FormEvent, status: string) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
     console.log(formData);
     if (validateForm()) {
       try {
@@ -250,7 +260,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
           ...formData,
           pageId: editingRow ? formData.pageId : undefined,
           templateData: formData.templateData,
-          status
+          status: PDStatus
         });
         toast.success(result.message);
         handleClose();
@@ -263,7 +273,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }
   };
 
-
+  
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement>,
     sectionId: number,
@@ -400,6 +410,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     setIsSlugManuallyEdited(true);
   };
 
+
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedTemplateId = parseInt(e.target.value);
     setFormErrors({ ...formErrors, templateId: "" });
@@ -410,12 +421,13 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     resetSectionsAndData();
     getTemplateIdWiseForm(selectedTemplateId);
   };
+
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
       <Card>
         <div>
-          <form className="flex flex-col gap-6 p-6" >
+          <form className="flex flex-col gap-6 p-6" onSubmit={handleSubmit}>
             <Box display="flex" alignItems="center">
               <Grid container spacing={4}>
                 <Grid item xs={12} sm={6}>
@@ -447,30 +459,27 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                   </Typography>
                   <Switch
                     size="medium"
-                    checked={formData.active}
+                    checked={formData.status}
                     onChange={(e: any) =>
-                      setFormData({ ...formData, active: e.target.checked })
+                      setFormData({ ...formData, status: e.target.checked })
                     }
                   />
                 </Grid>
+
                 <Grid item xs={12} sm={12}>
                   <CustomTextField
+                    disabled={open === sectionActions.EDIT}
                     error={!!formErrors.content}
                     helperText={formErrors.content}
                     label="Content *"
                     fullWidth
                     placeholder=""
                     value={formData.content}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      setFormData({ ...formData, content: e.target.value });
-                      if (e.target?.value?.length) {
-                        setFormErrors({ ...formErrors, content: "" });
-                      }
-                    }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CustomTextField
+                    // disabled={true}
                     multiline
                     maxRows={2}
                     minRows={2}
@@ -490,6 +499,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CustomTextField
+                    // disabled={true}
                     multiline
                     maxRows={10}
                     minRows={7}
@@ -515,6 +525,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CustomTextField
+                    // disabled={true}
                     multiline
                     maxRows={4}
                     minRows={4}
@@ -537,23 +548,12 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 </Grid>
                 <Grid item xs={12} md={4}>
                   <AppReactDatepicker
-                    selected={formData.scheduleDate}
+                    selected={date}
                     id="basic-input"
-                    onChange={(date: Date) => {
-                      const formattedDate = date ? date.toISOString().split('T')[0] : "";
-                      setFormData({
-                        ...formData,
-                        scheduleDate: formattedDate,
-                      });
-                      if (date) {
-                        setFormErrors({ ...formErrors, scheduleDate: "" });
-                      }
-                    }}
+                    onChange={(date: Date) => setDate(date)}
+                    placeholderText="Click to select a date"
                     customInput={
-                      <CustomTextField label="Schedule Date" fullWidth
-                        error={!!formErrors.scheduleDate}
-                        helperText={formErrors.scheduleDate}
-                      />
+                      <CustomTextField label="Schedule Date" fullWidth />
                     }
                   />
                 </Grid>
@@ -567,7 +567,11 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     value={formData.templateId}
                     label="Select Template"
                     id="custom-select"
-                    onChange={handleTemplateChange}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                      const templateId = Number(e.target.value);
+                      setFormData({ ...formData, templateId });
+                      getTemplateIdWiseForm(templateId);
+                    }}
                     inputProps={{}}
                   >
                     {!loading &&
@@ -584,90 +588,132 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 </Grid>
                 {sections.map((section) => (
                   <Grid item xs={6} key={section.sectionId}>
-                    <Card>
-                      <CardContent>
-                        <Typography variant="h6">
-                          {section.sectionName}
-                        </Typography>
-                        {section.sectionTemplate.map(
-                          (
-                            field: {
-                              fieldLabel: string;
-                              fieldType: string;
-                              isRequired: boolean;
-                              validation: string;
-                            },
-                            fieldIndex: number
-                          ) => (
-                            <div key={fieldIndex}>
-                              {field.fieldType === "file" ? (
-                                <>
-                                  <CustomTextField
-                                    label={field.fieldLabel}
-                                    name={field.fieldType}
-                                    required={field.isRequired}
-                                    type="file"
-                                    fullWidth
-                                    margin="normal"
-                                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                      handleInputChange(e, section.sectionId, fieldIndex)
-                                    }
-                                    error={Boolean(
-                                      section.errors?.[field.fieldType]
-                                    )}
-                                    helperText={
-                                      section.errors?.[field.fieldType]
-                                    }
-                                    InputLabelProps={{ shrink: true }}
-                                  />
-                                  {formData.templateData &&
-                                    formData.templateData[section.sectionName]?.[field.fieldType]?.preview && (
-                                      <Box mt={2}>
-                                        <img
-                                          src={
-                                            formData.templateData[section.sectionName][field.fieldType].preview
-                                          }
-                                          alt="Preview"
-                                          style={{ width: "100%", maxHeight: "200px", objectFit: "contain" }}
-                                        />
-                                      </Box>
-                                    )}
-                                </>
-                              ) : (
-                                <CustomTextField
-                                  label={field.fieldLabel}
-                                  type={field.fieldType}
-                                  required={field.isRequired}
-                                  name={field.fieldType}
-                                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                    handleInputChange(e, section.sectionId, fieldIndex)
-                                  }
-                                  fullWidth
-                                  margin="normal"
-                                  error={Boolean(section.errors?.[field.fieldType])}
-                                  helperText={section.errors?.[field.fieldType]}
-                                  // inputProps={
-                                  //   field.validation ? JSON.parse(field.validation) : {}
-                                  // }
-                                  value={
-                                    formData.templateData && formData.templateData[section.sectionName]?.[field.fieldType] || ""
-                                  }
-                                  inputProps={
-                                    field.validation
-                                      ? JSON.parse(field.validation)
-                                      : {}
-                                  }
-                                />
+                    <Typography variant="h6">
+                      {section.sectionName}
+                    </Typography>
+                    {section.sectionTemplate.map(
+                      (
+                        field: {
+                          fieldLabel: string;
+                          fieldType: string;
+                          isRequired: boolean;
+                          validation: string;
+                        },
+                        fieldIndex: number
+                      ) => (
+                        <div key={fieldIndex}>
+                          {field.fieldType === "file" ? (
+                            <>
+                              <CustomTextField
+                                label={field.fieldLabel}
+                                name={field.fieldType}
+                                required={!editingRow == field.isRequired}
+                                type="file"
+                                fullWidth
+                                margin="normal"
+                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                  handleInputChange(e, section.sectionId, fieldIndex)
+                                }
+                                error={Boolean(
+                                  section.errors?.[field.fieldType]
+                                )}
+                                helperText={
+                                  section.errors?.[field.fieldType]
+                                }
+                                InputLabelProps={{ shrink: true }}
+                              />
+                              {formData.templateData &&
+                                formData.templateData[section.sectionName]?.[field.fieldType]?.preview && (
+                                  <Box mt={2}>
+                                    <img
+                                      src={
+                                        formData.templateData[section.sectionName][field.fieldType].preview
+                                      }
+                                      alt="Preview"
+                                      style={{ width: "100%", maxHeight: "200px", objectFit: "contain" }}
+                                    />
+                                  </Box>
+                                )}
+                            </>
+                          ) : (
+                            <CustomTextField
+                              label={field.fieldLabel}
+                              type={field.fieldType}
+                              required={field.isRequired}
+                              name={field.fieldType}
+                              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                handleInputChange(
+                                  e,
+                                  section.sectionId,
+                                  fieldIndex
+                                )
+                              }
+                              fullWidth
+                              margin="normal"
+                              error={
+                                section.errors &&
+                                section.errors[field.fieldType]
+                              }
+                              helperText={
+                                section.errors &&
+                                section.errors[field.fieldType]
+                              }
+                              inputProps={
+                                field.validation
+                                  ? JSON.parse(field.validation)
+                                  : {}
+                              }
+                              value={
+                                formData.templateData && formData.templateData[section.sectionName]?.[field.fieldType] || ""
+                              }
+                            />
 
-                              )}
-                             
-                            </div>
-                          )
-                        )}
+                          )}
 
-                      </CardContent>
+                        </div>
+                        // <div key={fieldIndex}>
+                        //   <CustomTextField
+                        //     label={field.fieldLabel}
+                        //     type={field.fieldType}
+                        //     required={field.isRequired}
+                        //     name={field.fieldType}
+                        //     onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        //       handleInputChange(
+                        //         e,
+                        //         section.sectionId,
+                        //         fieldIndex
+                        //       )
+                        //     }
+                        //     fullWidth
+                        //     margin="normal"
+                        //     error={
+                        //       section.errors &&
+                        //       section.errors[field.fieldType]
+                        //     }
+                        //     helperText={
+                        //       section.errors &&
+                        //       section.errors[field.fieldType]
+                        //     }
+                        //     inputProps={
+                        //       field.validation
+                        //         ? JSON.parse(field.validation)
+                        //         : {}
+                        //     }
+                        //   />
 
-                    </Card>
+                        //   {section.errors &&
+                        //     section.errors[field.fieldType] && (
+                        //       <Typography
+                        //         variant="body2"
+                        //         color="error"
+                        //         style={{ marginTop: "0.5rem" }}
+                        //       >
+                        //         {section.errors[field.fieldType]}
+                        //       </Typography>
+                        //     )}
+                        // </div>
+                      )
+                    )}
                   </Grid>
                 ))}
                 <Grid
@@ -675,15 +721,20 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                   xs={12}
                   style={{ position: "sticky", bottom: 0, zIndex: 10 }}
                 >
-                  <Box p={7} display="flex" gap={2} justifyContent="end" bgcolor="background.paper">
+                  <Box
+                    p={7}
+                    display="flex"
+                    gap={2}
+                    justifyContent="end"
+                    bgcolor="background.paper"
+                  >
                     <Button variant="contained" color="error" type="reset" onClick={handleClose}>
                       Cancel
                     </Button>
-                    <Button color="warning" variant="contained"
-                      onClick={(event) => handleSubmit(event, 'Draft')}>
+                    <Button color="warning" variant="contained" onClick={() => setPDStatus('Draft')}>
                       Save as Draft
                     </Button>
-                    <Button variant="contained" type="submit" onClick={(event) => handleSubmit(event, 'Publish')} >
+                    <Button variant="contained" type="submit" onClick={() => setPDStatus('Publish')}>
                       Save & Publish
                     </Button>
                   </Box>
