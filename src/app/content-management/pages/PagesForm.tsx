@@ -9,6 +9,7 @@ import {
   Typography,
   TextField,
   Switch,
+  IconButton,
 } from "@mui/material";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -82,7 +83,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   const { getRootProps, getInputProps } = useDropzone({
     multiple: false,
     accept: {
-      "image/*": [".png", ".jpg", ".jpeg", ".gif"],
+      "image/*": [".png", ".jpg", ".jpeg"],
     },
     onDrop: (acceptedFiles: File[]) => {
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
@@ -135,20 +136,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
           }, {}),
         }));
 
-        const result1 = {} as any;
-
-        // result.data.forEach((section:any) => {
-        for (let ind = 0; ind < result.data.length; ind++) {
-          const sectionTemplate = result.data[ind].sectionTemplate;
-          const emptyData = {} as any;
-          for (let index = 0; index < sectionTemplate.length; index++) {
-            emptyData[sectionTemplate[index].fieldLabel] = "";
-          }
-
-          result1[result.data[ind].sectionName] = emptyData;
-        };
-
-
         setSections(sectionsWithErrors);
         setLoading(false);
       }
@@ -166,12 +153,18 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }));
   };
 
-  const validateField = (value: string, validation: any) => {
+  const validateField = (value: string, validation: any, field?: any) => {
+    console.log(field);
 
-    if (validation.required && !value) {
-      return "This field is required";
+    if (!value && field?.isRequired) {
+      return `${field?.fieldLabel} is required`
     }
-
+    if (field?.fieldType == 'email') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) {
+        return `Invalid email format`;
+      }
+    }
 
     if (validation.maxLength && value.length > validation.maxLength) {
       return `Maximum length is ${validation.maxLength}`;
@@ -200,10 +193,11 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
         return `Maximum value is ${validation.max}`;
       }
     }
-
-
-    if (validation.pattern && !new RegExp(validation.pattern).test(value)) {
-      return "Invalid format";
+    if (validation.pattern) {
+      const patternRegex = new RegExp(validation.pattern);
+      if (!patternRegex.test(value)) {
+        return `Value does not match the required pattern`;
+      }
     }
 
 
@@ -215,257 +209,95 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     //   }
     // }
 
+    // if (validation.accept) {
+    //   const acceptedTypes = validation.accept.split(',').map((type: any) => type.trim());
+    //   const fileExtension = value.split('.').pop();
+    //   if (fileExtension && !acceptedTypes.includes(`.${fileExtension}`)) {
+    //     return `Only accept ${validation.accept}`;
+    //   }
+    // }
+
     return "";
   };
+
   const validateForm = () => {
     let valid = true;
     let errors = { ...initialErrorData };
-  
+    let updatedSections = [...sections];
+
     // Validate form-level fields
     if (formData.templateId === -1) {
       errors.templateId = "Please select a template";
       valid = false;
     }
-  
+
     if (!formData.title) {
       errors.title = "Title is required";
       valid = false;
     }
-  
+
     if (!formData.slug) {
       errors.slug = "Slug is required";
       valid = false;
     }
-  
+
     if (!formData.content) {
       errors.content = "Content is required";
       valid = false;
     }
-  
+
     if (!formData.metaTitle) {
       errors.metaTitle = "Meta Title is required";
       valid = false;
     }
-  
+
     if (!formData.metaDescription) {
       errors.metaDescription = "Meta Description is required";
       valid = false;
     }
-  
+
     if (!formData.metaKeywords) {
       errors.metaKeywords = "Meta Keywords are required";
       valid = false;
     }
-  
-    // Validate section fields
-    const sectionErrors = sections.map((section, index) => {
-      const sectionError: any = {};
-  
-      section.sectionTemplate.forEach(
-        (
-          field: {
-            fieldLabel: string;
-            fieldType: string;
-            isRequired: boolean;
-            validation: string;
-          },
-          fieldIndex: number
-        ) => {
-          const value = section.sectionTemplate[fieldIndex][field.fieldType];
-          const validation = JSON.parse(field.validation || "{}");
-          const error = validateField(value, validation);
-  
-          // Update error messages for the field
-          sectionError[field.fieldType] = error || ""; // Clear error if no validation issue
-          if (error) {
-            valid = false; // Set form validity to false if there's any error
-          }
+
+    updatedSections = updatedSections.map((section, secIndex) => {
+      const updatedSectionTemplate = section.sectionTemplate.map((field:
+        {
+          fieldLabel: string;
+          fieldType: string;
+          isRequired: boolean;
+          validation: string;
+        },
+        fieldIndex: any) => {
+        const value = formData.templateData[`${secIndex}+${fieldIndex}`]?.[field.fieldType] || '';
+        const validation = JSON.parse(field.validation || "{}");
+
+        const error = validateField(value, validation, field);
+
+        if (error) {
+          valid = false;
         }
-      );
-  
-      return sectionError;
-    });
-  
-    // Update templateData errors
-    errors.templateData = { ...formData.templateData };
-  
-    // Update form and section errors in state
-    setFormErrors(errors);
-    setSections((prevSections) =>
-      prevSections.map((section, index) => ({
+
+        return {
+          ...field,
+          error,
+        };
+      });
+
+      return {
         ...section,
-        errors: sectionErrors[index], // Update errors for each section
-      }))
-    );
-  console.log(formData);
-  console.log(formErrors);
-  
-    return valid; // Return overall form validity
+        sectionTemplate: updatedSectionTemplate,
+      };
+    });
+
+    setSections(updatedSections);
+    setFormErrors(errors);
+    console.log(sections);
+    console.log(formData);
+
+    return valid;
   };
-  
-
-//   const validateForm = () => {
-//     let valid = true;
-//     let errors = { ...initialErrorData };
-
-//     // Validate form-level fields
-//     if (formData.templateId === -1) {
-//       errors.templateId = "Please select a template";
-//       valid = false;
-//     }
-
-//     if (!formData.title) {
-//       errors.title = "Title is required";
-//       valid = false;
-//     }
-
-//     if (!formData.slug) {
-//       errors.slug = "Slug is required";
-//       valid = false;
-//     }
-
-//     if (!formData.content) {
-//       errors.content = "Content is required";
-//       valid = false;
-//     }
-
-//     if (!formData.metaTitle) {
-//       errors.metaTitle = "Meta Title is required";
-//       valid = false;
-//     }
-
-//     if (!formData.metaDescription) {
-//       errors.metaDescription = "Meta Description is required";
-//       valid = false;
-//     }
-
-//     if (!formData.metaKeywords) {
-//       errors.metaKeywords = "Meta Keywords are required";
-//       valid = false;
-//     }
-
-//     console.log(sections);
-
-//     // Validate section fields
-//   const sectionErrors = sections.map((section, index) => {
-//     const sectionError: any = {};
-//     section.sectionTemplate.forEach(
-//       (
-//         field: {
-//           fieldLabel: string;
-//           fieldType: string;
-//           isRequired: boolean;
-//           validation: string;
-//         },
-//         fieldIndex: number
-//       ) => {
-//         const value = section.sectionTemplate[fieldIndex][field.fieldType];
-//         const validation = JSON.parse(field.validation || "{}");
-//         const error = validateField(value, validation);
-
-//         // Update error messages for the field
-//         sectionError[field.fieldType] = error || ""; 
-//         if (error) {
-//           valid = false; 
-//         }
-//       }
-//     );
-//     return sectionError;
-//   });
-
-//   // Update form and section errors in state
-//   setFormErrors(errors);
-//   setSections((prevSections) =>
-//     prevSections.map((section, index) => ({
-//       ...section,
-//       errors: sectionErrors[index], // Update errors for each section
-//     }))
-//   );
-// console.log(errors);
-// console.log(valid);
-
-//   return valid; // Return overall form validity
-//   };
-
-  // const validateForm = () => {
-  //   let valid = true;
-  //   let errors = { ...initialErrorData };
-
-  //   if (formData.templateId === -1) {
-  //     errors.templateId = "Please select a template";
-  //     valid = false;
-  //   }
-
-  //   if (!formData.title) {
-  //     errors.title = "Title is required";
-  //     valid = false;
-  //   }
-
-  //   if (!formData.slug) {
-  //     errors.slug = "Slug is required";
-  //     valid = false;
-  //   }
-
-  //   if (!formData.content) {
-  //     errors.content = "Content is required";
-  //     valid = false;
-  //   }
-
-  //   if (!formData.metaTitle) {
-  //     errors.metaTitle = "Meta Title is required";
-  //     valid = false;
-  //   }
-
-  //   if (!formData.metaDescription) {
-  //     errors.metaDescription = "Meta Description is required";
-  //     valid = false;
-  //   }
-
-  //   if (!formData.metaKeywords) {
-  //     errors.metaKeywords = "Meta Keywords are required";
-  //     valid = false;
-  //   }
-
-  //   const sectionErrors = sections.map((section) => {
-  //     const sectionError: any = {};
-  //     section.sectionTemplate.forEach(
-  //       (
-  //         field: {
-  //           fieldLabel: string;
-  //           fieldType: string;
-  //           isRequired: boolean;
-  //           validation: string;
-  //         },
-  //         fieldIndex: number
-  //       ) => {
-  //         const value = section.sectionTemplate[fieldIndex][field.fieldType];
-  //         console.log(section);
-
-  //         let validationObj = {};
-  //         try {
-  //           validationObj = JSON.parse(field.validation);
-  //         } catch (error) {
-  //           console.error(`Error parsing validation JSON: ${error}`);
-  //         }
-  //         const error = validateField(value, validationObj);
-  //         if (error) {
-  //           sectionError[field.fieldType] = error;
-  //           valid = false;
-  //         }
-  //       }
-  //     );
-  //     return sectionError;
-  //   });
-
-  //   setFormErrors(errors);
-  //   setSections((prevSections) =>
-  //     prevSections.map((section, index) => ({
-  //       ...section,
-  //       errors: sectionErrors[index],
-  //     }))
-  //   );
-  //   return valid;
-  // };
 
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -550,7 +382,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 if (temIndex === fieldIndex) {
                   secTemplate[name] = value;
                   console.log(value);
-                  
+
                   const validation = JSON.parse(secTemplate.validation || "{}");
                   const error = validateField(value, validation);
 
@@ -633,7 +465,17 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     resetSectionsAndData();
     getTemplateIdWiseForm(selectedTemplateId);
   };
+  const handleRemoveFile = (sectionIndex: number, fieldIndex: number) => {
+    setFormData((prevData) => {
+      const updatedTemplateData = { ...prevData.templateData };
+      delete updatedTemplateData[`${sectionIndex}+${fieldIndex}`];
 
+      return {
+        ...prevData,
+        templateData: updatedTemplateData,
+      };
+    });
+  }
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -676,8 +518,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     placeholder=""
                     value={formData.content}
                     multiline
-                    // maxRows={2}
-                    // minRows={2}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       setFormData({ ...formData, content: e.target.value });
                       if (e.target?.value?.length) {
@@ -689,8 +529,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 <Grid item xs={12} sm={6}>
                   <CustomTextField
                     multiline
-                    // maxRows={2}
-                    // minRows={2}
                     error={!!formErrors.metaTitle}
                     helperText={formErrors.metaTitle}
                     label="Meta Title* (maximum-character: 60 )"
@@ -707,10 +545,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <CustomTextField
-                    // disabled={true}
                     multiline
-                    // maxRows={10}
-                    // minRows={7}
                     error={!!formErrors.metaDescription}
                     helperText={formErrors.metaDescription}
                     label="Meta Description* (maximum-character: 160 )"
@@ -733,10 +568,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <CustomTextField
-                    // disabled={true}
                     multiline
-                    // maxRows={4}
-                    // minRows={4}
                     error={!!formErrors.metaKeywords}
                     helperText={formErrors.metaKeywords}
                     label="Meta Keywords* (maximum-character: 160 )"
@@ -802,7 +634,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                           {field.fieldType === "file" ? (
                             <>
                               <CustomTextField
-                                label={field.fieldLabel}
+                                label={field.isRequired === true ? `${field.fieldLabel} *` : field.fieldLabel}
                                 name={field.fieldType}
                                 // required={!editingRow == field.isRequired}
                                 type="file"
@@ -816,6 +648,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                     fieldIndex
                                   )
                                 }
+                                //@ts-ignore
                                 error={
                                   field.error && field.error
                                 }
@@ -824,24 +657,62 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                               />
                               {formData.templateData &&
                                 formData.templateData[`${index}+${fieldIndex}`]?.preview && (
-                                  <Box mt={2}>
-                                    <img
-                                      src={
-                                        formData.templateData[`${index}+${fieldIndex}`]?.preview
-                                      }
-                                      alt="Preview"
-                                      style={{
-                                        width: "100%",
-                                        maxHeight: "200px",
-                                        objectFit: "contain",
-                                      }}
-                                    />
-                                  </Box>
+                                  <Box mt={2} display="flex" flexDirection="column" alignItems="end">
+                                  <IconButton 
+                                    size="large"
+                                    onClick={() => handleRemoveFile(index, fieldIndex)}
+                                    aria-label="minus"
+                                    color="error"
+                                    style={{ marginBottom: '8px' }}
+                                  >
+                                    <i className="tabler-minus" />
+                                  </IconButton>
+                                
+                                  <Box
+                                    component="img"
+                                    src={formData.templateData[`${index}+${fieldIndex}`]?.preview}
+                                    alt="Preview"
+                                    sx={{
+                                      width: "100%",
+                                      maxHeight: "200px",
+                                      objectFit: "contain",
+                                      borderRadius: '4px',
+                                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                                    }}
+                                  />
+                                </Box>
+                                
+                                  // <Box mt={2}>
+
+                                    
+                                  //   <IconButton 
+                                  //     size="large"
+                                  //     onClick={() => handleRemoveFile(index, fieldIndex)}
+                                  //     aria-label="minus"
+                                  //     color="error"
+                                      
+                                  //   >
+                                  //     <i className="tabler-minus" />
+                                  //   </IconButton>
+
+                                  
+                                  //   <img
+                                  //     src={
+                                  //       formData.templateData[`${index}+${fieldIndex}`]?.preview
+                                  //     }
+                                  //     alt="Preview"
+                                  //     style={{
+                                  //       width: "100%",
+                                  //       maxHeight: "200px",
+                                  //       objectFit: "contain",
+                                  //     }}
+                                  //   />
+                                  // </Box>
                                 )}
                             </>
                           ) : (
                             <CustomTextField
-                              label={field.fieldLabel}
+                              label={field.isRequired === true ? `${field.fieldLabel} *` : field.fieldLabel}
                               type={field.fieldType}
                               // required={field.isRequired}
                               name={field.fieldType}
@@ -855,6 +726,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                               }
                               fullWidth
                               margin="normal"
+                              //@ts-ignore
                               error={
                                 field.error &&
                                 field.error
