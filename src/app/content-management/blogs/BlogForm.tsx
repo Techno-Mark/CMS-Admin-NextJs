@@ -28,11 +28,10 @@ import { tag } from "@/services/endpoint/tag";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import EditorCustom from "./RichEditor";
-import { blogDetailType, EDIT_BLOCK } from "@/types/apps/blogsType";
+import { ADD_BLOG, blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
 
 type blogFormPropsTypes = {
   open: number;
-  handleClose: Function;
   editingRow: blogDetailType | null;
 };
 
@@ -74,12 +73,16 @@ const initialErrorData = {
   metaKeywords: "",
 };
 
-function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
+function BlogForm({ open, editingRow }: blogFormPropsTypes) {
   const router = useRouter();
 
   //state management hook
   const [bannerImage, setBannerImage] = useState<File | null>(null);
   const [thumbnailImage, setThumbnailImage] = useState<File | null>(null);
+  const [isImageBannerTouched, setIsImageBannerTouched] = useState({
+    bannerImage: false,
+    thumbnailImage: false,
+  });
   const [formData, setFormData] =
     useState<typeof initialFormData>(initialFormData); // form data hooks
 
@@ -109,6 +112,7 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
     onDrop: (acceptedFiles: File[]) => {
       setFormErrors({ ...formErrors, bannerImageError: "" });
       setBannerImage(acceptedFiles[0]);
+      setIsImageBannerTouched({ ...isImageBannerTouched, bannerImage: true });
     },
   });
 
@@ -123,6 +127,10 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
     onDrop: (acceptedFiles: File[]) => {
       setFormErrors({ ...formErrors, thumbnailImageError: "" });
       setThumbnailImage(acceptedFiles[0]);
+      setIsImageBannerTouched({
+        ...isImageBannerTouched,
+        thumbnailImage: true,
+      });
     },
   });
 
@@ -130,7 +138,7 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
   useEffect(() => {
     async function getTemplate() {
       await getRequiredData();
-      if (editingRow && open == EDIT_BLOCK) {
+      if (editingRow && open == EDIT_BLOG) {
         formData.templateId = editingRow.templateId;
         formData.id = editingRow.blogId;
         formData.authorName = editingRow.authorName;
@@ -266,19 +274,21 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
     }
 
     // Validate Banner Image
-    if (!bannerImage) {
+    if (open == ADD_BLOG && !bannerImage) {
       errors.bannerImageError = "Banner Image is required";
       valid = false;
-    } else if (!validImageType.includes(bannerImage.type)) {
+    }
+    if (bannerImage && !validImageType.includes(bannerImage.type)) {
       errors.bannerImageError = `Invalid file type for Banner Image. Allowed types ${validImageType.join(",")}`;
       valid = false;
     }
 
     // Validate Thumbnail Image
-    if (!thumbnailImage) {
+    if (open == ADD_BLOG && !thumbnailImage) {
       errors.thumbnailImageError = "Thumbnail Image is required";
       valid = false;
-    } else if (!validImageType.includes(thumbnailImage.type)) {
+    }
+    if (thumbnailImage && !validImageType.includes(thumbnailImage.type)) {
       errors.thumbnailImageError = `Invalid file type for Thumbnail Image. Allowed types ${validImageType.join(",")}`;
       valid = false;
     }
@@ -301,15 +311,28 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
         formDataToSend.set("metaTitle", formData.metaTitle);
         formDataToSend.set("metaDescription", formData.metaDescription);
         formDataToSend.set("metaKeywords", formData.metaKeywords);
-        formDataToSend.append("bannerImage", bannerImage as Blob);
-        formDataToSend.append("thumbnailImage", thumbnailImage as Blob);
         formDataToSend.set("active", String(active));
         formDataToSend.set("tags", formData.tags.join(","));
         formDataToSend.set("categories", formData.categories.join(","));
-        // console.log(formDataToSend.get("bannerImage"));
-        const result = await postContentBlock(blogPost.create, formDataToSend);
+        if (bannerImage) {
+          formDataToSend.append("bannerImage", bannerImage as Blob);
+        }
+        if (thumbnailImage) {
+          formDataToSend.append("thumbnailImage", thumbnailImage as Blob);
+        }
+
+        let result = null;
+        if (open == EDIT_BLOG) {
+          formDataToSend.set("blogId", String(editingRow?.blogId));
+          result = await postContentBlock(blogPost.update, formDataToSend);
+        } else {
+          result = await postContentBlock(blogPost.create, formDataToSend);
+        }
+
         setLoading(false);
+
         if (result.status === "success") {
+          handleReset();
           toast.success(result.message);
           router.back();
         } else {
@@ -320,6 +343,13 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
         setLoading(false);
       }
     }
+  };
+
+  const handleReset = () => {
+    setFormData(initialFormData);
+    setFormErrors(initialErrorData);
+    router.push("/content-management/blogs");
+    return;
   };
 
   return (
@@ -474,7 +504,7 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
               )}
             </Grid>
           </Grid>
-          <Grid container spacing={4} sm={5}>
+          <Grid container spacing={6} sm={5}>
             <Grid item xs={12} sm={12}>
               <p className="text-[#4e4b5a] my-2"> Banner Image * </p>
               <div
@@ -486,34 +516,50 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
                 >
                   <input {...getBannerInputProps()} />
                   <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
-                    {bannerImage ? (
+                    {open == EDIT_BLOG && !isImageBannerTouched.bannerImage && (
+                      <img
+                        className="object-contain w-full h-full"
+                        src={
+                          process.env.NEXT_PUBLIC_BACKEND_BASE_URL +
+                          "/" +
+                          editingRow?.bannerImageUrl
+                        }
+                      />
+                    )}
+                    {bannerImage && isImageBannerTouched.bannerImage && (
                       <img
                         key={bannerImage.name}
                         alt={bannerImage.name}
                         className="object-contain w-full h-full"
                         src={URL.createObjectURL(bannerImage)}
                       />
-                    ) : (
-                      <>
-                        <Avatar variant="rounded" className="bs-12 is-12 mbe-9">
-                          <i className="tabler-upload" />
-                        </Avatar>
-                        <Typography variant="h5" className="mbe-2.5">
-                          Drop files here or click to upload.
-                        </Typography>
-                        <Typography>
-                          Drop files here or click{" "}
-                          <a
-                            href="/"
-                            onClick={(e) => e.preventDefault()}
-                            className="text-textPrimary no-underline"
-                          >
-                            browse
-                          </a>{" "}
-                          through your machine
-                        </Typography>
-                      </>
                     )}
+                    {!bannerImage &&
+                      !isImageBannerTouched.bannerImage &&
+                      open !== EDIT_BLOG && (
+                        <>
+                          <Avatar
+                            variant="rounded"
+                            className="bs-12 is-12 mbe-9"
+                          >
+                            <i className="tabler-upload" />
+                          </Avatar>
+                          <Typography variant="h5" className="mbe-2.5">
+                            Drop files here or click to upload.
+                          </Typography>
+                          <Typography>
+                            Drop files here or click{" "}
+                            <a
+                              href="/"
+                              onClick={(e) => e.preventDefault()}
+                              className="text-textPrimary no-underline"
+                            >
+                              browse
+                            </a>{" "}
+                            through your machine
+                          </Typography>
+                        </>
+                      )}
                   </div>
                   {!!formErrors.bannerImageError && (
                     <p className="text-[#ff5054]">
@@ -532,34 +578,52 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
                 >
                   <input {...getThumbnailInputProps()} />
                   <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
-                    {thumbnailImage ? (
+                    {open == EDIT_BLOG &&
+                      !isImageBannerTouched.thumbnailImage && (
+                        <img
+                          className="object-contain w-full h-full"
+                          src={
+                            process.env.NEXT_PUBLIC_BACKEND_BASE_URL +
+                            "/" +
+                            editingRow?.thumbnailImageUrl
+                          }
+                        />
+                      )}
+                    {thumbnailImage && isImageBannerTouched.thumbnailImage && (
                       <img
                         key={thumbnailImage.name}
                         alt={thumbnailImage.name}
                         className="object-contain w-full h-full"
                         src={URL.createObjectURL(thumbnailImage)}
                       />
-                    ) : (
-                      <>
-                        <Avatar variant="rounded" className="bs-12 is-12 mbe-9">
-                          <i className="tabler-upload" />
-                        </Avatar>
-                        <Typography variant="h5" className="mbe-2.5">
-                          Drop files here or click to upload.
-                        </Typography>
-                        <Typography>
-                          Drop files here or click{" "}
-                          <a
-                            href="/"
-                            onClick={(e) => e.preventDefault()}
-                            className="text-textPrimary no-underline"
-                          >
-                            browse
-                          </a>{" "}
-                          through your machine
-                        </Typography>
-                      </>
                     )}
+
+                    {!thumbnailImage &&
+                      !isImageBannerTouched.thumbnailImage &&
+                      open !== EDIT_BLOG && (
+                        <>
+                          <Avatar
+                            variant="rounded"
+                            className="bs-12 is-12 mbe-9"
+                          >
+                            <i className="tabler-upload" />
+                          </Avatar>
+                          <Typography variant="h5" className="mbe-2.5">
+                            Drop files here or click to upload.
+                          </Typography>
+                          <Typography>
+                            Drop files here or click{" "}
+                            <a
+                              href="/"
+                              onClick={(e) => e.preventDefault()}
+                              className="text-textPrimary no-underline"
+                            >
+                              browse
+                            </a>{" "}
+                            through your machine
+                          </Typography>
+                        </>
+                      )}
                   </div>
                   {!!formErrors.thumbnailImageError && (
                     <p className="text-[#ff5054]">
@@ -702,7 +766,7 @@ function BlogForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
                   color="error"
                   type="reset"
                   onClick={() => {
-                    handleClose();
+                    handleReset();
                   }}
                 >
                   Cancel

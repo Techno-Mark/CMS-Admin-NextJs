@@ -34,4 +34,4 @@ export type blogDetailType = {
 };
 
 export const ADD_BLOG = -1;
-export const EDIT_BLOCK = 1;
+export const EDIT_BLOG = 1;

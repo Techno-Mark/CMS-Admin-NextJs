@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import BlogForm from "../../BlogForm";
-import { blogDetailType, EDIT_BLOCK } from "@/types/apps/blogsType";
+import { blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
 import { useEffect, useState } from "react";
 import { postDataToOrganizationAPIs } from "@/services/apiService";
 import { blogPost } from "@/services/endpoint/blogpost";
@@ -37,11 +37,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     <>
       <LoadingBackdrop isLoading={loading} />
       {!loading && editingRow && (
-        <BlogForm
-          open={EDIT_BLOCK}
-          handleClose={() => router.push("/content-management/blogs")}
-          editingRow={editingRow}
-        />
+        <BlogForm open={EDIT_BLOG} editingRow={editingRow} />
       )}
     </>
   );
