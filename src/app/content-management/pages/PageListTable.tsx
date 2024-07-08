@@ -1,55 +1,38 @@
-// React Imports
-import { useEffect, useState, useMemo } from "react";
-// MUI Imports
-import Card from "@mui/material/Card";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import TablePagination from "@mui/material/TablePagination";
-import type { TextFieldProps } from "@mui/material/TextField";
-// Third-party Imports
-import classnames from "classnames";
+import CustomTextField from "@/@core/components/mui/TextField";
+import TablePaginationComponent from "@/components/TablePaginationComponent";
+import {
+  Button,
+  Card,
+  IconButton,
+  MenuItem,
+  TablePagination,
+  TextFieldProps,
+  Typography,
+} from "@mui/material";
 import { rankItem } from "@tanstack/match-sorter-utils";
 import {
+  ColumnDef,
+  FilterFn,
   createColumnHelper,
   flexRender,
   getCoreRowModel,
-  useReactTable,
-  getFilteredRowModel,
+  getFacetedMinMaxValues,
   getFacetedRowModel,
   getFacetedUniqueValues,
-  getFacetedMinMaxValues,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  useReactTable,
 } from "@tanstack/react-table";
-import type { ColumnDef, FilterFn } from "@tanstack/react-table";
-import type { RankingInfo } from "@tanstack/match-sorter-utils";
-// Type Imports
-import type { UsersType } from "@/types/apps/userTypes";
-// Component Imports
-import TablePaginationComponent from "@components/TablePaginationComponent";
-import CustomTextField from "@core/components/mui/TextField";
+import classNames from "classnames";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useMemo, useState } from "react";
+import ConfirmationDialog from "./ConfirmationDialog";
+import BreadCrumbList from "./BreadCrumbList";
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
-import ConfirmationDialog from "./ConfirmationDialog";
-import { useRouter } from "next/navigation";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import { redirectToAddPage, redirectToEditPage } from "@/services/endpoint/content-block";
-import { MenuItem } from "@mui/material";
+import { redirectToAddPage, redirectToEditPage } from "@/services/endpoint/pages";
 import CustomChip from "@/@core/components/mui/Chip";
-
-declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
-}
-
-type UsersTypeWithAction = UsersType & {
-  action?: string;
-};
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   // Rank the item
@@ -100,22 +83,31 @@ const DebouncedInput = ({
 };
 
 // Column Definitions
-const columnHelper = createColumnHelper<UsersTypeWithAction>();
+const columnHelper = createColumnHelper<any>();
 
-const UserListTable = ({
+const PageListTable = ({
   totalCount,
   tableData,
   getList,
   initialBody,
 }: {
   totalCount: number;
-  tableData?: UsersType[];
-  getList: (arg1: { page: number; limit: number; search: string, active: any }) => void;
+  tableData?: any;
+  getList: (arg1: {
+    page: number;
+    limit: number;
+    search: string;
+    organizationName: string;
+    active: any;
+    // status: string;
+  }) => void;
   initialBody: {
     page: number;
     limit: number;
     search: string;
-    active: any
+    organizationName: string;
+    active: any;
+    // status: string;
   };
 }) => {
   const router = useRouter();
@@ -125,7 +117,7 @@ const UserListTable = ({
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
 
-  const columns = useMemo<ColumnDef<UsersTypeWithAction, any>[]>(
+  const columns = useMemo<ColumnDef<any, any>[]>(
     () => [
       columnHelper.accessor("srNo", {
         header: "Sr. No.",
@@ -136,7 +128,7 @@ const UserListTable = ({
         ),
       }),
       columnHelper.accessor("name", {
-        header: "Content Block",
+        header: "PAge Name",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
             {row.original.name}
@@ -155,12 +147,12 @@ const UserListTable = ({
         header: "Status",
         cell: ({ row }) =>
           <CustomChip
-              size="small"
-              round="true"
-              label={row.original.status ? 'Active' : 'Inactive'}
-              variant="tonal"
-              color={row.original.status ? 'success' : 'error'}
-            />
+            size="small"
+            round="true"
+            label={row.original.active ? 'Publish' : 'Draft'}
+            variant="tonal"
+            color={row.original.active ? 'success' : 'warning'}
+          />
       }),
       columnHelper.accessor("id", {
         header: "Actions",
@@ -192,7 +184,7 @@ const UserListTable = ({
   );
 
   const table = useReactTable({
-    data: tableData as UsersType[],
+    data: tableData as any[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter,
@@ -219,13 +211,15 @@ const UserListTable = ({
       page: table.getState().pagination.pageIndex,
       limit: table.getState().pagination.pageSize,
       search: globalFilter,
+      organizationName: localStorage.getItem("orgName") || "",
       active: activeFilter,
+      // status: "Publish",
     });
   }, [
     table.getState().pagination.pageSize,
     table.getState().pagination.pageIndex,
     globalFilter,
-    activeFilter
+    activeFilter,
   ]);
 
   useEffect(() => {
@@ -234,18 +228,17 @@ const UserListTable = ({
         page: table.getState().pagination.pageIndex,
         limit: table.getState().pagination.pageSize,
         search: globalFilter,
+        organizationName: localStorage.getItem("orgName") || "",
         active: activeFilter,
+        // status: "Publish",
       });
     }
   }, [deletingId]);
 
   return (
     <>
-
       <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
         <BreadCrumbList />
-        {/* <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4"> */}
-        {/* <BreadCrumbList /> */}
         <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
           <DebouncedInput
             value={globalFilter ?? ""}
@@ -260,45 +253,39 @@ const UserListTable = ({
               fullWidth
               defaultValue="all"
               id="custom-select"
-              value={activeFilter === null ? "all" : activeFilter === true ? "active" : "inactive"}
+              value={
+                activeFilter === null
+                  ? "all"
+                  : activeFilter === true
+                    ? "active"
+                    : "inactive"
+              }
               onChange={(e) => {
                 const value = e.target.value;
-                setActiveFilter(value === "active" ? true : value === "inactive" ? false : null);
+                setActiveFilter(
+                  value === "active"
+                    ? true
+                    : value === "inactive"
+                      ? false
+                      : null
+                );
               }}
             >
               <MenuItem value="all">All</MenuItem>
-              <MenuItem value="active">Active</MenuItem>
-              <MenuItem value="inactive">Inactive</MenuItem>
+              <MenuItem value="active">Publish</MenuItem>
+              <MenuItem value="inactive">Draft</MenuItem>
             </CustomTextField>
           </div>
           <Button
-          variant="contained"
-          startIcon={<i className="tabler-plus" />}
-          onClick={() => router.push(redirectToAddPage)}
-          className="is-full sm:is-auto"
-        >
-          Add Content Block
-        </Button>
+            variant="contained"
+            startIcon={<i className="tabler-plus" />}
+            onClick={() => router.push(redirectToAddPage)}
+            className="is-full sm:is-auto"
+          >
+            Add Pages
+          </Button>
         </div>
       </div>
-
-      {/* <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-        <DebouncedInput
-          value={globalFilter ?? ""}
-          onChange={(value) => setGlobalFilter(String(value))}
-          placeholder="Search"
-          className="is-full sm:is-auto"
-        />
-        <Button
-          variant="contained"
-          startIcon={<i className="tabler-plus" />}
-          onClick={() => router.push(redirectToAddPage)}
-          className="is-full sm:is-auto"
-        >
-          Add Content Block
-        </Button>
-        
-      </div> */}
       <Card>
         <div className="overflow-x-auto">
           <table className={tableStyles.table}>
@@ -310,7 +297,7 @@ const UserListTable = ({
                       {header.isPlaceholder ? null : (
                         <>
                           <div
-                            className={classnames({
+                            className={classNames({
                               "flex items-center": header.column.getIsSorted(),
                               "cursor-pointer select-none":
                                 header.column.getCanSort(),
@@ -356,7 +343,7 @@ const UserListTable = ({
                     return (
                       <tr
                         key={row.id}
-                        className={classnames({
+                        className={classNames({
                           selected: row.getIsSelected(),
                         })}
                       >
@@ -395,4 +382,4 @@ const UserListTable = ({
   );
 };
 
-export default UserListTable;
+export default PageListTable;
