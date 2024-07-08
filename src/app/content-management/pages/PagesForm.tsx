@@ -280,105 +280,82 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     fieldIndex: number
   ) => {
     const { name, value, files } = event.target;
-
+  
     if (files && files[0]) {
       const file = files[0];
       const reader = new FileReader();
-
+  
       reader.onloadend = () => {
-        setSections((prevSections) => {
-          const updatedSections = prevSections.map((sec) => {
-            if (sec.sectionId === sectionId) {
-              const sectionName = sec.sectionName;
-
-              setFormData((prevData) => ({
-                ...prevData,
-                templateData: {
-                  ...prevData.templateData,
-                  [sectionName]: {
-                    ...prevData.templateData[sectionName],
-                    [name]: {
-                      file,
-                      preview: reader.result as string,
-                    },
-                  },
-                },
-              }));
-
-              sec.sectionTemplate[fieldIndex][name] = {
+        setSections((prevSections) =>
+          prevSections.map((sec) =>
+            sec.sectionId === sectionId
+              ? {
+                  ...sec,
+                  sectionTemplate: sec.sectionTemplate.map((field: any, idx: number) =>
+                    idx === fieldIndex
+                      ? {
+                          ...field,
+                          [name]: { // Update specific file field with file data and preview
+                            file,
+                            preview: reader.result as string,
+                          },
+                        }
+                      : field
+                  ),
+                }
+              : sec
+          )
+        );
+  
+        setFormData((prevData) => ({
+          ...prevData,
+          templateData: {
+            ...prevData.templateData,
+            [sections.find((sec) => sec.sectionId === sectionId)?.sectionName]: {
+              ...prevData.templateData[
+                sections.find((sec) => sec.sectionId === sectionId)?.sectionName
+              ],
+              [name]: { // Update formData with file data and preview
                 file,
                 preview: reader.result as string,
-              };
-
-              const validation = JSON.parse(
-                sec.sectionTemplate[fieldIndex].validation || "{}"
-              );
-              const error = validateField(file.name, validation);
-
-              return {
-                ...sec,
-                errors: {
-                  ...sec.errors,
-                  [name]: error,
-                },
-              };
-            }
-            return sec;
-          });
-
-          return updatedSections;
-        });
+              },
+            },
+          },
+        }));
       };
-
-      reader.readAsDataURL(file);
+  
+      reader.readAsDataURL(file); // Read file as data URL for preview
     } else {
-      setSections((prevSections) => {
-        const updatedSections = prevSections.map((sec) => {
-        
-          
-          if (sec.sectionId === sectionId) {
-            console.log(sectionId);
-            console.log(sec.sectionTemplate[fieldIndex]);
-            console.log(value);
-            
-            sec.sectionTemplate[fieldIndex][name] = value;
-            console.log(sec.sectionTemplate[fieldIndex][name]);
-            
-
-            const sectionName = sec.sectionName;
-            setFormData((prevData) => ({
-              ...prevData,
-              templateData: {
-                ...prevData.templateData,
-                [sectionName]: {
-                  ...prevData.templateData[sectionName],
-                  [name]: value,
-                },
-              },
-            }));
-
-            const validation = JSON.parse(
-              sec.sectionTemplate[fieldIndex].validation || "{}"
-            );
-            console.log(sec.sectionTemplate[fieldIndex].validation,validation);
-            
-            const error = validateField(value, validation);
-            console.log(error);
-            return {
-              ...sec,
-              errors: {
-                ...sec.errors,
-                [name]: error,
-              },
-            };
-          }
-          return sec;
-        });
-
-        return updatedSections;
-      });
+      setSections((prevSections) =>
+        prevSections.map((sec) =>
+          sec.sectionId === sectionId
+            ? {
+                ...sec,
+                sectionTemplate: sec.sectionTemplate.map((field: any, idx: number) =>
+                  idx === fieldIndex ? { ...field, [name]: value } : field // Update specific text field with new value based on fieldIndex
+                ),
+              }
+            : sec
+        )
+      );
+  
+      setFormData((prevData) => ({
+        ...prevData,
+        templateData: {
+          ...prevData.templateData,
+          [sections.find((sec) => sec.sectionId === sectionId)?.sectionName]: {
+            ...prevData.templateData[
+              sections.find((sec) => sec.sectionId === sectionId)?.sectionName
+            ],
+            [name]: value, // Update formData with new text input value
+          },
+        },
+      }));
     }
   };
+  
+  
+  
 
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(
     false
@@ -441,7 +418,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     onChange={handleSectionNameChange}
                   />
                 </Grid>
-                <Grid item xs={12} sm={5}>
+                <Grid item xs={12} sm={6}>
                   <CustomTextField
                     disabled={open === sectionActions.EDIT}
                     error={!!formErrors.slug}
@@ -671,47 +648,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                           )}
 
                         </div>
-                        // <div key={fieldIndex}>
-                        //   <CustomTextField
-                        //     label={field.fieldLabel}
-                        //     type={field.fieldType}
-                        //     required={field.isRequired}
-                        //     name={field.fieldType}
-                        //     onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                        //       handleInputChange(
-                        //         e,
-                        //         section.sectionId,
-                        //         fieldIndex
-                        //       )
-                        //     }
-                        //     fullWidth
-                        //     margin="normal"
-                        //     error={
-                        //       section.errors &&
-                        //       section.errors[field.fieldType]
-                        //     }
-                        //     helperText={
-                        //       section.errors &&
-                        //       section.errors[field.fieldType]
-                        //     }
-                        //     inputProps={
-                        //       field.validation
-                        //         ? JSON.parse(field.validation)
-                        //         : {}
-                        //     }
-                        //   />
-
-                        //   {section.errors &&
-                        //     section.errors[field.fieldType] && (
-                        //       <Typography
-                        //         variant="body2"
-                        //         color="error"
-                        //         style={{ marginTop: "0.5rem" }}
-                        //       >
-                        //         {section.errors[field.fieldType]}
-                        //       </Typography>
-                        //     )}
-                        // </div>
+                     
                       )
                     )}
                   </Grid>
