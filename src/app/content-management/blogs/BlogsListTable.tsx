@@ -175,9 +175,9 @@ const BlogListTable = () => {
             <CustomChip
               size="small"
               round="true"
-              label={row.original.active ? "Active" : "Inactive"}
+              label={row.original.active ? "Publish" : "Draft"}
               variant="tonal"
-              color={row.original.active ? "success" : "error"}
+              color={row.original.active ? "success" : "warning"}
             />
           </div>
         ),
@@ -285,8 +285,8 @@ const BlogListTable = () => {
                 }}
               >
                 <MenuItem value="all">All</MenuItem>
-                <MenuItem value="active">Active</MenuItem>
-                <MenuItem value="inactive">Inactive</MenuItem>
+                <MenuItem value="active">Publish</MenuItem>
+                <MenuItem value="inactive">Draft</MenuItem>
               </CustomTextField>
             </div>
             <Button
