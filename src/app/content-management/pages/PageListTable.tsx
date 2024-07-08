@@ -99,7 +99,7 @@ const PageListTable = ({
     search: string;
     organizationName: string;
     active: any;
-    status: string;
+    // status: string;
   }) => void;
   initialBody: {
     page: number;
@@ -107,7 +107,7 @@ const PageListTable = ({
     search: string;
     organizationName: string;
     active: any;
-    status: string;
+    // status: string;
   };
 }) => {
   const router = useRouter();
@@ -149,9 +149,9 @@ const PageListTable = ({
           <CustomChip
             size="small"
             round="true"
-            label={row.original.status ? 'Active' : 'Inactive'}
+            label={row.original.status ? 'Publish' : 'Draft'}
             variant="tonal"
-            color={row.original.status ? 'success' : 'error'}
+            color={row.original.status ? 'success' : 'warning'}
           />
       }),
       columnHelper.accessor("id", {
@@ -213,7 +213,7 @@ const PageListTable = ({
       search: globalFilter,
       organizationName: localStorage.getItem("orgName") || "",
       active: activeFilter,
-      status: "Publish",
+      // status: "Publish",
     });
   }, [
     table.getState().pagination.pageSize,
@@ -230,7 +230,7 @@ const PageListTable = ({
         search: globalFilter,
         organizationName: localStorage.getItem("orgName") || "",
         active: activeFilter,
-        status: "Publish",
+        // status: "Publish",
       });
     }
   }, [deletingId]);
@@ -272,8 +272,8 @@ const PageListTable = ({
               }}
             >
               <MenuItem value="all">All</MenuItem>
-              <MenuItem value="active">Active</MenuItem>
-              <MenuItem value="inactive">Inactive</MenuItem>
+              <MenuItem value="active">Publish</MenuItem>
+              <MenuItem value="inactive">Draft</MenuItem>
             </CustomTextField>
           </div>
           <Button

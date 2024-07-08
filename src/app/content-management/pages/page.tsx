@@ -12,7 +12,7 @@ const initialBody = {
   search: "",
   organizationName: "pabs",
   active: true,
-  status: "Publish",
+  // status: "",
 };
 
 const page = () => {
@@ -31,7 +31,7 @@ const page = () => {
           slug: item.pageSlug,
           jsonContent: item.pageContent,
           createdAt: item.createdAt,
-          status: item.active,
+          active: item.active,
         }))
       );
       setLoading(false);
