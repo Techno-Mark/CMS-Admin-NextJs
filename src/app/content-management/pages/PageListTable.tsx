@@ -149,9 +149,9 @@ const PageListTable = ({
           <CustomChip
             size="small"
             round="true"
-            label={row.original.status ? 'Publish' : 'Draft'}
+            label={row.original.active ? 'Publish' : 'Draft'}
             variant="tonal"
-            color={row.original.status ? 'success' : 'warning'}
+            color={row.original.active ? 'success' : 'warning'}
           />
       }),
       columnHelper.accessor("id", {
