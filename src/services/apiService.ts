@@ -1,7 +1,7 @@
 import { getSession, signOut } from "next-auth/react";
 import { toast } from "react-toastify";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = 'http://crm-stageapi.pacificabs.com:3005/api';
 
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
