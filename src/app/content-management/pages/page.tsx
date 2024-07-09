@@ -10,7 +10,7 @@ const initialBody = {
   page: 0,
   limit: 10,
   search: "",
-  organizationName: "pabs",
+  // organizationName: "pabs",
   active: true,
   // status: "",
 };

@@ -50,8 +50,9 @@ export const fetchData = async (
     if (!session || !session?.user) {
       throw new Error("No session or access token found");
     }
-
-    const orgId = localStorage.getItem("selectedOrgId");
+    
+    const orgId = localStorage.getItem('selectedOrgId'); 
+    console.log(`${API_URL}/${endpoint}`);
     const response = await fetch(`${API_URL}/${endpoint}`, {
       ...options,
       headers: {
