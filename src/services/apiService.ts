@@ -50,14 +50,17 @@ export const fetchData = async (
     if (!session || !session?.user) {
       throw new Error("No session or access token found");
     }
-
-    const orgId = localStorage.getItem("selectedOrgId");
+    
+    const orgId = localStorage.getItem('selectedOrgId'); 
+    console.log(`${API_URL}/${endpoint}`);
+    console.log(options);
+    
     const response = await fetch(`${API_URL}/${endpoint}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session?.user.token}`,
-        ...(orgId ? { orgId: orgId } : {}),
+        ...(orgId ? { "organization-id": orgId } : {}),
         ...options.headers,
       },
     });
@@ -129,6 +132,7 @@ export const postDataToOrganizationAPIs = async (
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method: "POST",
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${session?.user.token}`,
         "organization-id": "1",
       },
