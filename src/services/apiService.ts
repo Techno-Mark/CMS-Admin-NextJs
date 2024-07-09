@@ -132,6 +132,7 @@ export const postDataToOrganizationAPIs = async (
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method: "POST",
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${session?.user.token}`,
         "organization-id": "1",
       },

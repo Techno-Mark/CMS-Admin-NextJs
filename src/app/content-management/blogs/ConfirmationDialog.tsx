@@ -5,8 +5,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { toast } from "react-toastify";
-import { post, postContentBlock } from "@/services/apiService";
-import { template } from "@/services/endpoint/template";
+import { postDataToOrganizationAPIs } from "@/services/apiService";
 import { blogPost } from "@/services/endpoint/blogpost";
 
 type ConfirmationDialogProps = {
@@ -24,12 +23,10 @@ const ConfirmationDialog = ({
 }: ConfirmationDialogProps) => {
   const deleteTemplate = async () => {
     try {
-      console.log(deletingId, "iddd");
-      debugger;
-      const result = await postContentBlock(
-        blogPost.delete,
-        JSON.stringify({ blogId: deletingId })
-      );
+      console.log(deletingId, "id");
+      const result = await postDataToOrganizationAPIs(blogPost.delete, {
+        blogId: deletingId,
+      });
 
       if (result.status === "success") {
         toast.success(result.message);
