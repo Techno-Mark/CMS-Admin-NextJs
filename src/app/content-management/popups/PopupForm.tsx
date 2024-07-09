@@ -28,7 +28,7 @@ import { tag } from "@/services/endpoint/tag";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import EditorCustom from "./RichEditor";
-import { blogDetailType, EDIT_BLOCK } from "@/types/apps/blogsType";
+import { blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
 
 type blogFormPropsTypes = {
   open: number;
@@ -130,7 +130,7 @@ function PopupForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
   useEffect(() => {
     async function getTemplate() {
       await getRequiredData();
-      if (editingRow && open == EDIT_BLOCK) {
+      if (editingRow && open == EDIT_BLOG) {
         formData.templateId = editingRow.templateId;
         formData.id = editingRow.blogId;
         formData.authorName = editingRow.authorName;
