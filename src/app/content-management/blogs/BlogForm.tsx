@@ -33,6 +33,7 @@ import { ADD_BLOG, blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
 type blogFormPropsTypes = {
   open: number;
   editingRow: blogDetailType | null;
+  handleClose: Function;
 };
 
 const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
@@ -73,7 +74,7 @@ const initialErrorData = {
   metaKeywords: "",
 };
 
-function BlogForm({ open, editingRow }: blogFormPropsTypes) {
+function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
   const router = useRouter();
 
   //state management hook
@@ -136,23 +137,29 @@ function BlogForm({ open, editingRow }: blogFormPropsTypes) {
 
   //Effects
   useEffect(() => {
-    async function getTemplate() {
+    async function getBlogPostRelatedData() {
       await getRequiredData();
       if (editingRow && open == EDIT_BLOG) {
-        formData.templateId = editingRow.templateId;
-        formData.id = editingRow.blogId;
-        formData.authorName = editingRow.authorName;
-        formData.categories = editingRow.categories.split(",");
-        formData.tags = editingRow.tags.split(",");
-        formData.description = editingRow.description;
-        formData.metaDescription = editingRow.metaDescription;
-        formData.metaTitle = editingRow.metaTitle;
-        formData.metaKeywords = editingRow.metaKeywords;
-        formData.title = editingRow.title;
-        formData.slug = editingRow.slug;
+        const formData = {
+          templateId: editingRow.templateId,
+          id: editingRow.blogId,
+          authorName: editingRow.authorName,
+          categories: editingRow.categories.split(","),
+          tags: editingRow.tags.split(","),
+          description: editingRow.description,
+          metaDescription: editingRow.metaDescription,
+          metaTitle: editingRow.metaTitle,
+          metaKeywords: editingRow.metaKeywords,
+          title: editingRow.title,
+          slug: editingRow.slug,
+        };
+        setFormData({ ...formData, status: 0 });
+      } else {
+        setFormData({ ...initialFormData });
+        setFormErrors({ ...initialErrorData });
       }
     }
-    getTemplate();
+    getBlogPostRelatedData();
   }, []);
 
   // Methods
@@ -332,7 +339,6 @@ function BlogForm({ open, editingRow }: blogFormPropsTypes) {
         setLoading(false);
 
         if (result.status === "success") {
-          handleReset();
           toast.success(result.message);
           router.back();
         } else {
@@ -343,13 +349,6 @@ function BlogForm({ open, editingRow }: blogFormPropsTypes) {
         setLoading(false);
       }
     }
-  };
-
-  const handleReset = () => {
-    setFormData(initialFormData);
-    setFormErrors(initialErrorData);
-    router.push("/content-management/blogs");
-    return;
   };
 
   return (
@@ -766,7 +765,7 @@ function BlogForm({ open, editingRow }: blogFormPropsTypes) {
                   color="error"
                   type="reset"
                   onClick={() => {
-                    handleReset();
+                    handleClose();
                   }}
                 >
                   Cancel

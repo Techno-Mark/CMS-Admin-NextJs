@@ -37,7 +37,11 @@ const Page = ({ params }: { params: { id: string } }) => {
     <>
       <LoadingBackdrop isLoading={loading} />
       {!loading && editingRow && (
-        <BlogForm open={EDIT_BLOG} editingRow={editingRow} />
+        <BlogForm
+          open={EDIT_BLOG}
+          editingRow={editingRow}
+          handleClose={() => router.push("/content-management/blogs")}
+        />
       )}
     </>
   );
