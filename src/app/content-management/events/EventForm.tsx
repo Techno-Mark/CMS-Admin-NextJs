@@ -1,5 +1,6 @@
 // React Imports
 import { ChangeEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 // MUI Imports
 import Button from "@mui/material/Button";
 // Component Imports
@@ -14,103 +15,68 @@ import {
   Switch,
   Typography,
 } from "@mui/material";
-import { ADD_SECTION, EDIT_SECTION } from "@/types/apps/userTypes";
-import { post, postContentBlock } from "@/services/apiService";
+import { postContentBlock } from "@/services/apiService";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import { event } from "@/services/endpoint/event";
-import { template } from "@/services/endpoint/template";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import AppReactDatepicker from "@/libs/styles/AppReactDatepicker";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { useDropzone } from "react-dropzone";
 import Close from "@/@menu/svg/Close";
 import EditorBasic from "@/components/EditorToolbar";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { ADD_EVENT, EDIT_EVENT, eventDetailType } from "@/types/apps/eventType";
 
-type Props = {
-  open: ADD_SECTION | EDIT_SECTION;
+type EventFormPropsTypes = {
+  open: number;
+  editingRow: eventDetailType | null;
   handleClose: Function;
 };
 
-type FormDataType = {
-  id: number;
-  name: string;
-  // templateId: number;
-  startDate: any;
-  startTime: any;
-  endDate: any;
-  endTime: any;
-  location: string;
-  description: string;
-  organizerName: string;
-  organizerEmail: string;
-  organizerPhone: string;
-  registrationLink: string;
-  status: boolean;
-};
+const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
 
-//enum
-const sectionActions = {
-  ADD: -1,
-  EDIT: 1,
-};
-
-// Vars
 const initialData = {
-  id: 0,
-  name: "",
-  // templateId: -1,
-  startDate: null,
-  startTime: null,
-  endDate: null,
-  endTime: null,
+  eventId: 0,
+  title: "",
+  slug: "",
+  date: null as Date | null,
+  startTime: "",
+  endTime: "",
   location: "",
   description: "",
+  featureImageUrl: "",
   organizerName: "",
   organizerEmail: "",
   organizerPhone: "",
   registrationLink: "",
-  status: false,
+  active: false,
 };
 
 const initialErrorData = {
-  name: "",
-  // templateId: "",
-  startDate: "",
+  title: "",
+  slug: "",
+  date: "",
   startTime: "",
-  endDate: "",
   endTime: "",
   location: "",
   description: "",
+  featureImageUrl: "",
   organizerName: "",
   organizerEmail: "",
   organizerPhone: "",
 };
 
-const EventForm = ({ open, handleClose }: Props) => {
+const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
-  const [formData, setFormData] = useState<FormDataType>(initialData);
-  const [formErrors, setFormErrors] = useState<{
-    name: string;
-    // templateId: string;
-    startDate: string;
-    startTime: string;
-    endDate: string;
-    endTime: string;
-    location: string;
-    description: string;
-    organizerName: string;
-    organizerEmail: string;
-    organizerPhone: string;
-  }>(initialErrorData);
-
-  // const [templateList, setTemplateList] = useState<
-  //   [{ templateName: string; templateId: number }] | []
-  // >([]);
-  const [eventImage, setEventImage] = useState<File | null>(null);
-
+  const [formData, setFormData] = useState<typeof initialData>(initialData);
+  const [formErrors, setFormErrors] =
+    useState<typeof initialErrorData>(initialErrorData);
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] =
+    useState<boolean>(false);
+  const [featureImage, setFeatureImage] = useState<File | null>(null);
+  const [isFeatureImageTouched, setIsFeatureImageTouched] = useState(false);
+  // Custom Hooks
   const { getRootProps: getEventRootProps, getInputProps: getEventInputProps } =
     useDropzone({
       multiple: false,
@@ -118,72 +84,84 @@ const EventForm = ({ open, handleClose }: Props) => {
         "image/*": [".png", ".jpg", ".jpeg", ".gif"],
       },
       onDrop: (acceptedFiles: File[]) => {
-        setEventImage(acceptedFiles[0]);
+        setIsFeatureImageTouched(true);
+        setFeatureImage(acceptedFiles[0]);
       },
     });
 
-  const eventImg = eventImage ? (
-    <span className="truncate w-full px-4 flex items-center justify-between gap-4">
-      <img
-        key={eventImage.name}
-        alt={eventImage.name}
-        className="border border-gray-200 object-contain w-[90%] h-full"
-        src={URL.createObjectURL(eventImage)}
-      />
-      <IconButton
-        onClick={() => {
-          setEventImage(null);
-        }}
-      >
-        <Close />
-      </IconButton>
-    </span>
-  ) : null;
+  //Hooks
+  useEffect(() => {
+    if (open === EDIT_EVENT && editingRow) {
+      console.log(editingRow);
+      // setFormData({
+      //   eventId: editingRow.eventId,
+      //   title: editingRow.title,
+      //   slug: editingRow.slug,
+      //   date: editingRow.date,
+      //   startTime: editingRow.startTime,
+      //   endTime: editingRow.endTime,
+      //   location: editingRow.location,
+      //   description: editingRow.description,
+      //   featureImageUrl: editingRow.featureImageUrl,
+      //   organizerEmail: editingRow.organizerEmail,
+      //   organizerName: editingRow.organizerName,
+      //   organizerPhone: editingRow.organizerPhone,
+      //   registrationLink: editingRow.registrationLink,
+      //   active: editingRow.active,
+      // });
+      setFormData({ ...editingRow });
+    }
+    setLoading(false);
+  }, []);
 
-  // const getRequiredData = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const [templateResponse] = await Promise.all([
-  //       post(`${template.active}`, {}),
-  //     ]);
-  //     setTemplateList(templateResponse?.data?.templates);
-  //     setLoading(false);
-  //   } catch (error) {
-  //     setLoading(false);
-  //     console.error(error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   async function getTemplate() {
-  //     await getRequiredData();
-  //   }
-  //   getTemplate();
-  // }, []);
+  // Methods
+  const handleEventTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value;
+    setFormData((prevData) => ({
+      ...prevData,
+      title: newName,
+      slug:
+        !isSlugManuallyEdited && open === ADD_EVENT
+          ? newName
+              .replace(/[^\w\s]|_/g, "")
+              .replace(/\s+/g, "-")
+              .toLowerCase()
+          : prevData.slug,
+    }));
+    if (newName?.length) {
+      setFormErrors({ ...formErrors, title: "" });
+    }
+  };
 
   const validateForm = () => {
     let valid = true;
     let errors = { ...initialErrorData };
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-    // if (formData.templateId <= 0) {
-    //   errors.templateId = "Please select a template";
-    //   valid = false;
-    // }
-    if (!formData.name) {
-      errors.name = "Please enter event name";
+    if (!formData.title) {
+      errors.title = "Please enter event name";
       valid = false;
     }
-    if (!formData.startDate) {
-      errors.startDate = "Please select start date";
+    if (!formData.slug) {
+      errors.slug = "Please add a slug";
+      valid = false;
+    } else if (formData.slug.length < 5) {
+      errors.slug = "slug must be at least 5 characters long";
+      valid = false;
+    } else if (formData.slug.length > 255) {
+      errors.slug = "slug must be at most 255 characters long";
+      valid = false;
+    } else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(formData.slug)) {
+      errors.slug =
+        "slug must be a valid slug (only lowercase letters, numbers, and hyphens are allowed).";
+      valid = false;
+    }
+    if (!formData.date) {
+      errors.date = "Please select  date";
       valid = false;
     }
     if (!formData.startTime) {
       errors.startTime = "Please select start time";
-      valid = false;
-    }
-    if (!formData.endDate) {
-      errors.endDate = "Please select end date";
       valid = false;
     }
     if (!formData.endTime) {
@@ -219,51 +197,60 @@ const EventForm = ({ open, handleClose }: Props) => {
       errors.organizerPhone = "Please enter valid phone number";
       valid = false;
     }
+
+    // Validate Feature Image
+    if (open == ADD_EVENT && !featureImage) {
+      errors.featureImageUrl = "Feature Image is required";
+      valid = false;
+    }
+    if (featureImage && !validImageType.includes(featureImage.type)) {
+      errors.featureImageUrl = `Invalid file type for Feature Image. Allowed types ${validImageType.join(",")}`;
+      valid = false;
+    }
+
     setFormErrors(errors);
     return valid;
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     if (validateForm()) {
       try {
         setLoading(true);
 
         const formDataToSend = new FormData();
-        // formDataToSend.set("templateId", String(formData.templateId));
-        formDataToSend.set("title", formData.name);
-        formDataToSend.set("startDate", formData.startDate);
+        formDataToSend.set("title", formData.title);
+        formDataToSend.set("slug", formData.slug);
+        formDataToSend.set("date", String(formData.date));
         formDataToSend.set("startTime", formData.startTime);
-        formDataToSend.set("endDate", formData.endDate);
         formDataToSend.set("endTime", formData.endTime);
         formDataToSend.set("location", formData.location);
         formDataToSend.set("description", formData.description);
-        formDataToSend.append("bannerImage", eventImage as Blob);
         formDataToSend.set("organizerName", formData.organizerName);
         formDataToSend.set("organizerEmail", formData.organizerEmail);
         formDataToSend.set("organizerPhone", formData.organizerPhone);
         formDataToSend.set("registrationLink", formData.registrationLink);
-        formDataToSend.set("status", String(formData.status));
-        // formDataToSend.set("active", String(active));
+        formDataToSend.set("active", String(formData.active));
 
-        console.log(formDataToSend);
+        if (featureImage) {
+          formDataToSend.append("featureImage", featureImage as Blob);
+        }
+
+        let result = null;
+        if (open == EDIT_EVENT) {
+          formDataToSend.set("eventId", String(editingRow?.eventId));
+          result = await postContentBlock(event.update, formDataToSend);
+        } else {
+          result = await postContentBlock(event.create, formDataToSend);
+        }
+
         setLoading(false);
 
-        // const result = await postContentBlock(
-        //   open === sectionActions.EDIT ? event.update : event.create,
-        //   formDataToSend
-        // );
-        // setLoading(false);
-        // if (result.status === "success") {
-        //   toast.success(result.message);
-        //   handleReset();
-        //   setLoading(false);
-        //   router.back();
-        // } else {
-        //   toast.error(result.message);
-        //   setLoading(false);
-        // }
+        if (result.status === "success") {
+          toast.success(result.message);
+          router.back();
+        } else {
+          toast.error(result.message);
+        }
       } catch (error) {
         console.error(error);
         setLoading(false);
@@ -271,108 +258,45 @@ const EventForm = ({ open, handleClose }: Props) => {
     }
   };
 
-  const handleReset = () => {
-    setFormData(initialData);
-    setFormErrors(initialErrorData);
-    handleClose();
-  };
-
-  const getSectionDataById = async (id: string | number) => {
-    setLoading(true);
-    try {
-      const result = await postContentBlock(
-        event.getById,
-        JSON.stringify({
-          eventId: id,
-        })
-      );
-      const { data } = result;
-
-      setFormData({
-        ...formData,
-        id: data.pageId,
-        name: data.title,
-        status: data.active,
-      });
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (open === sectionActions.EDIT) {
-      // getSectionDataById(query[query.length - 1]);
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
       <BreadCrumbList />
       <Card>
         <div>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
+          <div className="flex flex-col gap-6 p-6">
             <div>
               <div className="flex flex-col gap-2 pb-4">
                 <Box display="flex" gap={4}>
                   <Grid container spacing={1} rowSpacing={5} sm={8}>
-                    {/* <Grid item xs={12} sm={6}>
-                      <CustomTextField
-                        error={!!formErrors.templateId}
-                        helperText={formErrors.templateId}
-                        select
-                        fullWidth
-                        defaultValue=""
-                        value={formData.templateId}
-                        label="Select Template *"
-                        id="custom-select"
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                          if (Number(e.target.value) <= 0) {
-                            setFormErrors({
-                              ...formErrors,
-                              templateId: "please select a template",
-                            });
-                          } else {
-                            setFormErrors({ ...formErrors, templateId: "" });
-                          }
-                          setFormData({
-                            ...formData,
-                            templateId: Number(e.target.value),
-                          });
-                        }}
-                      >
-                        <MenuItem value={-1}>
-                          <em>Select Template</em>
-                        </MenuItem>
-                        {templateList?.map((template) => (
-                          <MenuItem
-                            value={template.templateId}
-                            key={template.templateName}
-                          >
-                            {template.templateName}
-                          </MenuItem>
-                        ))}
-                      </CustomTextField>
-                    </Grid> */}
-
                     <Grid item xs={12} sm={6}>
                       <CustomTextField
-                        error={!!formErrors.name}
-                        helperText={formErrors.name}
+                        error={!!formErrors.title}
+                        helperText={formErrors.title}
                         label="Event Name *"
                         fullWidth
                         placeholder="Enter Name"
-                        value={formData.name}
-                        onChange={(e) => {
-                          setFormErrors({ ...formErrors, name: "" });
-                          setFormData({
-                            ...formData,
-                            name: e.target.value,
-                          });
+                        value={formData.title}
+                        onChange={handleEventTitleChange}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <CustomTextField
+                        // disabled={open === sectionActions.EDIT}
+                        // error={!!formErrors.slug}
+                        error={!!formErrors.slug}
+                        helperText={formErrors.slug}
+                        label="Slug *"
+                        fullWidth
+                        placeholder=""
+                        value={formData.slug}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                          setFormData({ ...formData, slug: e.target.value });
+                          setIsSlugManuallyEdited(true);
+                          if (e.target?.value?.length) {
+                            setFormErrors({ ...formErrors, slug: "" });
+                          }
                         }}
                       />
                     </Grid>
@@ -380,24 +304,23 @@ const EventForm = ({ open, handleClose }: Props) => {
                     <Grid item xs={12} md={6}>
                       <AppReactDatepicker
                         selected={
-                          formData.startDate &&
-                          dayjs.isDayjs(formData.startDate)
-                            ? formData.startDate.toDate()
-                            : formData.startDate
+                          formData.date && dayjs.isDayjs(formData.date)
+                            ? formData.date.toDate()
+                            : formData.date
                         }
                         id="basic-input"
                         onChange={(date: Date) => {
                           if (!date) {
                             setFormErrors({
                               ...formErrors,
-                              startDate: "please select start date",
+                              date: "please select start date",
                             });
                           } else {
-                            setFormErrors({ ...formErrors, startDate: "" });
+                            setFormErrors({ ...formErrors, date: "" });
                           }
                           setFormData({
                             ...formData,
-                            startDate: dayjs(date).format("MM/DD/YYYY"),
+                            date: new Date(dayjs(date).format("MM/DD/YYYY")),
                           });
                         }}
                         placeholderText="Enter Start Date"
@@ -405,8 +328,8 @@ const EventForm = ({ open, handleClose }: Props) => {
                           <CustomTextField
                             label="Event Start Date"
                             fullWidth
-                            error={!!formErrors.startDate}
-                            helperText={formErrors.startDate}
+                            error={!!formErrors.date}
+                            helperText={formErrors.date}
                           />
                         }
                       />
@@ -460,40 +383,6 @@ const EventForm = ({ open, handleClose }: Props) => {
                       />
                     </Grid>
 
-                    <Grid item xs={12} md={6}>
-                      <AppReactDatepicker
-                        selected={
-                          formData.endDate && dayjs.isDayjs(formData.endDate)
-                            ? formData.endDate.toDate()
-                            : formData.endDate
-                        }
-                        id="basic-input"
-                        onChange={(date: Date) => {
-                          if (!date) {
-                            setFormErrors({
-                              ...formErrors,
-                              endDate: "please select end date",
-                            });
-                          } else {
-                            setFormErrors({ ...formErrors, endDate: "" });
-                          }
-                          setFormData({
-                            ...formData,
-                            endDate: dayjs(date).format("MM/DD/YYYY"),
-                          });
-                        }}
-                        placeholderText="Enter End Date"
-                        customInput={
-                          <CustomTextField
-                            label="Event End Date"
-                            fullWidth
-                            error={!!formErrors.endDate}
-                            helperText={formErrors.endDate}
-                          />
-                        }
-                      />
-                    </Grid>
-
                     <Grid item xs={12} lg={6}>
                       <AppReactDatepicker
                         showTimeSelect
@@ -542,9 +431,6 @@ const EventForm = ({ open, handleClose }: Props) => {
 
                     <Grid item xs={12} sm={12}>
                       <CustomTextField
-                        multiline
-                        maxRows={3}
-                        minRows={7}
                         error={!!formErrors.location}
                         helperText={formErrors.location}
                         label="Location *"
@@ -585,67 +471,72 @@ const EventForm = ({ open, handleClose }: Props) => {
                           {formErrors.description}
                         </p>
                       )}
-                      {/* <CustomTextField
-                        multiline
-                        maxRows={10}
-                        minRows={7}
-                        error={!!formErrors.description}
-                        helperText={formErrors.description}
-                        label="Description *"
-                        fullWidth
-                        placeholder="Enter Detail About Event"
-                        value={formData.description}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                          setFormData({
-                            ...formData,
-                            description: e.target.value,
-                          });
-                          if (e.target?.value?.length) {
-                            setFormErrors({ ...formErrors, description: "" });
-                          }
-                        }}
-                      /> */}
                     </Grid>
                   </Grid>
                   <Grid container spacing={2} sm={4}>
                     <Grid item xs={12} sm={12}>
-                      <p className="text-[#4e4b5a] mb-1"> Event Image * </p>
-                      <input {...getEventInputProps()} />
-                      {eventImage ? (
-                        eventImg
-                      ) : (
+                      <p className="text-[#4e4b5a] my-2"> Thumbnail Image * </p>
+                      <div className="flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md">
                         <Box
                           {...getEventRootProps({ className: "dropzone" })}
-                          // {...eventImage}
+                          {...featureImage}
                         >
-                          <div className="flex items-center flex-col border-dashed border-2 p-16">
-                            <Typography variant="h4" className="mbe-2.5">
-                              Event Image
-                            </Typography>
-                            <Avatar
-                              variant="rounded"
-                              className="bs-12 is-12 mbe-9"
-                            >
-                              <i className="tabler-upload" />
-                            </Avatar>
+                          <input {...getEventInputProps()} />
+                          <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
+                            {open == EDIT_EVENT && !isFeatureImageTouched && (
+                              <img
+                                className="object-contain w-full h-full"
+                                src={
+                                  process.env.NEXT_PUBLIC_BACKEND_BASE_URL +
+                                  "/" +
+                                  editingRow?.featureImageUrl
+                                }
+                              />
+                            )}
+                            {featureImage && isFeatureImageTouched && (
+                              <img
+                                key={featureImage.name}
+                                alt={featureImage.name}
+                                className="object-contain w-full h-full"
+                                src={URL.createObjectURL(featureImage)}
+                              />
+                            )}
 
-                            <Typography variant="h5" className="mbe-2.5">
-                              Drop files here or click to upload.
-                            </Typography>
-                            <Typography>
-                              Drop files here or click{" "}
-                              <a
-                                href="/"
-                                onClick={(e) => e.preventDefault()}
-                                className="text-textPrimary no-underline"
-                              >
-                                browse
-                              </a>{" "}
-                              through your machine
-                            </Typography>
+                            {!featureImage &&
+                              !isFeatureImageTouched &&
+                              open !== EDIT_EVENT && (
+                                <>
+                                  <Avatar
+                                    variant="rounded"
+                                    className="bs-12 is-12 mbe-9"
+                                  >
+                                    <i className="tabler-upload" />
+                                  </Avatar>
+                                  <Typography variant="h5" className="mbe-2.5">
+                                    Drop files here or click to upload.
+                                  </Typography>
+                                  <Typography>
+                                    Drop files here or click{" "}
+                                    <a
+                                      href="/"
+                                      onClick={(e) => e.preventDefault()}
+                                      className="text-textPrimary no-underline"
+                                    >
+                                      browse
+                                    </a>{" "}
+                                    through your machine
+                                  </Typography>
+                                </>
+                              )}
                           </div>
+                          {!!formErrors.featureImageUrl && (
+                            <p className="text-[#ff5054]">
+                              {" "}
+                              {formErrors.featureImageUrl}
+                            </p>
+                          )}
                         </Box>
-                      )}
+                      </div>
                     </Grid>
                   </Grid>
                 </Box>
@@ -724,9 +615,9 @@ const EventForm = ({ open, handleClose }: Props) => {
                   </label>
                   <Switch
                     size="medium"
-                    checked={formData.status}
+                    checked={formData.active}
                     onChange={(e) =>
-                      setFormData({ ...formData, status: e.target.checked })
+                      setFormData({ ...formData, active: e.target.checked })
                     }
                   />
                 </Grid>
@@ -750,18 +641,22 @@ const EventForm = ({ open, handleClose }: Props) => {
                       variant="tonal"
                       color="error"
                       type="reset"
-                      onClick={() => handleReset()}
+                      onClick={() => handleClose()}
                     >
                       Cancel
                     </Button>
-                    <Button variant="contained" type="submit">
-                      {open === sectionActions.ADD ? "Add" : "Edit"} Event
+                    <Button
+                      variant="contained"
+                      type="submit"
+                      onClick={() => handleSubmit()}
+                    >
+                      {open === ADD_EVENT ? "Add" : "Edit"} Event
                     </Button>
                   </Box>
                 </Grid>
               </Grid>
             </Box>
-          </form>
+          </div>
         </div>
       </Card>
     </>

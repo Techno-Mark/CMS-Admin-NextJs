@@ -50,11 +50,10 @@ export const fetchData = async (
     if (!session || !session?.user) {
       throw new Error("No session or access token found");
     }
-    
-    const orgId = localStorage.getItem('selectedOrgId'); 
+
+    const orgId = localStorage.getItem("selectedOrgId");
     console.log(`${API_URL}/${endpoint}`);
-    console.log(options);
-    
+
     const response = await fetch(`${API_URL}/${endpoint}`, {
       ...options,
       headers: {
@@ -138,6 +137,7 @@ export const postDataToOrganizationAPIs = async (
       },
       body: JSON.stringify(data),
     });
+
     return await handleResponse(response);
   } catch (error: any) {
     console.error("Error fetching data:", error);

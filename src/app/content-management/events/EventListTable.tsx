@@ -21,17 +21,15 @@ import {
 import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
-// import ConfirmationDialog from "./ConfirmationDialog";
-import { post, postContentBlock } from "@/services/apiService";
+import { postDataToOrganizationAPIs } from "@/services/apiService";
 import CustomChip from "@/@core/components/mui/Chip";
-import { template } from "@/services/endpoint/template";
 import { TemplateType } from "@/types/apps/templateType";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import { truncateText } from "@/utils/common";
-import ConfirmationDialog from "./ConfirmationDialog";
-import { eventsType } from "@/types/apps/event";
+import { eventsType } from "@/types/apps/eventType";
 import { event } from "@/services/endpoint/event";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -86,13 +84,13 @@ const DebouncedInput = ({
 
 const columnHelper = createColumnHelper<EventTypeWithAction>();
 
-const EventListTable = () => {
+const BlogListTable = () => {
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
   const router = useRouter();
 
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<TemplateType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<number>(0);
@@ -106,15 +104,12 @@ const EventListTable = () => {
     const getData = async () => {
       setLoading(true);
       try {
-        const result = await postContentBlock(
-          event.list,
-          JSON.stringify({
-            page: page + 1,
-            limit: pageSize,
-            search: globalFilter,
-            active: activeFilter,
-          })
-        );
+        const result = await postDataToOrganizationAPIs(event.list, {
+          page: page + 1,
+          limit: pageSize,
+          search: globalFilter,
+          active: activeFilter,
+        });
         setData(result.data.events);
         setTotalRows(result.data.totalEvents);
       } catch (error: any) {
@@ -123,24 +118,7 @@ const EventListTable = () => {
         setLoading(false);
       }
     };
-    // getData();
-    setData([
-      {
-        srNo: 1,
-        eventId: 1,
-        eventTitle: "first",
-        createdAt: "26/05/2024",
-        active: true,
-      },
-      {
-        srNo: 3,
-        eventId: 2,
-        eventTitle: "second",
-        createdAt: "30/05/2024",
-        active: false,
-      },
-    ]);
-    setLoading(false);
+    getData();
   }, [page, pageSize, globalFilter, deletingId, activeFilter]);
 
   const columns = useMemo<ColumnDef<EventTypeWithAction, any>[]>(
@@ -154,13 +132,40 @@ const EventListTable = () => {
         ),
         enableSorting: false,
       }),
-      columnHelper.accessor("eventTitle", {
-        header: "Event Name",
+      columnHelper.accessor("title", {
+        header: "Event Title",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {row.original.eventTitle}
+            {row.original.title}
           </Typography>
         ),
+      }),
+      columnHelper.accessor("date", {
+        header: "Event Date",
+        cell: ({ row }) => (
+          <Typography color="text.primary" className="font-medium">
+            {row.original.date}
+          </Typography>
+        ),
+        enableSorting: false,
+      }),
+      columnHelper.accessor("startTime", {
+        header: "start Time",
+        cell: ({ row }) => (
+          <Typography color="text.primary" className="font-medium">
+            {row.original.startTime}
+          </Typography>
+        ),
+        enableSorting: false,
+      }),
+      columnHelper.accessor("endTime", {
+        header: "end time",
+        cell: ({ row }) => (
+          <Typography color="text.primary" className="font-medium">
+            {row.original.endTime}
+          </Typography>
+        ),
+        enableSorting: false,
       }),
       columnHelper.accessor("createdAt", {
         header: "Created At",
@@ -178,9 +183,9 @@ const EventListTable = () => {
             <CustomChip
               size="small"
               round="true"
-              label={row.original.active ? "Active" : "Inactive"}
+              label={row.original.active ? "Publish" : "Draft"}
               variant="tonal"
-              color={row.original.active ? "success" : "error"}
+              color={row.original.active ? "success" : "warning"}
             />
           </div>
         ),
@@ -200,14 +205,14 @@ const EventListTable = () => {
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
             </IconButton>
-            {/* <IconButton
+            <IconButton
               onClick={() => {
                 setIsDeleting(true);
                 setDeletingId(row.original.eventId);
               }}
             >
               <i className="tabler-trash text-[22px] text-textSecondary" />
-            </IconButton> */}
+            </IconButton>
           </div>
         ),
         enableSorting: false,
@@ -251,140 +256,144 @@ const EventListTable = () => {
 
   return (
     <>
-      <LoadingBackdrop isLoading={loading} />
-      <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
-        <BreadCrumbList />
-        <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-          <DebouncedInput
-            value={globalFilter ?? ""}
-            onChange={(value) => setGlobalFilter(String(value))}
-            placeholder="Search"
-            className="is-full sm:is-auto"
-          />
+      <div className="max-h-[75vh]">
+        <LoadingBackdrop isLoading={loading} />
+        <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
+          <BreadCrumbList />
           <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-            <Typography>Status:</Typography>
-            <CustomTextField
-              select
-              fullWidth
-              defaultValue="all"
-              id="custom-select"
-              value={
-                activeFilter === null
-                  ? "all"
-                  : activeFilter === true
-                    ? "active"
-                    : "inactive"
-              }
-              onChange={(e) => {
-                const value = e.target.value;
-                setActiveFilter(
-                  value === "active"
-                    ? true
-                    : value === "inactive"
-                      ? false
-                      : null
-                );
-              }}
+            <DebouncedInput
+              value={globalFilter ?? ""}
+              onChange={(value) => setGlobalFilter(String(value))}
+              placeholder="Search"
+              className="is-full sm:is-auto"
+            />
+            <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
+              <Typography>Status:</Typography>
+              <CustomTextField
+                select
+                fullWidth
+                defaultValue="all"
+                id="custom-select"
+                value={
+                  activeFilter === null
+                    ? "all"
+                    : activeFilter === true
+                      ? "active"
+                      : "inactive"
+                }
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setActiveFilter(
+                    value === "active"
+                      ? true
+                      : value === "inactive"
+                        ? false
+                        : null
+                  );
+                }}
+              >
+                <MenuItem value="all">All</MenuItem>
+                <MenuItem value="active">Publish</MenuItem>
+                <MenuItem value="inactive">Draft</MenuItem>
+              </CustomTextField>
+            </div>
+            <Button
+              variant="contained"
+              startIcon={<i className="tabler-plus" />}
+              onClick={() => router.push("/content-management/events/add")}
+              className="is-full sm:is-auto"
             >
-              <MenuItem value="all">All</MenuItem>
-              <MenuItem value="active">Active</MenuItem>
-              <MenuItem value="inactive">Inactive</MenuItem>
-            </CustomTextField>
+              Add Event
+            </Button>
           </div>
-          <Button
-            variant="contained"
-            startIcon={<i className="tabler-plus" />}
-            onClick={() => router.push("/content-management/events/add")}
-            className="is-full sm:is-auto"
-          >
-            Add Event
-          </Button>
         </div>
-      </div>
-      <Card>
-        <div className="overflow-x-auto h-[325px]">
-          <table className={tableStyles.table}>
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th key={header.id}>
-                      {header.isPlaceholder ? null : (
-                        <div
-                          className={classnames({
-                            "flex items-center": header.column.getIsSorted(),
-                            "cursor-pointer select-none":
-                              header.column.getCanSort(),
-                          })}
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                          {{
-                            asc: <i className="tabler-chevron-up text-xl" />,
-                            desc: <i className="tabler-chevron-down text-xl" />,
-                          }[header.column.getIsSorted() as "asc" | "desc"] ??
-                            null}
-                        </div>
-                      )}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            {table.getFilteredRowModel().rows.length === 0 ? (
-              <tbody>
-                <tr>
-                  <td
-                    colSpan={table.getVisibleFlatColumns().length}
-                    className="text-center"
-                  >
-                    No data available
-                  </td>
-                </tr>
-              </tbody>
-            ) : (
-              <tbody>
-                {table.getRowModel().rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className={classnames({
-                      selected: row.getIsSelected(),
-                    })}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
+        <Card className="flex flex-col h-full">
+          <div className="overflow-x-auto h-[470px]">
+            <table className={tableStyles.table}>
+              <thead className="">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th key={header.id}>
+                        {header.isPlaceholder ? null : (
+                          <div
+                            className={classnames({
+                              "flex items-center": header.column.getIsSorted(),
+                              "cursor-pointer select-none":
+                                header.column.getCanSort(),
+                            })}
+                            onClick={header.column.getToggleSortingHandler()}
+                          >
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                            {{
+                              asc: <i className="tabler-chevron-up text-xl" />,
+                              desc: (
+                                <i className="tabler-chevron-down text-xl" />
+                              ),
+                            }[header.column.getIsSorted() as "asc" | "desc"] ??
+                              null}
+                          </div>
                         )}
-                      </td>
+                      </th>
                     ))}
                   </tr>
                 ))}
-              </tbody>
-            )}
-          </table>
-        </div>
-        <TablePagination
-          component="div"
-          count={totalRows}
-          rowsPerPage={pageSize}
-          page={page}
-          onPageChange={handlePageChange}
-          onRowsPerPageChange={handleRowsPerPageChange}
+              </thead>
+              {table.getFilteredRowModel().rows.length === 0 ? (
+                <tbody>
+                  <tr>
+                    <td
+                      colSpan={table.getVisibleFlatColumns().length}
+                      className="text-center"
+                    >
+                      No data available
+                    </td>
+                  </tr>
+                </tbody>
+              ) : (
+                <tbody>
+                  {table.getRowModel().rows.map((row) => (
+                    <tr
+                      key={row.id}
+                      className={classnames({
+                        selected: row.getIsSelected(),
+                      })}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              )}
+            </table>
+          </div>
+          <TablePagination
+            component="div"
+            count={totalRows}
+            rowsPerPage={pageSize}
+            page={page}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+          />
+        </Card>
+        <ConfirmationDialog
+          open={isDeleting}
+          deletingId={deletingId}
+          setDeletingId={setDeletingId}
+          setOpen={(arg1: boolean) => setIsDeleting(arg1)}
         />
-      </Card>
-      {/* <ConfirmationDialog
-        open={isDeleting}
-        deletingId={deletingId}
-        setDeletingId={setDeletingId}
-        setOpen={(arg1: boolean) => setIsDeleting(arg1)}
-      /> */}
+      </div>
     </>
   );
 };
 
-export default EventListTable;
+export default BlogListTable;

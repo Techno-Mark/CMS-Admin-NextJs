@@ -5,9 +5,8 @@ import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { toast } from "react-toastify";
-import { post } from "@/services/apiService";
-import { deleteEvent } from "@/services/endpoint/events";
-import { useState } from "react";
+import { postDataToOrganizationAPIs } from "@/services/apiService";
+import { event } from "@/services/endpoint/event";
 
 type ConfirmationDialogProps = {
   deletingId: number;
@@ -22,10 +21,10 @@ const ConfirmationDialog = ({
   setOpen,
   setDeletingId,
 }: ConfirmationDialogProps) => {
-  const [deleteData, setDeleteData] = useState<boolean>(false);
-  const deleteContentBlock = async () => {
+  const deleteTemplate = async () => {
     try {
-      const result = await post(deleteEvent, {
+      console.log(deletingId, "id");
+      const result = await postDataToOrganizationAPIs(event.delete, {
         eventId: deletingId,
       });
 
@@ -39,46 +38,29 @@ const ConfirmationDialog = ({
     } finally {
       setDeletingId(0);
       setOpen(false);
-      setDeleteData(false);
     }
   };
 
   return (
-    <Dialog
-      fullWidth
-      maxWidth="xs"
-      open={open}
-      onClose={() => {
-        setOpen(false);
-        setDeleteData(false);
-      }}
-    >
+    <Dialog fullWidth maxWidth="xs" open={open} onClose={() => setOpen(false)}>
       <DialogContent className="flex items-center flex-col text-center sm:pbs-16 sm:pbe-6 sm:pli-16">
         <i className="tabler-alert-circle text-[88px] mbe-6 text-warning" />
         <Typography variant="h5">
-          {deleteData
-            ? "Are you sure you want to delete this event?"
-            : "Please unlink this event from all templates"}
+          Are you sure you want to delete the Event?
         </Typography>
       </DialogContent>
       <DialogActions className="justify-center pbs-0 sm:pbe-16 sm:pli-16">
-        <Button
-          variant="contained"
-          onClick={() =>
-            deleteData ? deleteContentBlock() : setDeleteData(true)
-          }
-        >
-          {deleteData ? "Yes" : "Unlink"}
+        <Button variant="contained" onClick={deleteTemplate}>
+          Yes
         </Button>
         <Button
           variant="tonal"
           color="secondary"
           onClick={() => {
             setOpen(false);
-            setDeleteData(false);
           }}
         >
-          {deleteData ? "No" : "Cancel"}
+          No
         </Button>
       </DialogActions>
     </Dialog>

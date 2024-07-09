@@ -11,7 +11,8 @@ const Page = () => {
   return (
     <EventForm
       open={ADD_EVENT}
-      handleClose={() => router.push("/content-management/blogs")}
+      handleClose={() => router.push("/content-management/events")}
+      editingRow={null}
     />
   );
 };
