@@ -6,7 +6,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
     if (response.status === 401) {
-      // await signOut({ redirect: true, callbackUrl: "/login" });
+      await signOut({ redirect: true, callbackUrl: "/login" });
       throw new Error("Unauthorized. Token missing or expired");
     } else if (response.status === 422) {
       const errorResponse = await response.json();
@@ -50,8 +50,11 @@ export const fetchData = async (
     if (!session || !session?.user) {
       throw new Error("No session or access token found");
     }
-
-    const orgId = localStorage.getItem("selectedOrgId");
+    
+    const orgId = localStorage.getItem('selectedOrgId'); 
+    console.log(`${API_URL}/${endpoint}`);
+    console.log(options);
+    
     const response = await fetch(`${API_URL}/${endpoint}`, {
       ...options,
       headers: {

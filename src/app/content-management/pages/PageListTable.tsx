@@ -97,7 +97,7 @@ const PageListTable = ({
     page: number;
     limit: number;
     search: string;
-    organizationName: string;
+    // organizationName: string;
     active: any;
     // status: string;
   }) => void;
@@ -105,7 +105,7 @@ const PageListTable = ({
     page: number;
     limit: number;
     search: string;
-    organizationName: string;
+    // organizationName: string;
     active: any;
     // status: string;
   };
@@ -149,9 +149,9 @@ const PageListTable = ({
           <CustomChip
             size="small"
             round="true"
-            label={row.original.status ? 'Publish' : 'Draft'}
+            label={row.original.active ? 'Publish' : 'Draft'}
             variant="tonal"
-            color={row.original.status ? 'success' : 'warning'}
+            color={row.original.active ? 'success' : 'warning'}
           />
       }),
       columnHelper.accessor("id", {
@@ -211,7 +211,7 @@ const PageListTable = ({
       page: table.getState().pagination.pageIndex,
       limit: table.getState().pagination.pageSize,
       search: globalFilter,
-      organizationName: localStorage.getItem("orgName") || "",
+      // organizationName: localStorage.getItem("orgName") || "",
       active: activeFilter,
       // status: "Publish",
     });
@@ -228,7 +228,7 @@ const PageListTable = ({
         page: table.getState().pagination.pageIndex,
         limit: table.getState().pagination.pageSize,
         search: globalFilter,
-        organizationName: localStorage.getItem("orgName") || "",
+        // organizationName: localStorage.getItem("orgName") || "",
         active: activeFilter,
         // status: "Publish",
       });
