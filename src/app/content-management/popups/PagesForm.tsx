@@ -402,7 +402,7 @@ function PopupForm({
                   justifyContent="end"
                   bgcolor="background.paper"
                 >
-                  <Button variant="outlined" color="error" onClick={handleClose}>
+                  <Button variant="outlined" color="error" onClick={()=>handleClose}>
                     Cancel
                   </Button>
                   <Button variant="contained" type="submit">
