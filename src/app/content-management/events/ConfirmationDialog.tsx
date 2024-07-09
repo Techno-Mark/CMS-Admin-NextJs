@@ -23,7 +23,6 @@ const ConfirmationDialog = ({
 }: ConfirmationDialogProps) => {
   const deleteTemplate = async () => {
     try {
-      console.log(deletingId, "id");
       const result = await postDataToOrganizationAPIs(event.delete, {
         eventId: deletingId,
       });

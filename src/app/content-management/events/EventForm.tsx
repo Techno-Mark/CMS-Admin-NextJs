@@ -92,23 +92,6 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
   //Hooks
   useEffect(() => {
     if (open === EDIT_EVENT && editingRow) {
-      console.log(editingRow);
-      // setFormData({
-      //   eventId: editingRow.eventId,
-      //   title: editingRow.title,
-      //   slug: editingRow.slug,
-      //   date: editingRow.date,
-      //   startTime: editingRow.startTime,
-      //   endTime: editingRow.endTime,
-      //   location: editingRow.location,
-      //   description: editingRow.description,
-      //   featureImageUrl: editingRow.featureImageUrl,
-      //   organizerEmail: editingRow.organizerEmail,
-      //   organizerName: editingRow.organizerName,
-      //   organizerPhone: editingRow.organizerPhone,
-      //   registrationLink: editingRow.registrationLink,
-      //   active: editingRow.active,
-      // });
       setFormData({ ...editingRow });
     }
     setLoading(false);
@@ -268,8 +251,8 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
             <div>
               <div className="flex flex-col gap-2 pb-4">
                 <Box display="flex" gap={4}>
-                  <Grid container spacing={1} rowSpacing={5} sm={8}>
-                    <Grid item xs={12} sm={6}>
+                  <Grid container spacing={1} rowSpacing={5} sm={7}>
+                    <Grid item xs={12} sm={12}>
                       <CustomTextField
                         error={!!formErrors.title}
                         helperText={formErrors.title}
@@ -281,7 +264,7 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
                       />
                     </Grid>
 
-                    <Grid item xs={12} sm={6}>
+                    <Grid item xs={12} sm={12}>
                       <CustomTextField
                         // disabled={open === sectionActions.EDIT}
                         // error={!!formErrors.slug}
@@ -298,40 +281,6 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
                             setFormErrors({ ...formErrors, slug: "" });
                           }
                         }}
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} md={6}>
-                      <AppReactDatepicker
-                        selected={
-                          formData.date && dayjs.isDayjs(formData.date)
-                            ? formData.date.toDate()
-                            : formData.date
-                        }
-                        id="basic-input"
-                        onChange={(date: Date) => {
-                          if (!date) {
-                            setFormErrors({
-                              ...formErrors,
-                              date: "please select start date",
-                            });
-                          } else {
-                            setFormErrors({ ...formErrors, date: "" });
-                          }
-                          setFormData({
-                            ...formData,
-                            date: new Date(dayjs(date).format("MM/DD/YYYY")),
-                          });
-                        }}
-                        placeholderText="Enter Start Date"
-                        customInput={
-                          <CustomTextField
-                            label="Event Start Date"
-                            fullWidth
-                            error={!!formErrors.date}
-                            helperText={formErrors.date}
-                          />
-                        }
                       />
                     </Grid>
 
@@ -429,7 +378,41 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
                       />
                     </Grid>
 
-                    <Grid item xs={12} sm={12}>
+                    <Grid item xs={6} md={6}>
+                      <AppReactDatepicker
+                        selected={
+                          formData.date && dayjs.isDayjs(formData.date)
+                            ? formData.date.toDate()
+                            : formData.date
+                        }
+                        id="basic-input"
+                        onChange={(date: Date) => {
+                          if (!date) {
+                            setFormErrors({
+                              ...formErrors,
+                              date: "please select start date",
+                            });
+                          } else {
+                            setFormErrors({ ...formErrors, date: "" });
+                          }
+                          setFormData({
+                            ...formData,
+                            date: new Date(dayjs(date).format("MM/DD/YYYY")),
+                          });
+                        }}
+                        placeholderText="Enter Start Date"
+                        customInput={
+                          <CustomTextField
+                            label="Event Start Date"
+                            fullWidth
+                            error={!!formErrors.date}
+                            helperText={formErrors.date}
+                          />
+                        }
+                      />
+                    </Grid>
+
+                    <Grid item xs={6} sm={6}>
                       <CustomTextField
                         error={!!formErrors.location}
                         helperText={formErrors.location}
@@ -473,7 +456,7 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
                       )}
                     </Grid>
                   </Grid>
-                  <Grid container spacing={2} sm={4}>
+                  <Grid container spacing={2} sm={5}>
                     <Grid item xs={12} sm={12}>
                       <p className="text-[#4e4b5a] my-2"> Thumbnail Image * </p>
                       <div className="flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md">
