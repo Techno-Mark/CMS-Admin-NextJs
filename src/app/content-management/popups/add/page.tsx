@@ -12,7 +12,7 @@ const page = () => {
   open={ADD_PAGES} 
   editingRow={null}
   setEditingRow={()=>{}}
-  handleClose={() => router.push('/content-management/pages')}/>;
+  handleClose={() => router.push('/content-management/popups')}/>;
 };
 
 export default page;

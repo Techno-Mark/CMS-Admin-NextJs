@@ -31,7 +31,7 @@ import ConfirmationDialog from "./ConfirmationDialog";
 
 
 import tableStyles from "@core/styles/table.module.css";
-import { redirectToAddPage, redirectToEditPage } from "@/services/endpoint/pages";
+import { redirectToAddPage, redirectToEditPage } from "@/services/endpoint/popup";
 import CustomChip from "@/@core/components/mui/Chip";
 import BreadCrumbList from "@/components/BreadCrumbList";
 
@@ -119,7 +119,7 @@ const PageListTable = ({
         ),
       }),
       columnHelper.accessor("name", {
-        header: "PAge Name",
+        header: "Popup Name",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
             {row.original.name}
@@ -270,7 +270,7 @@ const PageListTable = ({
             onClick={() => router.push(redirectToAddPage)}
             className="is-full sm:is-auto"
           >
-            Add Pages
+            Add Pop-up
           </Button>
         </div>
       </div>

@@ -33,7 +33,7 @@ const page = ({ params }: { params: { id: string } }) => {
       open={1}
       editingRow={editingRow}
       setEditingRow={setEditingRow}
-      handleClose={() => router.push('/content-management/pages')}
+      handleClose={() => router.push('/content-management/popups')}
     />
   );
 };

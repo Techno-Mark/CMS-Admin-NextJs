@@ -22,6 +22,7 @@ import AppReactDatepicker from "@/libs/styles/AppReactDatepicker";
 import { PagesType } from "./pagesType";
 import { pages } from "@/services/endpoint/pages";
 import { toast } from "react-toastify";
+import BreadCrumbList from "@/components/BreadCrumbList";
 
 type FileProp = {
   name: string;
@@ -479,6 +480,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
+      <BreadCrumbList />
       <Card>
         <div>
           <form className="flex flex-col gap-6 p-6" onSubmit={handleSubmit}>

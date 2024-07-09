@@ -28,22 +28,19 @@ import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import ConfirmationDialog from "./ConfirmationDialog";
-import BreadCrumbList from "./BreadCrumbList";
-// Style Imports
+
+
 import tableStyles from "@core/styles/table.module.css";
 import { redirectToAddPage, redirectToEditPage } from "@/services/endpoint/pages";
 import CustomChip from "@/@core/components/mui/Chip";
+import BreadCrumbList from "@/components/BreadCrumbList";
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-  // Rank the item
   const itemRank = rankItem(row.getValue(columnId), value);
-
-  // Store the itemRank info
   addMeta({
     itemRank,
   });
 
-  // Return if the item should be filtered in/out
   return itemRank.passed;
 };
 
@@ -57,7 +54,7 @@ const DebouncedInput = ({
   onChange: (value: string | number) => void;
   debounce?: number;
 } & Omit<TextFieldProps, "onChange">) => {
-  // States
+  
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
@@ -68,9 +65,7 @@ const DebouncedInput = ({
     const timeout = setTimeout(() => {
       onChange(value);
     }, debounce);
-
     return () => clearTimeout(timeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   return (
@@ -97,17 +92,13 @@ const PageListTable = ({
     page: number;
     limit: number;
     search: string;
-    // organizationName: string;
     active: any;
-    // status: string;
   }) => void;
   initialBody: {
     page: number;
     limit: number;
     search: string;
-    // organizationName: string;
     active: any;
-    // status: string;
   };
 }) => {
   const router = useRouter();
@@ -211,9 +202,7 @@ const PageListTable = ({
       page: table.getState().pagination.pageIndex,
       limit: table.getState().pagination.pageSize,
       search: globalFilter,
-      // organizationName: localStorage.getItem("orgName") || "",
       active: activeFilter,
-      // status: "Publish",
     });
   }, [
     table.getState().pagination.pageSize,
@@ -228,9 +217,8 @@ const PageListTable = ({
         page: table.getState().pagination.pageIndex,
         limit: table.getState().pagination.pageSize,
         search: globalFilter,
-        // organizationName: localStorage.getItem("orgName") || "",
         active: activeFilter,
-        // status: "Publish",
+        
       });
     }
   }, [deletingId]);

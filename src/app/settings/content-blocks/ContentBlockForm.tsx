@@ -23,6 +23,7 @@ import { toast } from "react-toastify";
 import { section } from "@/services/endpoint/section";
 import { UsersType } from "@/types/apps/userTypes";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
+import BreadCrumbList from "@/components/BreadCrumbList";
 
 const tooltipContent = {
   "pattern": "[A-Za-z]{3,10}",
@@ -247,6 +248,7 @@ const ContentBlockForm = ({ open }: Props) => {
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
+      <BreadCrumbList />
       <Card>
         <div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
