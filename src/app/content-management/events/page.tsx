@@ -1,4 +1,8 @@
-export default function Page() {
-    return <h1>Events page!</h1>
-}
-  
+import React from "react";
+import EventListTable from "./EventListTable";
+
+const page = () => {
+  return <EventListTable />;
+};
+
+export default page;
