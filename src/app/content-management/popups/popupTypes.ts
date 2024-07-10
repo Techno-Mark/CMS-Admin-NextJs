@@ -8,4 +8,6 @@ export type PopupTypes = {
     popupFile:string,
     popupId?:string
     
+
+   
 }

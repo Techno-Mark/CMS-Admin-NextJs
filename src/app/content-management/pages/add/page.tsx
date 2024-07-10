@@ -8,11 +8,11 @@ const ADD_PAGES = -1;
 const page = () => {
   const router = useRouter();
 
-  return <PagesForm 
-  open={ADD_PAGES} 
-  editingRow={null}
-  setEditingRow={()=>{}}
-  handleClose={() => router.push('/content-management/pages')}/>;
+  return <PagesForm
+    open={ADD_PAGES}
+    editingRow={null}
+    setEditingRow={() => { }}
+    handleClose={() => router.push('/content-management/pages')} />;
 };
 
 export default page;

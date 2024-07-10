@@ -18,10 +18,11 @@ import { useDropzone } from "react-dropzone";
 import { post, postContentBlock } from "@/services/apiService";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
-import EditorCustom from "./RichEditor";
+
 import { category } from "@/services/endpoint/category";
 import { popups } from "@/services/endpoint/popup";
 import { PopupTypes } from "./popupTypes";
+import EditorCustom from "./RichEditor";
 
 type Props = {
   open: -1 | 0 | 1;
@@ -52,6 +53,7 @@ const initialFormData = {
   active: false,
   buttonText: "",
   buttonRedirectLink: "",
+  
 };
 
 const initialErrorData = {
@@ -71,19 +73,50 @@ function PopupForm({
   editingRow,
 }: Props) {
   const router = useRouter();
+
+  // State management hooks
   const [popupFile, setPopupFile] = useState<File | null>(null);
   const [formData, setFormData] = useState<typeof initialFormData>(
     initialFormData
   );
+
+  // Error handler hooks
   const [formErrors, setFormErrors] = useState<typeof initialErrorData>(
     initialErrorData
   );
 
-
   const [loading, setLoading] = useState<boolean>(true);
 
+  useEffect(() => {
+    setLoading(true);
+    if (editingRow) {
+      setFormData(editingRow);
 
+      if (editingRow.description) {
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          description: editingRow.description,
+        }));
+      }
+      
 
+      if (editingRow.popupFile) {
+        const fileUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL + '/' + editingRow.popupFile;
+        fetch(fileUrl)
+          .then(async (res) => {
+            const blob = await res.blob();
+            const file = new File([blob], editingRow.popupFile, { type: blob.type });
+            setPopupFile(file);
+          })
+          .catch((err) => console.error("Failed to fetch popup file:", err));
+      }
+
+      setLoading(false);
+    } else {
+      setFormData(initialFormData);
+      setLoading(false);
+    }
+  }, [editingRow]);
 
 
   // Custom hooks
@@ -104,18 +137,7 @@ function PopupForm({
       },
     });
 
-  const {
-    getRootProps: getThumbnailRootProps,
-    getInputProps: getThumbnailInputProps,
-  } = useDropzone({
-    multiple: false,
-    accept: {
-      "image/*": [".png", ".jpg", ".jpeg", ".gif"],
-    },
-    onDrop: (acceptedFiles: File[]) => {
-      setFormErrors({ ...formErrors, thumbnailImageError: "" });
-    },
-  });
+
 
   // Validation before submit
   const validateForm = () => {
@@ -200,44 +222,7 @@ function PopupForm({
       }
     }
   };
-  const handleEditorChange = (content: string) => {
-    console.log("Editor content changed:", content);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      description: content,
-    }));
-  };
 
-  
-
-  useEffect(() => {
-    setLoading(true);
-    if (editingRow) {
-      setFormData(editingRow);
-
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        description: editingRow.description || '',
-      }));
-      
-
-      if (editingRow.popupFile) {
-        const fileUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL + '/' + editingRow.popupFile;
-        fetch(fileUrl)
-          .then(async (res) => {
-            const blob = await res.blob();
-            const file = new File([blob], editingRow.popupFile, { type: blob.type });
-            setPopupFile(file);
-          })
-          .catch((err) => console.error("Failed to fetch popup file:", err));
-      }
-
-      setLoading(false);
-    } else {
-      setFormData(initialFormData);
-      setLoading(false);
-    }
-  }, [editingRow]);
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -320,10 +305,12 @@ function PopupForm({
               <Grid item xs={12} sm={12}>
                 <p className="text-[#4e4b5a]">Description *</p>
                 <EditorCustom
-                  setContent={handleEditorChange}
+                  setContent={(content: any) => setFormData((prevFormData) => ({
+                    ...prevFormData,
+                    description: content,
+                  }))}
                   content={formData.description}
                 />
-                <p>{formData.description}</p>
               </Grid>
             </Grid>
             <Grid container spacing={4} sm={5}>
