@@ -660,44 +660,44 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                               {formData.templateData &&
                                 formData.templateData[`${index}+${fieldIndex}`]?.preview && (
                                   <Box mt={2} display="flex" flexDirection="column" alignItems="end">
-                                  <IconButton 
-                                    size="large"
-                                    onClick={() => handleRemoveFile(index, fieldIndex)}
-                                    aria-label="minus"
-                                    color="error"
-                                    style={{ marginBottom: '8px' }}
-                                  >
-                                    <i className="tabler-minus" />
-                                  </IconButton>
-                                
-                                  <Box
-                                    component="img"
-                                    src={formData.templateData[`${index}+${fieldIndex}`]?.preview}
-                                    alt="Preview"
-                                    sx={{
-                                      width: "100%",
-                                      maxHeight: "200px",
-                                      objectFit: "contain",
-                                      borderRadius: '4px',
-                                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                                    }}
-                                  />
-                                </Box>
-                                
+                                    <IconButton
+                                      size="large"
+                                      onClick={() => handleRemoveFile(index, fieldIndex)}
+                                      aria-label="minus"
+                                      color="error"
+                                      style={{ marginBottom: '8px' }}
+                                    >
+                                      <i className="tabler-minus" />
+                                    </IconButton>
+
+                                    <Box
+                                      component="img"
+                                      src={formData.templateData[`${index}+${fieldIndex}`]?.preview}
+                                      alt="Preview"
+                                      sx={{
+                                        width: "100%",
+                                        maxHeight: "200px",
+                                        objectFit: "contain",
+                                        borderRadius: '4px',
+                                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                                      }}
+                                    />
+                                  </Box>
+
                                   // <Box mt={2}>
 
-                                    
+
                                   //   <IconButton 
                                   //     size="large"
                                   //     onClick={() => handleRemoveFile(index, fieldIndex)}
                                   //     aria-label="minus"
                                   //     color="error"
-                                      
+
                                   //   >
                                   //     <i className="tabler-minus" />
                                   //   </IconButton>
 
-                                  
+
                                   //   <img
                                   //     src={
                                   //       formData.templateData[`${index}+${fieldIndex}`]?.preview
@@ -757,34 +757,44 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                   </Grid>
                 ))}
 
-                <Grid
-                  item
-                  xs={12}
-                  style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-                >
-                  <Box
-                    p={7}
-                    display="flex"
-                    gap={2}
-                    justifyContent="end"
-                    bgcolor="background.paper"
-                  >
-                    <Button variant="contained" color="error" type="reset" onClick={handleClose}>
-                      Cancel
-                    </Button>
-                    <Button color="warning" variant="contained" type="submit" onClick={() => setPDStatus(false)}>
-                      Save as Draft
-                    </Button>
-                    <Button variant="contained" type="submit" onClick={() => setPDStatus(true)}>
-                      Save & Publish
-                    </Button>
-                  </Box>
-                </Grid>
+
               </Grid>
+
             </Box>
+
           </form>
         </div>
+
       </Card>
+      <Grid
+        item
+        xs={12}
+        style={{ position: "sticky", bottom: 0, zIndex: 10 }}
+      >
+        <Box
+          p={7}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button variant="contained" color="error" type="reset" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button color="warning" variant="contained" type="submit" onClick={(event) => {
+            setPDStatus(false);
+            handleSubmit(event);
+          }}>
+            Save as Draft
+          </Button>
+          <Button variant="contained" type="submit" onClick={(event) => {
+            setPDStatus(true);
+            handleSubmit(event);
+          }}>
+            Save & Publish
+          </Button>
+        </Box>
+      </Grid>
     </>
   );
 }

@@ -101,7 +101,7 @@ function PopupForm({
   const { getRootProps: getBannerRootProps, getInputProps: getBannerInputProps } =
     useDropzone({
       multiple: false,
-      accept: validFileTypes.reduce((acc:any, type) => {
+      accept: validFileTypes.reduce((acc: any, type) => {
         const [category] = type.split("/");
         if (!acc[category]) {
           acc[category] = [];
@@ -164,7 +164,7 @@ function PopupForm({
       errors.btnRedirect = "Please enter a Button Redirect link";
       valid = false;
     }
-    
+
 
     if (!formData.description) {
       errors.description = "Please enter a description";
@@ -242,7 +242,7 @@ function PopupForm({
             <BreadCrumbList />
           </Grid>
           <Grid item xs={12} sm={1}>
-            <IconButton color="info" onClick={() => {}}>
+            <IconButton color="info" onClick={() => { }}>
               <i className="tabler-external-link text-textSecondary"></i>
             </IconButton>
           </Grid>
@@ -286,7 +286,7 @@ function PopupForm({
               </Grid>
               <Grid item xs={12} sm={12}>
                 <CustomTextField
-                multiline
+                  multiline
                   error={!!formErrors.btnRedirect}
                   helperText={formErrors.btnRedirect}
                   label="Popup Redirect Link"
@@ -301,17 +301,17 @@ function PopupForm({
                 />
               </Grid>
               <Grid item xs={12} sm={2}>
-                  <Typography variant="body2" sx={{ mr: 0 }}>
-                    Status
-                  </Typography>
-                  <Switch
-                    size='medium'
-                    checked={formData.active}
-                    onChange={(e) =>
-                      setFormData({ ...formData, active: e.target.checked })
-                    }
-                  />
-                </Grid>
+                <Typography variant="body2" sx={{ mr: 0 }}>
+                  Status
+                </Typography>
+                <Switch
+                  size='medium'
+                  checked={formData.active}
+                  onChange={(e) =>
+                    setFormData({ ...formData, active: e.target.checked })
+                  }
+                />
+              </Grid>
               <Grid item xs={12} sm={12}>
                 <p className="text-[#4e4b5a]">Description *</p>
 
@@ -325,9 +325,8 @@ function PopupForm({
               <Grid item xs={12} sm={12}>
                 <p className="text-[#4e4b5a] my-2">Popup File * </p>
                 <div
-                  className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md ${
-                    !!formErrors.bannerFileError && "border-red-400"
-                  }`}
+                  className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md ${!!formErrors.bannerFileError && "border-red-400"
+                    }`}
                 >
                   <Box
                     {...getBannerRootProps({ className: "dropzone" })}
@@ -388,33 +387,31 @@ function PopupForm({
               </Grid>
             </Grid>
           </Box>
-          <Box display="flex" gap={4}>
-            <Grid container spacing={2} sm={12}>
-              <Grid
-                item
-                xs={12}
-                style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-              >
-                <Box
-                  p={7}
-                  display="flex"
-                  gap={2}
-                  justifyContent="end"
-                  bgcolor="background.paper"
-                >
-                  <Button variant="outlined" color="error" onClick={()=>handleClose}>
-                    Cancel
-                  </Button>
-                  <Button variant="contained" type="submit">
-                    {open === -1 ? "Add" : "Edit"} Popup
-                  </Button>
-                </Box>
-              </Grid>
-         
-            </Grid>
-          </Box>
+
         </form>
       </Card>
+      <Grid
+        item
+        xs={12}
+        style={{ position: "sticky", bottom: 0, zIndex: 10 }}
+      >
+        <Box
+          p={7}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button variant="outlined" color="error" onClick={() => handleClose()}>
+            Cancel
+          </Button>
+          <Button variant="contained" type="submit" onClick={(event) => {
+            handleSubmit(event)
+          }}>
+            {open === -1 ? "Add" : "Edit"} Popup
+          </Button>
+        </Box>
+      </Grid>
     </>
   );
 }
