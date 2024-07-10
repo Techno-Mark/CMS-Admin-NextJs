@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import { post } from "@/services/apiService";
 import PageListTable from "./PageListTable";
-import { pages } from "@/services/endpoint/pages";
+import {  popups } from "@/services/endpoint/popup";
 import eventBus from "@/utils/eventBus";
 
 const initialBody = {
@@ -20,18 +20,16 @@ const page = () => {
   const getList = async (body: any) => {
     try {
       setLoading(true);
-      // const result = await post(pages.list, body);
-      // setTotalCount(result.data.totalRoles);
-      // setPagesData(
-      //   result.data.pages.map((item: any) => ({
-      //     id: item.pageId,
-      //     name: item.pageTitle,
-      //     slug: item.pageSlug,
-      //     jsonContent: item.pageContent,
-      //     createdAt: item.createdAt,
-      //     active: item.active,
-      //   }))
-      // );
+      const result = await post(popups.list, body);
+      setTotalCount(result.data.totalPopups);
+      setPagesData(
+        result.data.popups.map((item: any) => ({
+          popupId: item.popupId,
+          popupTitle: item.popupTitle,
+          createdAt: item.createdAt,
+          active: item.active,
+        }))
+      );
       setLoading(false);
     } catch (error) {
       console.error(error);

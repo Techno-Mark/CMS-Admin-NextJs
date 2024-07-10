@@ -1,9 +1,9 @@
-export const pages = {
-  list: `popups/list`,
-  create: `popups/create`,
-  update: `popups/update`,
-  getById: `popups/getById`,
-  delete: `popups/delete`,
+export const popups = {
+  list: `organization/popup/list`,
+  create: `organization/popup/create`,
+  update: `organization/popup/update`,
+  getById: `organization/popup/getById`,
+  delete: `organization/popup/delete`,
   // active: `organization/active`,
 };
 

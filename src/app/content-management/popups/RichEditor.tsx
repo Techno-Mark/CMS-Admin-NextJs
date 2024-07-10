@@ -204,11 +204,14 @@ const EditorCustom = ({
   content,
 }: {
   setContent: Function;
-  content: string;
+  content: any;
 }) => {
+  console.log(content);
+
+
   const handleEditorUpdate = ({ editor }: any) => {
     const html = editor.getHTML();
-    setContent((prev: Object) => ({
+    setContent((prev: any) => ({
       ...prev,
       description: html,
     }));
