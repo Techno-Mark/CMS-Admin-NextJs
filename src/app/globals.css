@@ -17,7 +17,7 @@
   --backdrop-color: rgb(var(--mui-mainColorChannels-light) / 0.5);
 }
 
-[data-mui-color-scheme='dark'] {
+[data-mui-color-scheme="dark"] {
   --backdrop-color: rgb(23 25 37 / 0.6);
 }
 
@@ -29,7 +29,7 @@
   margin: 0;
   border-width: 0;
   border-style: solid;
-  border-color: theme('borderColor.DEFAULT', currentColor);
+  border-color: theme("borderColor.DEFAULT", currentColor);
 }
 
 html {
@@ -110,7 +110,7 @@ ul:not([class]) {
   }
 }
 
-:where([class^='tabler-']) {
+:where([class^="tabler-"]) {
   font-size: 1.5rem;
 }
 
@@ -128,12 +128,17 @@ code {
 .text-v-center {
   margin: auto;
 }
-.ml-2{
+.ml-2 {
   margin-left: 5px;
 }
-.screen-center{
-  position:fixed;
+.screen-center {
+  position: fixed;
   margin: auto;
   left: 50%;
   top: 50%;
+}
+
+.editor-content > div {
+  outline: none !important;
+  box-shadow: none !important;
 }

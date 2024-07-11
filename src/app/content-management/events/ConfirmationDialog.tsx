@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { toast } from "react-toastify";
 import { postDataToOrganizationAPIs } from "@/services/apiService";
-import { blogPost } from "@/services/endpoint/blogpost";
+import { event } from "@/services/endpoint/event";
 
 type ConfirmationDialogProps = {
   deletingId: number;
@@ -23,9 +23,8 @@ const ConfirmationDialog = ({
 }: ConfirmationDialogProps) => {
   const deleteTemplate = async () => {
     try {
-      console.log(deletingId, "id");
-      const result = await postDataToOrganizationAPIs(blogPost.delete, {
-        blogId: deletingId,
+      const result = await postDataToOrganizationAPIs(event.delete, {
+        eventId: deletingId,
       });
 
       if (result.status === "success") {
@@ -46,7 +45,7 @@ const ConfirmationDialog = ({
       <DialogContent className="flex items-center flex-col text-center sm:pbs-16 sm:pbe-6 sm:pli-16">
         <i className="tabler-alert-circle text-[88px] mbe-6 text-warning" />
         <Typography variant="h5">
-          Are you sure you want to delete the Blog Post?
+          Are you sure you want to delete the Event?
         </Typography>
       </DialogContent>
       <DialogActions className="justify-center pbs-0 sm:pbe-16 sm:pli-16">
