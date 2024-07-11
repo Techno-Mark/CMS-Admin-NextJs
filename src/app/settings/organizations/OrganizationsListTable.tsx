@@ -3,14 +3,33 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Avatar, Badge, Chip, Divider, FormControl, InputLabel, MenuItem, Select, Switch,
-  TablePagination, TextFieldProps, Tooltip, Card, Button, Typography, IconButton
+  Avatar,
+  Badge,
+  Chip,
+  Divider,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Switch,
+  TablePagination,
+  TextFieldProps,
+  Tooltip,
+  Card,
+  Button,
+  Typography,
+  IconButton,
 } from "@mui/material";
 import classnames from "classnames";
 import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
 import {
-  createColumnHelper, flexRender, getCoreRowModel, useReactTable,
-  getFilteredRowModel, getPaginationRowModel, getSortedRowModel
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
 } from "@tanstack/react-table";
 import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { OrganizationsType } from "@/types/apps/organizationsType";
@@ -77,7 +96,6 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<OrganizationsTypeWithAction>();
 
 const OrganizationsListTable = () => {
-
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -142,6 +160,14 @@ const OrganizationsListTable = () => {
           </Typography>
         ),
       }),
+      columnHelper.accessor("organizationURL", {
+        header: "Organization URL",
+        cell: ({ row }) => (
+          <Typography color="text.primary" className="font-medium">
+            {row.original.organizationURL}
+          </Typography>
+        ),
+      }),
       columnHelper.accessor("active", {
         header: "Status",
         cell: ({ row }) => (
@@ -149,9 +175,9 @@ const OrganizationsListTable = () => {
             <CustomChip
               size="small"
               round="true"
-              label={row.original.active ? 'Active' : 'Inactive'}
+              label={row.original.active ? "Active" : "Inactive"}
               variant="tonal"
-              color={row.original.active ? 'success' : 'error'}
+              color={row.original.active ? "success" : "error"}
             />
           </div>
         ),
@@ -168,10 +194,12 @@ const OrganizationsListTable = () => {
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
             </IconButton>
-            <IconButton onClick={() => {
-              setIsDeleting(true);
-              setDeletingId(row.original.id);
-            }}>
+            <IconButton
+              onClick={() => {
+                setIsDeleting(true);
+                setDeletingId(row.original.id);
+              }}
+            >
               <i className="tabler-trash text-[22px] text-textSecondary" />
             </IconButton>
           </div>
@@ -186,7 +214,11 @@ const OrganizationsListTable = () => {
     data,
     columns,
     filterFns: { fuzzy: fuzzyFilter },
-    state: { rowSelection, globalFilter, pagination: { pageIndex: page, pageSize } },
+    state: {
+      rowSelection,
+      globalFilter,
+      pagination: { pageIndex: page, pageSize },
+    },
     globalFilterFn: fuzzyFilter,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
@@ -204,7 +236,9 @@ const OrganizationsListTable = () => {
     }
   };
 
-  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRowsPerPageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setPageSize(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -228,10 +262,22 @@ const OrganizationsListTable = () => {
               fullWidth
               defaultValue="all"
               id="custom-select"
-              value={activeFilter === null ? "all" : activeFilter === true ? "active" : "inactive"}
+              value={
+                activeFilter === null
+                  ? "all"
+                  : activeFilter === true
+                    ? "active"
+                    : "inactive"
+              }
               onChange={(e) => {
                 const value = e.target.value;
-                setActiveFilter(value === "active" ? true : value === "inactive" ? false : null);
+                setActiveFilter(
+                  value === "active"
+                    ? true
+                    : value === "inactive"
+                      ? false
+                      : null
+                );
               }}
             >
               <MenuItem value="all">All</MenuItem>
@@ -250,7 +296,6 @@ const OrganizationsListTable = () => {
         </div>
       </div>
       <Card>
-
         <div className="overflow-x-auto h-[325px]">
           <table className={tableStyles.table}>
             <thead>
@@ -262,15 +307,20 @@ const OrganizationsListTable = () => {
                         <div
                           className={classnames({
                             "flex items-center": header.column.getIsSorted(),
-                            "cursor-pointer select-none": header.column.getCanSort(),
+                            "cursor-pointer select-none":
+                              header.column.getCanSort(),
                           })}
                           onClick={header.column.getToggleSortingHandler()}
                         >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                           {{
                             asc: <i className="tabler-chevron-up text-xl" />,
                             desc: <i className="tabler-chevron-down text-xl" />,
-                          }[header.column.getIsSorted() as "asc" | "desc"] ?? null}
+                          }[header.column.getIsSorted() as "asc" | "desc"] ??
+                            null}
                         </div>
                       )}
                     </th>
@@ -281,7 +331,10 @@ const OrganizationsListTable = () => {
             {table.getFilteredRowModel().rows.length === 0 ? (
               <tbody>
                 <tr>
-                  <td colSpan={table.getVisibleFlatColumns().length} className="text-center">
+                  <td
+                    colSpan={table.getVisibleFlatColumns().length}
+                    className="text-center"
+                  >
                     No data available
                   </td>
                 </tr>
@@ -289,10 +342,16 @@ const OrganizationsListTable = () => {
             ) : (
               <tbody>
                 {table.getRowModel().rows.map((row) => (
-                  <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
+                  <tr
+                    key={row.id}
+                    className={classnames({ selected: row.getIsSelected() })}
+                  >
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
                       </td>
                     ))}
                   </tr>
