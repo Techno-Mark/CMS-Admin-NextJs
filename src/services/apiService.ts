@@ -100,11 +100,13 @@ export const postContentBlock = async (endpoint: string, data: any) => {
       throw new Error("No session or access token found");
     }
 
+    const orgId = localStorage.getItem("selectedOrgId");
+
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${session?.user.token}`,
-        "organization-id": "1",
+        "organization-id": `${orgId}`,
       },
       body: data,
     });
@@ -128,12 +130,14 @@ export const postDataToOrganizationAPIs = async (
       throw new Error("No session or access token found");
     }
 
+    const orgId = localStorage.getItem("selectedOrgId");
+
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session?.user.token}`,
-        "organization-id": "1",
+        "organization-id": `${orgId}`,
       },
       body: JSON.stringify(data),
     });
