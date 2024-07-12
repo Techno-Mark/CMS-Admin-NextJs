@@ -63,7 +63,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "src/app/content-management/blogs/RichEditor.tsx"  ],
   "exclude": [
     "node_modules"
   ]

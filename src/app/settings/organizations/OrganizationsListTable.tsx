@@ -296,7 +296,7 @@ const OrganizationsListTable = () => {
         </div>
       </div>
       <Card>
-        <div className="overflow-x-auto h-[325px]">
+        <div className="overflow-x-auto">
           <table className={tableStyles.table}>
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (

@@ -50,25 +50,16 @@ const ModeDropdown = () => {
         const response = await post(organization.active, {});
         const orgs = response.data.organizations as Organization[];
         setOrganizations(orgs);
-
-        // Check if selectedOrgId is in localStorage
+        
         const storedOrgId = localStorage.getItem('selectedOrgId');
 
 
         if (storedOrgId) {
-          const parsedOrgId = parseInt(storedOrgId, 10);
-          // const selectedOrg = orgs.find((org) => org.id === parsedOrgId.toString());
-          if (storedOrgId) {
-            setSelectedOrgId(parsedOrgId);
-          } 
-          // else {
-
-          //   setSelectedOrgId(orgs[0]?.id || null);
-          // }
-          // setSelectedOrgId(parsedOrgId);
-        } else {
-          setSelectedOrgId(orgs[0]?.id || null);
-          localStorage.setItem('selectedOrgId', orgs[0]?.id);
+          const parsedOrgId = parseInt(storedOrgId, 10); 
+          setSelectedOrgId(parsedOrgId);
+        } else if (orgs.length > 0) {
+          setSelectedOrgId(orgs[0].id);
+          localStorage.setItem('selectedOrgId', orgs[0].id);
         }
       } catch (error) {
         console.error('Error fetching organizations:', error);

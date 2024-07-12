@@ -21,15 +21,14 @@ import {
 import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
-// import ConfirmationDialog from "./ConfirmationDialog";
 import { postDataToOrganizationAPIs } from "@/services/apiService";
 import CustomChip from "@/@core/components/mui/Chip";
 import { TemplateType } from "@/types/apps/templateType";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import { truncateText } from "@/utils/common";
-import { blogsType } from "@/types/apps/blogsType";
-import { blogPost } from "@/services/endpoint/blogpost";
+import { eventsType } from "@/types/apps/eventType";
+import { event } from "@/services/endpoint/event";
 import ConfirmationDialog from "./ConfirmationDialog";
 
 declare module "@tanstack/table-core" {
@@ -41,7 +40,7 @@ declare module "@tanstack/table-core" {
   }
 }
 
-type BlogTypeWithAction = blogsType & {
+type EventTypeWithAction = eventsType & {
   action?: string;
 };
 
@@ -83,7 +82,7 @@ const DebouncedInput = ({
   );
 };
 
-const columnHelper = createColumnHelper<BlogTypeWithAction>();
+const columnHelper = createColumnHelper<EventTypeWithAction>();
 
 const BlogListTable = () => {
   const [rowSelection, setRowSelection] = useState({});
@@ -105,14 +104,14 @@ const BlogListTable = () => {
     const getData = async () => {
       setLoading(true);
       try {
-        const result = await postDataToOrganizationAPIs(blogPost.list, {
+        const result = await postDataToOrganizationAPIs(event.list, {
           page: page + 1,
           limit: pageSize,
           search: globalFilter,
           active: activeFilter,
         });
-        setData(result.data.blogs);
-        setTotalRows(result.data.totalBlogs);
+        setData(result.data.events);
+        setTotalRows(result.data.totalEvents);
       } catch (error: any) {
         setError(error.message);
       } finally {
@@ -122,7 +121,7 @@ const BlogListTable = () => {
     getData();
   }, [page, pageSize, globalFilter, deletingId, activeFilter]);
 
-  const columns = useMemo<ColumnDef<BlogTypeWithAction, any>[]>(
+  const columns = useMemo<ColumnDef<EventTypeWithAction, any>[]>(
     () => [
       columnHelper.accessor("srNo", {
         header: "Sr. No.",
@@ -133,28 +132,37 @@ const BlogListTable = () => {
         ),
         enableSorting: false,
       }),
-      columnHelper.accessor("blogTitle", {
-        header: "Blog Title",
+      columnHelper.accessor("title", {
+        header: "Event Title",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {row.original.blogTitle}
+            {row.original.title}
           </Typography>
         ),
       }),
-      columnHelper.accessor("blogSlug", {
-        header: "Slug",
+      columnHelper.accessor("date", {
+        header: "Event Date",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {truncateText(row.original.blogSlug, 25)}
+            {row.original.date}
           </Typography>
         ),
         enableSorting: false,
       }),
-      columnHelper.accessor("authorName", {
-        header: "Author Name",
+      columnHelper.accessor("startTime", {
+        header: "start Time",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {truncateText(row.original.authorName, 25)}
+            {row.original.startTime}
+          </Typography>
+        ),
+        enableSorting: false,
+      }),
+      columnHelper.accessor("endTime", {
+        header: "end time",
+        cell: ({ row }) => (
+          <Typography color="text.primary" className="font-medium">
+            {row.original.endTime}
           </Typography>
         ),
         enableSorting: false,
@@ -184,14 +192,14 @@ const BlogListTable = () => {
         enableSorting: false,
       }),
 
-      columnHelper.accessor("blogId", {
+      columnHelper.accessor("eventId", {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
             <IconButton
               onClick={() =>
                 router.push(
-                  `/content-management/blogs/edit/${row.original.blogId}`
+                  `/content-management/events/edit/${row.original.eventId}`
                 )
               }
             >
@@ -200,7 +208,7 @@ const BlogListTable = () => {
             <IconButton
               onClick={() => {
                 setIsDeleting(true);
-                setDeletingId(row.original.blogId);
+                setDeletingId(row.original.eventId);
               }}
             >
               <i className="tabler-trash text-[22px] text-textSecondary" />
@@ -292,10 +300,10 @@ const BlogListTable = () => {
             <Button
               variant="contained"
               startIcon={<i className="tabler-plus" />}
-              onClick={() => router.push("/content-management/blogs/add")}
+              onClick={() => router.push("/content-management/events/add")}
               className="is-full sm:is-auto"
             >
-              Add Blog
+              Add Event
             </Button>
           </div>
         </div>

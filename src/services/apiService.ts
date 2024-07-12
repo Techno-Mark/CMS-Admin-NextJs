@@ -52,12 +52,14 @@ export const fetchData = async (
     }
 
     const orgId = localStorage.getItem("selectedOrgId");
+    console.log(`${API_URL}/${endpoint}`);
+
     const response = await fetch(`${API_URL}/${endpoint}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session?.user.token}`,
-        ...(orgId ? { orgId: orgId } : {}),
+        ...(orgId ? { "organization-id": orgId } : {}),
         ...options.headers,
       },
     });
@@ -133,11 +135,13 @@ export const postDataToOrganizationAPIs = async (
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method: "POST",
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${session?.user.token}`,
         "organization-id": `${orgId}`,
       },
       body: JSON.stringify(data),
     });
+
     return await handleResponse(response);
   } catch (error: any) {
     console.error("Error fetching data:", error);
