@@ -5,70 +5,86 @@ import DraggableIcon from "./_svg/_DraggableIcon";
 const MenuItem: React.FC = () => {
   const [menuItems, setMenuItems] = useState<any[]>([
     {
-      id: "1",
       name: "Item 1",
+      logo: "",
+      link: "",
       children: [
         {
-          id: "1-1",
           name: "Subitem 1-1",
+          children: [],
+          logo: "",
+          link: "",
         },
-        { id: "1-2", name: "Subitem 1-2" },
+        { name: "Subitem 1-2", children: [], logo: "", link: "" },
+        { name: "Subitem 1-3", children: [], logo: "", link: "" },
       ],
     },
-    { id: "2", name: "Item 2" },
-    { id: "3", name: "Item 3" },
+    {
+      name: "Item 2",
+      children: [{ name: "Subitem 2-1", children: [], logo: "", link: "" }],
+      logo: "",
+      link: "",
+    },
+    {
+      name: "Item 3",
+      children: [
+        { name: "Subitem 3-1", children: [], logo: "", link: "" },
+        { name: "Subitem 3-2", children: [], logo: "", link: "" },
+      ],
+      logo: "",
+      link: "",
+    },
   ]);
 
-  const handleDragStart = (e: React.DragEvent<HTMLLIElement>, item: any) => {
-    e.dataTransfer.setData("text/plain", JSON.stringify(item));
-    console.log(item);
+  const handleDragStart = (
+    e: React.DragEvent<HTMLLIElement>,
+    item: any,
+    index: number
+  ) => {
+    e.dataTransfer.setData("text/plain", JSON.stringify(index));
   };
 
   const handleDrop = (
     event: React.DragEvent<HTMLLIElement>,
-    targetItem: any
+    targetItem: any,
+    targetIndex: number
   ) => {
-    const draggedItem: any = JSON.parse(
-      event.dataTransfer.getData("text/plain")
+    const draggedIndex: number = Number(
+      JSON.parse(event.dataTransfer.getData("text/plain"))
     );
-    console.log("on drop", draggedItem, targetItem);
 
-    if (draggedItem.id === targetItem.id) return;
+    const newMenuItems = [...menuItems];
 
-    let newItem = [...menuItems];
+    const removedItem = removeMenuItem(newMenuItems, draggedIndex);
+    addMenuItem(newMenuItems, removedItem, targetIndex);
 
-    if (!draggedItem.id.includes("-")) {
-      let index = newItem.indexOf((item: any) => item.id == draggedItem.id);
-      newItem.splice(index, 1, []);
-      newItem = newItem.filter((item: any) => {
-        item.id !== draggedItem.id;
-      });
-    }
+    return;
+  };
 
-    const removeItem = (items: any[], id: string): any[] => {
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        if (item.id === id) {
-          items.splice(i, 1);
-          return items;
-        }
-        if (item.children) {
-          item.children = removeItem(item.children, id);
-        }
-      }
-      return items;
-    };
+  const addMenuItem = (
+    newMenuItems: any,
+    removedItem: any,
+    targetIndex: number
+  ) => {
+    newMenuItems.splice(targetIndex, 0, removedItem);
+    console.log(newMenuItems);
+    setMenuItems(newMenuItems);
+  };
+  const removeMenuItem = (newMenuItems: any, draggedIndex: number) => {
+    const removedItem = menuItems[draggedIndex];
+    newMenuItems.splice(draggedIndex, 1);
+    return removedItem;
   };
 
   const renderMenuItems = (items: any[]): React.ReactNode => {
-    return items.map((item) => (
-      <ul>
+    return items.map((item, index) => (
+      <ul key={index}>
         {" "}
         <li
           className="flex items-center border-b-black border-b p-1"
           draggable
-          onDragStart={(e) => handleDragStart(e, item)}
-          onDrop={(e) => handleDrop(e, item)}
+          onDragStart={(e) => handleDragStart(e, item, index)}
+          onDrop={(e) => handleDrop(e, item, index)}
           onDragOver={(e: React.DragEvent<HTMLLIElement>) => e.preventDefault()}
         >
           <div className="flex-1 flex items-center">
