@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import DraggableIcon from "./_svg/_DraggableIcon";
 import { Fab } from "@mui/material";
-import KanbanDrawer from "./_kanban/KanbanDrawer";
+import KanbanDrawer from "./KanbanDrawer";
 
 const MenuItem: React.FC = () => {
   const [menuItems, setMenuItems] = useState<any[]>([

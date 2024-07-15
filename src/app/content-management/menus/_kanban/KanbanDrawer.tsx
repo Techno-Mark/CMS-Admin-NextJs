@@ -1,133 +1,134 @@
+// React Imports
+import { useEffect, useState, useRef } from "react";
+import type { ChangeEvent } from "react";
+
 // MUI Imports
 import Drawer from "@mui/material/Drawer";
 import Typography from "@mui/material/Typography";
-
+import MenuItem from "@mui/material/MenuItem";
+import Checkbox from "@mui/material/Checkbox";
+import ListItemText from "@mui/material/ListItemText";
+import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
+import InputAdornment from "@mui/material/InputAdornment";
 
-import CustomTextField from "@/@core/components/mui/TextField";
-import { ChangeEvent, Children, useEffect, useState } from "react";
-import { Button } from "@mui/material";
+// Third-party Imports
+import { useForm, Controller } from "react-hook-form";
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { minLength, nonEmpty, object, pipe, string } from "valibot";
+import type { InferInput } from "valibot";
+
+// Type Imports
+import type { ColumnType, TaskType } from "@/types/apps/kanbanTypes";
+import type { AppDispatch } from "@/redux-store";
+
+// Slice Imports
+import { editTask, deleteTask } from "@/redux-store/slices/kanban";
+
+// Component Imports
+import CustomAvatar from "@core/components/mui/Avatar";
+import CustomTextField from "@core/components/mui/TextField";
+import AppReactDatepicker from "@/libs/styles/AppReactDatepicker";
+
+// Data Imports
+import { chipColor } from "./TaskCard";
 
 type KanbanDrawerProps = {
   drawerOpen: boolean;
+  dispatch: AppDispatch;
   setDrawerOpen: (value: boolean) => void;
-  dataRequired: any;
-  menuItems: any;
-  setMenuItems: Function;
-  open: number;
+  task: TaskType;
+  columns: ColumnType[];
+  setColumns: (value: ColumnType[]) => void;
 };
 
-const initialFormData = {
-  name: "",
-  link: "",
-};
+type FormData = InferInput<typeof schema>;
 
-const initialErrorData = {
-  name: "",
-  link: "",
-};
+const schema = object({
+  title: pipe(string(), nonEmpty("Title is required"), minLength(1)),
+});
 
 const KanbanDrawer = (props: KanbanDrawerProps) => {
   // Props
+  const { drawerOpen, dispatch, setDrawerOpen, task, columns, setColumns } =
+    props;
+
+  // States
+  const [date, setDate] = useState<Date | undefined>(task.dueDate);
+  const [badgeText, setBadgeText] = useState(task.badgeText || []);
+  const [fileName, setFileName] = useState<string>("");
+  const [comment, setComment] = useState<string>("");
+
+  // Refs
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Hooks
   const {
-    drawerOpen,
-    setDrawerOpen,
-    menuItems,
-    setMenuItems,
-    dataRequired,
-    open,
-  } = props;
-  const [loading, setLoading] = useState(true);
-  const [formErrors, setFormErrors] =
-    useState<typeof initialErrorData>(initialErrorData);
-  const [formData, setFormData] =
-    useState<typeof initialErrorData>(initialFormData);
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: {
+      title: task.title,
+    },
+    resolver: valibotResolver(schema),
+  });
+
+  // Handle File Upload
+  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const { files } = event.target;
+
+    if (files && files.length !== 0) {
+      setFileName(files[0].name);
+    }
+  };
 
   // Close Drawer
   const handleClose = () => {
-    setFormData(initialFormData);
-    setFormErrors(initialErrorData);
     setDrawerOpen(false);
+    reset({ title: task.title });
+    setBadgeText(task.badgeText || []);
+    setDate(task.dueDate);
+    setFileName("");
+    setComment("");
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   // Update Task
   const updateTask = (data: FormData) => {
+    dispatch(
+      editTask({ id: task.id, title: data.title, badgeText, dueDate: date })
+    );
     handleClose();
   };
 
-  //validation before submit
-  const validateForm = () => {
-    let valid = true;
-    let errors = { ...initialErrorData };
+  // Handle Reset
+  const handleReset = () => {
+    setDrawerOpen(false);
+    dispatch(deleteTask(task.id));
 
-    if (!formData.name) {
-      errors.name = "Please enter a menu name";
-      valid = false;
-    } else if (formData.name.length < 3) {
-      errors.name = "name must be at least 3 characters long";
-      valid = false;
-    } else if (formData.name.length > 255) {
-      errors.name = "name must be at most 255 characters long";
-      valid = false;
-    }
-    if (!formData.link) {
-      errors.link = "Please add a link";
-      valid = false;
-    } else if (formData.link.length < 7) {
-      errors.link = "link must be at least 7 characters long";
-      valid = false;
-    } else if (formData.link.length > 1000) {
-      errors.link = "link must be at most 1000 characters long";
-      valid = false;
-    }
+    const updatedColumns = columns.map((column) => {
+      return {
+        ...column,
+        taskIds: column.taskIds.filter((taskId) => taskId !== task.id),
+      };
+    });
 
-    setFormErrors(errors);
-    return valid;
+    setColumns(updatedColumns);
   };
 
-  // Handle Sunmit
-  const handleSubmit = (d: any) => {
-    if (validateForm()) {
-      if (open == -1) {
-        const newMenus = [
-          ...menuItems,
-          { name: formData.name, link: formData.link, children: [], logo: "" },
-        ];
-        console.log(newMenus);
-        setMenuItems(newMenus);
-      } else if (open == 1) {
-        const { index, parentId } = dataRequired;
-        if (parentId == -1) {
-          menuItems[index].name = formData.name;
-          menuItems[index].link = formData.link;
-        } else {
-          menuItems[parentId].children[index].name = formData.name;
-          menuItems[parentId].children[index].link = formData.link;
-        }
-      }
-      handleClose();
-    }
-  };
-
+  // To set the initial values according to the task
   useEffect(() => {
-    if (open == 1) {
-      const { index, parentId } = dataRequired;
-      let name = "",
-        link = "";
-      if (parentId == -1) {
-        name = menuItems[index].name;
-        link = menuItems[index].link;
-      } else {
-        name = menuItems[parentId].children[index].name;
-        link = menuItems[parentId].children[index].link;
-      }
-      setFormData({
-        name: name,
-        link: link,
-      });
-    }
-    setLoading(false);
-  }, []);
+    reset({ title: task.title });
+    setBadgeText(task.badgeText || []);
+    setDate(task.dueDate);
+  }, [task, reset]);
 
   return (
     <div>
@@ -140,49 +141,156 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
         onClose={handleClose}
       >
         <div className="flex justify-between items-center pli-6 plb-5 border-be">
-          <Typography variant="h5">Add Menu</Typography>
+          <Typography variant="h5">Edit Task</Typography>
           <IconButton size="small" onClick={handleClose}>
             <i className="tabler-x text-2xl text-textPrimary" />
           </IconButton>
         </div>
         <div className="p-6">
-          <div className="flex flex-col gap-y-5">
-            <CustomTextField
-              error={!!formErrors.name}
-              helperText={formErrors.name}
-              label="Name *"
-              fullWidth
-              placeholder=""
-              value={formData.name}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setFormData({ ...formData, name: e.target.value });
-                if (e.target?.value?.length) {
-                  setFormErrors({ ...formErrors, name: "" });
-                }
+          <form
+            className="flex flex-col gap-y-5"
+            onSubmit={handleSubmit(updateTask)}
+          >
+            <Controller
+              name="title"
+              control={control}
+              render={({ field }) => (
+                <CustomTextField
+                  fullWidth
+                  label="Title"
+                  {...field}
+                  error={Boolean(errors.title)}
+                  helperText={errors.title?.message}
+                />
+              )}
+            />
+
+            <AppReactDatepicker
+              selected={date ? new Date(date) : new Date()}
+              id="basic-input"
+              onChange={(date: Date) => {
+                setDate(date);
               }}
+              placeholderText="Click to select a date"
+              dateFormat={"d MMMM, yyyy"}
+              customInput={<CustomTextField label="Due Date" fullWidth />}
             />
             <CustomTextField
-              error={!!formErrors.link}
-              helperText={formErrors.link}
-              label="Link *"
-              fullWidth
-              placeholder=""
-              value={formData.link}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setFormData({ ...formData, link: e.target.value });
-                if (e.target?.value?.length) {
-                  setFormErrors({ ...formErrors, link: "" });
-                }
+              select
+              label="Label"
+              SelectProps={{
+                multiple: true,
+                value: badgeText || [],
+                onChange: (e) => setBadgeText(e.target.value as string[]),
+                renderValue: (selected) => (
+                  <div className="flex flex-wrap gap-1">
+                    {(selected as string[]).map((value) => (
+                      <Chip
+                        variant="tonal"
+                        key={value}
+                        size="small"
+                        onMouseDown={(e) => e.stopPropagation()}
+                        label={value}
+                        color={chipColor[value]?.color}
+                        onDelete={() =>
+                          setBadgeText((current) =>
+                            current.filter((item) => item !== value)
+                          )
+                        }
+                      />
+                    ))}
+                  </div>
+                ),
               }}
-            />
-            <Button
-              variant="contained"
-              type="submit"
-              onClick={() => handleSubmit(true)}
             >
-              {open == -1 ? "Add " : "Edit"} Menu
-            </Button>
-          </div>
+              {Object.keys(chipColor).map((chip) => (
+                <MenuItem key={chip} value={chip}>
+                  <Checkbox
+                    checked={badgeText && badgeText.indexOf(chip) > -1}
+                  />
+                  <ListItemText primary={chip} />
+                </MenuItem>
+              ))}
+            </CustomTextField>
+            <div>
+              <Typography variant="caption" color="text.primary">
+                Assigned
+              </Typography>
+              <div className="flex gap-1">
+                {task.assigned?.map((avatar, index) => (
+                  <Tooltip title={avatar.name} key={index}>
+                    <CustomAvatar
+                      key={index}
+                      src={avatar.src}
+                      size={26}
+                      className="cursor-pointer"
+                    />
+                  </Tooltip>
+                ))}
+                <CustomAvatar size={26} className="cursor-pointer">
+                  <i className="tabler-plus text-base text-textSecondary" />
+                </CustomAvatar>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <CustomTextField
+                fullWidth
+                placeholder="Choose File"
+                variant="outlined"
+                value={fileName}
+                InputProps={{
+                  readOnly: true,
+                  endAdornment: fileName ? (
+                    <InputAdornment position="end">
+                      <IconButton
+                        size="small"
+                        edge="end"
+                        onClick={() => setFileName("")}
+                      >
+                        <i className="tabler-x" />
+                      </IconButton>
+                    </InputAdornment>
+                  ) : null,
+                }}
+              />
+              <Button
+                component="label"
+                variant="tonal"
+                htmlFor="contained-button-file"
+              >
+                Choose
+                <input
+                  hidden
+                  id="contained-button-file"
+                  type="file"
+                  onChange={handleFileUpload}
+                  ref={fileInputRef}
+                />
+              </Button>
+            </div>
+            <CustomTextField
+              fullWidth
+              label="Comment"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              multiline
+              rows={4}
+              placeholder="Write a Comment...."
+            />
+            <div className="flex gap-4">
+              <Button variant="contained" color="primary" type="submit">
+                Update
+              </Button>
+              <Button
+                variant="tonal"
+                color="error"
+                type="reset"
+                onClick={handleReset}
+              >
+                Delete
+              </Button>
+            </div>
+          </form>
         </div>
       </Drawer>
     </div>

@@ -1,19 +1,21 @@
 import type { KanbanType } from "@/types/apps/kanbanTypes";
 
 export const db: KanbanType = {
-  menus: [
-    {
-      id: 1,
-      title: "title1",
-      link: "link1",
-    },
-  ],
-
   columns: [
     {
       id: 1,
       title: "In Progress",
       taskIds: [1, 2],
+    },
+    {
+      id: 2,
+      title: "In Review",
+      taskIds: [3, 4],
+    },
+    {
+      id: 3,
+      title: "Done",
+      taskIds: [5, 6],
     },
   ],
   tasks: [
@@ -29,18 +31,6 @@ export const db: KanbanType = {
         { src: "/images/avatars/3.png", name: "Robert Johnson" },
       ],
       dueDate: new Date(new Date().getFullYear(), 11, 30),
-    },
-    {
-      id: 2,
-      title: "Review Javascript code",
-      badgeText: ["Code Review"],
-      attachments: 2,
-      comments: 8,
-      assigned: [
-        { src: "/images/avatars/4.png", name: "Emily Davis" },
-        { src: "/images/avatars/5.png", name: " Tom Smith" },
-      ],
-      dueDate: new Date(new Date().getFullYear(), 5, 30),
     },
     {
       id: 2,

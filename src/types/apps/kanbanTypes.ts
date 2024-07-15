@@ -15,14 +15,7 @@ export type ColumnType = {
   taskIds: number[];
 };
 
-export type MenuType = {
-  id: number;
-  title: string;
-  link: string;
-};
-
 export type KanbanType = {
-  menus: MenuType[];
   columns: ColumnType[];
   tasks: TaskType[];
   currentTaskId?: number;
