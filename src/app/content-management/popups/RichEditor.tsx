@@ -24,7 +24,6 @@ const EditorToolbar = () => {
   return (
     <div className="flex flex-wrap gap-x-4 gap-y-2 p-6 sticky top-0 bg-white z-10">
 
-
       <Chip
         size="small"
         onClick={() => editor.chain().focus().toggleBold().run()}

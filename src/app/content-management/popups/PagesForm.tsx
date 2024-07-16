@@ -315,9 +315,9 @@ function PopupForm({
             </Grid>
             <Grid container spacing={4} sm={5}>
               <Grid item xs={12} sm={12}>
-                <p className="text-[#4e4b5a] my-2">Popup File * </p>
+                <p className="text-[#4e4b5a]">Popup File * </p>
                 <div
-                  className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md ${!!formErrors.popupFileError && "border-red-400"
+                  className={`flex items-center flex-col w-[400px] h-[400px] border border-dashed border-gray-300 rounded-md ${!!formErrors.popupFileError && "border-red-400"
                     }`}
                 >
                   <Box
