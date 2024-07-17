@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth";
 // Function to get session token from cookies manually
 const getSessionToken = async () => {
   const session = await getServerSession(authOptions);
-  console.log("session",session);
+  console.log("session", session);
 
   if (!session) {
     console.log("You must be logged in.");
@@ -14,8 +14,7 @@ const getSessionToken = async () => {
     //   res.status(401).json({ message: "You must be logged in." })
     return;
   } else {
-    console.log("asddasdas");
-    window.location.href ='/home'
+    window.location.href = "/home";
   }
 };
 

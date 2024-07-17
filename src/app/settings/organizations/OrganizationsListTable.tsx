@@ -296,7 +296,7 @@ const OrganizationsListTable = () => {
         </div>
       </div>
       <Card>
-        <div className="overflow-x-auto h-[325px]">
+        <div className="overflow-x-auto">
           <table className={tableStyles.table}>
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -335,7 +335,8 @@ const OrganizationsListTable = () => {
                     colSpan={table.getVisibleFlatColumns().length}
                     className="text-center"
                   >
-                    No data available
+                    Currently there is no record found, you may Add Organization
+                    to continue
                   </td>
                 </tr>
               </tbody>
