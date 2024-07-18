@@ -401,7 +401,8 @@ const ContentBlockForm = ({ open }: Props) => {
                             {field.fieldType === "multiple" && (
                               <TableRow>
                                 <TableCell colSpan={5}>
-                                  <Accordion expanded={expanded} onChange={handleChange}>
+                                  <Accordion expanded={expanded} onChange={handleChange}
+                                  >
                                     <AccordionSummary
                                       expandIcon={<IconButton
                                         size="small"
@@ -411,7 +412,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                       >
                                         <i className="tabler-chevron-down" />
                                       </IconButton>}>
-                                      <span>Multiple Fields</span>
+                                      <Typography variant="subtitle1">Multiple Label: {field.fieldLabel ? field.fieldLabel : 'N/A'}</Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                       <Table>
