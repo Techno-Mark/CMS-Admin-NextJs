@@ -3,7 +3,6 @@ const commonPrefix = "organization/menu";
 export const menu = {
   list: `${commonPrefix}/list`,
   delete: `${commonPrefix}/delete`,
-  create: `${commonPrefix}/create-update`,
-  update: `${commonPrefix}/update`,
+  createAndUpdate: `${commonPrefix}/create-and-update`,
   getById: `${commonPrefix}/getById`,
 };

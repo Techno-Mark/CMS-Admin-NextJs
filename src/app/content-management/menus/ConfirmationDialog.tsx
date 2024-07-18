@@ -5,11 +5,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { toast } from "react-toastify";
-import {
-  postContentBlock,
-  postDataToOrganizationAPIs,
-} from "@/services/apiService";
-import { blogPost } from "@/services/endpoint/blogpost";
+import { postDataToOrganizationAPIs } from "@/services/apiService";
 import { menu } from "@/services/endpoint/menu";
 
 type ConfirmationDialogProps = {
