@@ -5,8 +5,12 @@ import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { toast } from "react-toastify";
-import { postContentBlock } from "@/services/apiService";
+import {
+  postContentBlock,
+  postDataToOrganizationAPIs,
+} from "@/services/apiService";
 import { blogPost } from "@/services/endpoint/blogpost";
+import { menu } from "@/services/endpoint/menu";
 
 type ConfirmationDialogProps = {
   deletingId: number;
@@ -21,14 +25,11 @@ const ConfirmationDialog = ({
   setOpen,
   setDeletingId,
 }: ConfirmationDialogProps) => {
-  const deleteTemplate = async () => {
+  const deleteMenu = async () => {
     try {
-      console.log(deletingId, "iddd");
-      debugger;
-      const result = await postContentBlock(
-        blogPost.delete,
-        JSON.stringify({ blogId: deletingId })
-      );
+      const result = await postDataToOrganizationAPIs(menu.delete, {
+        menuId: deletingId,
+      });
 
       if (result.status === "success") {
         toast.success(result.message);
@@ -52,7 +53,7 @@ const ConfirmationDialog = ({
         </Typography>
       </DialogContent>
       <DialogActions className="justify-center pbs-0 sm:pbe-16 sm:pli-16">
-        <Button variant="contained" onClick={deleteTemplate}>
+        <Button variant="contained" onClick={deleteMenu}>
           Yes
         </Button>
         <Button

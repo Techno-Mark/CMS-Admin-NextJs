@@ -1,12 +1,3 @@
-// import MenuItem from "./MenuItem";
-// export default function Page() {
-//   return (
-//     <>
-//       <MenuItem />
-//     </>
-//   );
-// }
-
 // Third-party Imports
 import classnames from "classnames";
 
@@ -18,19 +9,10 @@ import { commonLayoutClasses } from "@layouts/utils/layoutClasses";
 
 // Styles Imports
 import styles from "./_kanban/styles.module.css";
+import MenuListTable from "./MenusListTable";
 
 const KanbanPage = () => {
-  return (
-    <div
-      className={classnames(
-        commonLayoutClasses.contentHeightFixed,
-        styles.scroll,
-        "is-full overflow-auto pis-2 -mis-2"
-      )}
-    >
-      <KanbanBoard />
-    </div>
-  );
+  return <MenuListTable />;
 };
 
 export default KanbanPage;
