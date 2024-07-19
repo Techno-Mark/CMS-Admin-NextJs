@@ -37,6 +37,7 @@ const Providers = async (props: Props) => {
           demoName={demoName}
         >
           <ThemeProvider direction={direction} systemMode={systemMode}>
+            {children}
             <AppReactToastify
               position={themeConfig.toastPosition}
               hideProgressBar
