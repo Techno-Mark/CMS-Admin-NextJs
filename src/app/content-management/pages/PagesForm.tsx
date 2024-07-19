@@ -132,9 +132,11 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   useEffect(() => {
     setLoading(true);
     if (editingRow) {
+      
       setFormData(editingRow);
       getTemplateIdWiseForm(editingRow.templateId);
       setLoading(false);
+      
     } else {
       setFormData(initialFormData);
       setLoading(false);
@@ -323,6 +325,101 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     if (validateForm()) {
       try {
         setLoading(true);
+
+        const formattedData: any[] = [];
+
+        Object.keys(formData.templateData).forEach(key => {
+          const content = formData.templateData[key];
+          const mainKey = content.templateId;
+          const sectionName = content.sectionName;
+          const sectionId = content.templateSectionId;
+          const sectionMultipleId = content.templateSectionMultipleId;
+          console.log(content);
+
+
+          // Find or create the corresponding content block
+          let contentBlock = formattedData.find(block => block[`${sectionName}-${mainKey}`]);
+          if (!contentBlock) {
+            contentBlock = { [`${sectionName}-${mainKey}`]: [] };
+            formattedData.push(contentBlock);
+          }
+
+          // Determine the content type and format accordingly
+          let formattedContent;
+          switch (content.fieldType) {
+            case 'email':
+              formattedContent = {
+                Label: sectionMultipleId? content.subField :content.fieldLabel || "",
+                Value: content.email || "",
+
+              };
+              break;
+            case 'file':
+              formattedContent = {
+                Label: sectionMultipleId? content.subField :content.fieldLabel || "",
+                Value: content.file || "",
+                Preview: content.preview || "",
+
+              };
+              break;
+            case 'url':
+              formattedContent = {
+                Label: sectionMultipleId? content.subField :content.fieldLabel || "",
+                Value: content.url || "",
+
+              };
+              break;
+            case 'date':
+              formattedContent = {
+                Label: sectionMultipleId? content.subField :content.fieldLabel || "",
+                Value: content.date || "",
+
+              };
+              break;
+            case 'number':
+              formattedContent = {
+                Label: sectionMultipleId? content.subField :content.fieldLabel || "",
+                Value: content.number || "",
+
+              };
+              break;
+            case 'textarea':
+              formattedContent = {
+                Label: sectionMultipleId? content.subField :content.fieldLabel || "",
+                Value: content.textarea || "",
+
+              };
+              break;
+            case 'text':
+            default:
+              formattedContent = {
+                Label: content.fieldLabel || "",
+                Value: content.text || "",
+
+              };
+              break;
+          }
+
+          // Check for templateSectionMultipleId to create nested structure
+          if (sectionMultipleId) {
+            let nestedSection = contentBlock[`${sectionName}-${mainKey}`].find((section: { [x: string]: any; }) => section[`${content.fieldLabel}`]);
+            if (!nestedSection) {
+              nestedSection = { [`${content.fieldLabel}`]: [] };
+              contentBlock[`${sectionName}-${mainKey}`].push(nestedSection);
+            }
+            nestedSection[`${content.fieldLabel}`].push(formattedContent
+            //   {
+            //   Label: content.subField || "",
+            //   Value: content.text || "",
+            // }
+          );
+          } else {
+            contentBlock[`${sectionName}-${mainKey}`].push(formattedContent);
+          }
+        });
+
+        console.log(JSON.stringify(formattedData, null, 2));
+
         const endpoint = editingRow ? pages.update : pages.create;
         const result = await post(endpoint, {
           ...formData,
@@ -347,7 +444,10 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     index: number,
     fieldIndex: number,
     subFieldIndex?: any,
-    section?: any
+    section?: any,
+    fieldLabel?: string,
+    subField?: string,
+    fieldType?: string
   ) => {
     const { name, value, files } = event.target;
     console.log(section);
@@ -374,6 +474,14 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                           file,
                           preview: reader.result as string,
                           error: error,
+                          sectionName: section.sectionSlug,
+                          orderId: section.sectionOrder,
+                          templateId: index,
+                          templateSectionId: temIndex,
+                          templateSectionMultipleId: subFieldIndex.toString(),
+                          fieldLabel: fieldLabel,
+                          subField: subField,
+                          fieldType: fieldType
                         },
                       },
                     }));
@@ -389,6 +497,14 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                           file,
                           preview: reader.result as string,
                           error: error,
+                          sectionName: section.sectionSlug,
+                          orderId: section.sectionOrder,
+                          templateId: index,
+                          templateSectionId: temIndex,
+                          templateSectionMultipleId: "",
+                          fieldLabel: fieldLabel,
+                          subField: subField,
+                          fieldType: fieldType
                         },
                       },
                     }));
@@ -422,6 +538,14 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                         ...prevData.templateData[`${index}+${fieldIndex}+${subFieldIndex}`],
                         [name]: value,
                         error: error,
+                        sectionName: section.sectionSlug,
+                        orderId: section.sectionOrder,
+                        templateId: index,
+                        templateSectionId: temIndex,
+                        templateSectionMultipleId: subFieldIndex.toString(),
+                        fieldLabel: fieldLabel,
+                        subField: subField,
+                        fieldType: fieldType
                       },
                     },
                   }));
@@ -446,6 +570,14 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                         ...prevData.templateData[`${index}+${temIndex}`],
                         [name]: value,
                         error: error,
+                        sectionName: section.sectionSlug,
+                        orderId: section.sectionOrder,
+                        templateId: index,
+                        templateSectionId: temIndex,
+                        templateSectionMultipleId: "",
+                        fieldLabel: fieldLabel,
+                        subField: subField,
+                        fieldType: fieldType
                       },
                     },
                   }));
@@ -705,7 +837,14 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                     fullWidth
                                     margin="normal"
                                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                      handleInputChange(e, section.sectionId, index, fieldIndex, null, section)
+                                      handleInputChange(
+                                        e,
+                                        section.sectionId,
+                                        index,
+                                        fieldIndex,
+                                        null,
+                                        section,
+                                        field.fieldLabel, '', field.fieldType)
                                     }
                                     //@ts-ignore
                                     error={
@@ -803,14 +942,17 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                     type="file"
                                                     fullWidth
                                                     margin="normal"
-                                                    onChange={(e) =>
+                                                    onChange={(e: any) =>
                                                       handleInputChange(
                                                         e,
                                                         section.sectionId,
                                                         index,
                                                         fieldIndex,
                                                         subFieldIndex,
-                                                        section
+                                                        section,
+                                                        field.fieldLabel,
+                                                        subField.fieldLabel,
+                                                        subField.fieldType
                                                       )
                                                     }
                                                     error={subField.error && subField.error}
@@ -871,14 +1013,17 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                   }
                                                   type={subField.fieldType}
                                                   name={subField.fieldType}
-                                                  onChange={(e) =>
+                                                  onChange={(e: any) =>
                                                     handleInputChange(
                                                       e,
                                                       section.sectionId,
                                                       index,
                                                       fieldIndex,
                                                       subFieldIndex,
-                                                      section
+                                                      section,
+                                                      field.fieldLabel,
+                                                      subField.fieldLabel,
+                                                      subField.fieldType
                                                     )
                                                   }
                                                   fullWidth
@@ -912,7 +1057,13 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                       type={field.fieldType}
                                       name={field.fieldType}
                                       onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                        handleInputChange(e, section.sectionId, index, fieldIndex, null, section)
+                                        handleInputChange(e,
+                                          section.sectionId,
+                                          index,
+                                          fieldIndex,
+                                          null,
+                                          section,
+                                          field.fieldLabel, '', field.fieldType)
                                       }
                                       fullWidth
                                       margin="normal"
