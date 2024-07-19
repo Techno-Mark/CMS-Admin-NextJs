@@ -1,10 +1,13 @@
 "use client";
 import React, { useState } from "react";
-import DraggableIcon from "./_svg/_DraggableIcon";
-import { Fab } from "@mui/material";
-import KanbanDrawer from "./KanbanDrawer";
+import DraggableIcon from "../_svg/_DraggableIcon";
+import { Card, Fab } from "@mui/material";
+import KanbanDrawer from "../KanbanDrawer";
+import LoadingBackdrop from "@/components/LoadingBackdrop";
+import BreadCrumbList from "@/components/BreadCrumbList";
 
 const MenuItem: React.FC = () => {
+  const [loading, setLoading] = useState<boolean>(false);
   const [menuItems, setMenuItems] = useState<any[]>([
     {
       name: "Item 1",
@@ -161,37 +164,43 @@ const MenuItem: React.FC = () => {
     ));
   };
   return (
-    <div className="bg-white p-2 max-w-[70%] m-auto">
-      {renderMenuItems(menuItems, -1)}
-      <Fab
-        variant="extended"
-        className="w-7 h-7"
-        onClick={() => setDrawerOpen(true)}
-      >
-        <i className="tabler-plus mie-1" />
-        Add
-      </Fab>
-      {drawerOpen && (
-        <KanbanDrawer
-          drawerOpen={drawerOpen}
-          setDrawerOpen={setDrawerOpen}
-          dataRequired={null}
-          menuItems={menuItems}
-          setMenuItems={setMenuItems}
-          open={-1}
-        />
-      )}
-      {editDrawer && (
-        <KanbanDrawer
-          drawerOpen={editDrawer}
-          setDrawerOpen={setEditDrawer}
-          dataRequired={editdata}
-          menuItems={menuItems}
-          setMenuItems={setMenuItems}
-          open={1}
-        />
-      )}
-    </div>
+    <>
+      <LoadingBackdrop isLoading={loading} />
+      <BreadCrumbList />
+      <Card>
+        <div className="bg-white p-2 max-w-[70%] m-auto">
+          {renderMenuItems(menuItems, -1)}
+          <Fab
+            variant="extended"
+            className="w-7 h-7"
+            onClick={() => setDrawerOpen(true)}
+          >
+            <i className="tabler-plus mie-1" />
+            Add
+          </Fab>
+          {drawerOpen && (
+            <KanbanDrawer
+              drawerOpen={drawerOpen}
+              setDrawerOpen={setDrawerOpen}
+              dataRequired={null}
+              menuItems={menuItems}
+              setMenuItems={setMenuItems}
+              open={-1}
+            />
+          )}
+          {editDrawer && (
+            <KanbanDrawer
+              drawerOpen={editDrawer}
+              setDrawerOpen={setEditDrawer}
+              dataRequired={editdata}
+              menuItems={menuItems}
+              setMenuItems={setMenuItems}
+              open={1}
+            />
+          )}
+        </div>
+      </Card>
+    </>
   );
 };
 

@@ -72,7 +72,7 @@ const MenuForm = ({ open, handleClose, editingRow }: Props) => {
     if (validateFormData(formData)) {
       try {
         setLoading(true);
-        const endpoint = menu.create;
+        const endpoint = menu.createAndUpdate;
 
         const payload = {
           menuId: editingRow ? formData.menuId : undefined,

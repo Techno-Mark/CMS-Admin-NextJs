@@ -11,7 +11,6 @@ import {
 } from "@core/utils/serverHelpers";
 import themeConfig from "@/configs/themeConfig";
 import AppReactToastify from "@/libs/styles/AppReactToastify";
-import ReduxProvider from "@/redux-store/ReduxProvider";
 
 type Props = ChildrenType & {
   direction: Direction;
@@ -38,7 +37,6 @@ const Providers = async (props: Props) => {
           demoName={demoName}
         >
           <ThemeProvider direction={direction} systemMode={systemMode}>
-            <ReduxProvider>{children}</ReduxProvider>
             <AppReactToastify
               position={themeConfig.toastPosition}
               hideProgressBar
