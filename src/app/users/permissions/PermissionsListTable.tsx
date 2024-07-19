@@ -42,7 +42,7 @@ import {
 import { formatDate } from "@/utils/formatDate";
 import { Chip } from "@mui/material";
 import OpenDialogOnElementClick from "@/components/Dialogs/OpenDialogOnElementClick";
-import PermissionDialog from "@/components/Dialogs/PermissionDialog";
+import PermissionDialog from "./PermissionDialog";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {

@@ -9,7 +9,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 
 // Component Imports
 import CustomTextField from "@core/components/mui/TextField";
-import DialogCloseButton from "./DialogCloseButton";
+import DialogCloseButton from "../../../components/Dialogs/DialogCloseButton";
 import { useEffect, useState } from "react";
 import { get, post } from "@/services/apiService";
 import {

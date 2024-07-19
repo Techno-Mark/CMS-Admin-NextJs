@@ -118,13 +118,14 @@ const RoleDialog = ({ open, setOpen, title }: RoleDialogProps) => {
       open={open}
       onClose={handleClose}
       sx={{ "& .MuiDialog-paper": { overflow: "visible" } }}
+      className="my-[-5px]"
     >
       <DialogCloseButton onClick={() => setOpen(false)} disableRipple>
         <i className="tabler-x" />
       </DialogCloseButton>
       <DialogTitle
         variant="h4"
-        className="flex flex-col gap-2 text-center sm:pbs-16 sm:pbe-6 sm:pli-16"
+        className="flex flex-col gap-2 text-center sm:pbs-16 sm:pbe-6 sm:pli-16 mt-[-2rem]"
       >
         {title ? "Edit Role" : "Add Role"}
         <Typography component="span" className="flex flex-col text-center">
@@ -132,7 +133,7 @@ const RoleDialog = ({ open, setOpen, title }: RoleDialogProps) => {
         </Typography>
       </DialogTitle>
       <form onSubmit={(e) => e.preventDefault()}>
-        <DialogContent className="overflow-visible flex flex-col gap-6 pbs-0 sm:pli-16">
+        <DialogContent className="overflow-visible flex flex-col gap-6 pbs-0 sm:pli-16 mt-[-2rem] mb-[-10px]">
           <CustomTextField
             label="Role Name"
             variant="outlined"
@@ -144,7 +145,7 @@ const RoleDialog = ({ open, setOpen, title }: RoleDialogProps) => {
           <Typography variant="h5" className="min-is-[225px]">
             Role Permissions
           </Typography>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto max-h-[15rem]">
             <table className={tableStyles.table}>
               <tbody>
                 <tr className="border-bs-0">
@@ -264,7 +265,7 @@ const RoleDialog = ({ open, setOpen, title }: RoleDialogProps) => {
             </table>
           </div>
         </DialogContent>
-        <DialogActions className="justify-center pbs-0 sm:pbe-16 sm:pli-16">
+        <DialogActions className="justify-center pbs-0 sm:pbe-16 sm:pli-16 mb-[-3rem]">
           <Button variant="contained" type="submit" onClick={handleClose}>
             Submit
           </Button>
