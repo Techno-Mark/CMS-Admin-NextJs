@@ -92,8 +92,8 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
             .join("-");
 
           togglePermission(`${id}-read`);
-          togglePermission(`${id}-write`);
-          togglePermission(`${id}-create`);
+          togglePermission(`${id}-create/edit`);
+          togglePermission(`${id}-delete`);
         });
     }
   };
