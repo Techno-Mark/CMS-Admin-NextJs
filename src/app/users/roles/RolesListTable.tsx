@@ -41,6 +41,7 @@ import {
 import RoleCards from "./RolesCard";
 import { Chip } from "@mui/material";
 import { formatDate } from "@/utils/formatDate";
+import RoleDialog from "./RoleDialog";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -131,6 +132,8 @@ const RolesListTable = ({
   const [globalFilter, setGlobalFilter] = useState("");
   const [deletingId, setDeletingId] = useState<number>(0);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [editId, setEditId] = useState<number>(0);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const columns = useMemo<ColumnDef<RolesTypeWithAction, any>[]>(
     () => [
@@ -150,19 +153,19 @@ const RolesListTable = ({
           </Typography>
         ),
       }),
-      columnHelper.accessor("roleDescription", {
-        header: "Description",
-        cell: ({ row }) => (
-          <Typography color="text.primary" className="font-medium">
-            {row.original.roleDescription}
-          </Typography>
-        ),
-      }),
+      // columnHelper.accessor("roleDescription", {
+      //   header: "Description",
+      //   cell: ({ row }) => (
+      //     <Typography color="text.primary" className="font-medium">
+      //       {row.original.roleDescription}
+      //     </Typography>
+      //   ),
+      // }),
       columnHelper.accessor("createdAt", {
         header: "Created At",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {formatDate(row.original.createdAt)}
+            {row.original.createdAt}
           </Typography>
         ),
       }),
@@ -187,7 +190,8 @@ const RolesListTable = ({
             <div className="flex items-center">
               <IconButton
                 onClick={() => {
-                  router.push(redirectToEditPage(row.original.roleId));
+                  setEditId(row.original.roleId);
+                  setOpenDialog(true);
                 }}
               >
                 <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -246,7 +250,7 @@ const RolesListTable = ({
   ]);
 
   useEffect(() => {
-    if (deletingId === 0) {
+    if (deletingId === 0 || !openDialog) {
       getList({
         ...initialBody,
         page: table.getState().pagination.pageIndex,
@@ -254,7 +258,7 @@ const RolesListTable = ({
         search: globalFilter,
       });
     }
-  }, [deletingId]);
+  }, [deletingId, openDialog]);
 
   return (
     <>
@@ -370,14 +374,22 @@ const RolesListTable = ({
           }}
         />
       </Card>
+
       <ConfirmationDialog
         open={isDeleting}
         setDeletingId={setDeletingId}
         setOpen={(arg1: boolean) => setIsDeleting(arg1)}
         deletePayload={{
           roleId: deletingId,
-          organizationId: 1, // will be dynamic in future
+          organizationId: 1,
         }}
+      />
+
+      <RoleDialog
+        open={openDialog}
+        setOpen={setOpenDialog}
+        title={"Edit"}
+        editId={editId}
       />
     </>
   );

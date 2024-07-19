@@ -125,10 +125,11 @@ const PermissionsListTable = ({
   const router = useRouter();
   // States
   const [open, setOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
   const [globalFilter, setGlobalFilter] = useState("");
   const [deletingId, setDeletingId] = useState<number>(0);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
-  const [editValue, setEditValue] = useState<string | number>("");
+  const [editValue, setEditValue] = useState<number>(0);
   //vars
   const buttonProps: ButtonProps = {
     variant: "contained",
@@ -178,6 +179,7 @@ const PermissionsListTable = ({
               <IconButton
                 onClick={() => {
                   setOpen(true);
+                  setAddOpen(true);
                   setEditValue(row.original.permissionId);
                 }}
               >
@@ -224,7 +226,9 @@ const PermissionsListTable = ({
   });
 
   const handleAddPermission = () => {
-    setEditValue("");
+    setEditValue(0);
+    setOpen(true);
+    setAddOpen(true);
   };
 
   useEffect(() => {
@@ -250,6 +254,17 @@ const PermissionsListTable = ({
       });
     }
   }, [deletingId]);
+
+  useEffect(() => {
+    if (!open) {
+      getList({
+        ...initialBody,
+        page: table.getState().pagination.pageIndex,
+        limit: table.getState().pagination.pageSize,
+        search: globalFilter,
+      });
+    }
+  }, [addOpen, open]);
 
   return (
     <>
@@ -367,7 +382,15 @@ const PermissionsListTable = ({
           permissionId: deletingId,
         }}
       />
-      <PermissionDialog open={open} setOpen={setOpen} editId={editValue} />
+      <PermissionDialog
+        open={open}
+        setOpen={(arg1: boolean) => {
+          setOpen(arg1);
+          setAddOpen(arg1);
+        }}
+        editId={editValue}
+        addOpen={addOpen}
+      />
     </>
   );
 };
