@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import DraggableIcon from "../_svg/_DraggableIcon";
-import { Card, Fab } from "@mui/material";
+import { Box, Button, Card, Fab, Grid } from "@mui/material";
 import KanbanDrawer from "../KanbanDrawer";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import BreadCrumbList from "@/components/BreadCrumbList";
@@ -199,6 +199,41 @@ const MenuItem: React.FC = () => {
             />
           )}
         </div>
+        <Box display="flex" gap={4}>
+          <Grid container spacing={2} sm={12}>
+            <Grid
+              item
+              xs={12}
+              style={{ position: "sticky", bottom: 0, zIndex: 10 }}
+            >
+              <Box
+                p={7}
+                display="flex"
+                gap={2}
+                justifyContent="end"
+                bgcolor="background.paper"
+              >
+                <Button
+                  variant="contained"
+                  color="error"
+                  type="reset"
+                  onClick={() => {
+                    // handleClose();
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  // onClick={() => handleSubmit(false)}
+                >
+                  {/* {open === sectionActions.ADD ? "Add" : "Edit"} Content Block */}{" "}
+                  Save
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
       </Card>
     </>
   );
