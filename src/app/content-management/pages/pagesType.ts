@@ -10,5 +10,6 @@ export type PagesType = {
     metaKeywords: string,
     scheduleDate: string,
     templateData: [],
-    pageId:string
+    pageId:string,
+    sectionTemplate:string
 }

@@ -5,6 +5,8 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
+    console.log(response);
+
     if (response.status === 401) {
       await signOut({ redirect: true, callbackUrl: "/login" });
       throw new Error("Unauthorized. Token missing or expired");
@@ -52,7 +54,6 @@ export const fetchData = async (
     }
 
     const orgId = localStorage.getItem("selectedOrgId");
-    console.log(`${API_URL}/${endpoint}`);
 
     const response = await fetch(`${API_URL}/${endpoint}`, {
       ...options,
@@ -89,8 +90,6 @@ export const del = (endpoint: string) =>
   fetchData(endpoint, {
     method: "DELETE",
   });
-
-// Newly Added
 
 export const postContentBlock = async (endpoint: string, data: any) => {
   try {
