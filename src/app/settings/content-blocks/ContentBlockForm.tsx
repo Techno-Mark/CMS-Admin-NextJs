@@ -30,8 +30,8 @@ import { SyntheticEvent } from "react-draft-wysiwyg";
 
 const tooltipContent = {
   "pattern": "[A-Za-z]{3,10}",
-  "maxlength": 10,
-  "minlength": 3,
+  "maxLength": 10,
+  "minLength": 3,
   "min": "01",
   "max": "100",
   "accept": ".jpg, .jpeg, .png",
