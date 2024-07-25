@@ -1,44 +1,18 @@
 
 import LoadingBackdrop from "@/components/LoadingBackdrop";
-import {
-  Button,
-  Box,
-  Card,
-  Grid,
-  MenuItem,
-  Typography,
-  TextField,
-  Switch,
-  IconButton,
-  CardContent,
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  CardActions,
-} from "@mui/material";
+import { Button, Box, Card, Grid, MenuItem, Typography, IconButton, CardContent, CardActions, } from "@mui/material";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { get, post } from "@/services/apiService";
 import { template } from "@/services/endpoint/template";
 import CustomTextField from "@/@core/components/mui/TextField";
 import { useRouter } from "next/navigation";
-import { boolean } from "valibot";
-import AppReactDatepicker from "@/libs/styles/AppReactDatepicker";
 import { PagesType } from "./pagesType";
 import { pages } from "@/services/endpoint/pages";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
 
-type FileProp = {
-  name: string;
-  type: string;
-  size: number;
-};
-
-const sectionActions = {
-  ADD: -1,
-  EDIT: 1,
-};
+const sectionActions = { ADD: -1, EDIT: 1 };
 
 const initialFormData = {
   pageId: "",
@@ -49,9 +23,7 @@ const initialFormData = {
   metaTitle: "",
   metaDescription: "",
   metaKeywords: "",
-  // scheduleDate: new Date().toISOString().split('T')[0],
   templateData: {} as Record<string, any>,
-  // status: false
   sections: [
     {
       sectionName: 'Section 1',
@@ -60,20 +32,11 @@ const initialFormData = {
           fieldLabel: 'Field 1',
           fieldType: 'multiple',
           isRequired: true,
-          validation: '{}', // Example validation
-          multipleData: [
-            {
-              fieldType: 'text',
-              fieldLabel: 'Subfield 1',
-              isRequired: true,
-              validation: '{}',
-            },
+          validation: '{}',
+          multipleData: [{ fieldType: 'text', fieldLabel: 'Subfield 1', isRequired: true, validation: '{}', },
           ],
         }]
     }]
-
-
-
 };
 
 const initialErrorData = {
@@ -85,7 +48,6 @@ const initialErrorData = {
   metaDescription: "",
   metaKeywords: "",
   templateData: {} as Record<string, any>,
-  // scheduleDate: ""
 };
 type Props = {
   open: -1 | 0 | 1;
@@ -94,8 +56,7 @@ type Props = {
   setEditingRow: React.Dispatch<React.SetStateAction<PagesType | null>>;
 };
 function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
-  const router = useRouter();
-  const [files, setFiles] = useState<File[]>([]);
+
   const [formData, setFormData] = useState<typeof initialFormData>(
     initialFormData
   );
@@ -108,35 +69,13 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   const [sections, setSections] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [PDStatus, setPDStatus] = useState<boolean>(false);
-  const [expanded, setExpanded] = useState(true)
-  const [expandedIndex, setExpandedIndex] = useState()
-  const [expandedIndices, setExpandedIndices] = useState(sections.map(() => true));
-
-  const handleChange = (index: any) => {
-    setExpandedIndices((prev) => {
-      const newExpandedIndices = [...prev];
-      newExpandedIndices[index] = !prev[index];
-      return newExpandedIndices;
-    });
-  };
-  const { getRootProps, getInputProps } = useDropzone({
-    multiple: false,
-    accept: {
-      "image/*": [".png", ".jpg", ".jpeg"],
-    },
-    onDrop: (acceptedFiles: File[]) => {
-      setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
-    },
-  });
 
   useEffect(() => {
     setLoading(true);
     if (editingRow) {
-      
       setFormData(editingRow);
       getTemplateIdWiseForm(editingRow.templateId);
       setLoading(false);
-      
     } else {
       setFormData(initialFormData);
       setLoading(false);
@@ -148,7 +87,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }
     getTemplate();
   }, []);
-
   const getActiveTemplateList = async () => {
     try {
       setLoading(true);
@@ -161,9 +99,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       setLoading(false);
     }
   };
-
-
-
   const getTemplateIdWiseForm = async (templateId: number) => {
     setLoading(true);
     try {
@@ -176,7 +111,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
             return acc;
           }, {}),
         }));
-
         setSections(sectionsWithErrors);
         setLoading(false);
       }
@@ -184,14 +118,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       console.error(error);
       setLoading(false);
     }
-  };
-
-  const resetSectionsAndData = () => {
-    setSections([]);
-    setFormData((prevData) => ({
-      ...prevData,
-      templateData: {},
-    }));
   };
   const validateField = (value: string, validation: any, field?: any) => {
     if (!value && field?.isRequired) {
@@ -232,64 +158,51 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }
     return "";
   };
-
   const validateForm = () => {
     let valid = true;
     let errors = { ...initialErrorData };
     let updatedSections = [...sections];
-
-    // Validate form-level fields
     if (formData.templateId === -1) {
       errors.templateId = "Please select a template";
       valid = false;
     }
-
     if (!formData.title) {
       errors.title = "Title is required";
       valid = false;
     }
-
     if (!formData.slug) {
       errors.slug = "Slug is required";
       valid = false;
     }
-
     if (!formData.content) {
       errors.content = "Content is required";
       valid = false;
     }
-
     if (!formData.metaTitle) {
       errors.metaTitle = "Meta Title is required";
       valid = false;
     }
-
     if (!formData.metaDescription) {
       errors.metaDescription = "Meta Description is required";
       valid = false;
     }
-
     if (!formData.metaKeywords) {
       errors.metaKeywords = "Meta Keywords are required";
       valid = false;
     }
-
     updatedSections = updatedSections.map((section, secIndex) => {
       const updatedSectionTemplate = section.sectionTemplate.map((field: any, fieldIndex: any) => {
         let error = "";
         const value = formData.templateData[`${secIndex}+${fieldIndex}`]?.[field.fieldType] || '';
         const validation = JSON.parse(field.validation || "{}");
-
         if (field.fieldType === "multiple") {
           field.multipleData = field.multipleData.map((subField: any, subFieldIndex: any) => {
             const subValue = formData.templateData[`${secIndex}+${fieldIndex}+${subFieldIndex}`]?.[subField.fieldType] || '';
             const subValidation = JSON.parse(subField.validation || "{}");
             const subError = validateField(subValue, subValidation, subField);
-
             if (subError) {
               valid = false;
             }
-
             return {
               ...subField,
               error: subError,
@@ -301,62 +214,49 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
             valid = false;
           }
         }
-
         return {
           ...field,
           error,
         };
       });
-
       return {
         ...section,
         sectionTemplate: updatedSectionTemplate,
       };
     });
-
     setSections(updatedSections);
     setFormErrors(errors);
-
     return valid;
   };
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (validateForm()) {
       try {
         setLoading(true);
-
         const formattedData: any[] = [];
-
         Object.keys(formData.templateData).forEach(key => {
           const content = formData.templateData[key];
           const mainKey = content.templateId;
           const sectionName = content.sectionName;
           const sectionId = content.templateSectionId;
+          const keyMultiple = content.keyMultiple;
           const sectionMultipleId = content.templateSectionMultipleId;
-          console.log(content);
-
-
-          // Find or create the corresponding content block
           let contentBlock = formattedData.find(block => block[`${sectionName}-${mainKey}`]);
           if (!contentBlock) {
             contentBlock = { [`${sectionName}-${mainKey}`]: [] };
             formattedData.push(contentBlock);
           }
-
-          // Determine the content type and format accordingly
           let formattedContent;
           switch (content.fieldType) {
             case 'email':
               formattedContent = {
-                Label: sectionMultipleId? content.subField :content.fieldLabel || "",
+                Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 Value: content.email || "",
-
               };
               break;
             case 'file':
               formattedContent = {
-                Label: sectionMultipleId? content.subField :content.fieldLabel || "",
+                Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 Value: content.file || "",
                 Preview: content.preview || "",
 
@@ -364,28 +264,28 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
               break;
             case 'url':
               formattedContent = {
-                Label: sectionMultipleId? content.subField :content.fieldLabel || "",
+                Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 Value: content.url || "",
 
               };
               break;
             case 'date':
               formattedContent = {
-                Label: sectionMultipleId? content.subField :content.fieldLabel || "",
+                Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 Value: content.date || "",
 
               };
               break;
             case 'number':
               formattedContent = {
-                Label: sectionMultipleId? content.subField :content.fieldLabel || "",
+                Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 Value: content.number || "",
 
               };
               break;
             case 'textarea':
               formattedContent = {
-                Label: sectionMultipleId? content.subField :content.fieldLabel || "",
+                Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 Value: content.textarea || "",
 
               };
@@ -393,38 +293,34 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
             case 'text':
             default:
               formattedContent = {
-                Label: content.fieldLabel || "",
+                Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 Value: content.text || "",
 
               };
               break;
           }
-
-          // Check for templateSectionMultipleId to create nested structure
           if (sectionMultipleId) {
             let nestedSection = contentBlock[`${sectionName}-${mainKey}`].find((section: { [x: string]: any; }) => section[`${content.fieldLabel}`]);
             if (!nestedSection) {
               nestedSection = { [`${content.fieldLabel}`]: [] };
               contentBlock[`${sectionName}-${mainKey}`].push(nestedSection);
             }
-            nestedSection[`${content.fieldLabel}`].push(formattedContent
-            //   {
-            //   Label: content.subField || "",
-            //   Value: content.text || "",
-            // }
-          );
+            let groupedArray = nestedSection[`${content.fieldLabel}`].find((item: any) => item.keyMultiple === keyMultiple);
+            if (!groupedArray) {
+              groupedArray = { keyMultiple, items: [] };
+              nestedSection[`${content.fieldLabel}`].push(groupedArray);
+            }
+            groupedArray.items.push({ ...formattedContent });
           } else {
             contentBlock[`${sectionName}-${mainKey}`].push(formattedContent);
           }
         });
-
-        console.log(JSON.stringify(formattedData, null, 2));
-
         const endpoint = editingRow ? pages.update : pages.create;
         const result = await post(endpoint, {
           ...formData,
           pageId: editingRow ? formData.pageId : undefined,
           templateData: formData.templateData,
+          formatData: formattedData,
           active: PDStatus
         });
         toast.success(result.message);
@@ -437,25 +333,14 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       }
     }
   };
-
   const handleInputChange = (
-    event: ChangeEvent<HTMLInputElement>,
-    sectionId: number,
-    index: number,
-    fieldIndex: number,
-    subFieldIndex?: any,
-    section?: any,
-    fieldLabel?: string,
-    subField?: string,
-    fieldType?: string
+    event: ChangeEvent<HTMLInputElement>, sectionId: number, index: number, fieldIndex: number,
+    subFieldIndex?: any, section?: any, fieldLabel?: string, subField?: string, fieldType?: string
   ) => {
     const { name, value, files } = event.target;
-    console.log(section);
-
     if (files && files[0]) {
       const file = files[0];
       const reader = new FileReader();
-
       reader.onloadend = () => {
         setSections((prevSections) => {
           const updatedSections = prevSections.map((sec, mainIndex) => {
@@ -481,7 +366,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                           templateSectionMultipleId: subFieldIndex.toString(),
                           fieldLabel: fieldLabel,
                           subField: subField,
-                          fieldType: fieldType
+                          fieldType: fieldType,
+                          keyMultiple: temIndex
                         },
                       },
                     }));
@@ -545,7 +431,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                         templateSectionMultipleId: subFieldIndex.toString(),
                         fieldLabel: fieldLabel,
                         subField: subField,
-                        fieldType: fieldType
+                        fieldType: fieldType,
+                        keyMultiple: temIndex
                       },
                     },
                   }));
@@ -577,7 +464,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                         templateSectionMultipleId: "",
                         fieldLabel: fieldLabel,
                         subField: subField,
-                        fieldType: fieldType
+                        fieldType: fieldType,
+                        keyMultiple: temIndex
                       },
                     },
                   }));
@@ -639,20 +527,13 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       } else {
         delete updatedTemplateData[`${sectionIndex}+${fieldIndex}`];
       }
-
-
       return {
         ...prevData,
         templateData: updatedTemplateData,
       };
     });
   }
-
-
-
   const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
-    // Logic to duplicate the entire multiple form section
-    // Example implementation:
     const newSectionTemplate = [...sections[index].sectionTemplate];
     const duplicateField = { ...newSectionTemplate[fieldIndex] };
     newSectionTemplate.push({ ...duplicateField });
@@ -662,10 +543,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       return updatedSections;
     });
   };
-
   const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
-    // Logic to remove the last duplicate multiple form section
-    // Example implementation:
     const newSectionTemplate = [...sections[index].sectionTemplate];
     if (newSectionTemplate.length > 1) {
       newSectionTemplate.splice(fieldIndex, 1);
@@ -676,7 +554,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       });
     }
   };
-
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -709,8 +586,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     onChange={handleSlugChange}
                   />
                 </Grid>
-
-
                 <Grid item xs={12} sm={6}>
                   <CustomTextField
                     error={!!formErrors.content}
@@ -788,7 +663,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     }}
                   />
                 </Grid>
-
                 <Grid item xs={12} sm={12}>
                   <CustomTextField
                     error={!!formErrors.templateId}
@@ -825,8 +699,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                         <Typography variant="h5">{section.sectionName}</Typography>
                         {section.sectionTemplate.map((field: any, fieldIndex: number) => (
                           <Grid container key={`${index}+${fieldIndex}`} spacing={2}>
-
-
                             {field.fieldType === "file" ? (
                               <>
                                 <Grid item xs={12} sm={12}>
@@ -838,12 +710,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                     margin="normal"
                                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
                                       handleInputChange(
-                                        e,
-                                        section.sectionId,
-                                        index,
-                                        fieldIndex,
-                                        null,
-                                        section,
+                                        e, section.sectionId, index, fieldIndex, null, section,
                                         field.fieldLabel, '', field.fieldType)
                                     }
                                     //@ts-ignore
@@ -880,206 +747,201 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                   )}
                                 </Grid>
                               </>
-                            ) :
-
-                              field.fieldType === 'multiple' ? (
-                                <Grid item xs={12} style={{ marginBottom: '10px' }}>
-                                  <Card variant="outlined">
-                                    <CardActions>
-                                      <Grid container xs={12} sm={12} spacing={2}>
-                                        <Grid item xs={10}>
-                                          <Typography variant="h6" component="div">
-                                            {field.fieldLabel}
-                                          </Typography>
-                                        </Grid>
-                                        <Grid item xs={1}>
-                                          <IconButton
-                                            size="small"
-                                            onClick={() =>
-                                              handleAddDuplicateForm(index, fieldIndex)
-                                            }
-                                            aria-label="plus"
-                                            color="success"
-                                          >
-                                            <i className="tabler-plus" />
-                                          </IconButton>
-                                        </Grid>
-                                        <Grid item xs={1}>
-                                          <IconButton
-                                            size="small"
-                                            onClick={() =>
-                                              handleRemoveDuplicateForm(index, fieldIndex)
-                                            }
-                                            aria-label="minus"
-                                            color="error"
-                                          >
-                                            <i className="tabler-minus" />
-                                          </IconButton>
-                                        </Grid>
+                            ) : field.fieldType === 'multiple' ? (
+                              <Grid item xs={12} style={{ marginBottom: '10px' }}>
+                                <Card variant="outlined">
+                                  <CardActions>
+                                    <Grid container xs={12} sm={12} spacing={2}>
+                                      <Grid item xs={10}>
+                                        <Typography variant="h6" component="div">
+                                          {field.fieldLabel}
+                                        </Typography>
                                       </Grid>
-                                    </CardActions>
-                                    <CardContent>
-                                      {
-                                        field.multipleData?.map(
-                                          (subField: any, subFieldIndex: number) => (
-                                            <Grid
-                                              container
-                                              key={`${index}+${fieldIndex}+${subFieldIndex}`}
-                                              spacing={2}
-                                              item
-                                              xs={12}
-                                              sm={12}
-                                            >
-                                              {subField.fieldType === 'file' ? (
-                                                <>
-                                                  <CustomTextField
-                                                    label={
-                                                      subField.isRequired
-                                                        ? `${subField.fieldLabel} *`
-                                                        : subField.fieldLabel
-                                                    }
-                                                    name={subField.fieldType}
-                                                    type="file"
-                                                    fullWidth
-                                                    margin="normal"
-                                                    onChange={(e: any) =>
-                                                      handleInputChange(
-                                                        e,
-                                                        section.sectionId,
-                                                        index,
-                                                        fieldIndex,
-                                                        subFieldIndex,
-                                                        section,
-                                                        field.fieldLabel,
-                                                        subField.fieldLabel,
-                                                        subField.fieldType
-                                                      )
-                                                    }
-                                                    error={subField.error && subField.error}
-                                                    helperText={subField.error && subField.error}
-                                                    InputLabelProps={{ shrink: true }}
-                                                  />
-                                                  {formData.templateData &&
-                                                    formData.templateData[
-                                                      `${index}+${fieldIndex}+${subFieldIndex}`
-                                                    ]?.preview && (
-                                                      <Box
-                                                        mt={2}
-                                                        display="flex"
-                                                        flexDirection="column"
-                                                        alignItems="end"
-                                                      >
-                                                        <IconButton
-                                                          size="large"
-                                                          onClick={() =>
-                                                            handleRemoveFile(
-                                                              index,
-                                                              fieldIndex,
-                                                              subFieldIndex
-                                                            )
-                                                          }
-                                                          aria-label="minus"
-                                                          color="error"
-                                                          style={{ marginBottom: '8px' }}
-                                                        >
-                                                          <i className="tabler-minus" />
-                                                        </IconButton>
-                                                        <Box
-                                                          component="img"
-                                                          src={
-                                                            formData.templateData[
-                                                              `${index}+${fieldIndex}+${subFieldIndex}`
-                                                            ]?.preview
-                                                          }
-                                                          alt="Preview"
-                                                          sx={{
-                                                            width: '100%',
-                                                            maxHeight: '200px',
-                                                            objectFit: 'contain',
-                                                            borderRadius: '4px',
-                                                            boxShadow:
-                                                              '0 2px 4px rgba(0, 0, 0, 0.1)',
-                                                          }}
-                                                        />
-                                                      </Box>
-                                                    )}
-                                                </>
-                                              ) : (
-                                                <CustomTextField
-                                                  label={
-                                                    subField.isRequired
-                                                      ? `${subField.fieldLabel} *`
-                                                      : subField.fieldLabel
-                                                  }
-                                                  type={subField.fieldType}
-                                                  name={subField.fieldType}
-                                                  onChange={(e: any) =>
-                                                    handleInputChange(
-                                                      e,
-                                                      section.sectionId,
-                                                      index,
-                                                      fieldIndex,
-                                                      subFieldIndex,
-                                                      section,
-                                                      field.fieldLabel,
-                                                      subField.fieldLabel,
-                                                      subField.fieldType
-                                                    )
-                                                  }
-                                                  fullWidth
-                                                  margin="normal"
-                                                  error={subField.error && subField.error}
-                                                  helperText={subField.error && subField.error}
-                                                  inputProps={
-                                                    subField.validation
-                                                      ? JSON.parse(subField.validation)
-                                                      : {}
-                                                  }
-                                                  value={
-                                                    formData.templateData?.[
-                                                    `${index}+${fieldIndex}+${subFieldIndex}`
-                                                    ]?.[subField.fieldType] || ''
-                                                  }
-                                                />
-                                              )}
-                                            </Grid>
-                                          )
-                                        )
-                                      }
-                                    </CardContent>
-                                  </Card>
-                                </Grid>
-                              )
-                                : (
-                                  <Grid item xs={12} sm={12}>
-                                    <CustomTextField
-                                      label={field.isRequired ? `${field.fieldLabel} *` : field.fieldLabel}
-                                      type={field.fieldType}
-                                      name={field.fieldType}
-                                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                        handleInputChange(e,
-                                          section.sectionId,
-                                          index,
-                                          fieldIndex,
-                                          null,
-                                          section,
-                                          field.fieldLabel, '', field.fieldType)
-                                      }
-                                      fullWidth
-                                      margin="normal"
-                                      //@ts-ignore
-                                      error={field.error &&
-                                        field.error}
-                                      //@ts-ignore
-                                      helperText={field.error &&
-                                        field.error}
-                                      inputProps={field.validation ? JSON.parse(field.validation) : {}}
-                                      value={
-                                        formData.templateData?.[`${index}+${fieldIndex}`]?.[field.fieldType] || ""
-                                      }
-                                    />
-                                  </Grid>
-                                )}
+                                      <Grid item xs={1}>
+                                        <IconButton
+                                          size="small"
+                                          onClick={() =>
+                                            handleAddDuplicateForm(index, fieldIndex)
+                                          }
+                                          aria-label="plus"
+                                          color="success"
+                                        >
+                                          <i className="tabler-plus" />
+                                        </IconButton>
+                                      </Grid>
+                                      <Grid item xs={1}>
+                                        <IconButton
+                                          size="small"
+                                          onClick={() =>
+                                            handleRemoveDuplicateForm(index, fieldIndex)
+                                          }
+                                          aria-label="minus"
+                                          color="error"
+                                        >
+                                          <i className="tabler-minus" />
+                                        </IconButton>
+                                      </Grid>
+                                    </Grid>
+                                  </CardActions>
+                                  <CardContent>
+                                    {field.multipleData?.map(
+                                      (subField: any, subFieldIndex: number) => (
+                                        <Grid
+                                          container
+                                          key={`${index}+${fieldIndex}+${subFieldIndex}`}
+                                          spacing={2}
+                                          item
+                                          xs={12}
+                                          sm={12}>
+                                          {subField.fieldType === 'file' ? (
+                                            <>
+                                              <CustomTextField
+                                                label={
+                                                  subField.isRequired
+                                                    ? `${subField.fieldLabel} *`
+                                                    : subField.fieldLabel
+                                                }
+                                                name={subField.fieldType}
+                                                type="file"
+                                                fullWidth
+                                                margin="normal"
+                                                onChange={(e: any) =>
+                                                  handleInputChange(
+                                                    e,
+                                                    section.sectionId,
+                                                    index,
+                                                    fieldIndex,
+                                                    subFieldIndex,
+                                                    section,
+                                                    field.fieldLabel,
+                                                    subField.fieldLabel,
+                                                    subField.fieldType
+                                                  )
+                                                }
+                                                error={subField.error && subField.error}
+                                                helperText={subField.error && subField.error}
+                                                InputLabelProps={{ shrink: true }}
+                                              />
+                                              {formData.templateData &&
+                                                formData.templateData[
+                                                  `${index}+${fieldIndex}+${subFieldIndex}`
+                                                ]?.preview && (
+                                                  <Box
+                                                    mt={2}
+                                                    display="flex"
+                                                    flexDirection="column"
+                                                    alignItems="end"
+                                                  >
+                                                    <IconButton
+                                                      size="large"
+                                                      onClick={() =>
+                                                        handleRemoveFile(
+                                                          index,
+                                                          fieldIndex,
+                                                          subFieldIndex
+                                                        )
+                                                      }
+                                                      aria-label="minus"
+                                                      color="error"
+                                                      style={{ marginBottom: '8px' }}
+                                                    >
+                                                      <i className="tabler-minus" />
+                                                    </IconButton>
+                                                    <Box
+                                                      component="img"
+                                                      src={
+                                                        formData.templateData[
+                                                          `${index}+${fieldIndex}+${subFieldIndex}`
+                                                        ]?.preview
+                                                      }
+                                                      alt="Preview"
+                                                      sx={{
+                                                        width: '100%',
+                                                        maxHeight: '200px',
+                                                        objectFit: 'contain',
+                                                        borderRadius: '4px',
+                                                        boxShadow:
+                                                          '0 2px 4px rgba(0, 0, 0, 0.1)',
+                                                      }}
+                                                    />
+                                                  </Box>
+                                                )}
+                                            </>
+                                          ) : (
+                                            <CustomTextField
+                                              label={
+                                                subField.isRequired
+                                                  ? `${subField.fieldLabel} *`
+                                                  : subField.fieldLabel
+                                              }
+                                              type={subField.fieldType}
+                                              name={subField.fieldType}
+                                              onChange={(e: any) =>
+                                                handleInputChange(
+                                                  e,
+                                                  section.sectionId,
+                                                  index,
+                                                  fieldIndex,
+                                                  subFieldIndex,
+                                                  section,
+                                                  field.fieldLabel,
+                                                  subField.fieldLabel,
+                                                  subField.fieldType
+                                                )
+                                              }
+                                              fullWidth
+                                              margin="normal"
+                                              error={subField.error && subField.error}
+                                              helperText={subField.error && subField.error}
+                                              inputProps={
+                                                subField.validation
+                                                  ? JSON.parse(subField.validation)
+                                                  : {}
+                                              }
+                                              value={
+                                                formData.templateData?.[
+                                                `${index}+${fieldIndex}+${subFieldIndex}`
+                                                ]?.[subField.fieldType] || ''
+                                              }
+                                            />
+                                          )}
+                                        </Grid>
+                                      )
+                                    )
+                                    }
+                                  </CardContent>
+                                </Card>
+                              </Grid>
+                            ) : (
+                              <Grid item xs={12} sm={12}>
+                                <CustomTextField
+                                  label={field.isRequired ? `${field.fieldLabel} *` : field.fieldLabel}
+                                  type={field.fieldType}
+                                  name={field.fieldType}
+                                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                    handleInputChange(e,
+                                      section.sectionId,
+                                      index,
+                                      fieldIndex,
+                                      null,
+                                      section,
+                                      field.fieldLabel, '', field.fieldType)
+                                  }
+                                  fullWidth
+                                  margin="normal"
+                                  //@ts-ignore
+                                  error={field.error &&
+                                    field.error}
+                                  //@ts-ignore
+                                  helperText={field.error &&
+                                    field.error}
+                                  inputProps={field.validation ? JSON.parse(field.validation) : {}}
+                                  value={
+                                    formData.templateData?.[`${index}+${fieldIndex}`]?.[field.fieldType] || ""
+                                  }
+                                />
+                              </Grid>
+                            )}
                           </Grid>
                         ))}
                       </CardContent>
@@ -1089,39 +951,14 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
               </Grid>
             </Box>
           </form>
-        </div>
-      </Card>
+        </div>      </Card>
       <Grid
         item
         xs={12}
-        style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-      >
-        <Box
-          p={5}
-          display="flex"
-          gap={2}
-          justifyContent="end"
-          bgcolor="background.paper"
-        >
+        style={{ position: "sticky", bottom: 0, zIndex: 10 }} >
+        <Box p={5} display="flex" gap={2} justifyContent="end" bgcolor="background.paper"        >
           <Button variant="contained" size="small" color="error" type="reset" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button color="warning" variant="contained" size="small" type="submit" onClick={(event) => {
-            setPDStatus(false);
-            handleSubmit(event);
-          }}>
-            Save as Draft
-          </Button>
-          <Button variant="contained" type="submit" size="small" onClick={(event) => {
-            setPDStatus(true);
-            handleSubmit(event);
-          }}>
-            Save & Publish
-          </Button>
-        </Box>
-      </Grid>
-    </>
-  );
-}
-
-export default PagesForm;
+            Cancel</Button>          <Button color="warning" variant="contained" size="small" type="submit" onClick={(event) => {
+              setPDStatus(false); handleSubmit(event);
+            }}>  Save as Draft   </Button>          <Button variant="contained" type="submit" size="small" onClick={(event) => { setPDStatus(true); handleSubmit(event); }}>            Save & Publish          </Button>        </Box>      </Grid>    </>);
+} export default PagesForm;
