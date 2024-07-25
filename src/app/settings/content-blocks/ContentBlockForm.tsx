@@ -302,7 +302,7 @@ const ContentBlockForm = ({ open }: Props) => {
                 </Grid>
                 <Grid item xs={12} sm={5}>
                   <CustomTextField
-                    disabled={open === sectionActions.EDIT}
+                    // disabled={open === sectionActions.EDIT}
                     error={!!formErrors.slug}
                     helperText={formErrors.slug}
                     label="Slug *"

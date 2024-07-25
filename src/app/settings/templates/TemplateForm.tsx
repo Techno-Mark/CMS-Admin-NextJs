@@ -267,7 +267,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                 </Grid>
                 <Grid item xs={12} sm={5}>
                   <CustomTextField
-                    disabled={open === sectionActions.EDIT}
+                    // disabled={open === sectionActions.EDIT}
                     error={!!formErrors.templateSlug}
                     helperText={formErrors.templateSlug}
                     label="Template Slug *"

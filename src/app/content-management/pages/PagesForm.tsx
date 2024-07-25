@@ -24,6 +24,7 @@ const initialFormData = {
   metaDescription: "",
   metaKeywords: "",
   templateData: {} as Record<string, any>,
+  sectionData: {} as Record<string, any>,
   sections: [
     {
       sectionName: 'Section 1',
@@ -74,7 +75,20 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     setLoading(true);
     if (editingRow) {
       setFormData(editingRow);
-      getTemplateIdWiseForm(editingRow.templateId);
+      console.log(editingRow);
+
+      // getTemplateIdWiseForm(editingRow.templateId);
+
+      if (editingRow.sectionData) {
+        const sectionsWithErrors = editingRow.sectionData.map((section: any) => ({
+          ...section,
+          errors: section.sectionTemplate.reduce((acc: any, field: any) => {
+            acc[field.fieldType] = "";
+            return acc;
+          }, {}),
+        }));
+        setSections(sectionsWithErrors);
+      }
       setLoading(false);
     } else {
       setFormData(initialFormData);
@@ -190,40 +204,43 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       errors.metaKeywords = "Meta Keywords are required";
       valid = false;
     }
-    updatedSections = updatedSections.map((section, secIndex) => {
-      const updatedSectionTemplate = section.sectionTemplate.map((field: any, fieldIndex: any) => {
-        let error = "";
-        const value = formData.templateData[`${secIndex}+${fieldIndex}`]?.[field.fieldType] || '';
-        const validation = JSON.parse(field.validation || "{}");
-        if (field.fieldType === "multiple") {
-          field.multipleData = field.multipleData.map((subField: any, subFieldIndex: any) => {
-            const subValue = formData.templateData[`${secIndex}+${fieldIndex}+${subFieldIndex}`]?.[subField.fieldType] || '';
-            const subValidation = JSON.parse(subField.validation || "{}");
-            const subError = validateField(subValue, subValidation, subField);
-            if (subError) {
+
+    if (formData.templateData) {
+      updatedSections = updatedSections.map((section, secIndex) => {
+        const updatedSectionTemplate = section.sectionTemplate.map((field: any, fieldIndex: any) => {
+          let error = "";
+          const value = formData.templateData[`${secIndex}+${fieldIndex}`]?.[field.fieldType] || '';
+          const validation = JSON.parse(field.validation || "{}");
+          if (field.fieldType === "multiple") {
+            field.multipleData = field.multipleData.map((subField: any, subFieldIndex: any) => {
+              const subValue = formData.templateData[`${secIndex}+${fieldIndex}+${subFieldIndex}`]?.[subField.fieldType] || '';
+              const subValidation = JSON.parse(subField.validation || "{}");
+              const subError = validateField(subValue, subValidation, subField);
+              if (subError) {
+                valid = false;
+              }
+              return {
+                ...subField,
+                error: subError,
+              };
+            });
+          } else {
+            error = validateField(value, validation, field);
+            if (error) {
               valid = false;
             }
-            return {
-              ...subField,
-              error: subError,
-            };
-          });
-        } else {
-          error = validateField(value, validation, field);
-          if (error) {
-            valid = false;
           }
-        }
+          return {
+            ...field,
+            error,
+          };
+        });
         return {
-          ...field,
-          error,
+          ...section,
+          sectionTemplate: updatedSectionTemplate,
         };
       });
-      return {
-        ...section,
-        sectionTemplate: updatedSectionTemplate,
-      };
-    });
+    }
     setSections(updatedSections);
     setFormErrors(errors);
     return valid;
@@ -315,12 +332,15 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
             contentBlock[`${sectionName}-${mainKey}`].push(formattedContent);
           }
         });
+        console.log(sections);
+
         const endpoint = editingRow ? pages.update : pages.create;
         const result = await post(endpoint, {
           ...formData,
           pageId: editingRow ? formData.pageId : undefined,
           templateData: formData.templateData,
           formatData: formattedData,
+          sectionData: sections,
           active: PDStatus
         });
         toast.success(result.message);
@@ -333,6 +353,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       }
     }
   };
+
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement>, sectionId: number, index: number, fieldIndex: number,
     subFieldIndex?: any, section?: any, fieldLabel?: string, subField?: string, fieldType?: string
@@ -576,7 +597,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <CustomTextField
-                    disabled={open === sectionActions.EDIT}
+                    // disabled={open === sectionActions.EDIT}
                     error={!!formErrors.slug}
                     helperText={formErrors.slug}
                     label="Slug *"
@@ -677,6 +698,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                       const templateId = Number(e.target.value);
                       setFormData({ ...formData, templateId });
                       getTemplateIdWiseForm(templateId);
+
                     }}
                     inputProps={{}}
                   >
@@ -758,6 +780,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                         </Typography>
                                       </Grid>
                                       <Grid item xs={1}>
+
                                         <IconButton
                                           size="small"
                                           onClick={() =>
@@ -768,6 +791,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                         >
                                           <i className="tabler-plus" />
                                         </IconButton>
+
+
                                       </Grid>
                                       <Grid item xs={1}>
                                         <IconButton
