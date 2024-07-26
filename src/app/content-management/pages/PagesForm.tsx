@@ -1,6 +1,6 @@
 
 import LoadingBackdrop from "@/components/LoadingBackdrop";
-import { Button, Box, Card, Grid, MenuItem, Typography, IconButton, CardContent, CardActions, } from "@mui/material";
+import { Button, Box, Card, Grid, MenuItem, Typography, IconButton, CardContent, CardActions, ButtonGroup, Tooltip, } from "@mui/material";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { get, post } from "@/services/apiService";
@@ -75,10 +75,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     setLoading(true);
     if (editingRow) {
       setFormData(editingRow);
-      console.log(editingRow);
-
       // getTemplateIdWiseForm(editingRow.templateId);
-
       if (editingRow.sectionData) {
         const sectionsWithErrors = editingRow.sectionData.map((section: any) => ({
           ...section,
@@ -245,8 +242,10 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     setFormErrors(errors);
     return valid;
   };
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent,pdStatus:boolean) => {
     event.preventDefault();
+    // console.log(PDStatus);
+    // setPDStatus(pdStatus)
     if (validateForm()) {
       try {
         setLoading(true);
@@ -332,8 +331,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
             contentBlock[`${sectionName}-${mainKey}`].push(formattedContent);
           }
         });
-        console.log(sections);
-
         const endpoint = editingRow ? pages.update : pages.create;
         const result = await post(endpoint, {
           ...formData,
@@ -341,7 +338,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
           templateData: formData.templateData,
           formatData: formattedData,
           sectionData: sections,
-          active: PDStatus
+          active: pdStatus
         });
         toast.success(result.message);
         handleClose();
@@ -564,24 +561,59 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       return updatedSections;
     });
   };
+  // const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
+  //   const newSectionTemplate = [...sections[index].sectionTemplate];
+  //   if (newSectionTemplate.length > 1) {
+  //     newSectionTemplate.splice(fieldIndex, 1);
+  //     setSections((prevSections) => {
+  //       const updatedSections = [...prevSections];
+  //       updatedSections[index].sectionTemplate = newSectionTemplate;
+  //       return updatedSections;
+  //     });
+  //   }
+  // };
+
   const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
     const newSectionTemplate = [...sections[index].sectionTemplate];
+    // Check if there are more than one items in the section template
     if (newSectionTemplate.length > 1) {
+      // Remove the item from the section template
       newSectionTemplate.splice(fieldIndex, 1);
+      // Update sections state
       setSections((prevSections) => {
         const updatedSections = [...prevSections];
         updatedSections[index].sectionTemplate = newSectionTemplate;
         return updatedSections;
       });
+      // Update formData.templateData
+      setFormData((prevFormData) => {
+        const newTemplateData = { ...prevFormData.templateData };
+
+        // Iterate through the keys of templateData
+        Object.keys(newTemplateData).forEach((key) => {
+          const [sectionIdx, fieldIdx, subFieldIdx] = key.split('+').map(Number);
+          // Remove matching entries
+          if (sectionIdx === index && fieldIdx === fieldIndex) {
+            delete newTemplateData[key];
+          }
+        });
+        return {
+          ...prevFormData,
+          templateData: newTemplateData
+        };
+      });
     }
   };
+
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
       <BreadCrumbList />
       <Card>
         <div>
-          <form className="flex flex-col gap-6 p-6" onSubmit={handleSubmit}>
+          <form className="flex flex-col gap-6 p-6" 
+          // onSubmit={handleSubmit}
+          >
             <Box display="flex" alignItems="center">
               <Grid container spacing={4}>
                 <Grid item xs={12} sm={6}>
@@ -716,7 +748,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   {sections.map((section, index) => (
-                    <Card key={index} variant="outlined" style={{ marginBottom: '10px' }}>
+                    <Card key={index} variant="outlined" style={{ marginBottom: '10px' }} >
                       <CardContent>
                         <Typography variant="h5">{section.sectionName}</Typography>
                         {section.sectionTemplate.map((field: any, fieldIndex: number) => (
@@ -779,32 +811,29 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                           {field.fieldLabel}
                                         </Typography>
                                       </Grid>
-                                      <Grid item xs={1}>
-
-                                        <IconButton
-                                          size="small"
-                                          onClick={() =>
-                                            handleAddDuplicateForm(index, fieldIndex)
-                                          }
-                                          aria-label="plus"
-                                          color="success"
-                                        >
-                                          <i className="tabler-plus" />
-                                        </IconButton>
-
-
-                                      </Grid>
-                                      <Grid item xs={1}>
-                                        <IconButton
-                                          size="small"
-                                          onClick={() =>
-                                            handleRemoveDuplicateForm(index, fieldIndex)
-                                          }
-                                          aria-label="minus"
-                                          color="error"
-                                        >
-                                          <i className="tabler-minus" />
-                                        </IconButton>
+                                      <Grid item xs={2} >
+                                        <ButtonGroup variant='tonal' size="small">
+                                          {fieldIndex === section.sectionTemplate.length - 1 && (
+                                            <Tooltip title={`Add ${field.fieldLabel}`}>
+                                              <Button size="small"
+                                                onClick={() =>
+                                                  handleAddDuplicateForm(index, fieldIndex)
+                                                }>
+                                                <i className="tabler-plus" />
+                                              </Button>
+                                            </Tooltip>
+                                          )}
+                                          {field.multipleData.length > 1 && (
+                                            <Tooltip title={`Remove ${field.fieldLabel}`}>
+                                              <Button size="small"
+                                                onClick={() =>
+                                                  handleRemoveDuplicateForm(index, fieldIndex)
+                                                }>
+                                                <i className="tabler-minus" />
+                                              </Button>
+                                            </Tooltip>
+                                          )}
+                                        </ButtonGroup>
                                       </Grid>
                                     </Grid>
                                   </CardActions>
@@ -894,6 +923,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                             </>
                                           ) : (
                                             <CustomTextField
+                                              multiline
                                               label={
                                                 subField.isRequired
                                                   ? `${subField.fieldLabel} *`
@@ -940,6 +970,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                             ) : (
                               <Grid item xs={12} sm={12}>
                                 <CustomTextField
+                                  multiline
                                   label={field.isRequired ? `${field.fieldLabel} *` : field.fieldLabel}
                                   type={field.fieldType}
                                   name={field.fieldType}
@@ -976,14 +1007,29 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
               </Grid>
             </Box>
           </form>
-        </div>      </Card>
+        </div>      </Card >
       <Grid
         item
         xs={12}
         style={{ position: "sticky", bottom: 0, zIndex: 10 }} >
         <Box p={5} display="flex" gap={2} justifyContent="end" bgcolor="background.paper"        >
           <Button variant="contained" size="small" color="error" type="reset" onClick={handleClose}>
-            Cancel</Button>          <Button color="warning" variant="contained" size="small" type="submit" onClick={(event) => {
-              setPDStatus(false); handleSubmit(event);
-            }}>  Save as Draft   </Button>          <Button variant="contained" type="submit" size="small" onClick={(event) => { setPDStatus(true); handleSubmit(event); }}>            Save & Publish          </Button>        </Box>      </Grid>    </>);
+            Cancel
+          </Button>
+          <Button color="warning" variant="contained" size="small" type="submit" onClick={(event) => {
+            // setPDStatus(false); 
+            handleSubmit(event,false);
+          }}>  
+          Save as Draft
+          </Button>
+          <Button variant="contained" type="submit" size="small"
+            onClick={(event) => { 
+              // setPDStatus(true); 
+              handleSubmit(event,true);
+            }}>
+            Save & Publish
+          </Button>
+        </Box>
+      </Grid>
+    </>);
 } export default PagesForm;
