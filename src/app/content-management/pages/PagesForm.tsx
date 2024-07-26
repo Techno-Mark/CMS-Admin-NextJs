@@ -772,7 +772,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                       field.error && field.error
                                     }
                                     helperText={field.error && field.error}
-                                    InputLabelProps={{ shrink: true }}
+                                    // InputLabelProps={{ shrink: true }}
+                                    inputProps={field.validation ? JSON.parse(field.validation) : {}}
+
                                   />
                                   {formData.templateData && formData.templateData[`${index}+${fieldIndex}`]?.preview && (
                                     <Box mt={2} display="flex" flexDirection="column" alignItems="end">
@@ -874,7 +876,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                 }
                                                 error={subField.error && subField.error}
                                                 helperText={subField.error && subField.error}
-                                                InputLabelProps={{ shrink: true }}
+                                                // InputLabelProps={{ shrink: true }}
+                                                inputProps={subField.validation ? JSON.parse(subField.validation) : {}}
                                               />
                                               {formData.templateData &&
                                                 formData.templateData[

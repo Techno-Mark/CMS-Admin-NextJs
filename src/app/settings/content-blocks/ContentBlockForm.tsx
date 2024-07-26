@@ -32,19 +32,19 @@ const tooltipContent = {
   "pattern": "[A-Za-z]{3,10}",
   "maxLength": 10,
   "minLength": 3,
-  "min": "01",
-  "max": "100",
-  "accept": ".jpg, .jpeg, .png",
+  // "min": "01",
+  // "max": "100",
+  // "accept": ".jpg, .jpeg, .png",
 };
 
 const fieldTypeOptions = [
   { label: 'email', value: 'email' },
   { label: 'file', value: 'file' },
   { label: 'text', value: 'text' },
-  { label: 'url', value: 'url' },
-  { label: 'date', value: 'date' },
-  { label: 'number', value: 'number' },
-  { label: 'textarea', value: 'textarea' },
+  // { label: 'url', value: 'url' },
+  // { label: 'date', value: 'date' },
+  // { label: 'number', value: 'number' },
+  // { label: 'textarea', value: 'textarea' },
   { label: 'Multiple', value: 'multiple' }
 ];
 
@@ -52,10 +52,10 @@ const fieldTypeOptionsForMultiple = [
   { label: 'email', value: 'email' },
   { label: 'file', value: 'file' },
   { label: 'text', value: 'text' },
-  { label: 'url', value: 'url' },
-  { label: 'date', value: 'date' },
-  { label: 'number', value: 'number' },
-  { label: 'textarea', value: 'textarea' }
+  // { label: 'url', value: 'url' },
+  // { label: 'date', value: 'date' },
+  // { label: 'number', value: 'number' },
+  // { label: 'textarea', value: 'textarea' }
 ];
 
 const sectionActions = {
