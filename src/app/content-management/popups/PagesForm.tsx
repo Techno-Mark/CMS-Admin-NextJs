@@ -22,7 +22,7 @@ import BreadCrumbList from "@/components/BreadCrumbList";
 import { category } from "@/services/endpoint/category";
 import { popups } from "@/services/endpoint/popup";
 import { PopupTypes } from "./popupTypes";
-import EditorCustom from "./RichEditor";
+// import EditorCustom from "./RichEditor";
 
 type Props = {
   open: -1 | 0 | 1;
@@ -305,13 +305,13 @@ function PopupForm({
               </Grid>
               <Grid item xs={12} sm={12}>
                 <p className="text-[#4e4b5a]">Description *</p>
-                <EditorCustom
+                {/* <EditorCustom
                   setContent={(content: any) => setFormData((prevFormData) => ({
                     ...prevFormData,
                     description: content,
                   }))}
                   content={formData.description}
-                />
+                /> */}
               </Grid>
             </Grid>
             <Grid container spacing={4} sm={5}>
