@@ -53,7 +53,7 @@ const initialFormData = {
   active: false,
   buttonText: "",
   buttonRedirectLink: "",
-  
+ 
 };
 
 const initialErrorData = {
@@ -90,6 +90,7 @@ function PopupForm({
   useEffect(() => {
     setLoading(true);
     if (editingRow) {
+     //@ts-ignore
       setFormData(editingRow);
 
       if (editingRow.description) {

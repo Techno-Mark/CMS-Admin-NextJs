@@ -70,7 +70,121 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   const [sections, setSections] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [PDStatus, setPDStatus] = useState<boolean>(false);
+  // useEffect(() => {
+  //   setLoading(true);
+  //   if (editingRow) {
+  //     setFormData(editingRow);
+  
+  //     const sectionsWithErrors = editingRow.sectionData.map((section: any) => ({
+  //       ...section,
+  //       errors: section.sectionTemplate.reduce((acc: any, field: any) => {
+  //         acc[field.fieldType] = "";
+  //         return acc;
+  //       }, {}),
+  //     }));
+  
+  //     // Fetch and merge template data
+  //     getTemplateIdWiseForm(editingRow.templateId).then((templateSections) => {
+  //       if (templateSections) {
+  //         const mergedSections = sectionsWithErrors.map((section: any) => {
+  //           const matchingTemplate = templateSections.find(
+  //             (tplSection: any) => tplSection.sectionId === section.sectionId
+  //           );
+  
+  //           if (matchingTemplate) {
+  //             return {
+  //               ...section,
+  //               sectionTemplate: section.sectionTemplate.map((field: any) => {
+  //                 const matchingField = matchingTemplate.sectionTemplate.find(
+  //                   (tplField: any) => tplField.fieldLabel === field.fieldLabel
+  //                 );
+  
+  //                 if (matchingField) {
+  //                   // If the field is of type 'multiple', merge multipleData
+  //                   if (field.fieldType === 'multiple' && matchingField.multipleData) {
+  //                     return {
+  //                       ...field,
+  //                       multipleData: mergeMultipleData(field.multipleData, matchingField.multipleData),
+  //                     };
+  //                   }
+  
+  //                   return { ...field, ...matchingField };
+  //                 }
+  
+  //                 return field;
+  //               }),
+  //             };
+  //           }
+  
+  //           return section;
+  //         });
+  
+  //         setSections(mergedSections);
+  //       }
+  //       setLoading(false);
+  //     }).catch((error) => {
+  //       console.error('Error fetching template sections:', error);
+  //       setLoading(false);
+  //     });
+  //   } else {
+  //     setFormData(initialFormData);
+  //     setLoading(false);
+  //   }
+  // }, [editingRow]);
+  // const mergeMultipleData = (existingMultipleData: any, newMultipleData: any) => {
+  //   // Customize this logic as needed
+  //   // This example appends new multipleData entries to existing ones
+  //   // You may want to merge based on specific keys or conditions
+  //   return [...existingMultipleData, ...newMultipleData];
+  // };
 
+  // useEffect(() => {
+  //   setLoading(true);
+  //   if (editingRow) {
+  //     setFormData(editingRow);
+  //     const sectionsWithErrors = editingRow.sectionData.map((section: any) => ({
+  //       ...section,
+  //       errors: section.sectionTemplate.reduce((acc: any, field: any) => {
+  //         acc[field.fieldType] = "";
+  //         return acc;
+  //       }, {}),
+  //     }));
+  
+  //     // Fetch and merge template data
+  //     getTemplateIdWiseForm(editingRow.templateId).then((templateSections) => {
+  //       if (templateSections) {
+  //         const mergedSections = sectionsWithErrors.map((section: any) => {
+  //           const matchingTemplate = templateSections.find(
+  //             (tplSection: any) => tplSection.sectionId === section.sectionId
+  //           );
+  
+  //           if (matchingTemplate) {
+  //             return {
+  //               ...section,
+  //               sectionTemplate: section.sectionTemplate.map((field: any) => {
+  //                 const matchingField = matchingTemplate.sectionTemplate.find(
+  //                   (tplField: any) => tplField.fieldLabel === field.fieldLabel
+  //                 );
+  //                 return matchingField ? { ...field, ...matchingField } : field;
+  //               }),
+  //             };
+  //           }
+  
+  //           return section;
+  //         });
+  
+  //         setSections(mergedSections);
+  //       }
+  //       setLoading(false);
+  //     }).catch((error) => {
+  //       console.error('Error fetching template sections:', error);
+  //       setLoading(false);
+  //     });
+  //   } else {
+  //     setFormData(initialFormData);
+  //     setLoading(false);
+  //   }
+  // }, [editingRow]);
   useEffect(() => {
     setLoading(true);
     if (editingRow) {
@@ -351,13 +465,24 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }
   };
 
-  const handleInputChange = (
+  const handleInputChange = async (
     event: ChangeEvent<HTMLInputElement>, sectionId: number, index: number, fieldIndex: number,
     subFieldIndex?: any, section?: any, fieldLabel?: string, subField?: string, fieldType?: string
   ) => {
     const { name, value, files } = event.target;
     if (files && files[0]) {
+   
+   
+   
       const file = files[0];
+
+      const formData = new FormData();
+      formData.append('image', file);
+
+      // Upload the file to the server
+      const response = await post(pages.fileUpoad,formData);
+
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setSections((prevSections) => {
@@ -424,6 +549,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
         });
       };
       reader.readAsDataURL(file);
+
+
+
     } else {
       setSections((prevSections) => {
         const updatedSections = prevSections.map((sec, mainIndex) => {
@@ -718,6 +846,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CustomTextField
+                  //  disabled={open === sectionActions.EDIT}
                     error={!!formErrors.templateId}
                     helperText={formErrors.templateId}
                     select
@@ -728,7 +857,10 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     id="custom-select"
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       const templateId = Number(e.target.value);
-                      setFormData({ ...formData, templateId });
+                      setFormData({ ...formData, templateId 
+                        ,templateData:{},sectionData:{}
+                      });
+                      setSections([])
                       getTemplateIdWiseForm(templateId);
 
                     }}
