@@ -8,7 +8,7 @@ import { post } from '@/services/apiService';
 import { organization } from '@/services/endpoint/organization';
 import CustomTextField from '@/@core/components/mui/TextField';
 import { fetchData } from '../../../services/apiService';
-import BreadCrumbList from '../content-blocks/BreadCrumbList';
+import BreadCrumbList from '@/components/BreadCrumbList';
 import LoadingBackdrop from '@/components/LoadingBackdrop';
 
 type Props = {

@@ -1,20 +1,19 @@
-// MUI Imports
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { deleteSection } from "@/app/api/content-block";
+import { deleteSection } from "@/services/endpoint/content-block";
 import { toast } from "react-toastify";
 import { post } from "@/services/apiService";
-
+ 
 type ConfirmationDialogProps = {
   deletingId: number;
   open: boolean;
   setOpen: (open: boolean) => void;
   setDeletingId: React.Dispatch<React.SetStateAction<number>>;
 };
-
+ 
 const ConfirmationDialog = ({
   deletingId,
   open,
@@ -26,7 +25,7 @@ const ConfirmationDialog = ({
       const result = await post(deleteSection, {
         sectionId: deletingId,
       });
-
+ 
       if (result.status === "success") {
         toast.success(result.message);
       } else {
@@ -39,7 +38,7 @@ const ConfirmationDialog = ({
       setOpen(false);
     }
   };
-
+ 
   return (
     <Dialog fullWidth maxWidth="xs" open={open} onClose={() => setOpen(false)}>
       <DialogContent className="flex items-center flex-col text-center sm:pbs-16 sm:pbe-6 sm:pli-16">
@@ -65,5 +64,5 @@ const ConfirmationDialog = ({
     </Dialog>
   );
 };
-
+ 
 export default ConfirmationDialog;

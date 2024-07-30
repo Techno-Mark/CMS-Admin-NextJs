@@ -17,7 +17,7 @@ import { TemplateType } from '@/types/apps/templateType';
 import { template } from '@/services/endpoint/template';
 import CustomAutocomplete from '@core/components/mui/Autocomplete';
 import { section } from '@/services/endpoint/section';
-import BreadCrumbList from '../content-blocks/BreadCrumbList';
+import BreadCrumbList from '@/components/BreadCrumbList';
 import LoadingBackdrop from '@/components/LoadingBackdrop';
 // import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -203,7 +203,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
       )
     );
   };
-  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false); 
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false);
   const handleSectionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
     setFormErrors({ ...formErrors, templateName: "" });
@@ -221,7 +221,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
       ...prevData,
       templateSlug: newSlug,
     }));
-    setIsSlugManuallyEdited(true); 
+    setIsSlugManuallyEdited(true);
   };
 
   return (
@@ -267,7 +267,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                 </Grid>
                 <Grid item xs={12} sm={5}>
                   <CustomTextField
-                    disabled={open === sectionActions.EDIT}
+                    // disabled={open === sectionActions.EDIT}
                     error={!!formErrors.templateSlug}
                     helperText={formErrors.templateSlug}
                     label="Template Slug *"

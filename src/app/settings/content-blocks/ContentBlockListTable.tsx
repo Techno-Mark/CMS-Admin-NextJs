@@ -33,8 +33,8 @@ import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { useRouter } from "next/navigation";
-import BreadCrumbList from "./BreadCrumbList";
-import { redirectToAddPage, redirectToEditPage } from "@/app/api/content-block";
+import BreadCrumbList from "@/components/BreadCrumbList";
+import { redirectToAddPage, redirectToEditPage } from "@/services/endpoint/content-block";
 import { MenuItem } from "@mui/material";
 import CustomChip from "@/@core/components/mui/Chip";
 
@@ -300,7 +300,7 @@ const UserListTable = ({
         
       </div> */}
       <Card>
-        <div className="overflow-x-auto h-[340px]">
+        <div className="overflow-x-auto">
           <table className={tableStyles.table}>
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (

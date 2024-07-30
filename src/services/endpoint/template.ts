@@ -4,6 +4,7 @@ export const template = {
   update: `template/update`,
   getById: `template/getById`,
   delete: `template/delete`,
+  active: `template/active`,
   save: `template/save`,
-  getTemplateSectionsById: `template/getTemplateSectionsById`
+  getTemplateSectionsById: `template/getTemplateSectionsById`,
 };

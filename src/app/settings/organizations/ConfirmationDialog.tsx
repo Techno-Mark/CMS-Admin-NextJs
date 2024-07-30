@@ -61,7 +61,7 @@ const ConfirmationDialog = ({
             setOpen(false);
           }}
         >
-          Cancel
+          No
         </Button>
       </DialogActions>
     </Dialog>
