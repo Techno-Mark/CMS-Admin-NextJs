@@ -1,19 +1,18 @@
 "use client";
+import React from "react";
+import PagesForm from "../PagesForm";
+import { useRouter } from 'next/navigation';
 
-import { useRouter } from "next/navigation";
-import { ADD_BLOG } from "@/types/apps/blogsType";
-import PopupForm from "../PopupForm";
+const ADD_PAGES = -1;
 
-const Page = () => {
+const page = () => {
   const router = useRouter();
 
-  return (
-    <PopupForm
-      open={ADD_BLOG}
-      handleClose={() => router.push("/content-management/blogs")}
-      editingRow={null}
-    />
-  );
+  return <PagesForm
+    open={ADD_PAGES}
+    editingRow={null}
+    setEditingRow={() => { }}
+    handleClose={() => router.push('/content-management/popups')} />;
 };
 
-export default Page;
+export default page;

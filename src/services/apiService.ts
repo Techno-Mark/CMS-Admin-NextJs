@@ -12,6 +12,7 @@ const handleResponse = async (response: Response) => {
       const errorResponse = await response.json();
       const { message, data } = errorResponse;
       if (message === "validation error" && data) {
+      if (message === "validation error" && data) {
         const errors = Object.keys(data).map((key) => `${key}: ${data[key]}`);
         toast.error(errors.join("; "));
         throw new Error("Validation error1");
@@ -22,6 +23,7 @@ const handleResponse = async (response: Response) => {
     } else if (response.status === 400) {
       const errorResponse = await response.json();
       const { message, data } = errorResponse;
+      if (message === "validation error" && data && typeof data === "object") {
       if (message === "validation error" && data && typeof data === "object") {
         const errors = Object.values(data).map((errorMessage) => errorMessage);
         toast.error(errors.join("; "));

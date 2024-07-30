@@ -12,6 +12,7 @@ import { TextStyle } from "@tiptap/extension-text-style";
 import { EditorProvider, useCurrentEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { Placeholder } from "@tiptap/extension-placeholder";
+import { Typography } from "@mui/material";
 
 const EditorToolbar = () => {
   const { editor } = useCurrentEditor();
@@ -22,6 +23,19 @@ const EditorToolbar = () => {
 
   return (
     <div className="flex flex-wrap gap-x-4 gap-y-2 p-6 sticky top-0 bg-white z-10">
+
+      <Chip
+        size="small"
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        disabled={!editor.can().chain().focus().toggleBold().run()}
+        {...(editor.isActive("bold") && { variant: "tonal", color: "primary" })}
+        label={
+          <Typography variant="body2" className="flex items-center">
+            <i className="tabler-bold text-xs mr-1" />
+          </Typography>
+        }
+      />
+
       <Chip
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
@@ -204,14 +218,14 @@ const EditorCustom = ({
   content,
 }: {
   setContent: Function;
-  content: string;
+  content: any;
 }) => {
+  console.log(content);
+
+
   const handleEditorUpdate = ({ editor }: any) => {
     const html = editor.getHTML();
-    setContent((prev: Object) => ({
-      ...prev,
-      description: html,
-    }));
+    setContent(html);
   };
 
   return (

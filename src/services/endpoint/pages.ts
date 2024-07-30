@@ -4,6 +4,7 @@ export const pages = {
   update: `organization/page/update`,
   getById: `organization/page/getById`,
   delete: `organization/page/delete`,
+  fileUpoad:  `upload`
   // active: `organization/active`,
 };
 
