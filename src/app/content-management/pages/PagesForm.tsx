@@ -481,7 +481,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       formData.append('image', file);
 
       // Upload the file to the server
-      const response = await post(pages.fileUpoad,formData);
+      // const response = await post(pages.fileUpoad,formData);
 
 
       const reader = new FileReader();

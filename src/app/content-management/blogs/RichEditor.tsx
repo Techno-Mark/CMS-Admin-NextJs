@@ -5,12 +5,12 @@ import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
 
 // Third-party imports
-// import { Color } from "@tiptap/extension-color";
-// import { ListItem } from "@tiptap/extension-list-item";
-// import { TextStyle } from "@tiptap/extension-text-style";
-// import { EditorProvider, useCurrentEditor } from "@tiptap/react";
-// import { StarterKit } from "@tiptap/starter-kit";
-// import { Placeholder } from "@tiptap/extension-placeholder";
+import { Color } from "@tiptap/extension-color";
+import { ListItem } from "@tiptap/extension-list-item";
+import { TextStyle } from "@tiptap/extension-text-style";
+import { EditorProvider } from "@tiptap/react";
+import { StarterKit } from "@tiptap/starter-kit";
+import { Placeholder } from "@tiptap/extension-placeholder";
 
 const EditorToolbar = () => {
   const { editor } = useCurrentEditor();
@@ -179,24 +179,24 @@ const EditorToolbar = () => {
   );
 };
 
-// const extensions = [
-//   Color.configure({ types: [TextStyle.name, ListItem.name] }),
+const extensions = [
+  Color.configure({ types: [TextStyle.name, ListItem.name] }),
 
-//   TextStyle,
-//   StarterKit.configure({
-//     bulletList: {
-//       keepMarks: true,
-//       keepAttributes: false,
-//     },
-//     orderedList: {
-//       keepMarks: true,
-//       keepAttributes: false,
-//     },
-//   }),
-//   Placeholder.configure({
-//     placeholder: "Write something here...",
-//   }),
-// ];
+  TextStyle,
+  StarterKit.configure({
+    bulletList: {
+      keepMarks: true,
+      keepAttributes: false,
+    },
+    orderedList: {
+      keepMarks: true,
+      keepAttributes: false,
+    },
+  }),
+  Placeholder.configure({
+    placeholder: "Write something here...",
+  }),
+];
 
 const EditorCustom = ({
   setContent,
@@ -215,7 +215,7 @@ const EditorCustom = ({
 
   return (
     <div className="border rounded-md min-h-[350px] max-h-[550px]">
-      {/* <EditorProvider
+      <EditorProvider
         slotBefore={
           <>
             <EditorToolbar />
@@ -225,13 +225,8 @@ const EditorCustom = ({
         extensions={extensions}
         content={content}
         onUpdate={handleEditorUpdate}
-      /> */}
+      />
     </div>
   );
 };
-
-export default EditorCustom;
-function useCurrentEditor(): { editor: any; } {
-  throw new Error("Function not implemented.");
-}
 
