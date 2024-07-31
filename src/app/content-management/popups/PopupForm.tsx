@@ -27,7 +27,7 @@ import { category } from "@/services/endpoint/category";
 import { tag } from "@/services/endpoint/tag";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
-import EditorCustom from "./RichEditor";
+// import EditorCustom from "./RichEditor";
 import { blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
 
 type blogFormPropsTypes = {
@@ -369,10 +369,10 @@ function PopupForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
             <Grid item xs={12} sm={12}>
               <p className="text-[#4e4b5a]">Description *</p>
 
-              <EditorCustom
+              {/* <EditorCustom
                 setContent={setFormData}
                 content={formData.description}
-              />
+              /> */}
             </Grid>
           </Grid>
           <Grid container spacing={4} sm={5}>
