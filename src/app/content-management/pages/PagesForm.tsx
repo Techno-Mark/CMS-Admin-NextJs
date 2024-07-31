@@ -41,6 +41,7 @@ const initialFormData = {
 };
 
 const initialErrorData = {
+  
   templateId: "",
   title: "",
   slug: "",

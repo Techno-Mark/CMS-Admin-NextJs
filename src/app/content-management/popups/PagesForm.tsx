@@ -21,7 +21,9 @@ import BreadCrumbList from "@/components/BreadCrumbList";
 
 import { category } from "@/services/endpoint/category";
 import { popups } from "@/services/endpoint/popup";
+
 import { PopupTypes } from "./popupTypes";
+
 // import EditorCustom from "./RichEditor";
 
 type Props = {
