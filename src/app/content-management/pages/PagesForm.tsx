@@ -948,7 +948,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                       </Grid>
                                       <Grid item xs={2} >
                                         <ButtonGroup variant='tonal' size="small">
-                                          {fieldIndex === section.sectionTemplate.length - 1 && (
+                                          {/* {fieldIndex === section.sectionTemplate.length - 1 && ( */}
                                             <Tooltip title={`Add ${field.fieldLabel}`}>
                                               <Button size="small"
                                                 onClick={() =>
@@ -957,8 +957,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                 <i className="tabler-plus" />
                                               </Button>
                                             </Tooltip>
-                                          )}
-                                          {field.multipleData.length > 1 && (
+                                          {/* )} */}
+                                          {/* {field.multipleData.length > 1 && ( */}
                                             <Tooltip title={`Remove ${field.fieldLabel}`}>
                                               <Button size="small"
                                                 onClick={() =>
@@ -967,7 +967,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                 <i className="tabler-minus" />
                                               </Button>
                                             </Tooltip>
-                                          )}
+                                          {/* )} */}
                                         </ButtonGroup>
                                       </Grid>
                                     </Grid>
