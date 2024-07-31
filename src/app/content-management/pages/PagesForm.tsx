@@ -41,7 +41,6 @@ const initialFormData = {
 };
 
 const initialErrorData = {
-  
   templateId: "",
   title: "",
   slug: "",
@@ -472,9 +471,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   ) => {
     const { name, value, files } = event.target;
     if (files && files[0]) {
-   
-   
-   
       const file = files[0];
 
       const formData = new FormData();
@@ -482,8 +478,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
 
       // Upload the file to the server
       // const response = await post(pages.fileUpoad,formData);
-
-
       const reader = new FileReader();
       reader.onloadend = () => {
         setSections((prevSections) => {
@@ -690,49 +684,49 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       return updatedSections;
     });
   };
-  // const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
-  //   const newSectionTemplate = [...sections[index].sectionTemplate];
-  //   if (newSectionTemplate.length > 1) {
-  //     newSectionTemplate.splice(fieldIndex, 1);
-  //     setSections((prevSections) => {
-  //       const updatedSections = [...prevSections];
-  //       updatedSections[index].sectionTemplate = newSectionTemplate;
-  //       return updatedSections;
-  //     });
-  //   }
-  // };
-
   const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
     const newSectionTemplate = [...sections[index].sectionTemplate];
-    // Check if there are more than one items in the section template
     if (newSectionTemplate.length > 1) {
-      // Remove the item from the section template
       newSectionTemplate.splice(fieldIndex, 1);
-      // Update sections state
       setSections((prevSections) => {
         const updatedSections = [...prevSections];
         updatedSections[index].sectionTemplate = newSectionTemplate;
         return updatedSections;
       });
-      // Update formData.templateData
-      setFormData((prevFormData) => {
-        const newTemplateData = { ...prevFormData.templateData };
-
-        // Iterate through the keys of templateData
-        Object.keys(newTemplateData).forEach((key) => {
-          const [sectionIdx, fieldIdx, subFieldIdx] = key.split('+').map(Number);
-          // Remove matching entries
-          if (sectionIdx === index && fieldIdx === fieldIndex) {
-            delete newTemplateData[key];
-          }
-        });
-        return {
-          ...prevFormData,
-          templateData: newTemplateData
-        };
-      });
     }
   };
+
+  // const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
+  //   const newSectionTemplate = [...sections[index].sectionTemplate];
+  //   // Check if there are more than one items in the section template
+  //   if (newSectionTemplate.length > 1) {
+  //     // Remove the item from the section template
+  //     newSectionTemplate.splice(fieldIndex, 1);
+  //     // Update sections state
+  //     setSections((prevSections) => {
+  //       const updatedSections = [...prevSections];
+  //       updatedSections[index].sectionTemplate = newSectionTemplate;
+  //       return updatedSections;
+  //     });
+  //     // Update formData.templateData
+  //     setFormData((prevFormData) => {
+  //       const newTemplateData = { ...prevFormData.templateData };
+
+  //       // Iterate through the keys of templateData
+  //       Object.keys(newTemplateData).forEach((key) => {
+  //         const [sectionIdx, fieldIdx, subFieldIdx] = key.split('+').map(Number);
+  //         // Remove matching entries
+  //         if (sectionIdx === index && fieldIdx === fieldIndex) {
+  //           delete newTemplateData[key];
+  //         }
+  //       });
+  //       return {
+  //         ...prevFormData,
+  //         templateData: newTemplateData
+  //       };
+  //     });
+  //   }
+  // };
 
   return (
     <>
@@ -958,7 +952,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                               </Button>
                                             </Tooltip>
                                           {/* )} */}
-                                          {/* {field.multipleData.length > 1 && ( */}
+                                          {field.multipleData.length > 1 && (
                                             <Tooltip title={`Remove ${field.fieldLabel}`}>
                                               <Button size="small"
                                                 onClick={() =>
@@ -967,7 +961,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                 <i className="tabler-minus" />
                                               </Button>
                                             </Tooltip>
-                                          {/* )} */}
+                                           )} 
                                         </ButtonGroup>
                                       </Grid>
                                     </Grid>
