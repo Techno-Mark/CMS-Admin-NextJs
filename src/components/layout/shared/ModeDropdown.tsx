@@ -67,6 +67,7 @@ const ModeDropdown = () => {
     event.preventDefault();
     setSelectedOrgId(orgId);
     localStorage.setItem('selectedOrgId', orgId);
+    window.location.reload();
     handleClose();
   };
 
