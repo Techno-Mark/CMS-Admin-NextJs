@@ -24,9 +24,7 @@ import { popups } from "@/services/endpoint/popup";
 
 import { PopupTypes } from "./popupTypes";
 import dynamic from 'next/dynamic';
-import CustomEditor from "@/components/custom-editor";
-import QuillEditor from "@/components/custom-editor";
-import EditorCustom from "@/components/custom-editor";
+
 import EditorBasic from "@/components/EditorToolbar";
 // Dynamic import for CKEditor
 const CKEditor = dynamic<{ editor: any, data: string, onChange: (event: any, editor: any) => void }>(() =>

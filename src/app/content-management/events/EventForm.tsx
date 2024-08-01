@@ -29,9 +29,6 @@ import { ADD_EVENT, EDIT_EVENT, eventDetailType } from "@/types/apps/eventType";
 // import { CKEditor } from "@ckeditor/ckeditor5-react";
 // import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import dynamic from 'next/dynamic';
-import CustomEditor from "@/components/custom-editor";
-import QuillEditor from "@/components/custom-editor";
-import EditorCustom from "@/components/custom-editor";
 // Dynamic import for CKEditor
 const CKEditor = dynamic<{ editor: any, data: string, onChange: (event: any, editor: any) => void }>(() =>
   import('@ckeditor/ckeditor5-react').then((mod: any) => mod.CKEditor), { ssr: false });

@@ -32,8 +32,8 @@ import { ADD_BLOG, blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
 // import { CKEditor } from "@ckeditor/ckeditor5-react";
 // import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import dynamic from 'next/dynamic';
-
 import EditorBasic from "@/components/EditorToolbar";
+
 // Dynamic import for CKEditor
 const CKEditor = dynamic<{ editor: any, data: string, onChange: (event: any, editor: any) => void }>(() =>
   import('@ckeditor/ckeditor5-react').then((mod: any) => mod.CKEditor), { ssr: false });
@@ -424,8 +424,6 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
             </Grid>
             <Grid item xs={12} sm={12}>
               <p className="text-[#4e4b5a]">Description *</p>
-<<<<<<< HEAD
-=======
               {/* <CKEditor
                 editor={ClassicEditor}
                 data={formData.description}
@@ -461,11 +459,9 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
               />
 
 
->>>>>>> contant_management
               {/* <EditorCustom
                 setContent={setFormData}
                 content={formData.description}
-              /> */}
               /> */}
             </Grid>
             <Grid item xs={12} sm={12}>
