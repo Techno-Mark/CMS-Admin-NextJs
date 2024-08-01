@@ -15,16 +15,46 @@ import CustomTextField from "@/@core/components/mui/TextField";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
-import { post, postContentBlock } from "@/services/apiService";
+import { postContentBlock } from "@/services/apiService";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
 
-import { category } from "@/services/endpoint/category";
 import { popups } from "@/services/endpoint/popup";
 
-import { PopupTypes } from "./popupTypes";
 
-// import EditorCustom from "./RichEditor";
+import { PopupTypes } from "./popupTypes";
+import dynamic from 'next/dynamic';
+import CustomEditor from "@/components/custom-editor";
+import QuillEditor from "@/components/custom-editor";
+import EditorCustom from "@/components/custom-editor";
+import EditorBasic from "@/components/EditorToolbar";
+// Dynamic import for CKEditor
+const CKEditor = dynamic<{ editor: any, data: string, onChange: (event: any, editor: any) => void }>(() =>
+  import('@ckeditor/ckeditor5-react').then((mod: any) => mod.CKEditor), { ssr: false });
+
+const ClassicEditor = dynamic(() => import('@ckeditor/ckeditor5-build-classic').then((mod: any) => mod.default), {
+  ssr: false,
+});
+
+
+
+// import { CKEditor } from "@ckeditor/ckeditor5-react";
+// import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
+// const CKEditor = dynamic(() => import("@ckeditor/ckeditor5-react"), {
+//   ssr: false,
+// });
+
+
+// const CKEditor = dynamic(
+//   () => import('@ckeditor/ckeditor5-react').then((mod) => mod.CKEditor),
+//   { ssr: false }
+// );
+
+// const ClassicEditor = dynamic(
+//   () => import('@ckeditor/ckeditor5-build-classic'),
+//   { ssr: false }
+// );
 
 type Props = {
   open: -1 | 0 | 1;
@@ -55,7 +85,7 @@ const initialFormData = {
   active: false,
   buttonText: "",
   buttonRedirectLink: "",
- 
+
 };
 
 const initialErrorData = {
@@ -92,7 +122,7 @@ function PopupForm({
   useEffect(() => {
     setLoading(true);
     if (editingRow) {
-     //@ts-ignore
+      //@ts-ignore
       setFormData(editingRow);
 
       if (editingRow.description) {
@@ -101,7 +131,7 @@ function PopupForm({
           description: editingRow.description,
         }));
       }
-      
+
 
       if (editingRow.popupFile) {
         const fileUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL + '/' + editingRow.popupFile;
@@ -225,6 +255,18 @@ function PopupForm({
       }
     }
   };
+  const handleEditorChange = (content: string) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      description: content
+    }));
+    if (content?.length) {
+      setFormErrors((prevFormErrors) => ({
+        ...prevFormErrors,
+        description: ""
+      }));
+    }
+  };
 
   return (
     <>
@@ -307,13 +349,40 @@ function PopupForm({
               </Grid>
               <Grid item xs={12} sm={12}>
                 <p className="text-[#4e4b5a]">Description *</p>
-                {/* <EditorCustom
-                  setContent={(content: any) => setFormData((prevFormData) => ({
-                    ...prevFormData,
-                    description: content,
-                  }))}
+
+
+                <EditorBasic
                   content={formData.description}
+                  onContentChange={(content: string) => {
+                    setFormData({
+                      ...formData,
+                      description: content,
+                    });
+                    if (content.length) {
+                      setFormErrors({ ...formErrors, description: "" });
+                    }
+                  }}
+                  error={!!formErrors.description}
+                />
+                {/* <CKEditor
+                  editor={ClassicEditor}
+                  data={formData.description}
+                  onChange={(event: any, editor: any) => {
+                    if (editor) {
+                      const data = editor.getData();
+                      setFormData((prevFormData) => ({ ...prevFormData, description: data }));
+                      if (data?.length) {
+                        setFormErrors((prevFormErrors) => ({ ...prevFormErrors, description: "" }));
+                      }
+                    }
+                  }}
                 /> */}
+                {/* <QuillEditor
+                  value={formData.description}
+                  onChange={handleEditorChange} 
+                /> */}
+                {/* <EditorCustom /> */}
+                {/* <CustomEditor initialData={""} /> */}
               </Grid>
             </Grid>
             <Grid container spacing={4} sm={5}>

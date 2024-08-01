@@ -30,20 +30,6 @@ const ModeDropdown = () => {
   const selectedOrgName = organizations.find((org) => org.id === selectedOrgId)?.name || 'Select Organization';
   const avatarText = selectedOrgName.split(' ').map((n) => n[0]).join('');
 
-  // useEffect(() => {
-  //   const fetchOrganizations = async () => {
-  //     try {
-  //       const response = await post(organization.active, {});
-  //       const orgs = response.data.organizations as Organization[];
-  //       setOrganizations(orgs);
-  //     } catch (error) {
-  //       console.error('Error fetching organizations:', error);
-  //     }
-  //   };
-
-  //   fetchOrganizations();
-  // }, []);
-
   useEffect(() => {
     const fetchOrganizations = async () => {
       try {
@@ -77,7 +63,8 @@ const ModeDropdown = () => {
     setOpen((prevOpen) => !prevOpen);
   };
 
-  const handleModeSwitch = (orgId: string) => {
+  const handleModeSwitch = (orgId: string, event: React.MouseEvent) => {
+    event.preventDefault();
     setSelectedOrgId(orgId);
     localStorage.setItem('selectedOrgId', orgId);
     handleClose();
@@ -122,7 +109,8 @@ const ModeDropdown = () => {
                     <MenuItem
                       key={org.id}
                       className="gap-3"
-                      onClick={() => handleModeSwitch(org.id)}
+                      // onClick={() => handleModeSwitch(org.id)}
+                      onClick={(e) => handleModeSwitch(org.id, e)}
                       selected={selectedOrgId === org.id}
                     >
                       <Avatar

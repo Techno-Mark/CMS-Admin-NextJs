@@ -29,7 +29,18 @@ import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
 // import EditorCustom from "./RichEditor";
 import { ADD_BLOG, blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
+// import { CKEditor } from "@ckeditor/ckeditor5-react";
+// import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import dynamic from 'next/dynamic';
 
+import EditorBasic from "@/components/EditorToolbar";
+// Dynamic import for CKEditor
+const CKEditor = dynamic<{ editor: any, data: string, onChange: (event: any, editor: any) => void }>(() =>
+  import('@ckeditor/ckeditor5-react').then((mod: any) => mod.CKEditor), { ssr: false });
+
+const ClassicEditor = dynamic(() => import('@ckeditor/ckeditor5-build-classic').then((mod: any) => mod.default), {
+  ssr: false,
+});
 type blogFormPropsTypes = {
   open: number;
   editingRow: blogDetailType | null;
@@ -172,9 +183,9 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
       slug:
         !isSlugManuallyEdited && open === sectionActions.ADD
           ? newName
-              .replace(/[^\w\s]|_/g, "")
-              .replace(/\s+/g, "-")
-              .toLowerCase()
+            .replace(/[^\w\s]|_/g, "")
+            .replace(/\s+/g, "-")
+            .toLowerCase()
           : prevData.slug,
     }));
     if (newName?.length) {
@@ -350,7 +361,18 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
       }
     }
   };
-
+  const handleEditorChange = (content: string) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      description: content
+    }));
+    if (content?.length) {
+      setFormErrors((prevFormErrors) => ({
+        ...prevFormErrors,
+        description: ""
+      }));
+    }
+  };
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -360,7 +382,7 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
             <BreadCrumbList />
           </Grid>
           <Grid item xs={12} sm={1}>
-            <IconButton color="info" onClick={() => {}}>
+            <IconButton color="info" onClick={() => { }}>
               <i className="tabler-external-link text-textSecondary"></i>
             </IconButton>
           </Grid>
@@ -402,9 +424,48 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
             </Grid>
             <Grid item xs={12} sm={12}>
               <p className="text-[#4e4b5a]">Description *</p>
+<<<<<<< HEAD
+=======
+              {/* <CKEditor
+                editor={ClassicEditor}
+                data={formData.description}
+                onChange={(event: any, editor: any) => {
+                  if (editor) {
+                    const data = editor.getData();
+                    setFormData((prevFormData) => ({ ...prevFormData, description: data }));
+                    if (data?.length) {
+                      setFormErrors((prevFormErrors) => ({ ...prevFormErrors, description: "" }));
+                    }
+                  }
+                }}
+              /> */}
+              {/* <EditorCustom
+               setContent={setFormData}
+               content={formData.description}
+                // content={formData.description}
+                // setContent={(content:any) => setFormData((prev) => ({ ...prev, description: content }))}
+              /> */}
+
+              <EditorBasic
+                content={formData.description}
+                onContentChange={(content: string) => {
+                  setFormData({
+                    ...formData,
+                    description: content,
+                  });
+                  if (content.length) {
+                    setFormErrors({ ...formErrors, description: "" });
+                  }
+                }}
+                error={!!formErrors.description}
+              />
+
+
+>>>>>>> contant_management
               {/* <EditorCustom
                 setContent={setFormData}
                 content={formData.description}
+              /> */}
               /> */}
             </Grid>
             <Grid item xs={12} sm={12}>
