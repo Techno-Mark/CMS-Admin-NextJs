@@ -1,9 +1,4 @@
-"use client";
-
-// React Imports
 import { useState, useEffect } from "react";
-
-// MUI Imports
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -13,16 +8,19 @@ import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-
-// Component Imports
 import DialogCloseButton from "@components/Dialogs/DialogCloseButton";
 import CustomTextField from "@core/components/mui/TextField";
-
-// Style Imports
 import tableStyles from "@core/styles/table.module.css";
+import axios from "axios";
+import React from "react";
+import {
+  createRole,
+  getRoleById,
+  updateRole,
+} from "@/services/endpoint/users/roles";
 import { post } from "@/services/apiService";
-import { getPermissionsList } from "@/services/endpoint/users/permissions";
-import { PermissionsType } from "@/types/apps/permissionsType";
+import { toast } from "react-toastify";
+import { Switch } from "@mui/material";
 
 type RoleDialogProps = {
   open: boolean;
@@ -31,107 +29,91 @@ type RoleDialogProps = {
   editId?: number;
 };
 
-type DataType =
-  | string
-  | {
-      title: string;
-      read?: boolean;
-      write?: boolean;
-      select?: boolean;
-    };
-
-// const defaultData: DataType[] = [
-//   "User Management",
-//   "Content Management",
-//   "Disputes Management",
-//   "Database Management",
-//   "Financial Management",
-//   "Reporting",
-//   "API Control",
-//   "Repository Management",
-//   "Payroll",
-// ];
-
 const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
-  // States
-  const [selectedCheckbox, setSelectedCheckbox] = useState<string[]>([]);
-
+  const [selectedCheckbox, setSelectedCheckbox] = useState<number[]>([]);
   const [isIndeterminateCheckbox, setIsIndeterminateCheckbox] =
     useState<boolean>(false);
   const [defaultData, setDefaultData] = useState<any>([]);
   const [roleName, setRoleName] = useState("");
   const [roleError, setRoleError] = useState(false);
+  const [active, setActive] = useState(false);
 
   const handleClose = () => {
     setOpen(false);
     setRoleName("");
     setRoleError(false);
+    setActive(false);
+    setDefaultData([]);
+    setSelectedCheckbox([]);
+    setIsIndeterminateCheckbox(false);
   };
 
-  const togglePermission = (id: string) => {
-    const arr = selectedCheckbox;
-
-    if (selectedCheckbox.includes(id)) {
-      arr.splice(arr.indexOf(id), 1);
-      setSelectedCheckbox([...arr]);
-    } else {
-      arr.push(id);
-      setSelectedCheckbox([...arr]);
-    }
+  const togglePermission = (id: number) => {
+    setSelectedCheckbox((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
   };
 
   const handleSelectAllCheckbox = () => {
     if (isIndeterminateCheckbox) {
       setSelectedCheckbox([]);
     } else {
-      defaultData.length > 0 &&
-        defaultData.forEach((row: any) => {
-          const id = (typeof row === "string" ? row : row.title)
-            .toLowerCase()
-            .split(" ")
-            .join("-");
-
-          togglePermission(`${id}-read`);
-          togglePermission(`${id}-create/edit`);
-          togglePermission(`${id}-delete`);
-        });
+      const allCheckboxes = defaultData.flatMap((module: any) =>
+        module.permissions.map((perm: any) => perm.id)
+      );
+      setSelectedCheckbox(allCheckboxes);
     }
   };
 
-  const getList = async () => {
+  const fetchRolePermissions = async (roleId: number) => {
     try {
-      const result = await post(getPermissionsList, {
-        page: 1,
-        limit: 1000,
-        search: "",
-        active: true,
-      });
-      setDefaultData(
-        result.data.permissions
-          .map((i: PermissionsType) => i.permissionName)
-          .reverse()
-      );
+      const result = await post(getRoleById, { roleId });
+
+      if (result.data.data) {
+        const data = result.data.data;
+        const permissions = data.permission;
+        const selected = permissions.flatMap((perm: any) =>
+          perm.permissions.filter((p: any) => p.checked).map((p: any) => p.id)
+        );
+        if (roleId > 0) {
+          setDefaultData(permissions);
+          setSelectedCheckbox(selected);
+          setActive(data.active);
+          setRoleName(data.roleName);
+        } else {
+          setDefaultData(permissions);
+          setSelectedCheckbox(selected);
+        }
+      }
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    getList();
-  }, []);
+    if (open) {
+      if (editId !== 0) {
+        fetchRolePermissions(1);
+      } else {
+        fetchRolePermissions(0);
+      }
+    }
+  }, [open, editId]);
 
   useEffect(() => {
+    const allPermissionsCount = defaultData.flatMap(
+      (module: any) => module.permissions
+    ).length;
     if (
       selectedCheckbox.length > 0 &&
-      selectedCheckbox.length < defaultData.length * 3
+      selectedCheckbox.length < allPermissionsCount
     ) {
       setIsIndeterminateCheckbox(true);
     } else {
       setIsIndeterminateCheckbox(false);
     }
-  }, [selectedCheckbox]);
+  }, [selectedCheckbox, defaultData]);
 
-  //validation before submit
   const validateForm = () => {
     let valid = true;
 
@@ -143,11 +125,27 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
     return valid;
   };
 
-  const handleSubmit = (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
     if (validateForm()) {
-      console.log(roleName, selectedCheckbox);
+      try {
+        const endpoint = editId > 0 ? updateRole : createRole;
+        const payload = {
+          organizationId: 1,
+          roleName: roleName,
+          roleId: editId,
+          roleActionMapping: selectedCheckbox,
+          active: active,
+        };
+        const result = await post(endpoint, payload);
+        toast.success(result.message);
+        handleClose();
+      } catch (error) {
+        console.error(error);
+      } finally {
+        handleClose();
+      }
     }
   };
 
@@ -161,7 +159,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
       sx={{ "& .MuiDialog-paper": { overflow: "visible" } }}
       className="my-[-5px]"
     >
-      <DialogCloseButton onClick={() => setOpen(false)} disableRipple>
+      <DialogCloseButton onClick={handleClose} disableRipple>
         <i className="tabler-x" />
       </DialogCloseButton>
       <DialogTitle
@@ -188,6 +186,15 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
               setRoleError(false);
             }}
           />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={active}
+                onChange={(e) => setActive(e.target.checked)}
+              />
+            }
+            label="Status"
+          />
           <Typography variant="h5" className="min-is-[225px]">
             Role Permissions
           </Typography>
@@ -200,7 +207,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
                       color="text.primary"
                       className="font-medium whitespace-nowrap flex-grow min-is-[225px]"
                     >
-                      {/* Administrator Access */}
+                      {/* Module Name */}
                     </Typography>
                   </th>
                   <th className="!text-end pie-0 !pr-4">
@@ -211,7 +218,12 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
                           onChange={handleSelectAllCheckbox}
                           indeterminate={isIndeterminateCheckbox}
                           checked={
-                            selectedCheckbox.length === defaultData.length * 3
+                            selectedCheckbox.length > 0 &&
+                            defaultData.length > 0 &&
+                            selectedCheckbox.length ===
+                              defaultData.flatMap(
+                                (module: any) => module.permissions
+                              ).length
                           }
                         />
                       }
@@ -220,94 +232,38 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
                   </th>
                 </tr>
                 {defaultData.length > 0 &&
-                  defaultData.map((item: any, index: number) => {
-                    const id = (typeof item === "string" ? item : item.title)
-                      .toLowerCase()
-                      .split(" ")
-                      .join("-");
-
-                    return (
-                      <tr key={index} className="border-be">
+                  defaultData.map((module: any, index: number) => (
+                    <React.Fragment key={index}>
+                      <tr className="border-be">
                         <td className="pis-0">
                           <Typography
                             className="font-medium whitespace-nowrap flex-grow min-is-[225px]"
                             color="text.primary"
                           >
-                            {typeof item === "object" ? item.title : item}
+                            {module.moduleName}
                           </Typography>
                         </td>
                         <td className="!text-end pie-0 !pr-4">
-                          {typeof item === "object" ? (
-                            <FormGroup className="flex-row justify-end flex-nowrap gap-6">
+                          <FormGroup className="flex-row justify-end flex-nowrap gap-6">
+                            {module.permissions.map((perm: any) => (
                               <FormControlLabel
-                                className="mie-0"
-                                control={<Checkbox checked={item.read} />}
-                                label="Read"
-                              />
-                              <FormControlLabel
-                                className="mie-0"
-                                control={<Checkbox checked={item.write} />}
-                                label="Write"
-                              />
-                              <FormControlLabel
-                                className="mie-0"
-                                control={<Checkbox checked={item.select} />}
-                                label="Select"
-                              />
-                            </FormGroup>
-                          ) : (
-                            <FormGroup className="flex-row justify-end flex-nowrap gap-6">
-                              <FormControlLabel
+                                key={perm.id}
                                 className="mie-0"
                                 control={
                                   <Checkbox
-                                    id={`${id}-read`}
-                                    onChange={() =>
-                                      togglePermission(`${id}-read`)
-                                    }
-                                    checked={selectedCheckbox.includes(
-                                      `${id}-read`
-                                    )}
+                                    id={perm.id.toString()}
+                                    onChange={() => togglePermission(perm.id)}
+                                    checked={selectedCheckbox.includes(perm.id)}
                                   />
                                 }
-                                label="Read"
+                                label={perm.permissionName}
                               />
-                              <FormControlLabel
-                                className="mie-0"
-                                control={
-                                  <Checkbox
-                                    id={`${id}-create/edit`}
-                                    onChange={() =>
-                                      togglePermission(`${id}-create/edit`)
-                                    }
-                                    checked={selectedCheckbox.includes(
-                                      `${id}-create/edit`
-                                    )}
-                                  />
-                                }
-                                label="Create/Edit"
-                              />
-                              <FormControlLabel
-                                className="mie-0"
-                                control={
-                                  <Checkbox
-                                    id={`${id}-delete`}
-                                    onChange={() =>
-                                      togglePermission(`${id}-delete`)
-                                    }
-                                    checked={selectedCheckbox.includes(
-                                      `${id}-delete`
-                                    )}
-                                  />
-                                }
-                                label="Delete"
-                              />
-                            </FormGroup>
-                          )}
+                            ))}
+                          </FormGroup>
                         </td>
                       </tr>
-                    );
-                  })}
+                    </React.Fragment>
+                  ))}
               </tbody>
             </table>
           </div>
