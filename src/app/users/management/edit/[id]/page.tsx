@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import { useEffect, useState } from "react";
-import { get } from "@/services/apiService";
+import { post } from "@/services/apiService";
 import UserForm from "../../UserForm";
 import { getUserById } from "@/services/endpoint/users/management";
 
@@ -17,22 +17,15 @@ const Page = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await get(getUserById(params.id));
+        const response = await post(getUserById, { userId: params.id });
         if (response.statusCode !== 200) {
           throw new Error("Failed to fetch data");
         }
-        const data = await response;
-        setEditingRow(data.data);
+        const data = await response.data;
+        setEditingRow(data);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
-        setEditingRow({
-          userId: 1,
-          userName: "iron man",
-          userEmail: "ironman@yopmail.com",
-          company:
-            '[{"id":0,"companyId":1,"roleId":1},{"id":0,"companyId":1,"roleId":2},{"id":0,"companyId":1,"roleId":2}]',
-        });
         setLoading(false);
       }
     };

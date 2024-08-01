@@ -7,9 +7,7 @@ export const redirectToEditPage = (id: number | string) => {
 //api endpoints
 export const getUsersList = "users/list";
 
-export const getUserById = (id: string | number) => {
-  return `users/getById/${id}`;
-};
+export const getUserById = "users/getById";
 
 export const createUser = "users/create";
 

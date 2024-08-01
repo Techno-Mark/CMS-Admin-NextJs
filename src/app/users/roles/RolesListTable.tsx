@@ -134,6 +134,7 @@ const RolesListTable = ({
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [editId, setEditId] = useState<number>(0);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [call, setCall] = useState<boolean>(false);
 
   const columns = useMemo<ColumnDef<RolesTypeWithAction, any>[]>(
     () => [
@@ -192,6 +193,7 @@ const RolesListTable = ({
                 onClick={() => {
                   setEditId(row.original.roleId);
                   setOpenDialog(true);
+                  setCall(false);
                 }}
               >
                 <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -250,7 +252,8 @@ const RolesListTable = ({
   ]);
 
   useEffect(() => {
-    if (deletingId === 0 || !openDialog) {
+    console.log(call)
+    if (deletingId === 0 || call) {
       getList({
         ...initialBody,
         page: table.getState().pagination.pageIndex,
@@ -258,7 +261,7 @@ const RolesListTable = ({
         search: globalFilter,
       });
     }
-  }, [deletingId, openDialog]);
+  }, [deletingId, call]);
 
   return (
     <>
@@ -387,7 +390,10 @@ const RolesListTable = ({
 
       <RoleDialog
         open={openDialog}
-        setOpen={setOpenDialog}
+        setOpen={(e) => {
+          setOpenDialog(false);
+          setCall(true);
+        }}
         title={"Edit"}
         editId={editId}
       />

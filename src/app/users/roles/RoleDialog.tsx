@@ -69,12 +69,16 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
     try {
       const result = await post(getRoleById, { roleId });
 
-      if (result.data.data) {
-        const data = result.data.data;
-        const permissions = data.permission;
+      if (result.data) {
+        const data = result.data;
+        const permissions = data.permission.filter(
+          (module: any) => module.moduleName !== null
+        );
+
         const selected = permissions.flatMap((perm: any) =>
           perm.permissions.filter((p: any) => p.checked).map((p: any) => p.id)
         );
+
         if (roleId > 0) {
           setDefaultData(permissions);
           setSelectedCheckbox(selected);
@@ -93,10 +97,10 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
   useEffect(() => {
     if (open) {
       if (editId !== 0) {
-        fetchRolePermissions(1);
-      } else {
-        fetchRolePermissions(0);
+        fetchRolePermissions(editId);
       }
+    } else {
+      fetchRolePermissions(0);
     }
   }, [open, editId]);
 
@@ -131,13 +135,21 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
     if (validateForm()) {
       try {
         const endpoint = editId > 0 ? updateRole : createRole;
-        const payload = {
-          organizationId: 1,
-          roleName: roleName,
-          roleId: editId,
-          roleActionMapping: selectedCheckbox,
-          active: active,
-        };
+        const payload =
+          editId > 0
+            ? {
+                organizationId: 1,
+                roleName: roleName,
+                roleId: editId,
+                roleActionMapping: selectedCheckbox,
+                active: active,
+              }
+            : {
+                organizationId: 1,
+                roleName: roleName,
+                roleActionMapping: selectedCheckbox,
+                active: active,
+              };
         const result = await post(endpoint, payload);
         toast.success(result.message);
         handleClose();

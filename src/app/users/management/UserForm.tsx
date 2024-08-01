@@ -45,7 +45,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
   const [company, setCompany] = useState([
     {
       id: 0,
-      companyId: -1,
+      organizationId: -1,
       roleId: -1,
     },
   ]);
@@ -93,12 +93,20 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
   useEffect(() => {
     if (open === EDIT_USER && editingRow) {
       setFormData({
-        userId: editingRow.userId,
-        userName: editingRow.userName,
-        userEmail: editingRow.userEmail,
+        userId: editingRow.UserId,
+        userName: editingRow.Username,
+        userEmail: editingRow.Email,
       });
-
-      setCompany(JSON.parse(editingRow.company));
+      setCompany(
+        editingRow.RolesOrganizations.map(
+          (i: any) =>
+            new Object({
+              id: 0,
+              organizationId: i.organizationId,
+              roleId: i.roleId,
+            })
+        )
+      );
     }
     setLoading(false);
   }, []);
@@ -108,7 +116,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
       ...company,
       {
         id: 0,
-        companyId: -1,
+        organizationId: -1,
         roleId: -1,
       },
     ]);
@@ -139,7 +147,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
       setCompany([
         {
           id: 0,
-          companyId: -1,
+          organizationId: -1,
           roleId: -1,
         },
       ]);
@@ -149,7 +157,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
 
   const handleCompanyChange = (e: number, index: number) => {
     const newFields = [...company];
-    newFields[index].companyId = e;
+    newFields[index].organizationId = e;
     setCompany(newFields);
 
     const newErrors = [...companyIdError];
@@ -185,7 +193,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
       valid = false;
     }
 
-    const newTaskErrors = company.map((field) => field.companyId <= 0);
+    const newTaskErrors = company.map((field) => field.organizationId <= 0);
     setCompanyIdError(newTaskErrors);
     const newSubTaskDescErrors = company.map((field) => field.roleId <= 0);
     setRoleIdError(newSubTaskDescErrors);
@@ -202,42 +210,42 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
     return valid;
   };
 
-  const getFormDataEntries = (formData: any) => {
-    const entries: any = {};
-    formData.forEach((value: any, key: any) => {
-      entries[key] = value;
-    });
-    return entries;
-  };
-
   const handleSubmit = async () => {
     if (validateForm()) {
       try {
         setLoading(true);
 
-        const formDataToSend = new FormData();
-        formDataToSend.set("userName", formData.userName);
-        formDataToSend.set("userEmail", formData.userEmail);
-        formDataToSend.set("company", JSON.stringify(company));
+        const param =
+          open == EDIT_USER
+            ? {
+                userId: editingRow?.UserId,
+                userName: formData.userName,
+                email: formData.userEmail,
+                active: true,
+                organizations: company,
+              }
+            : {
+                userName: formData.userName,
+                email: formData.userEmail,
+                active: true,
+                organizations: company,
+              };
 
         let result = null;
         if (open == EDIT_USER) {
-          formDataToSend.set("eventId", String(editingRow?.userId));
-          console.log("edit", getFormDataEntries(formDataToSend));
-          // result = await post(updateUser, formDataToSend);
+          result = await post(updateUser, param);
         } else {
-          console.log("create", getFormDataEntries(formDataToSend));
-          // result = await post(createUser, formDataToSend);
+          result = await post(createUser, param);
         }
 
         setLoading(false);
 
-        // if (result.status === "success") {
-        //   toast.success(result.message);
-        //   router.back();
-        // } else {
-        //   toast.error(result.message);
-        // }
+        if (result.status === "success") {
+          toast.success(result.message);
+          router.back();
+        } else {
+          toast.error(result.message);
+        }
       } catch (error) {
         console.error(error);
         setLoading(false);
@@ -311,7 +319,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                             select
                             fullWidth
                             defaultValue=""
-                            value={field.companyId}
+                            value={field.organizationId}
                             label="Select Company"
                             id="custom-select"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -365,7 +373,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                         </Grid>
                         <Grid item xs={12} sm={4}>
                           {index === 0 &&
-                          company[0].companyId > 0 &&
+                          company[0].organizationId > 0 &&
                           company[0].roleId > 0 ? (
                             <>
                               <span
