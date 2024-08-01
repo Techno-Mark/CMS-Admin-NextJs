@@ -352,18 +352,18 @@ function PopupForm({
 
 
                 <EditorBasic
-                content={formData.description}
-                onContentChange={(content: string) => {
-                  setFormData({
-                    ...formData,
-                    description: content,
-                  });
-                  if (content.length) {
-                    setFormErrors({ ...formErrors, description: "" });
-                  }
-                }}
-                error={!!formErrors.description}
-              />
+                  content={formData.description}
+                  onContentChange={(content: string) => {
+                    setFormData({
+                      ...formData,
+                      description: content,
+                    });
+                    if (content.length) {
+                      setFormErrors({ ...formErrors, description: "" });
+                    }
+                  }}
+                  error={!!formErrors.description}
+                />
                 {/* <CKEditor
                   editor={ClassicEditor}
                   data={formData.description}
