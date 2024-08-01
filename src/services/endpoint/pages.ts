@@ -4,8 +4,10 @@ export const pages = {
   update: `organization/page/update`,
   getById: `organization/page/getById`,
   delete: `organization/page/delete`,
+  fileUpoad:  `upload`
   // active: `organization/active`,
 };
+
 
 export const redirectToEditPage = (id: number | string) => {
   return `/content-management/pages/edit/${id}`;

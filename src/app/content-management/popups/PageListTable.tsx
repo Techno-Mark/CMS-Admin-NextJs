@@ -31,7 +31,7 @@ import ConfirmationDialog from "./ConfirmationDialog";
 
 
 import tableStyles from "@core/styles/table.module.css";
-import { redirectToAddPage, redirectToEditPage } from "@/services/endpoint/pages";
+import { redirectToAddPage, redirectToEditPage } from "@/services/endpoint/popup";
 import CustomChip from "@/@core/components/mui/Chip";
 import BreadCrumbList from "@/components/BreadCrumbList";
 
@@ -54,7 +54,7 @@ const DebouncedInput = ({
   onChange: (value: string | number) => void;
   debounce?: number;
 } & Omit<TextFieldProps, "onChange">) => {
-  
+
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
@@ -118,11 +118,11 @@ const PageListTable = ({
           </Typography>
         ),
       }),
-      columnHelper.accessor("name", {
-        header: "PAge Name",
+      columnHelper.accessor("popupTitle", {
+        header: "Popup Title",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {row.original.name}
+            {row.original.popupTitle}
           </Typography>
         ),
       }),
@@ -140,9 +140,9 @@ const PageListTable = ({
           <CustomChip
             size="small"
             round="true"
-            label={row.original.active ? 'Publish' : 'Draft'}
+            label={row.original.active ? 'Active' : 'Inactive'}
             variant="tonal"
-            color={row.original.active ? 'success' : 'warning'}
+            color={row.original.active ? 'success' : 'error'}
           />
       }),
       columnHelper.accessor("id", {
@@ -152,7 +152,7 @@ const PageListTable = ({
             <div className="flex items-center">
               <IconButton
                 onClick={() => {
-                  router.push(redirectToEditPage(row.original.id));
+                  router.push(redirectToEditPage(row.original.popupId));
                 }}
               >
                 <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -160,7 +160,7 @@ const PageListTable = ({
               <IconButton
                 onClick={() => {
                   setIsDeleting(true);
-                  setDeletingId(row.original.id);
+                  setDeletingId(row.original.popupId);
                 }}
               >
                 <i className="tabler-trash text-[22px] text-textSecondary" />
@@ -218,7 +218,7 @@ const PageListTable = ({
         limit: table.getState().pagination.pageSize,
         search: globalFilter,
         active: activeFilter,
-        
+
       });
     }
   }, [deletingId]);
@@ -260,8 +260,8 @@ const PageListTable = ({
               }}
             >
               <MenuItem value="all">All</MenuItem>
-              <MenuItem value="active">Publish</MenuItem>
-              <MenuItem value="inactive">Draft</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="inactive">InActive</MenuItem>
             </CustomTextField>
           </div>
           <Button
@@ -270,7 +270,7 @@ const PageListTable = ({
             onClick={() => router.push(redirectToAddPage)}
             className="is-full sm:is-auto"
           >
-            Add Pages
+            Add Pop-up
           </Button>
         </div>
       </div>

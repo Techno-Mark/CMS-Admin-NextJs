@@ -27,7 +27,7 @@ import { category } from "@/services/endpoint/category";
 import { tag } from "@/services/endpoint/tag";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
-import EditorCustom from "./RichEditor";
+// import EditorCustom from "./RichEditor";
 import { ADD_BLOG, blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
 
 type blogFormPropsTypes = {
@@ -402,10 +402,10 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
             </Grid>
             <Grid item xs={12} sm={12}>
               <p className="text-[#4e4b5a]">Description *</p>
-              <EditorCustom
+              {/* <EditorCustom
                 setContent={setFormData}
                 content={formData.description}
-              />
+              /> */}
             </Grid>
             <Grid item xs={12} sm={12}>
               <CustomTextField
