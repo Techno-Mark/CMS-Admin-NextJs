@@ -374,7 +374,7 @@ const UserListTable = () => {
           open={isDeleting}
           setDeletingId={setDeletingId}
           setOpen={(arg1: boolean) => setIsDeleting(arg1)}
-          deletePayload={{ id: deletingId }}
+          deletePayload={{ userId: deletingId }}
         />
       </div>
     </>
