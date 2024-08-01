@@ -5,14 +5,14 @@ export const redirectToEditPage = (id: number | string) => {
 };
 
 //api endpoints
-export const getUsersList = "users/management/list";
+export const getUsersList = "users/list";
 
 export const getUserById = (id: string | number) => {
-  return `users/management/getById/${id}`;
+  return `users/getById/${id}`;
 };
 
-export const createUser = "users/management/create";
+export const createUser = "users/create";
 
-export const updateUser = "users/management/update";
+export const updateUser = "users/update";
 
-export const deleteUser = "users/management/delete";
+export const deleteUser = "users/delete";

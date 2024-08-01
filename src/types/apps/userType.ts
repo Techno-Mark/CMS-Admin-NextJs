@@ -1,9 +1,9 @@
 export interface userType {
   srNo?: number;
-  userId: number;
-  userName: string;
+  UserId: number;
+  Username: string;
   role: string;
-  active: boolean;
+  Status: string;
   createdAt: string;
   updatedAt: string | null;
 }

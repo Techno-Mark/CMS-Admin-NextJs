@@ -113,30 +113,11 @@ const UserListTable = () => {
           search: globalFilter,
           active: activeFilter,
         });
-        setData(result.data.events);
-        setTotalRows(result.data.totalEvents);
+        setData(result.data.users);
+        setTotalRows(result.data.totalUsers);
       } catch (error: any) {
         setError(error.message);
-        setData([
-          {
-            srNo: 1,
-            userId: 1,
-            userName: "John",
-            role: "admin",
-            active: true,
-            createdAt: "24/07/2024",
-            updatedAt: null,
-          },
-          {
-            srNo: 2,
-            userId: 2,
-            userName: "Doe",
-            role: "User",
-            active: false,
-            createdAt: "29/07/2024",
-            updatedAt: null,
-          },
-        ]);
+        setData([]);
         setTotalRows(2);
       } finally {
         setLoading(false);
@@ -156,23 +137,23 @@ const UserListTable = () => {
         ),
         enableSorting: false,
       }),
-      columnHelper.accessor("userName", {
+      columnHelper.accessor("Username", {
         header: "User",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {row.original.userName}
+            {row.original.Username}
           </Typography>
         ),
       }),
-      columnHelper.accessor("role", {
-        header: "Role",
-        cell: ({ row }) => (
-          <Typography color="text.primary" className="font-medium">
-            {row.original.role}
-          </Typography>
-        ),
-        enableSorting: false,
-      }),
+      // columnHelper.accessor("role", {
+      //   header: "Role",
+      //   cell: ({ row }) => (
+      //     <Typography color="text.primary" className="font-medium">
+      //       {row.original.role}
+      //     </Typography>
+      //   ),
+      //   enableSorting: false,
+      // }),
       columnHelper.accessor("createdAt", {
         header: "Created At",
         cell: ({ row }) => (
@@ -182,29 +163,29 @@ const UserListTable = () => {
         ),
       }),
 
-      columnHelper.accessor("active", {
+      columnHelper.accessor("Status", {
         header: "Status",
         cell: ({ row }) => (
           <div className="flex items-center">
             <CustomChip
               size="small"
               round="true"
-              label={row.original.active ? "Active" : "Inactive"}
+              label={row.original.Status}
               variant="tonal"
-              color={row.original.active ? "success" : "warning"}
+              color={row.original.Status === "Active" ? "success" : "warning"}
             />
           </div>
         ),
         enableSorting: false,
       }),
 
-      columnHelper.accessor("userId", {
+      columnHelper.accessor("UserId", {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
             <IconButton
               onClick={() =>
-                router.push(`/users/management/edit/${row.original.userId}`)
+                router.push(`/users/management/edit/${row.original.UserId}`)
               }
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -212,7 +193,7 @@ const UserListTable = () => {
             <IconButton
               onClick={() => {
                 setIsDeleting(true);
-                setDeletingId(row.original.userId);
+                setDeletingId(row.original.UserId);
               }}
             >
               <i className="tabler-trash text-[22px] text-textSecondary" />

@@ -289,7 +289,7 @@ const PermissionsListTable = ({
         </div>
       </div>
       <Card>
-        <div className="overflow-x-auto h-[340px]">
+        <div className="overflow-x-auto h-[380px]">
           <table className={tableStyles.table}>
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
