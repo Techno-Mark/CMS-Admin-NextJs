@@ -8,7 +8,7 @@ import Chip from "@mui/material/Chip";
 import { Color } from "@tiptap/extension-color";
 import { ListItem } from "@tiptap/extension-list-item";
 import { TextStyle } from "@tiptap/extension-text-style";
-import { EditorProvider } from "@tiptap/react";
+import { EditorProvider, useCurrentEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { Placeholder } from "@tiptap/extension-placeholder";
 
@@ -179,6 +179,9 @@ const EditorToolbar = () => {
   );
 };
 
+
+
+
 const extensions = [
   Color.configure({ types: [TextStyle.name, ListItem.name] }),
 
@@ -230,3 +233,4 @@ const EditorCustom = ({
   );
 };
 
+export default EditorCustom;

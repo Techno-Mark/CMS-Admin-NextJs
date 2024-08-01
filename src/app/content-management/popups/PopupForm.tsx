@@ -27,7 +27,6 @@ import { category } from "@/services/endpoint/category";
 import { tag } from "@/services/endpoint/tag";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
-// import EditorCustom from "./RichEditor";
 import { blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
 
 type blogFormPropsTypes = {
@@ -157,9 +156,9 @@ function PopupForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
       slug:
         !isSlugManuallyEdited && open === sectionActions.ADD
           ? newName
-              .replace(/[^\w\s]|_/g, "")
-              .replace(/\s+/g, "-")
-              .toLowerCase()
+            .replace(/[^\w\s]|_/g, "")
+            .replace(/\s+/g, "-")
+            .toLowerCase()
           : prevData.slug,
     }));
     if (newName?.length) {
@@ -331,7 +330,7 @@ function PopupForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
             <BreadCrumbList />
           </Grid>
           <Grid item xs={12} sm={1}>
-            <IconButton color="info" onClick={() => {}}>
+            <IconButton color="info" onClick={() => { }}>
               <i className="tabler-external-link text-textSecondary"></i>
             </IconButton>
           </Grid>
@@ -369,7 +368,9 @@ function PopupForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
 
 
             <Grid item xs={12} sm={12}>
-              <p className="text-[#4e4b5a]">Description *</p>
+              <p className="text-[#4e4b5a]">Description 1!@# *</p>
+             
+              {/* <CustomEditor /> */}
 
               {/* <EditorCustom
                 setContent={setFormData}
@@ -469,7 +470,7 @@ function PopupForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
                   Save & Publish
                 </Button>
               </Box>
-              
+
             </Grid>
           </Grid>
         </Box>
