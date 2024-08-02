@@ -42,7 +42,7 @@ const cardData: CardDataType[] = [
   },
 ];
 
-const RoleCards = () => {
+const RoleCards = ({ openDialog, setOpenDialog }: any) => {
   // Vars
   const typographyProps: TypographyProps = {
     children: "Edit Role",
@@ -120,6 +120,8 @@ const RoleCards = () => {
             element={Card}
             elementProps={CardProps}
             dialog={RoleDialog}
+            openDialog={openDialog}
+            setOpenDialog={setOpenDialog}
           />
         </Grid>
       </Grid>

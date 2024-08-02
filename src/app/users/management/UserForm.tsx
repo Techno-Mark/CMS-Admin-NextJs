@@ -6,7 +6,15 @@ import { organization } from "@/services/endpoint/organization";
 import { createUser, updateUser } from "@/services/endpoint/users/management";
 import { getRoleList } from "@/services/endpoint/users/roles";
 import { userDetailType } from "@/types/apps/userType";
-import { Box, Button, Card, Grid, MenuItem } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  FormControlLabel,
+  Grid,
+  MenuItem,
+  Switch,
+} from "@mui/material";
 import { useRouter } from "next/navigation";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -24,6 +32,7 @@ const initialData = {
   userId: 0,
   userName: "",
   userEmail: "",
+  active: false,
 };
 
 const initialErrorData = {
@@ -47,13 +56,43 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
       id: 0,
       organizationId: -1,
       roleId: -1,
+      roles: [] as LabelValue[],
     },
   ]);
   const [companyIdError, setCompanyIdError] = useState([false]);
   const [roleIdError, setRoleIdError] = useState([false]);
   const [deletedCompany, setDeletedCompany] = useState<number[] | []>([]);
   const [companyList, setCompanyList] = useState<LabelValue[]>([]);
-  const [roleList, setRoleList] = useState<LabelValue[]>([]);
+
+  const setRolesInCompany = async (organizationId: number, index: number) => {
+    const roles = (await fetchRoles(organizationId)) as LabelValue[];
+
+    const newCompany = [...company];
+    newCompany[index].roles = roles;
+    setCompany(newCompany);
+  };
+
+  const fetchRoles = async (organizationId: number) => {
+    try {
+      const response = await post(getRoleList, {
+        page: 1,
+        limit: 1000,
+        search: "",
+        organizationId: organizationId,
+        active: true,
+      });
+
+      return response.data.roles.map(
+        (r: any) =>
+          new Object({
+            id: r.roleId,
+            name: r.roleName,
+          })
+      ) as LabelValue[];
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     const fetchOrganizations = async () => {
@@ -66,50 +105,39 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
       }
     };
 
-    const fetchRoles = async () => {
-      try {
-        const response = await post(getRoleList, {});
-        const roles = response.data.roles as LabelValue[];
-        // setRoleList(roles);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
     fetchOrganizations();
-    // fetchRoles();
-    setRoleList([
-      {
-        id: 1,
-        name: "Content Editor",
-      },
-      {
-        id: 2,
-        name: "Manage",
-      },
-    ]);
   }, []);
 
   useEffect(() => {
-    if (open === EDIT_USER && editingRow) {
-      setFormData({
-        userId: editingRow.UserId,
-        userName: editingRow.Username,
-        userEmail: editingRow.Email,
-      });
-      setCompany(
-        editingRow.RolesOrganizations.map(
-          (i: any) =>
-            new Object({
+    const fetchEditingRowData = async () => {
+      if (open === EDIT_USER && editingRow) {
+        setFormData({
+          userId: editingRow.UserId,
+          userName: editingRow.Username,
+          userEmail: editingRow.Email,
+          active: editingRow.Status,
+        });
+
+        const rolesOrganizations = await Promise.all(
+          editingRow.RolesOrganizations.map(async (i: any) => {
+            const roles = await fetchRoles(i.organizationId);
+            return {
               id: 0,
               organizationId: i.organizationId,
               roleId: i.roleId,
-            })
-        )
-      );
-    }
-    setLoading(false);
-  }, []);
+              roles: roles,
+            };
+          })
+        );
+        setCompany(rolesOrganizations);
+      }
+      setLoading(false);
+    };
+
+    fetchEditingRowData();
+  }, [open, editingRow]);
+
+  console.log(company)
 
   const addCompany = () => {
     setCompany([
@@ -118,6 +146,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
         id: 0,
         organizationId: -1,
         roleId: -1,
+        roles: [],
       },
     ]);
     setCompanyIdError([...companyIdError, false]);
@@ -149,6 +178,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
           id: 0,
           organizationId: -1,
           roleId: -1,
+          roles: [],
         },
       ]);
     company.length === 1 && setCompanyIdError([false]);
@@ -158,11 +188,14 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
   const handleCompanyChange = (e: number, index: number) => {
     const newFields = [...company];
     newFields[index].organizationId = e;
+    newFields[index].roleId = -1;
     setCompany(newFields);
 
     const newErrors = [...companyIdError];
     newErrors[index] = e <= 0;
     setCompanyIdError(newErrors);
+
+    setRolesInCompany(e, index);
   };
 
   const handleRoleChange = (e: number, index: number) => {
@@ -221,14 +254,26 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                 userId: editingRow?.UserId,
                 userName: formData.userName,
                 email: formData.userEmail,
-                active: true,
-                organizations: company,
+                active: formData.active,
+                organizations: company.map(
+                  (c) =>
+                    new Object({
+                      roleId: c.roleId,
+                      organizationId: c.organizationId,
+                    })
+                ),
               }
             : {
                 userName: formData.userName,
                 email: formData.userEmail,
-                active: true,
-                organizations: company,
+                active: formData.active,
+                organizations: company.map(
+                  (c) =>
+                    new Object({
+                      roleId: c.roleId,
+                      organizationId: c.organizationId,
+                    })
+                ),
               };
 
         let result = null;
@@ -264,7 +309,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
               <div className="flex flex-col gap-2 pb-4">
                 <Box display="flex" gap={4}>
                   <Grid container spacing={1} sm={12}>
-                    <Grid item xs={12} sm={6} className="mb-4">
+                    <Grid item xs={10} sm={5} className="mb-4">
                       <CustomTextField
                         error={!!formErrors.userName}
                         helperText={formErrors.userName}
@@ -282,7 +327,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                       />
                     </Grid>
 
-                    <Grid item xs={12} sm={6}>
+                    <Grid item xs={10} sm={5}>
                       <CustomTextField
                         error={!!formErrors.userEmail}
                         helperText={formErrors.userEmail}
@@ -297,6 +342,24 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                             userEmail: e.target.value,
                           });
                         }}
+                      />
+                    </Grid>
+
+                    <Grid item xs={4} sm={2}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={formData.active}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                active: e.target.checked,
+                              })
+                            }
+                          />
+                        }
+                        label="Status"
+                        className="mt-4 ml-2"
                       />
                     </Grid>
 
@@ -360,9 +423,8 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                             <MenuItem value={-1}>
                               <em>Select Role</em>
                             </MenuItem>
-                            {!loading &&
-                              !!roleList.length &&
-                              roleList.map((role: any) => {
+                            {field.roles.length > 0 &&
+                              field.roles.map((role: any) => {
                                 return (
                                   <MenuItem value={role.id} key={role.id}>
                                     {role.name}

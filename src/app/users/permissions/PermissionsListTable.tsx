@@ -40,7 +40,7 @@ import {
   redirectToEditPage,
 } from "@/services/endpoint/users/roles";
 import { formatDate } from "@/utils/formatDate";
-import { Chip } from "@mui/material";
+import { Chip, MenuItem } from "@mui/material";
 import OpenDialogOnElementClick from "@/components/Dialogs/OpenDialogOnElementClick";
 import PermissionDialog from "./PermissionDialog";
 
@@ -115,7 +115,12 @@ const PermissionsListTable = ({
 }: {
   totalCount: number;
   tableData?: PermissionsType[];
-  getList: (arg1: { page: number; limit: number; search: string }) => void;
+  getList: (arg1: {
+    page: number;
+    limit: number;
+    search: string;
+    active: boolean | null;
+  }) => void;
   initialBody: {
     page: number;
     limit: number;
@@ -130,6 +135,8 @@ const PermissionsListTable = ({
   const [deletingId, setDeletingId] = useState<number>(0);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<number>(0);
+  const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
+
   //vars
   const buttonProps: ButtonProps = {
     variant: "contained",
@@ -237,11 +244,13 @@ const PermissionsListTable = ({
       page: table.getState().pagination.pageIndex,
       limit: table.getState().pagination.pageSize,
       search: globalFilter,
+      active: activeFilter,
     });
   }, [
     table.getState().pagination.pageSize,
     table.getState().pagination.pageIndex,
     globalFilter,
+    activeFilter,
   ]);
 
   useEffect(() => {
@@ -251,6 +260,7 @@ const PermissionsListTable = ({
         page: table.getState().pagination.pageIndex,
         limit: table.getState().pagination.pageSize,
         search: globalFilter,
+        active: activeFilter,
       });
     }
   }, [deletingId]);
@@ -262,6 +272,7 @@ const PermissionsListTable = ({
         page: table.getState().pagination.pageIndex,
         limit: table.getState().pagination.pageSize,
         search: globalFilter,
+        active: activeFilter,
       });
     }
   }, [addOpen, open]);
@@ -271,15 +282,42 @@ const PermissionsListTable = ({
       <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
         <BreadCrumbList />
         <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-          <IconButton>
-            <i className="tabler-filter text-[22px] text-textSecondary" />
-          </IconButton>
           <DebouncedInput
             value={globalFilter ?? ""}
             onChange={(value) => setGlobalFilter(String(value))}
             placeholder="Search"
             className="is-full sm:is-auto"
           />
+          <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
+            <Typography>Status:</Typography>
+            <CustomTextField
+              select
+              fullWidth
+              defaultValue="all"
+              id="custom-select"
+              value={
+                activeFilter === null
+                  ? "all"
+                  : activeFilter === true
+                    ? "active"
+                    : "inactive"
+              }
+              onChange={(e) => {
+                const value = e.target.value;
+                setActiveFilter(
+                  value === "active"
+                    ? true
+                    : value === "inactive"
+                      ? false
+                      : null
+                );
+              }}
+            >
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="inactive">Inactive</MenuItem>
+            </CustomTextField>
+          </div>
           <OpenDialogOnElementClick
             element={Button}
             elementProps={buttonProps}
