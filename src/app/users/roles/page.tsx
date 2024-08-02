@@ -9,6 +9,7 @@ const initialBody = {
   limit: 10,
   search: "",
   organizationId: 1,
+  active: null,
 };
 
 const page = () => {
