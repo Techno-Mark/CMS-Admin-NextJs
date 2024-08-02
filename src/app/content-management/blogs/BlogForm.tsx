@@ -373,6 +373,15 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
       }));
     }
   };
+
+  const handleContentChange = (content: any) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      description: content,
+    }));
+   
+  };
+
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -446,16 +455,19 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
 
               <EditorBasic
                 content={formData.description}
-                onContentChange={(content: string) => {
-                  setFormData({
-                    ...formData,
-                    description: content,
-                  });
-                  if (content.length) {
-                    setFormErrors({ ...formErrors, description: "" });
-                  }
-                }}
+                onContentChange={handleContentChange}
+
+                // onContentChange={(content: string) => {
+                //   setFormData({ ...formData, 
+                //     description: content })
+
+
+                //   // if (content.length) {
+                //   //   setFormErrors({ ...formErrors, description: "" });
+                //   // }
+                // }}
                 error={!!formErrors.description}
+                helperText={formErrors.description}
               />
 
 

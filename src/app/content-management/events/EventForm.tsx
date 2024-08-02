@@ -263,6 +263,13 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
       }));
     }
   };
+  const handleContentChange = (content: any) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      description: content,
+    }));
+   
+  };
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -461,18 +468,12 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
 
 
                       <EditorBasic
-                content={formData.description}
-                onContentChange={(content: string) => {
-                  setFormData({
-                    ...formData,
-                    description: content,
-                  });
-                  if (content.length) {
-                    setFormErrors({ ...formErrors, description: "" });
-                  }
-                }}
-                error={!!formErrors.description}
-              />
+                         content={formData.description}
+                         onContentChange={handleContentChange}
+        
+                         error={!!formErrors.description}
+                         helperText={formErrors.description}
+                      />
 
                       {/* <EditorCustom /> */}
                       {/* <EditorBasic
@@ -501,7 +502,7 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
                           }
                         }}
                       /> */}
- 
+
                       {formErrors.description && (
                         <p className="ml-[-2px] mt-2 MuiFormHelperText-root Mui-error MuiFormHelperText-sizeSmall MuiFormHelperText-contained mui-1ou7mfh-MuiFormHelperText-root">
                           {formErrors.description}

@@ -265,7 +265,15 @@ function PopupForm({
       }));
     }
   };
-
+  const handleContentChange = (content: any) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      description: content,
+    }));
+    // if (content.length) {
+    //   setFormErrors({ ...formErrors, description: "" });
+    // }
+  };
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -351,16 +359,19 @@ function PopupForm({
 
                 <EditorBasic
                   content={formData.description}
-                  onContentChange={(content: string) => {
-                    setFormData({
-                      ...formData,
-                      description: content,
-                    });
-                    if (content.length) {
-                      setFormErrors({ ...formErrors, description: "" });
-                    }
-                  }}
+                  onContentChange={handleContentChange}
+
+                  // onContentChange={(content: string) => {
+                  //   setFormData({ ...formData, 
+                  //     description: content })
+
+
+                  //   // if (content.length) {
+                  //   //   setFormErrors({ ...formErrors, description: "" });
+                  //   // }
+                  // }}
                   error={!!formErrors.description}
+                  helperText={formErrors.description}
                 />
                 {/* <CKEditor
                   editor={ClassicEditor}

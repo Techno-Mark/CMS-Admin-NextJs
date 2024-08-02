@@ -15,6 +15,7 @@ import { useSettings } from '@core/hooks/useSettings';
 // API Imports
 import { organization } from "@/services/endpoint/organization";
 import { post } from "@/services/apiService";
+import { setLocalStorageItem } from '@/utils/localStorageHelper';
 
 interface Organization {
   id: string;
@@ -45,7 +46,9 @@ const ModeDropdown = () => {
           setSelectedOrgId(parsedOrgId);
         } else if (orgs.length > 0) {
           setSelectedOrgId(orgs[0].id);
-          localStorage.setItem('selectedOrgId', orgs[0].id);
+          setLocalStorageItem('selectedOrgId', orgs[0].id);
+
+          // localStorage.setItem('selectedOrgId', orgs[0].id);
         }
       } catch (error) {
         console.error('Error fetching organizations:', error);
@@ -66,8 +69,9 @@ const ModeDropdown = () => {
   const handleModeSwitch = (orgId: string, event: React.MouseEvent) => {
     event.preventDefault();
     setSelectedOrgId(orgId);
-    localStorage.setItem('selectedOrgId', orgId);
-    window.location.reload();
+    // localStorage.setItem('selectedOrgId', orgId);
+    setLocalStorageItem('selectedOrgId', orgId);
+    // window.location.reload();
     handleClose();
   };
 
