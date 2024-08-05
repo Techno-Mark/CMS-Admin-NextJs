@@ -2,11 +2,9 @@
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import { Button, Box, Card, Grid, MenuItem, Typography, IconButton, CardContent, CardActions, ButtonGroup, Tooltip, } from "@mui/material";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { useDropzone } from "react-dropzone";
 import { get, post } from "@/services/apiService";
 import { template } from "@/services/endpoint/template";
 import CustomTextField from "@/@core/components/mui/TextField";
-import { useRouter } from "next/navigation";
 import { PagesType } from "./pagesType";
 import { pages } from "@/services/endpoint/pages";
 import { toast } from "react-toastify";
@@ -674,10 +672,34 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       };
     });
   }
+  // const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
+  //   const newSectionTemplate = [...sections[index].sectionTemplate];
+  //   const duplicateField = { ...newSectionTemplate[fieldIndex] };
+  //   newSectionTemplate.push({ ...duplicateField });
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     updatedSections[index].sectionTemplate = newSectionTemplate;
+  //     return updatedSections;
+  //   });
+  // };
+  // const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
+  //   const newSectionTemplate = [...sections[index].sectionTemplate];
+  //   if (newSectionTemplate.length > 1) {
+  //     newSectionTemplate.splice(fieldIndex, 1);
+  //     setSections((prevSections) => {
+  //       const updatedSections = [...prevSections];
+  //       updatedSections[index].sectionTemplate = newSectionTemplate;
+  //       return updatedSections;
+  //     });
+  //   }
+  // };
+
+
   const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
     const newSectionTemplate = [...sections[index].sectionTemplate];
     const duplicateField = { ...newSectionTemplate[fieldIndex] };
-    newSectionTemplate.push({ ...duplicateField });
+    // Insert duplicateField right after the current fieldIndex
+    newSectionTemplate.splice(fieldIndex + 1, 0, duplicateField);
     setSections((prevSections) => {
       const updatedSections = [...prevSections];
       updatedSections[index].sectionTemplate = newSectionTemplate;
@@ -685,16 +707,30 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     });
   };
   const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
-    const newSectionTemplate = [...sections[index].sectionTemplate];
-    if (newSectionTemplate.length > 1) {
-      newSectionTemplate.splice(fieldIndex, 1);
-      setSections((prevSections) => {
-        const updatedSections = [...prevSections];
+    setSections((prevSections) => {
+      const updatedSections = [...prevSections];
+      const newSectionTemplate = [...updatedSections[index].sectionTemplate];
+  
+      if (newSectionTemplate.length > 1) {
+        newSectionTemplate.splice(fieldIndex, 1);
         updatedSections[index].sectionTemplate = newSectionTemplate;
-        return updatedSections;
-      });
-    }
-  };
+      }
+  
+      return updatedSections;
+    });
+  };  
+  // const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
+  //   const newSectionTemplate = [...sections[index].sectionTemplate];
+  //   if (newSectionTemplate.length > 1) {
+  //     newSectionTemplate.splice(fieldIndex, 1);
+  //     setSections((prevSections) => {
+  //       const updatedSections = [...prevSections];
+  //       updatedSections[index].sectionTemplate = newSectionTemplate;
+  //       return updatedSections;
+  //     });
+  //   }
+  // };
+
 
   // const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
   //   const newSectionTemplate = [...sections[index].sectionTemplate];
@@ -952,7 +988,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                               </Button>
                                             </Tooltip>
                                           {/* )} */}
-                                          {field.multipleData.length > 1 && (
+                                          {/* {field.multipleData.length > 1 && ( */}
                                             <Tooltip title={`Remove ${field.fieldLabel}`}>
                                               <Button size="small"
                                                 onClick={() =>
@@ -961,7 +997,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                 <i className="tabler-minus" />
                                               </Button>
                                             </Tooltip>
-                                           )} 
+                                           {/* )}  */}
                                         </ButtonGroup>
                                       </Grid>
                                     </Grid>
@@ -1097,6 +1133,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                   </CardContent>
                                 </Card>
                               </Grid>
+                                
+
                             ) : (
                               <Grid item xs={12} sm={12}>
                                 <CustomTextField

@@ -39,14 +39,18 @@ const ModeDropdown = () => {
         setOrganizations(orgs);
         
         const storedOrgId = localStorage.getItem('selectedOrgId');
-
+     
+        
 
         if (storedOrgId) {
           const parsedOrgId = parseInt(storedOrgId, 10); 
           setSelectedOrgId(parsedOrgId);
         } else if (orgs.length > 0) {
-          setSelectedOrgId(orgs[0].id);
-          setLocalStorageItem('selectedOrgId', orgs[0].id);
+          console.log(orgs[0].id);
+          const parsedOrgId = parseInt(orgs[0].id, 10); 
+
+          setSelectedOrgId(parsedOrgId);
+          setLocalStorageItem('selectedOrgId',parsedOrgId);
 
           // localStorage.setItem('selectedOrgId', orgs[0].id);
         }

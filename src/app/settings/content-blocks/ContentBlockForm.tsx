@@ -365,21 +365,28 @@ const ContentBlockForm = ({ open }: Props) => {
                                   onChange={(e) => handleChangeField(index, "fieldLabel", e.target.value)}
                                 />
                               </TableCell>
-                              <TableCell>
-                                <Switch
-                                  checked={field.isRequired}
-                                  onChange={(e) => handleChangeField(index, "isRequired", e.target.checked)}
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <CustomTextField
-                                  fullWidth
-                                  value={field.validation}
-                                  onChange={(e) => handleChangeField(index, "validation", e.target.value)}
-                                  error={!!formErrors.jsonContent[index]}
-                                  helperText={formErrors.jsonContent[index]}
-                                />
-                              </TableCell>
+                              {/* {field.fieldType !== "multiple" && (<> */}
+
+                                <TableCell>
+                                  <Switch
+                                    checked={field.isRequired}
+                                    onChange={(e) => handleChangeField(index, "isRequired", e.target.checked)}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <CustomTextField
+                                    fullWidth
+                                    value={field.validation}
+                                    onChange={(e) => handleChangeField(index, "validation", e.target.value)}
+                                    error={!!formErrors.jsonContent[index]}
+                                    helperText={formErrors.jsonContent[index]}
+                                  />
+                                </TableCell>
+                              {/* </>)} */}
+                              {/* {field.fieldType === "multiple" ?? (<> */}
+                                {/* <TableCell>&nbsp; s</TableCell>
+                                <TableCell>&nbsp; s</TableCell>
+                              </>)} */}
                               <TableCell>
                                 <IconButton size="small" onClick={() => handleRemoveRow(index)} aria-label="minus" color="error">
                                   <i className="tabler-minus" />
@@ -452,6 +459,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                                   onChange={(e) => handleChangeField(index, "fieldLabel", e.target.value, subIndex)}
                                                 />
                                               </TableCell>
+                                              {/* {field.fieldType !== "multiple" && (<> */}
                                               <TableCell>
                                                 <Switch
                                                   checked={subField.isRequired}
@@ -467,6 +475,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                                   helperText={formErrors.jsonContent[index]?.[subIndex]}
                                                 />
                                               </TableCell>
+                                              {/* </>)} */}
                                               <TableCell>
                                                 <IconButton
                                                   size="small"
