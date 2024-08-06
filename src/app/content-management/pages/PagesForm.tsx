@@ -9,6 +9,13 @@ import { PagesType } from "./pagesType";
 import { pages } from "@/services/endpoint/pages";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
+import { v4 as uuidv4 } from 'uuid';
+
+ 
+const createField = (field: any) => ({
+  ...field,
+  id: uuidv4(),
+});
 
 const sectionActions = { ADD: -1, EDIT: 1 };
 
@@ -671,6 +678,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
         templateData: updatedTemplateData,
       };
     });
+    console.log(formData);
+    console.log(sections);
+    
   }
   // const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
   //   const newSectionTemplate = [...sections[index].sectionTemplate];
@@ -695,30 +705,190 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   // };
 
 
+  // const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
+  //   const newSectionTemplate = [...sections[index].sectionTemplate];
+  //   const duplicateField = { ...newSectionTemplate[fieldIndex] };
+  //   // Insert duplicateField right after the current fieldIndex
+  //   newSectionTemplate.splice(fieldIndex + 1, 0, duplicateField);
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     updatedSections[index].sectionTemplate = newSectionTemplate;
+  //     return updatedSections;
+  //   });
+  //   console.log(sections);
+    
+  // };
+  // const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
+  //   const newSectionTemplate = [...sections[index].sectionTemplate];
+  //   const fieldToDuplicate = { ...newSectionTemplate[fieldIndex] };
+  //   const duplicateField = createField(fieldToDuplicate); // Assign a new unique ID
+  
+  //   // Insert duplicateField right after the current fieldIndex
+  //   newSectionTemplate.splice(fieldIndex + 1, 0, duplicateField);
+  
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     updatedSections[index].sectionTemplate = newSectionTemplate;
+  //     return updatedSections;
+  //   });
+  //   console.log(sections);
+  // };
+
+  // const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
+  //   const newSectionTemplate = [...sections[index].sectionTemplate];
+  //   const fieldToDuplicate = { ...newSectionTemplate[fieldIndex] };
+  //   const duplicateField = { ...fieldToDuplicate, id: uuidv4() }; // Assign a new unique ID
+  
+  //   // Insert duplicateField right after the current fieldIndex
+  //   newSectionTemplate.splice(fieldIndex + 1, 0, duplicateField);
+  
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     updatedSections[index].sectionTemplate = newSectionTemplate;
+  //     return updatedSections;
+  //   });
+  //   console.log(sections);
+  //   console.log(formData);
+    
+  // };
+ 
+  // const handleRemoveDuplicateForm = (index: number, fieldId: string) => {
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     const newSectionTemplate = [...updatedSections[index].sectionTemplate];
+  
+  //     // Find the index of the field with the given ID
+  //     const fieldIndex = newSectionTemplate.findIndex(field => field.id === fieldId);
+  
+  //     if (fieldIndex !== -1 && newSectionTemplate.length > 1) {
+  //       newSectionTemplate.splice(fieldIndex, 1);
+  //       updatedSections[index].sectionTemplate = newSectionTemplate;
+  //     }
+  //     console.log(sections);
+  //     console.log(formData);
+  
+  //     return updatedSections;
+  //   });
+  // };
+  
+
   const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
-    const newSectionTemplate = [...sections[index].sectionTemplate];
-    const duplicateField = { ...newSectionTemplate[fieldIndex] };
-    // Insert duplicateField right after the current fieldIndex
-    newSectionTemplate.splice(fieldIndex + 1, 0, duplicateField);
     setSections((prevSections) => {
       const updatedSections = [...prevSections];
+      const newSectionTemplate = [...updatedSections[index].sectionTemplate];
+      const fieldToDuplicate = { ...newSectionTemplate[fieldIndex] };
+      const duplicateField = { ...fieldToDuplicate, id: uuidv4() }; // Assign a new unique ID
+  
+      // Insert duplicateField right after the current fieldIndex
+      newSectionTemplate.splice(fieldIndex + 1, 0, duplicateField);
       updatedSections[index].sectionTemplate = newSectionTemplate;
       return updatedSections;
     });
   };
-  const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
+
+  // const handleRemoveDuplicateForm = (index: number, fieldId: string) => {
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     const newSectionTemplate = [...updatedSections[index].sectionTemplate];
+  
+  //     // Find the index of the field with the given ID
+  //     const fieldIndex = newSectionTemplate.findIndex(field => field.id === fieldId);
+  //     console.log("Field ID to remove:", fieldId);
+  //     console.log("Field Index found:", fieldIndex);
+  
+  //     if (fieldIndex !== -1 && newSectionTemplate.length > 1) {
+  //       newSectionTemplate.splice(fieldIndex, 1);
+  //       updatedSections[index].sectionTemplate = newSectionTemplate;
+  //     } else {
+  //       console.log("Field not found or only one field left");
+  //     }
+  
+  //     return updatedSections;
+  //   });
+  // };
+
+  // const handleRemoveDuplicateForm = (index: number, fieldId: string) => {
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     const newSectionTemplate = [...updatedSections[index].sectionTemplate];
+  
+  //     // Find the index of the field with the given ID
+  //     const fieldIndex = newSectionTemplate.findIndex(field => field.id === fieldId);
+  
+  //     if (fieldIndex !== -1 && newSectionTemplate[fieldIndex].multipleData.length > 1) {
+  //       // Remove the specific field from the multipleData array by ID
+  //       const newMultipleData = newSectionTemplate[fieldIndex].multipleData.filter((subField:any) => subField.id !== fieldId);
+  
+  //       newSectionTemplate[fieldIndex].multipleData = newMultipleData;
+  //       updatedSections[index].sectionTemplate = newSectionTemplate;
+  //     }
+  
+  //     return updatedSections;
+  //   });
+  // };
+
+  // const handleRemoveDuplicateForm = (index: number, fieldId: string) => {
+  //   console.log(`Removing field with ID: ${fieldId} at section index: ${index}`);
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     const newSectionTemplate = [...updatedSections[index].sectionTemplate];
+  
+  //     // Find the index of the field with the given ID
+  //     const fieldIndex = newSectionTemplate.findIndex(field => field.id === fieldId);
+  //     console.log(`Found field index: ${fieldIndex}`);
+  
+  //     if (fieldIndex !== -1) {
+  //       newSectionTemplate.splice(fieldIndex, 1); // Remove the specific field by index
+  //       updatedSections[index].sectionTemplate = newSectionTemplate;
+  //     }
+  
+  //     console.log('Updated Sections:', updatedSections);
+  //     return updatedSections;
+  //   });
+  // };
+  
+  const handleRemoveDuplicateForm = (index: number, fieldId: string) => {
     setSections((prevSections) => {
       const updatedSections = [...prevSections];
-      const newSectionTemplate = [...updatedSections[index].sectionTemplate];
-  
-      if (newSectionTemplate.length > 1) {
-        newSectionTemplate.splice(fieldIndex, 1);
-        updatedSections[index].sectionTemplate = newSectionTemplate;
-      }
-  
+      const newSectionTemplate = updatedSections[index].sectionTemplate.filter(field => field.id !== fieldId);
+      updatedSections[index].sectionTemplate = newSectionTemplate;
       return updatedSections;
     });
-  };  
+  };
+  
+  
+  
+
+  // const handleRemoveDuplicateForm = (index: number, fieldId: string) => {
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     const newSectionTemplate = [...updatedSections[index].sectionTemplate];
+      
+  //     // Find the index of the field with the given ID
+  //     const fieldIndex = newSectionTemplate.findIndex(field => field.id === fieldId);
+      
+  //     if (fieldIndex !== -1 && newSectionTemplate.length > 1) {
+  //       newSectionTemplate.splice(fieldIndex, 1);
+  //       updatedSections[index].sectionTemplate = newSectionTemplate;
+  //     }
+  
+  //     return updatedSections;
+  //   });
+  // };
+  
+  // const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     const newSectionTemplate = [...updatedSections[index].sectionTemplate];
+  
+  //     if (newSectionTemplate.length > 1) {
+  //       newSectionTemplate.splice(fieldIndex, 1);
+  //       updatedSections[index].sectionTemplate = newSectionTemplate;
+  //     }
+  
+  //     return updatedSections;
+  //   });
+  // };  
   // const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
   //   const newSectionTemplate = [...sections[index].sectionTemplate];
   //   if (newSectionTemplate.length > 1) {
@@ -978,7 +1148,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                       </Grid>
                                       <Grid item xs={2} >
                                         <ButtonGroup variant='tonal' size="small">
-                                          {/* {fieldIndex === section.sectionTemplate.length - 1 && ( */}
+                                        {/* {field.multipleData.length - 1 === fieldIndex && ( */}
                                             <Tooltip title={`Add ${field.fieldLabel}`}>
                                               <Button size="small"
                                                 onClick={() =>
@@ -987,17 +1157,17 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                 <i className="tabler-plus" />
                                               </Button>
                                             </Tooltip>
-                                          {/* )} */}
-                                          {/* {field.multipleData.length > 1 && ( */}
+                                          {/* )}  */}
+                                           {/* {field.multipleData.length > 1 && ( */}
                                             <Tooltip title={`Remove ${field.fieldLabel}`}>
                                               <Button size="small"
                                                 onClick={() =>
-                                                  handleRemoveDuplicateForm(index, fieldIndex)
+                                                  handleRemoveDuplicateForm(index, field.id)
                                                 }>
                                                 <i className="tabler-minus" />
                                               </Button>
                                             </Tooltip>
-                                           {/* )}  */}
+                                            {/* )}   */}
                                         </ButtonGroup>
                                       </Grid>
                                     </Grid>
