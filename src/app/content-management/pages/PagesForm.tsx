@@ -678,262 +678,235 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
         templateData: updatedTemplateData,
       };
     });
-    console.log(formData);
-    console.log(sections);
     
   }
-  // const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
-  //   const newSectionTemplate = [...sections[index].sectionTemplate];
-  //   const duplicateField = { ...newSectionTemplate[fieldIndex] };
-  //   newSectionTemplate.push({ ...duplicateField });
-  //   setSections((prevSections) => {
-  //     const updatedSections = [...prevSections];
-  //     updatedSections[index].sectionTemplate = newSectionTemplate;
-  //     return updatedSections;
-  //   });
-  // };
-  // const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
-  //   const newSectionTemplate = [...sections[index].sectionTemplate];
-  //   if (newSectionTemplate.length > 1) {
-  //     newSectionTemplate.splice(fieldIndex, 1);
-  //     setSections((prevSections) => {
-  //       const updatedSections = [...prevSections];
-  //       updatedSections[index].sectionTemplate = newSectionTemplate;
-  //       return updatedSections;
-  //     });
-  //   }
-  // };
+  const generateUniqueId = () => '_' + Math.random().toString(36).substr(2, 9);
 
-
-  // const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
-  //   const newSectionTemplate = [...sections[index].sectionTemplate];
-  //   const duplicateField = { ...newSectionTemplate[fieldIndex] };
-  //   // Insert duplicateField right after the current fieldIndex
-  //   newSectionTemplate.splice(fieldIndex + 1, 0, duplicateField);
-  //   setSections((prevSections) => {
-  //     const updatedSections = [...prevSections];
-  //     updatedSections[index].sectionTemplate = newSectionTemplate;
-  //     return updatedSections;
-  //   });
-  //   console.log(sections);
-    
-  // };
-  // const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
-  //   const newSectionTemplate = [...sections[index].sectionTemplate];
-  //   const fieldToDuplicate = { ...newSectionTemplate[fieldIndex] };
-  //   const duplicateField = createField(fieldToDuplicate); // Assign a new unique ID
-  
-  //   // Insert duplicateField right after the current fieldIndex
-  //   newSectionTemplate.splice(fieldIndex + 1, 0, duplicateField);
-  
-  //   setSections((prevSections) => {
-  //     const updatedSections = [...prevSections];
-  //     updatedSections[index].sectionTemplate = newSectionTemplate;
-  //     return updatedSections;
-  //   });
-  //   console.log(sections);
-  // };
-
-  // const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
-  //   const newSectionTemplate = [...sections[index].sectionTemplate];
-  //   const fieldToDuplicate = { ...newSectionTemplate[fieldIndex] };
-  //   const duplicateField = { ...fieldToDuplicate, id: uuidv4() }; // Assign a new unique ID
-  
-  //   // Insert duplicateField right after the current fieldIndex
-  //   newSectionTemplate.splice(fieldIndex + 1, 0, duplicateField);
-  
-  //   setSections((prevSections) => {
-  //     const updatedSections = [...prevSections];
-  //     updatedSections[index].sectionTemplate = newSectionTemplate;
-  //     return updatedSections;
-  //   });
-  //   console.log(sections);
-  //   console.log(formData);
-    
-  // };
- 
-  // const handleRemoveDuplicateForm = (index: number, fieldId: string) => {
-  //   setSections((prevSections) => {
-  //     const updatedSections = [...prevSections];
-  //     const newSectionTemplate = [...updatedSections[index].sectionTemplate];
-  
-  //     // Find the index of the field with the given ID
-  //     const fieldIndex = newSectionTemplate.findIndex(field => field.id === fieldId);
-  
-  //     if (fieldIndex !== -1 && newSectionTemplate.length > 1) {
-  //       newSectionTemplate.splice(fieldIndex, 1);
-  //       updatedSections[index].sectionTemplate = newSectionTemplate;
-  //     }
-  //     console.log(sections);
-  //     console.log(formData);
-  
-  //     return updatedSections;
-  //   });
-  // };
-  
-
-  const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
-    setSections((prevSections) => {
+  const handleAddDuplicateForm = (sectionIndex: number, fieldIndex: number) => {
+    setSections(prevSections => {
       const updatedSections = [...prevSections];
-      const newSectionTemplate = [...updatedSections[index].sectionTemplate];
-      const fieldToDuplicate = { ...newSectionTemplate[fieldIndex] };
-      const duplicateField = { ...fieldToDuplicate, id: uuidv4() }; // Assign a new unique ID
+      const targetField = updatedSections[sectionIndex].sectionTemplate[fieldIndex];
   
-      // Insert duplicateField right after the current fieldIndex
-      newSectionTemplate.splice(fieldIndex + 1, 0, duplicateField);
-      updatedSections[index].sectionTemplate = newSectionTemplate;
-      return updatedSections;
-    });
-  };
-
-  // const handleRemoveDuplicateForm = (index: number, fieldId: string) => {
-  //   setSections((prevSections) => {
-  //     const updatedSections = [...prevSections];
-  //     const newSectionTemplate = [...updatedSections[index].sectionTemplate];
+      if (targetField.fieldType === 'multiple') {
+        const newField = {
+          ...targetField,
+          id: generateUniqueId(), // Add unique ID to the new `multiple` field
+          multipleData: targetField.multipleData.map(data => ({
+            ...data,
+            id: generateUniqueId() // Add unique ID to each item in the cloned data
+          }))
+        };
   
-  //     // Find the index of the field with the given ID
-  //     const fieldIndex = newSectionTemplate.findIndex(field => field.id === fieldId);
-  //     console.log("Field ID to remove:", fieldId);
-  //     console.log("Field Index found:", fieldIndex);
+        const updatedTemplate = [
+          ...updatedSections[sectionIndex].sectionTemplate.slice(0, fieldIndex + 1),
+          newField,
+          ...updatedSections[sectionIndex].sectionTemplate.slice(fieldIndex + 1)
+        ];
   
-  //     if (fieldIndex !== -1 && newSectionTemplate.length > 1) {
-  //       newSectionTemplate.splice(fieldIndex, 1);
-  //       updatedSections[index].sectionTemplate = newSectionTemplate;
-  //     } else {
-  //       console.log("Field not found or only one field left");
-  //     }
+        updatedSections[sectionIndex] = {
+          ...updatedSections[sectionIndex],
+          sectionTemplate: updatedTemplate
+        };
+      }
   
-  //     return updatedSections;
-  //   });
-  // };
-
-  // const handleRemoveDuplicateForm = (index: number, fieldId: string) => {
-  //   setSections((prevSections) => {
-  //     const updatedSections = [...prevSections];
-  //     const newSectionTemplate = [...updatedSections[index].sectionTemplate];
-  
-  //     // Find the index of the field with the given ID
-  //     const fieldIndex = newSectionTemplate.findIndex(field => field.id === fieldId);
-  
-  //     if (fieldIndex !== -1 && newSectionTemplate[fieldIndex].multipleData.length > 1) {
-  //       // Remove the specific field from the multipleData array by ID
-  //       const newMultipleData = newSectionTemplate[fieldIndex].multipleData.filter((subField:any) => subField.id !== fieldId);
-  
-  //       newSectionTemplate[fieldIndex].multipleData = newMultipleData;
-  //       updatedSections[index].sectionTemplate = newSectionTemplate;
-  //     }
-  
-  //     return updatedSections;
-  //   });
-  // };
-
-  // const handleRemoveDuplicateForm = (index: number, fieldId: string) => {
-  //   console.log(`Removing field with ID: ${fieldId} at section index: ${index}`);
-  //   setSections((prevSections) => {
-  //     const updatedSections = [...prevSections];
-  //     const newSectionTemplate = [...updatedSections[index].sectionTemplate];
-  
-  //     // Find the index of the field with the given ID
-  //     const fieldIndex = newSectionTemplate.findIndex(field => field.id === fieldId);
-  //     console.log(`Found field index: ${fieldIndex}`);
-  
-  //     if (fieldIndex !== -1) {
-  //       newSectionTemplate.splice(fieldIndex, 1); // Remove the specific field by index
-  //       updatedSections[index].sectionTemplate = newSectionTemplate;
-  //     }
-  
-  //     console.log('Updated Sections:', updatedSections);
-  //     return updatedSections;
-  //   });
-  // };
-  
-  const handleRemoveDuplicateForm = (index: number, fieldId: string) => {
-    setSections((prevSections) => {
-      const updatedSections = [...prevSections];
-      const newSectionTemplate = updatedSections[index].sectionTemplate.filter(field => field.id !== fieldId);
-      updatedSections[index].sectionTemplate = newSectionTemplate;
       return updatedSections;
     });
   };
   
-  
-  
 
-  // const handleRemoveDuplicateForm = (index: number, fieldId: string) => {
-  //   setSections((prevSections) => {
+  // const handleAddDuplicateForm = (sectionIndex: number, fieldIndex: number) => {
+  //   setSections(prevSections => {
   //     const updatedSections = [...prevSections];
-  //     const newSectionTemplate = [...updatedSections[index].sectionTemplate];
-      
-  //     // Find the index of the field with the given ID
-  //     const fieldIndex = newSectionTemplate.findIndex(field => field.id === fieldId);
-      
-  //     if (fieldIndex !== -1 && newSectionTemplate.length > 1) {
-  //       newSectionTemplate.splice(fieldIndex, 1);
-  //       updatedSections[index].sectionTemplate = newSectionTemplate;
-  //     }
+  //     const targetField = updatedSections[sectionIndex].sectionTemplate[fieldIndex];
   
-  //     return updatedSections;
-  //   });
-  // };
-  
-  // const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
-  //   setSections((prevSections) => {
-  //     const updatedSections = [...prevSections];
-  //     const newSectionTemplate = [...updatedSections[index].sectionTemplate];
-  
-  //     if (newSectionTemplate.length > 1) {
-  //       newSectionTemplate.splice(fieldIndex, 1);
-  //       updatedSections[index].sectionTemplate = newSectionTemplate;
-  //     }
-  
-  //     return updatedSections;
-  //   });
-  // };  
-  // const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
-  //   const newSectionTemplate = [...sections[index].sectionTemplate];
-  //   if (newSectionTemplate.length > 1) {
-  //     newSectionTemplate.splice(fieldIndex, 1);
-  //     setSections((prevSections) => {
-  //       const updatedSections = [...prevSections];
-  //       updatedSections[index].sectionTemplate = newSectionTemplate;
-  //       return updatedSections;
-  //     });
-  //   }
-  // };
-
-
-  // const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
-  //   const newSectionTemplate = [...sections[index].sectionTemplate];
-  //   // Check if there are more than one items in the section template
-  //   if (newSectionTemplate.length > 1) {
-  //     // Remove the item from the section template
-  //     newSectionTemplate.splice(fieldIndex, 1);
-  //     // Update sections state
-  //     setSections((prevSections) => {
-  //       const updatedSections = [...prevSections];
-  //       updatedSections[index].sectionTemplate = newSectionTemplate;
-  //       return updatedSections;
-  //     });
-  //     // Update formData.templateData
-  //     setFormData((prevFormData) => {
-  //       const newTemplateData = { ...prevFormData.templateData };
-
-  //       // Iterate through the keys of templateData
-  //       Object.keys(newTemplateData).forEach((key) => {
-  //         const [sectionIdx, fieldIdx, subFieldIdx] = key.split('+').map(Number);
-  //         // Remove matching entries
-  //         if (sectionIdx === index && fieldIdx === fieldIndex) {
-  //           delete newTemplateData[key];
-  //         }
-  //       });
-  //       return {
-  //         ...prevFormData,
-  //         templateData: newTemplateData
+  //     if (targetField.fieldType === 'multiple') {
+  //       // Clone the target field
+  //       const newField = {
+  //         ...targetField,
+  //         id: generateUniqueId(), // Add unique ID to the new `multiple` field
+  //         multipleData: targetField.multipleData.map(data => ({
+  //           ...data,
+  //           id: generateUniqueId() // Add unique ID to each item in the cloned data
+  //         }))
   //       };
-  //     });
-  //   }
+  
+  //       // Insert the cloned field after the original field
+  //       const updatedTemplate = [
+  //         ...updatedSections[sectionIndex].sectionTemplate.slice(0, fieldIndex + 1),
+  //         newField,
+  //         ...updatedSections[sectionIndex].sectionTemplate.slice(fieldIndex + 1)
+  //       ];
+  
+  //       // Update the section with the new template
+  //       updatedSections[sectionIndex] = {
+  //         ...updatedSections[sectionIndex],
+  //         sectionTemplate: updatedTemplate
+  //       };
+  //     }
+  
+  //     return updatedSections;
+  //   });
+  // };
+  
+  // const handleAddDuplicateForm = (sectionIndex, fieldIndex) => {
+  //   setSections(prevSections => {
+  //     const updatedSections = [...prevSections];
+  //     const targetField = updatedSections[sectionIndex].sectionTemplate[fieldIndex];
+      
+  //     if (targetField.fieldType === 'multiple') {
+  //       // Create a new unique ID for the new multiple object
+  //       const newField = { 
+  //         ...targetField,
+  //         multipleData: [...targetField.multipleData.map(item => ({ ...item, id: Date.now() }))]
+  //       };
+
+  //       // Add the new field object to the section
+  //       updatedSections[sectionIndex].sectionTemplate = [
+  //         ...updatedSections[sectionIndex].sectionTemplate,
+  //         newField
+  //       ];
+  //     }
+
+  //     return updatedSections;
+  //   });
   // };
 
+  // Handler for removing a specific multiple field object
+  // const handleRemoveDuplicateForm = (sectionIndex, fieldIndex, id) => {
+  //   setSections(prevSections => {
+  //     const updatedSections = [...prevSections];
+  //     const targetField = updatedSections[sectionIndex].sectionTemplate[fieldIndex];
+
+  //     if (targetField.fieldType === 'multiple') {
+  //       // Remove the specific multiple object by ID
+  //       const newMultipleData = targetField.multipleData.filter(item => item.id !== id);
+
+  //       // Update the target field with the filtered multiple data
+  //       const updatedField = { ...targetField, multipleData: newMultipleData };
+
+  //       // Replace the old field with the updated field
+  //       updatedSections[sectionIndex].sectionTemplate = [
+  //         ...updatedSections[sectionIndex].sectionTemplate.slice(0, fieldIndex),
+  //         updatedField,
+  //         ...updatedSections[sectionIndex].sectionTemplate.slice(fieldIndex + 1)
+  //       ];
+  //     }
+
+  //     return updatedSections;
+  //   });
+  // };
+  // const handleRemoveDuplicateForm = (sectionIndex: number, fieldIndex: number, fieldId: string) => {
+  //   setSections(prevSections => {
+  //     const updatedSections = [...prevSections];
+  //     const section = updatedSections[sectionIndex];
+  
+  //     // Filter out the `multiple` field with the given ID
+  //     const updatedTemplate = section.sectionTemplate.filter((field, index) => {
+  //       // If the field is of type 'multiple', check if its ID matches
+  //       if (field.fieldType === 'multiple' && field.id === fieldId) {
+  //         return false; // Exclude this field from the updated template
+  //       }
+  //       return true; // Include all other fields
+  //     });
+  
+  //     // Update the section with the new template
+  //     updatedSections[sectionIndex] = {
+  //       ...section,
+  //       sectionTemplate: updatedTemplate
+  //     };
+  
+  //     return updatedSections;
+  //   });
+  // };
+
+
+//   const handleRemoveDuplicateForm = (sectionIndex: number, fieldId: string) => {
+//   setSections(prevSections => {
+//     const updatedSections = [...prevSections];
+//     const section = updatedSections[sectionIndex];
+
+//     // Filter out the `multiple` field with the given ID
+//     const updatedTemplate = section.sectionTemplate.filter(field => {
+//       // Check if the field is of type 'multiple' and its ID matches
+//       if (field.fieldType === 'multiple') {
+//         return field.id !== fieldId; // Exclude this field if its ID matches
+//       }
+//       return true; // Include all other fields
+//     });
+
+//     // Update the section with the new template
+//     updatedSections[sectionIndex] = {
+//       ...section,
+//       sectionTemplate: updatedTemplate
+//     };
+
+//     return updatedSections;
+//   });
+// };
+// const handleRemoveDuplicateForm = (sectionIndex: number, fieldId: string) => {
+//   setSections(prevSections => {
+//     const updatedSections = [...prevSections];
+//     const section = updatedSections[sectionIndex];
+
+//     // Filter out the `multiple` field with the given ID
+//     const updatedTemplate = section.sectionTemplate.filter(field => {
+//       // Check if the field is of type 'multiple' and if its ID matches
+//       if (field.fieldType === 'multiple' && field.id === fieldId) {
+//         console.log(fieldId);
+//         console.log(field);
+        
+//         return false; // Exclude this field from the updated template
+//       }
+//       return true; // Include all other fields
+//     });
+
+//     // Update the section with the new template
+//     updatedSections[sectionIndex] = {
+//       ...section,
+//       sectionTemplate: updatedTemplate
+//     };
+
+//     return updatedSections;
+//   });
+// };
+
+const handleRemoveDuplicateForm = (
+  sectionIndex: number,
+  fieldLabel: string,
+  fieldType: string,
+  fieldId: string
+) => {
+  setSections(prevSections => {
+    const updatedSections = [...prevSections];
+    const section = updatedSections[sectionIndex];
+
+    // Filter out the `multiple` field with the matching criteria
+    const updatedTemplate = section.sectionTemplate.filter(field => {
+      if (
+        field.fieldType === 'multiple' &&
+        field.fieldLabel === fieldLabel &&
+        field.fieldType === fieldType &&
+        field.id === fieldId
+      ) {
+        return false; // Exclude this field from the updated template
+      }
+      return true; // Include all other fields
+    });
+
+    // Update the section with the new template
+    updatedSections[sectionIndex] = {
+      ...section,
+      sectionTemplate: updatedTemplate
+    };
+
+    return updatedSections;
+  });
+};
+
+
+
+
+  
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -1161,9 +1134,11 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                            {/* {field.multipleData.length > 1 && ( */}
                                             <Tooltip title={`Remove ${field.fieldLabel}`}>
                                               <Button size="small"
-                                                onClick={() =>
-                                                  handleRemoveDuplicateForm(index, field.id)
-                                                }>
+                                                // onClick={() =>
+                                                //   handleRemoveDuplicateForm(index, fieldIndex, field.id)
+                                                // }
+                                                onClick={() => handleRemoveDuplicateForm(index,field.fieldLabel,field.fieldType, field.id)}
+                                                >
                                                 <i className="tabler-minus" />
                                               </Button>
                                             </Tooltip>
