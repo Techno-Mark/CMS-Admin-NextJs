@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import { v4 as uuidv4 } from 'uuid';
 
- 
+
 const createField = (field: any) => ({
   ...field,
   id: uuidv4(),
@@ -79,7 +79,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   //   setLoading(true);
   //   if (editingRow) {
   //     setFormData(editingRow);
-  
+
   //     const sectionsWithErrors = editingRow.sectionData.map((section: any) => ({
   //       ...section,
   //       errors: section.sectionTemplate.reduce((acc: any, field: any) => {
@@ -87,7 +87,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   //         return acc;
   //       }, {}),
   //     }));
-  
+
   //     // Fetch and merge template data
   //     getTemplateIdWiseForm(editingRow.templateId).then((templateSections) => {
   //       if (templateSections) {
@@ -95,7 +95,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   //           const matchingTemplate = templateSections.find(
   //             (tplSection: any) => tplSection.sectionId === section.sectionId
   //           );
-  
+
   //           if (matchingTemplate) {
   //             return {
   //               ...section,
@@ -103,7 +103,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   //                 const matchingField = matchingTemplate.sectionTemplate.find(
   //                   (tplField: any) => tplField.fieldLabel === field.fieldLabel
   //                 );
-  
+
   //                 if (matchingField) {
   //                   // If the field is of type 'multiple', merge multipleData
   //                   if (field.fieldType === 'multiple' && matchingField.multipleData) {
@@ -112,18 +112,18 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   //                       multipleData: mergeMultipleData(field.multipleData, matchingField.multipleData),
   //                     };
   //                   }
-  
+
   //                   return { ...field, ...matchingField };
   //                 }
-  
+
   //                 return field;
   //               }),
   //             };
   //           }
-  
+
   //           return section;
   //         });
-  
+
   //         setSections(mergedSections);
   //       }
   //       setLoading(false);
@@ -154,7 +154,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   //         return acc;
   //       }, {}),
   //     }));
-  
+
   //     // Fetch and merge template data
   //     getTemplateIdWiseForm(editingRow.templateId).then((templateSections) => {
   //       if (templateSections) {
@@ -162,7 +162,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   //           const matchingTemplate = templateSections.find(
   //             (tplSection: any) => tplSection.sectionId === section.sectionId
   //           );
-  
+
   //           if (matchingTemplate) {
   //             return {
   //               ...section,
@@ -174,10 +174,10 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   //               }),
   //             };
   //           }
-  
+
   //           return section;
   //         });
-  
+
   //         setSections(mergedSections);
   //       }
   //       setLoading(false);
@@ -361,7 +361,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     setFormErrors(errors);
     return valid;
   };
-  const handleSubmit = async (event: React.FormEvent,pdStatus:boolean) => {
+  const handleSubmit = async (event: React.FormEvent, pdStatus: boolean) => {
     event.preventDefault();
     // console.log(PDStatus);
     // setPDStatus(pdStatus)
@@ -678,7 +678,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
         templateData: updatedTemplateData,
       };
     });
-    
+
   }
   const generateUniqueId = () => '_' + Math.random().toString(36).substr(2, 9);
 
@@ -686,7 +686,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     setSections(prevSections => {
       const updatedSections = [...prevSections];
       const targetField = updatedSections[sectionIndex].sectionTemplate[fieldIndex];
-  
+
       if (targetField.fieldType === 'multiple') {
         const newField = {
           ...targetField,
@@ -696,29 +696,28 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
             id: generateUniqueId() // Add unique ID to each item in the cloned data
           }))
         };
-  
+
         const updatedTemplate = [
           ...updatedSections[sectionIndex].sectionTemplate.slice(0, fieldIndex + 1),
           newField,
           ...updatedSections[sectionIndex].sectionTemplate.slice(fieldIndex + 1)
         ];
-  
+
         updatedSections[sectionIndex] = {
           ...updatedSections[sectionIndex],
           sectionTemplate: updatedTemplate
         };
       }
-  
+
       return updatedSections;
     });
   };
-  
 
   // const handleAddDuplicateForm = (sectionIndex: number, fieldIndex: number) => {
   //   setSections(prevSections => {
   //     const updatedSections = [...prevSections];
   //     const targetField = updatedSections[sectionIndex].sectionTemplate[fieldIndex];
-  
+
   //     if (targetField.fieldType === 'multiple') {
   //       // Clone the target field
   //       const newField = {
@@ -729,30 +728,30 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   //           id: generateUniqueId() // Add unique ID to each item in the cloned data
   //         }))
   //       };
-  
+
   //       // Insert the cloned field after the original field
   //       const updatedTemplate = [
   //         ...updatedSections[sectionIndex].sectionTemplate.slice(0, fieldIndex + 1),
   //         newField,
   //         ...updatedSections[sectionIndex].sectionTemplate.slice(fieldIndex + 1)
   //       ];
-  
+
   //       // Update the section with the new template
   //       updatedSections[sectionIndex] = {
   //         ...updatedSections[sectionIndex],
   //         sectionTemplate: updatedTemplate
   //       };
   //     }
-  
+
   //     return updatedSections;
   //   });
   // };
-  
+
   // const handleAddDuplicateForm = (sectionIndex, fieldIndex) => {
   //   setSections(prevSections => {
   //     const updatedSections = [...prevSections];
   //     const targetField = updatedSections[sectionIndex].sectionTemplate[fieldIndex];
-      
+
   //     if (targetField.fieldType === 'multiple') {
   //       // Create a new unique ID for the new multiple object
   //       const newField = { 
@@ -799,7 +798,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   //   setSections(prevSections => {
   //     const updatedSections = [...prevSections];
   //     const section = updatedSections[sectionIndex];
-  
+
   //     // Filter out the `multiple` field with the given ID
   //     const updatedTemplate = section.sectionTemplate.filter((field, index) => {
   //       // If the field is of type 'multiple', check if its ID matches
@@ -808,112 +807,112 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   //       }
   //       return true; // Include all other fields
   //     });
-  
+
   //     // Update the section with the new template
   //     updatedSections[sectionIndex] = {
   //       ...section,
   //       sectionTemplate: updatedTemplate
   //     };
-  
+
   //     return updatedSections;
   //   });
   // };
 
 
-//   const handleRemoveDuplicateForm = (sectionIndex: number, fieldId: string) => {
-//   setSections(prevSections => {
-//     const updatedSections = [...prevSections];
-//     const section = updatedSections[sectionIndex];
+  //   const handleRemoveDuplicateForm = (sectionIndex: number, fieldId: string) => {
+  //   setSections(prevSections => {
+  //     const updatedSections = [...prevSections];
+  //     const section = updatedSections[sectionIndex];
 
-//     // Filter out the `multiple` field with the given ID
-//     const updatedTemplate = section.sectionTemplate.filter(field => {
-//       // Check if the field is of type 'multiple' and its ID matches
-//       if (field.fieldType === 'multiple') {
-//         return field.id !== fieldId; // Exclude this field if its ID matches
-//       }
-//       return true; // Include all other fields
-//     });
+  //     // Filter out the `multiple` field with the given ID
+  //     const updatedTemplate = section.sectionTemplate.filter(field => {
+  //       // Check if the field is of type 'multiple' and its ID matches
+  //       if (field.fieldType === 'multiple') {
+  //         return field.id !== fieldId; // Exclude this field if its ID matches
+  //       }
+  //       return true; // Include all other fields
+  //     });
 
-//     // Update the section with the new template
-//     updatedSections[sectionIndex] = {
-//       ...section,
-//       sectionTemplate: updatedTemplate
-//     };
+  //     // Update the section with the new template
+  //     updatedSections[sectionIndex] = {
+  //       ...section,
+  //       sectionTemplate: updatedTemplate
+  //     };
 
-//     return updatedSections;
-//   });
-// };
-// const handleRemoveDuplicateForm = (sectionIndex: number, fieldId: string) => {
-//   setSections(prevSections => {
-//     const updatedSections = [...prevSections];
-//     const section = updatedSections[sectionIndex];
+  //     return updatedSections;
+  //   });
+  // };
+  // const handleRemoveDuplicateForm = (sectionIndex: number, fieldId: string) => {
+  //   setSections(prevSections => {
+  //     const updatedSections = [...prevSections];
+  //     const section = updatedSections[sectionIndex];
 
-//     // Filter out the `multiple` field with the given ID
-//     const updatedTemplate = section.sectionTemplate.filter(field => {
-//       // Check if the field is of type 'multiple' and if its ID matches
-//       if (field.fieldType === 'multiple' && field.id === fieldId) {
-//         console.log(fieldId);
-//         console.log(field);
-        
-//         return false; // Exclude this field from the updated template
-//       }
-//       return true; // Include all other fields
-//     });
+  //     // Filter out the `multiple` field with the given ID
+  //     const updatedTemplate = section.sectionTemplate.filter(field => {
+  //       // Check if the field is of type 'multiple' and if its ID matches
+  //       if (field.fieldType === 'multiple' && field.id === fieldId) {
+  //         console.log(fieldId);
+  //         console.log(field);
 
-//     // Update the section with the new template
-//     updatedSections[sectionIndex] = {
-//       ...section,
-//       sectionTemplate: updatedTemplate
-//     };
+  //         return false; // Exclude this field from the updated template
+  //       }
+  //       return true; // Include all other fields
+  //     });
 
-//     return updatedSections;
-//   });
-// };
+  //     // Update the section with the new template
+  //     updatedSections[sectionIndex] = {
+  //       ...section,
+  //       sectionTemplate: updatedTemplate
+  //     };
 
-const handleRemoveDuplicateForm = (
-  sectionIndex: number,
-  fieldLabel: string,
-  fieldType: string,
-  fieldId: string
-) => {
-  setSections(prevSections => {
-    const updatedSections = [...prevSections];
-    const section = updatedSections[sectionIndex];
+  //     return updatedSections;
+  //   });
+  // };
 
-    // Filter out the `multiple` field with the matching criteria
-    const updatedTemplate = section.sectionTemplate.filter(field => {
-      if (
-        field.fieldType === 'multiple' &&
-        field.fieldLabel === fieldLabel &&
-        field.fieldType === fieldType &&
-        field.id === fieldId
-      ) {
-        return false; // Exclude this field from the updated template
-      }
-      return true; // Include all other fields
+  const handleRemoveDuplicateForm = (
+    sectionIndex: number,
+    fieldLabel: string,
+    fieldType: string,
+    fieldId: string
+  ) => {
+    setSections(prevSections => {
+      const updatedSections = [...prevSections];
+      const section = updatedSections[sectionIndex];
+
+      // Filter out the `multiple` field with the matching criteria
+      const updatedTemplate = section.sectionTemplate.filter(field => {
+        if (
+          field.fieldType === 'multiple' &&
+          field.fieldLabel === fieldLabel &&
+          field.fieldType === fieldType &&
+          field.id === fieldId
+        ) {
+          return false; // Exclude this field from the updated template
+        }
+        return true; // Include all other fields
+      });
+
+      // Update the section with the new template
+      updatedSections[sectionIndex] = {
+        ...section,
+        sectionTemplate: updatedTemplate
+      };
+
+      return updatedSections;
     });
-
-    // Update the section with the new template
-    updatedSections[sectionIndex] = {
-      ...section,
-      sectionTemplate: updatedTemplate
-    };
-
-    return updatedSections;
-  });
-};
+  };
 
 
 
 
-  
+
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
       <BreadCrumbList />
       <Card>
         <div>
-          <form className="flex flex-col gap-6 p-6" 
+          <form className="flex flex-col gap-6 p-6"
           // onSubmit={handleSubmit}
           >
             <Box display="flex" alignItems="center">
@@ -1020,7 +1019,7 @@ const handleRemoveDuplicateForm = (
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CustomTextField
-                  //  disabled={open === sectionActions.EDIT}
+                    //  disabled={open === sectionActions.EDIT}
                     error={!!formErrors.templateId}
                     helperText={formErrors.templateId}
                     select
@@ -1031,8 +1030,9 @@ const handleRemoveDuplicateForm = (
                     id="custom-select"
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       const templateId = Number(e.target.value);
-                      setFormData({ ...formData, templateId 
-                        ,templateData:{},sectionData:{}
+                      setFormData({
+                        ...formData, templateId
+                        , templateData: {}, sectionData: {}
                       });
                       setSections([])
                       getTemplateIdWiseForm(templateId);
@@ -1121,28 +1121,28 @@ const handleRemoveDuplicateForm = (
                                       </Grid>
                                       <Grid item xs={2} >
                                         <ButtonGroup variant='tonal' size="small">
-                                        {/* {field.multipleData.length - 1 === fieldIndex && ( */}
-                                            <Tooltip title={`Add ${field.fieldLabel}`}>
-                                              <Button size="small"
-                                                onClick={() =>
-                                                  handleAddDuplicateForm(index, fieldIndex)
-                                                }>
-                                                <i className="tabler-plus" />
-                                              </Button>
-                                            </Tooltip>
+                                          {/* {field.multipleData.length - 1 === fieldIndex && ( */}
+                                          <Tooltip title={`Add ${field.fieldLabel}`}>
+                                            <Button size="small"
+                                              onClick={() =>
+                                                handleAddDuplicateForm(index, fieldIndex)
+                                              }>
+                                              <i className="tabler-plus" />
+                                            </Button>
+                                          </Tooltip>
                                           {/* )}  */}
-                                           {/* {field.multipleData.length > 1 && ( */}
-                                            <Tooltip title={`Remove ${field.fieldLabel}`}>
-                                              <Button size="small"
-                                                // onClick={() =>
-                                                //   handleRemoveDuplicateForm(index, fieldIndex, field.id)
-                                                // }
-                                                onClick={() => handleRemoveDuplicateForm(index,field.fieldLabel,field.fieldType, field.id)}
-                                                >
-                                                <i className="tabler-minus" />
-                                              </Button>
-                                            </Tooltip>
-                                            {/* )}   */}
+                                          {/* {field.multipleData.length > 1 && ( */}
+                                          <Tooltip title={`Remove ${field.fieldLabel}`}>
+                                            <Button size="small"
+                                              // onClick={() =>
+                                              //   handleRemoveDuplicateForm(index, fieldIndex, field.id)
+                                              // }
+                                              onClick={() => handleRemoveDuplicateForm(index, field.fieldLabel, field.fieldType, field.id)}
+                                            >
+                                              <i className="tabler-minus" />
+                                            </Button>
+                                          </Tooltip>
+                                          {/* )}   */}
                                         </ButtonGroup>
                                       </Grid>
                                     </Grid>
@@ -1278,7 +1278,7 @@ const handleRemoveDuplicateForm = (
                                   </CardContent>
                                 </Card>
                               </Grid>
-                                
+
 
                             ) : (
                               <Grid item xs={12} sm={12}>
@@ -1331,14 +1331,14 @@ const handleRemoveDuplicateForm = (
           </Button>
           <Button color="warning" variant="contained" size="small" type="submit" onClick={(event) => {
             // setPDStatus(false); 
-            handleSubmit(event,false);
-          }}>  
-          Save as Draft
+            handleSubmit(event, false);
+          }}>
+            Save as Draft
           </Button>
           <Button variant="contained" type="submit" size="small"
-            onClick={(event) => { 
+            onClick={(event) => {
               // setPDStatus(true); 
-              handleSubmit(event,true);
+              handleSubmit(event, true);
             }}>
             Save & Publish
           </Button>
