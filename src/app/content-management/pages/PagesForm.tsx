@@ -367,7 +367,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     sectionId: number, 
     index: number, 
     fieldIndex: number,
-    subFieldIndex?: number, 
+    subFieldIndex?: any, 
     section?: any, 
     fieldLabel?: string, 
     subField?: string, 
@@ -950,7 +950,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                     margin="normal"
                                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
                                       handleInputChange(
-                                        e, section.sectionId, index, fieldIndex, null, section,
+                                        e, section.sectionId, index, fieldIndex, 'null', section,
                                         field.fieldLabel, '', field.fieldType)
                                     }
                                     //@ts-ignore

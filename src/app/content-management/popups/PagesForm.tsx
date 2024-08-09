@@ -26,13 +26,7 @@ import { PopupTypes } from "./popupTypes";
 import dynamic from 'next/dynamic';
 
 import EditorBasic from "@/components/EditorToolbar";
-// Dynamic import for CKEditor
-const CKEditor = dynamic<{ editor: any, data: string, onChange: (event: any, editor: any) => void }>(() =>
-  import('@ckeditor/ckeditor5-react').then((mod: any) => mod.CKEditor), { ssr: false });
 
-const ClassicEditor = dynamic(() => import('@ckeditor/ckeditor5-build-classic').then((mod: any) => mod.default), {
-  ssr: false,
-});
 
 
 

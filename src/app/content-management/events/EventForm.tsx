@@ -30,12 +30,12 @@ import { ADD_EVENT, EDIT_EVENT, eventDetailType } from "@/types/apps/eventType";
 // import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import dynamic from 'next/dynamic';
 // Dynamic import for CKEditor
-const CKEditor = dynamic<{ editor: any, data: string, onChange: (event: any, editor: any) => void }>(() =>
-  import('@ckeditor/ckeditor5-react').then((mod: any) => mod.CKEditor), { ssr: false });
+// const CKEditor = dynamic<{ editor: any, data: string, onChange: (event: any, editor: any) => void }>(() =>
+//   import('@ckeditor/ckeditor5-react').then((mod: any) => mod.CKEditor), { ssr: false });
 
-const ClassicEditor = dynamic(() => import('@ckeditor/ckeditor5-build-classic').then((mod: any) => mod.default), {
-  ssr: false,
-});
+// const ClassicEditor = dynamic(() => import('@ckeditor/ckeditor5-build-classic').then((mod: any) => mod.default), {
+//   ssr: false,
+// });
 
 
 type EventFormPropsTypes = {
