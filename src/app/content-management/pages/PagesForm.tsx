@@ -363,22 +363,22 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }
   };
   const handleInputChange = (
-    event: ChangeEvent<HTMLInputElement>, 
-    sectionId: number, 
-    index: number, 
+    event: ChangeEvent<HTMLInputElement>,
+    sectionId: number,
+    index: number,
     fieldIndex: number,
-    subFieldIndex?: any, 
-    section?: any, 
-    fieldLabel?: string, 
-    subField?: string, 
+    subFieldIndex?: any,
+    section?: any,
+    fieldLabel?: string,
+    subField?: string,
     fieldType?: string
   ) => {
     const { name, value, files } = event.target;
-  
+
     if (files && files[0]) {
       const file = files[0];
       const reader = new FileReader();
-  
+
       reader.onloadend = () => {
         setSections((prevSections) => {
           const updatedSections = prevSections.map((sec, mainIndex) => {
@@ -445,7 +445,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
           return updatedSections;
         });
       };
-  
+
       // Handling image and video previews
       if (file.type.startsWith('video/')) {
         reader.readAsDataURL(file); // For video, use Data URL
@@ -535,7 +535,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       });
     }
   };
-  
+
   // const handleInputChange = (
   //   event: ChangeEvent<HTMLInputElement>, sectionId: number, index: number, fieldIndex: number,
   //   subFieldIndex?: any, section?: any, fieldLabel?: string, subField?: string, fieldType?: string
@@ -571,7 +571,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   //                         subField: subField,
   //                         fieldType: fieldType,
   //                         keyMultiple: temIndex
-                          
+
   //                       },
   //                     },
   //                   }));
@@ -973,7 +973,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                       >
                                         <i className="tabler-minus" />
                                       </IconButton>
-                                      {formData.templateData[`${index}+${fieldIndex}`]?.fileType.includes("video") ? (
+                                      {
+                                      formData.templateData[`${index}+${fieldIndex}`]?.fileType  &&
+                                      formData.templateData[`${index}+${fieldIndex}`]?.fileType.includes("video") ? (
                                         <Box
                                           component="video"
                                           src={formData.templateData[`${index}+${fieldIndex}`]?.preview}
@@ -1108,71 +1110,75 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                 inputProps={subField.validation ? JSON.parse(subField.validation) : {}}
                                               />
                                               {formData.templateData &&
-  formData.templateData[
-    `${index}+${fieldIndex}+${subFieldIndex}`
-  ]?.preview && (
-    <Box
-      mt={2}
-      display="flex"
-      flexDirection="column"
-      alignItems="end"
-    >
-      <IconButton
-        size="large"
-        onClick={() =>
-          handleRemoveFile(
-            index,
-            fieldIndex,
-            subFieldIndex
-          )
-        }
-        aria-label="minus"
-        color="error"
-        style={{ marginBottom: '8px' }}
-      >
-        <i className="tabler-minus" />
-      </IconButton>
-      {formData.templateData[
-        `${index}+${fieldIndex}+${subFieldIndex}`
-      ]?.fileType.includes("video") ? (
-        <Box
-          component="video"
-          src={
-            formData.templateData[
-              `${index}+${fieldIndex}+${subFieldIndex}`
-            ]?.preview
-          }
-          controls
-          sx={{
-            width: '100%',
-            maxHeight: '200px',
-            objectFit: 'contain',
-            borderRadius: '4px',
-            boxShadow:
-              '0 2px 4px rgba(0, 0, 0, 0.1)',
-          }}
-        />
-      ) : (
-        <Box
-          component="img"
-          src={
-            formData.templateData[
-              `${index}+${fieldIndex}+${subFieldIndex}`
-            ]?.preview
-          }
-          alt="Preview"
-          sx={{
-            width: '100%',
-            maxHeight: '200px',
-            objectFit: 'contain',
-            borderRadius: '4px',
-            boxShadow:
-              '0 2px 4px rgba(0, 0, 0, 0.1)',
-          }}
-        />
-      )}
-    </Box>
-  )}
+                                                formData.templateData[
+                                                  `${index}+${fieldIndex}+${subFieldIndex}`
+                                                ]?.preview && (
+                                                  <Box
+                                                    mt={2}
+                                                    display="flex"
+                                                    flexDirection="column"
+                                                    alignItems="end"
+                                                  >
+                                                    <IconButton
+                                                      size="large"
+                                                      onClick={() =>
+                                                        handleRemoveFile(
+                                                          index,
+                                                          fieldIndex,
+                                                          subFieldIndex
+                                                        )
+                                                      }
+                                                      aria-label="minus"
+                                                      color="error"
+                                                      style={{ marginBottom: '8px' }}
+                                                    >
+                                                      <i className="tabler-minus" />
+                                                    </IconButton>
+                                                    {
+                                                    formData.templateData[
+                                                      `${index}+${fieldIndex}+${subFieldIndex}`
+                                                    ]?.fileType &&
+                                                    formData.templateData[
+                                                      `${index}+${fieldIndex}+${subFieldIndex}`
+                                                    ]?.fileType.includes("video") ? (
+                                                      <Box
+                                                        component="video"
+                                                        src={
+                                                          formData.templateData[
+                                                            `${index}+${fieldIndex}+${subFieldIndex}`
+                                                          ]?.preview
+                                                        }
+                                                        controls
+                                                        sx={{
+                                                          width: '100%',
+                                                          maxHeight: '200px',
+                                                          objectFit: 'contain',
+                                                          borderRadius: '4px',
+                                                          boxShadow:
+                                                            '0 2px 4px rgba(0, 0, 0, 0.1)',
+                                                        }}
+                                                      />
+                                                    ) : (
+                                                      <Box
+                                                        component="img"
+                                                        src={
+                                                          formData.templateData[
+                                                            `${index}+${fieldIndex}+${subFieldIndex}`
+                                                          ]?.preview
+                                                        }
+                                                        alt="Preview"
+                                                        sx={{
+                                                          width: '100%',
+                                                          maxHeight: '200px',
+                                                          objectFit: 'contain',
+                                                          borderRadius: '4px',
+                                                          boxShadow:
+                                                            '0 2px 4px rgba(0, 0, 0, 0.1)',
+                                                        }}
+                                                      />
+                                                    )}
+                                                  </Box>
+                                                )}
 
                                               {/* {formData.templateData &&
                                                 formData.templateData[
