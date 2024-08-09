@@ -2,20 +2,15 @@
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import { Button, Box, Card, Grid, MenuItem, Typography, IconButton, CardContent, CardActions, ButtonGroup, Tooltip, } from "@mui/material";
 import React, { ChangeEvent, useEffect, useState } from "react";
+import { useDropzone } from "react-dropzone";
 import { get, post } from "@/services/apiService";
 import { template } from "@/services/endpoint/template";
 import CustomTextField from "@/@core/components/mui/TextField";
+import { useRouter } from "next/navigation";
 import { PagesType } from "./pagesType";
 import { pages } from "@/services/endpoint/pages";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
-import { v4 as uuidv4 } from 'uuid';
-
-
-const createField = (field: any) => ({
-  ...field,
-  id: uuidv4(),
-});
 
 const sectionActions = { ADD: -1, EDIT: 1 };
 
@@ -75,121 +70,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   const [sections, setSections] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [PDStatus, setPDStatus] = useState<boolean>(false);
-  // useEffect(() => {
-  //   setLoading(true);
-  //   if (editingRow) {
-  //     setFormData(editingRow);
 
-  //     const sectionsWithErrors = editingRow.sectionData.map((section: any) => ({
-  //       ...section,
-  //       errors: section.sectionTemplate.reduce((acc: any, field: any) => {
-  //         acc[field.fieldType] = "";
-  //         return acc;
-  //       }, {}),
-  //     }));
-
-  //     // Fetch and merge template data
-  //     getTemplateIdWiseForm(editingRow.templateId).then((templateSections) => {
-  //       if (templateSections) {
-  //         const mergedSections = sectionsWithErrors.map((section: any) => {
-  //           const matchingTemplate = templateSections.find(
-  //             (tplSection: any) => tplSection.sectionId === section.sectionId
-  //           );
-
-  //           if (matchingTemplate) {
-  //             return {
-  //               ...section,
-  //               sectionTemplate: section.sectionTemplate.map((field: any) => {
-  //                 const matchingField = matchingTemplate.sectionTemplate.find(
-  //                   (tplField: any) => tplField.fieldLabel === field.fieldLabel
-  //                 );
-
-  //                 if (matchingField) {
-  //                   // If the field is of type 'multiple', merge multipleData
-  //                   if (field.fieldType === 'multiple' && matchingField.multipleData) {
-  //                     return {
-  //                       ...field,
-  //                       multipleData: mergeMultipleData(field.multipleData, matchingField.multipleData),
-  //                     };
-  //                   }
-
-  //                   return { ...field, ...matchingField };
-  //                 }
-
-  //                 return field;
-  //               }),
-  //             };
-  //           }
-
-  //           return section;
-  //         });
-
-  //         setSections(mergedSections);
-  //       }
-  //       setLoading(false);
-  //     }).catch((error) => {
-  //       console.error('Error fetching template sections:', error);
-  //       setLoading(false);
-  //     });
-  //   } else {
-  //     setFormData(initialFormData);
-  //     setLoading(false);
-  //   }
-  // }, [editingRow]);
-  // const mergeMultipleData = (existingMultipleData: any, newMultipleData: any) => {
-  //   // Customize this logic as needed
-  //   // This example appends new multipleData entries to existing ones
-  //   // You may want to merge based on specific keys or conditions
-  //   return [...existingMultipleData, ...newMultipleData];
-  // };
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   if (editingRow) {
-  //     setFormData(editingRow);
-  //     const sectionsWithErrors = editingRow.sectionData.map((section: any) => ({
-  //       ...section,
-  //       errors: section.sectionTemplate.reduce((acc: any, field: any) => {
-  //         acc[field.fieldType] = "";
-  //         return acc;
-  //       }, {}),
-  //     }));
-
-  //     // Fetch and merge template data
-  //     getTemplateIdWiseForm(editingRow.templateId).then((templateSections) => {
-  //       if (templateSections) {
-  //         const mergedSections = sectionsWithErrors.map((section: any) => {
-  //           const matchingTemplate = templateSections.find(
-  //             (tplSection: any) => tplSection.sectionId === section.sectionId
-  //           );
-
-  //           if (matchingTemplate) {
-  //             return {
-  //               ...section,
-  //               sectionTemplate: section.sectionTemplate.map((field: any) => {
-  //                 const matchingField = matchingTemplate.sectionTemplate.find(
-  //                   (tplField: any) => tplField.fieldLabel === field.fieldLabel
-  //                 );
-  //                 return matchingField ? { ...field, ...matchingField } : field;
-  //               }),
-  //             };
-  //           }
-
-  //           return section;
-  //         });
-
-  //         setSections(mergedSections);
-  //       }
-  //       setLoading(false);
-  //     }).catch((error) => {
-  //       console.error('Error fetching template sections:', error);
-  //       setLoading(false);
-  //     });
-  //   } else {
-  //     setFormData(initialFormData);
-  //     setLoading(false);
-  //   }
-  // }, [editingRow]);
   useEffect(() => {
     setLoading(true);
     if (editingRow) {
@@ -385,52 +266,64 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
           switch (content.fieldType) {
             case 'email':
               formattedContent = {
-                Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
-                Value: content.email || "",
+                // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
+                // Value: content.email || "",
+
+                [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.email || ""
+
               };
               break;
             case 'file':
               formattedContent = {
-                Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
-                Value: content.file || "",
-                Preview: content.preview || "",
+                // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
+                // Value: content.file || "",
+                // Preview: content.preview || "",
+
+                [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.preview
 
               };
               break;
             case 'url':
               formattedContent = {
-                Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
-                Value: content.url || "",
+                // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
+                // Value: content.url || "",
 
+                [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.url
               };
               break;
             case 'date':
               formattedContent = {
-                Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
-                Value: content.date || "",
+                // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
+                // Value: content.date || "",
+                [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.date
 
               };
               break;
             case 'number':
               formattedContent = {
-                Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
-                Value: content.number || "",
+                // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
+                // Value: content.number || "",
+
+                [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.number
 
               };
               break;
             case 'textarea':
               formattedContent = {
-                Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
-                Value: content.textarea || "",
+                // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
+                // Value: content.textarea || "",
+
+                [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.textarea
 
               };
               break;
             case 'text':
             default:
               formattedContent = {
-                Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
-                Value: content.text || "",
+                // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
+                // Value: content.text || "",
 
+                [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.text
               };
               break;
           }
@@ -469,21 +362,23 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       }
     }
   };
-
-  const handleInputChange = async (
-    event: ChangeEvent<HTMLInputElement>, sectionId: number, index: number, fieldIndex: number,
-    subFieldIndex?: any, section?: any, fieldLabel?: string, subField?: string, fieldType?: string
+  const handleInputChange = (
+    event: ChangeEvent<HTMLInputElement>, 
+    sectionId: number, 
+    index: number, 
+    fieldIndex: number,
+    subFieldIndex?: number, 
+    section?: any, 
+    fieldLabel?: string, 
+    subField?: string, 
+    fieldType?: string
   ) => {
     const { name, value, files } = event.target;
+  
     if (files && files[0]) {
       const file = files[0];
-
-      const formData = new FormData();
-      formData.append('image', file);
-
-      // Upload the file to the server
-      // const response = await post(pages.fileUpoad,formData);
       const reader = new FileReader();
+  
       reader.onloadend = () => {
         setSections((prevSections) => {
           const updatedSections = prevSections.map((sec, mainIndex) => {
@@ -510,7 +405,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                           fieldLabel: fieldLabel,
                           subField: subField,
                           fieldType: fieldType,
-                          keyMultiple: temIndex
+                          keyMultiple: temIndex,
+                          fileType: file.type, // Track the type of file
                         },
                       },
                     }));
@@ -533,7 +429,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                           templateSectionMultipleId: "",
                           fieldLabel: fieldLabel,
                           subField: subField,
-                          fieldType: fieldType
+                          fieldType: fieldType,
+                          fileType: file.type, // Track the type of file
                         },
                       },
                     }));
@@ -548,11 +445,15 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
           return updatedSections;
         });
       };
-      reader.readAsDataURL(file);
-
-
-
+  
+      // Handling image and video previews
+      if (file.type.startsWith('video/')) {
+        reader.readAsDataURL(file); // For video, use Data URL
+      } else {
+        reader.readAsDataURL(file); // Default to Data URL (e.g., images)
+      }
     } else {
+      // Handling non-file input changes
       setSections((prevSections) => {
         const updatedSections = prevSections.map((sec, mainIndex) => {
           if (mainIndex === index) {
@@ -578,7 +479,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                         fieldLabel: fieldLabel,
                         subField: subField,
                         fieldType: fieldType,
-                        keyMultiple: temIndex
+                        keyMultiple: temIndex,
                       },
                     },
                   }));
@@ -611,7 +512,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                         fieldLabel: fieldLabel,
                         subField: subField,
                         fieldType: fieldType,
-                        keyMultiple: temIndex
+                        keyMultiple: temIndex,
                       },
                     },
                   }));
@@ -634,6 +535,163 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       });
     }
   };
+  
+  // const handleInputChange = (
+  //   event: ChangeEvent<HTMLInputElement>, sectionId: number, index: number, fieldIndex: number,
+  //   subFieldIndex?: any, section?: any, fieldLabel?: string, subField?: string, fieldType?: string
+  // ) => {
+  //   const { name, value, files } = event.target;
+  //   if (files && files[0]) {
+  //     const file = files[0];
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       setSections((prevSections) => {
+  //         const updatedSections = prevSections.map((sec, mainIndex) => {
+  //           if (mainIndex === index) {
+  //             const updatedSectionTemplate = sec.sectionTemplate.map((secTemplate: any, temIndex: any) => {
+  //               if (temIndex === fieldIndex) {
+  //                 if (subFieldIndex !== undefined && secTemplate.fieldType === "multiple") {
+  //                   secTemplate.multipleData[subFieldIndex][name] = value;
+  //                   const validation = JSON.parse(secTemplate.multipleData[subFieldIndex].validation || "{}");
+  //                   const error = validateField(value, validation, secTemplate.multipleData[subFieldIndex]);
+  //                   setFormData((prevData) => ({
+  //                     ...prevData,
+  //                     templateData: {
+  //                       ...prevData.templateData,
+  //                       [`${index}+${fieldIndex}+${subFieldIndex}`]: {
+  //                         file,
+  //                         preview: reader.result as string,
+  //                         error: error,
+  //                         sectionName: section.sectionSlug,
+  //                         orderId: section.sectionOrder,
+  //                         templateId: index,
+  //                         templateSectionId: temIndex,
+  //                         templateSectionMultipleId: subFieldIndex.toString(),
+  //                         fieldLabel: fieldLabel,
+  //                         subField: subField,
+  //                         fieldType: fieldType,
+  //                         keyMultiple: temIndex
+                          
+  //                       },
+  //                     },
+  //                   }));
+  //                 } else {
+  //                   secTemplate[name] = value;
+  //                   const validation = JSON.parse(secTemplate.validation || "{}");
+  //                   const error = validateField(value, validation, secTemplate);
+  //                   setFormData((prevData) => ({
+  //                     ...prevData,
+  //                     templateData: {
+  //                       ...prevData.templateData,
+  //                       [`${index}+${temIndex}`]: {
+  //                         file,
+  //                         preview: reader.result as string,
+  //                         error: error,
+  //                         sectionName: section.sectionSlug,
+  //                         orderId: section.sectionOrder,
+  //                         templateId: index,
+  //                         templateSectionId: temIndex,
+  //                         templateSectionMultipleId: "",
+  //                         fieldLabel: fieldLabel,
+  //                         subField: subField,
+  //                         fieldType: fieldType
+  //                       },
+  //                     },
+  //                   }));
+  //                 }
+  //               }
+  //               return secTemplate;
+  //             });
+  //             return { ...sec, sectionTemplate: updatedSectionTemplate };
+  //           }
+  //           return sec;
+  //         });
+  //         return updatedSections;
+  //       });
+  //     };
+  //     reader.readAsDataURL(file);
+  //   } else {
+  //     setSections((prevSections) => {
+  //       const updatedSections = prevSections.map((sec, mainIndex) => {
+  //         if (mainIndex === index) {
+  //           const updatedSectionTemplate = sec.sectionTemplate.map((secTemplate: any, temIndex: any) => {
+  //             if (temIndex === fieldIndex) {
+  //               if (subFieldIndex !== undefined && secTemplate.fieldType === "multiple") {
+  //                 secTemplate.multipleData[subFieldIndex][name] = value;
+  //                 const validation = JSON.parse(secTemplate.multipleData[subFieldIndex].validation || "{}");
+  //                 const error = validateField(value, validation, secTemplate.multipleData[subFieldIndex]);
+  //                 setFormData((prevData) => ({
+  //                   ...prevData,
+  //                   templateData: {
+  //                     ...prevData.templateData,
+  //                     [`${index}+${fieldIndex}+${subFieldIndex}`]: {
+  //                       ...prevData.templateData[`${index}+${fieldIndex}+${subFieldIndex}`],
+  //                       [name]: value,
+  //                       error: error,
+  //                       sectionName: section.sectionSlug,
+  //                       orderId: section.sectionOrder,
+  //                       templateId: index,
+  //                       templateSectionId: temIndex,
+  //                       templateSectionMultipleId: subFieldIndex.toString(),
+  //                       fieldLabel: fieldLabel,
+  //                       subField: subField,
+  //                       fieldType: fieldType,
+  //                       keyMultiple: temIndex
+  //                     },
+  //                   },
+  //                 }));
+  //                 return {
+  //                   ...secTemplate,
+  //                   multipleData: secTemplate.multipleData.map((data: any, idx: any) => {
+  //                     if (idx === subFieldIndex) {
+  //                       return { ...data, error };
+  //                     }
+  //                     return data;
+  //                   }),
+  //                 };
+  //               } else {
+  //                 secTemplate[name] = value;
+  //                 const validation = JSON.parse(secTemplate.validation || "{}");
+  //                 const error = validateField(value, validation, secTemplate);
+  //                 setFormData((prevData) => ({
+  //                   ...prevData,
+  //                   templateData: {
+  //                     ...prevData.templateData,
+  //                     [`${index}+${temIndex}`]: {
+  //                       ...prevData.templateData[`${index}+${temIndex}`],
+  //                       [name]: value,
+  //                       error: error,
+  //                       sectionName: section.sectionSlug,
+  //                       orderId: section.sectionOrder,
+  //                       templateId: index,
+  //                       templateSectionId: temIndex,
+  //                       templateSectionMultipleId: "",
+  //                       fieldLabel: fieldLabel,
+  //                       subField: subField,
+  //                       fieldType: fieldType,
+  //                       keyMultiple: temIndex
+  //                     },
+  //                   },
+  //                 }));
+  //                 return {
+  //                   ...secTemplate,
+  //                   error,
+  //                 };
+  //               }
+  //             }
+  //             return secTemplate;
+  //           });
+  //           return {
+  //             ...sec,
+  //             sectionTemplate: updatedSectionTemplate,
+  //           };
+  //         }
+  //         return sec;
+  //       });
+  //       return updatedSections;
+  //     });
+  //   }
+  // };
 
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(
     false
@@ -678,233 +736,60 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
         templateData: updatedTemplateData,
       };
     });
-
   }
-  const generateUniqueId = () => '_' + Math.random().toString(36).substr(2, 9);
-
-  const handleAddDuplicateForm = (sectionIndex: number, fieldIndex: number) => {
-    setSections(prevSections => {
+  const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
+    const newSectionTemplate = [...sections[index].sectionTemplate];
+    const duplicateField = { ...newSectionTemplate[fieldIndex] };
+    newSectionTemplate.push({ ...duplicateField });
+    setSections((prevSections) => {
       const updatedSections = [...prevSections];
-      const targetField = updatedSections[sectionIndex].sectionTemplate[fieldIndex];
-
-      if (targetField.fieldType === 'multiple') {
-        const newField = {
-          ...targetField,
-          id: generateUniqueId(), // Add unique ID to the new `multiple` field
-          multipleData: targetField.multipleData.map(data => ({
-            ...data,
-            id: generateUniqueId() // Add unique ID to each item in the cloned data
-          }))
-        };
-
-        const updatedTemplate = [
-          ...updatedSections[sectionIndex].sectionTemplate.slice(0, fieldIndex + 1),
-          newField,
-          ...updatedSections[sectionIndex].sectionTemplate.slice(fieldIndex + 1)
-        ];
-
-        updatedSections[sectionIndex] = {
-          ...updatedSections[sectionIndex],
-          sectionTemplate: updatedTemplate
-        };
-      }
-
+      updatedSections[index].sectionTemplate = newSectionTemplate;
       return updatedSections;
     });
   };
-
-  // const handleAddDuplicateForm = (sectionIndex: number, fieldIndex: number) => {
-  //   setSections(prevSections => {
-  //     const updatedSections = [...prevSections];
-  //     const targetField = updatedSections[sectionIndex].sectionTemplate[fieldIndex];
-
-  //     if (targetField.fieldType === 'multiple') {
-  //       // Clone the target field
-  //       const newField = {
-  //         ...targetField,
-  //         id: generateUniqueId(), // Add unique ID to the new `multiple` field
-  //         multipleData: targetField.multipleData.map(data => ({
-  //           ...data,
-  //           id: generateUniqueId() // Add unique ID to each item in the cloned data
-  //         }))
-  //       };
-
-  //       // Insert the cloned field after the original field
-  //       const updatedTemplate = [
-  //         ...updatedSections[sectionIndex].sectionTemplate.slice(0, fieldIndex + 1),
-  //         newField,
-  //         ...updatedSections[sectionIndex].sectionTemplate.slice(fieldIndex + 1)
-  //       ];
-
-  //       // Update the section with the new template
-  //       updatedSections[sectionIndex] = {
-  //         ...updatedSections[sectionIndex],
-  //         sectionTemplate: updatedTemplate
-  //       };
-  //     }
-
-  //     return updatedSections;
-  //   });
-  // };
-
-  // const handleAddDuplicateForm = (sectionIndex, fieldIndex) => {
-  //   setSections(prevSections => {
-  //     const updatedSections = [...prevSections];
-  //     const targetField = updatedSections[sectionIndex].sectionTemplate[fieldIndex];
-
-  //     if (targetField.fieldType === 'multiple') {
-  //       // Create a new unique ID for the new multiple object
-  //       const newField = { 
-  //         ...targetField,
-  //         multipleData: [...targetField.multipleData.map(item => ({ ...item, id: Date.now() }))]
-  //       };
-
-  //       // Add the new field object to the section
-  //       updatedSections[sectionIndex].sectionTemplate = [
-  //         ...updatedSections[sectionIndex].sectionTemplate,
-  //         newField
-  //       ];
-  //     }
-
-  //     return updatedSections;
-  //   });
-  // };
-
-  // Handler for removing a specific multiple field object
-  // const handleRemoveDuplicateForm = (sectionIndex, fieldIndex, id) => {
-  //   setSections(prevSections => {
-  //     const updatedSections = [...prevSections];
-  //     const targetField = updatedSections[sectionIndex].sectionTemplate[fieldIndex];
-
-  //     if (targetField.fieldType === 'multiple') {
-  //       // Remove the specific multiple object by ID
-  //       const newMultipleData = targetField.multipleData.filter(item => item.id !== id);
-
-  //       // Update the target field with the filtered multiple data
-  //       const updatedField = { ...targetField, multipleData: newMultipleData };
-
-  //       // Replace the old field with the updated field
-  //       updatedSections[sectionIndex].sectionTemplate = [
-  //         ...updatedSections[sectionIndex].sectionTemplate.slice(0, fieldIndex),
-  //         updatedField,
-  //         ...updatedSections[sectionIndex].sectionTemplate.slice(fieldIndex + 1)
-  //       ];
-  //     }
-
-  //     return updatedSections;
-  //   });
-  // };
-  // const handleRemoveDuplicateForm = (sectionIndex: number, fieldIndex: number, fieldId: string) => {
-  //   setSections(prevSections => {
-  //     const updatedSections = [...prevSections];
-  //     const section = updatedSections[sectionIndex];
-
-  //     // Filter out the `multiple` field with the given ID
-  //     const updatedTemplate = section.sectionTemplate.filter((field, index) => {
-  //       // If the field is of type 'multiple', check if its ID matches
-  //       if (field.fieldType === 'multiple' && field.id === fieldId) {
-  //         return false; // Exclude this field from the updated template
-  //       }
-  //       return true; // Include all other fields
+  // const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
+  //   const newSectionTemplate = [...sections[index].sectionTemplate];
+  //   if (newSectionTemplate.length > 1) {
+  //     newSectionTemplate.splice(fieldIndex, 1);
+  //     setSections((prevSections) => {
+  //       const updatedSections = [...prevSections];
+  //       updatedSections[index].sectionTemplate = newSectionTemplate;
+  //       return updatedSections;
   //     });
-
-  //     // Update the section with the new template
-  //     updatedSections[sectionIndex] = {
-  //       ...section,
-  //       sectionTemplate: updatedTemplate
-  //     };
-
-  //     return updatedSections;
-  //   });
+  //   }
   // };
 
+  const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
+    const newSectionTemplate = [...sections[index].sectionTemplate];
 
-  //   const handleRemoveDuplicateForm = (sectionIndex: number, fieldId: string) => {
-  //   setSections(prevSections => {
-  //     const updatedSections = [...prevSections];
-  //     const section = updatedSections[sectionIndex];
+    if (newSectionTemplate.length > 1) {
 
-  //     // Filter out the `multiple` field with the given ID
-  //     const updatedTemplate = section.sectionTemplate.filter(field => {
-  //       // Check if the field is of type 'multiple' and its ID matches
-  //       if (field.fieldType === 'multiple') {
-  //         return field.id !== fieldId; // Exclude this field if its ID matches
-  //       }
-  //       return true; // Include all other fields
-  //     });
-
-  //     // Update the section with the new template
-  //     updatedSections[sectionIndex] = {
-  //       ...section,
-  //       sectionTemplate: updatedTemplate
-  //     };
-
-  //     return updatedSections;
-  //   });
-  // };
-  // const handleRemoveDuplicateForm = (sectionIndex: number, fieldId: string) => {
-  //   setSections(prevSections => {
-  //     const updatedSections = [...prevSections];
-  //     const section = updatedSections[sectionIndex];
-
-  //     // Filter out the `multiple` field with the given ID
-  //     const updatedTemplate = section.sectionTemplate.filter(field => {
-  //       // Check if the field is of type 'multiple' and if its ID matches
-  //       if (field.fieldType === 'multiple' && field.id === fieldId) {
-  //         console.log(fieldId);
-  //         console.log(field);
-
-  //         return false; // Exclude this field from the updated template
-  //       }
-  //       return true; // Include all other fields
-  //     });
-
-  //     // Update the section with the new template
-  //     updatedSections[sectionIndex] = {
-  //       ...section,
-  //       sectionTemplate: updatedTemplate
-  //     };
-
-  //     return updatedSections;
-  //   });
-  // };
-
-  const handleRemoveDuplicateForm = (
-    sectionIndex: number,
-    fieldLabel: string,
-    fieldType: string,
-    fieldId: string
-  ) => {
-    setSections(prevSections => {
-      const updatedSections = [...prevSections];
-      const section = updatedSections[sectionIndex];
-
-      // Filter out the `multiple` field with the matching criteria
-      const updatedTemplate = section.sectionTemplate.filter(field => {
-        if (
-          field.fieldType === 'multiple' &&
-          field.fieldLabel === fieldLabel &&
-          field.fieldType === fieldType &&
-          field.id === fieldId
-        ) {
-          return false; // Exclude this field from the updated template
-        }
-        return true; // Include all other fields
+      newSectionTemplate.splice(fieldIndex, 1);
+      // Update sections state
+      setSections((prevSections) => {
+        const updatedSections = [...prevSections];
+        updatedSections[index].sectionTemplate = newSectionTemplate;
+        return updatedSections;
       });
+      // Update formData.templateData
+      setFormData((prevFormData) => {
+        const newTemplateData = { ...prevFormData.templateData };
 
-      // Update the section with the new template
-      updatedSections[sectionIndex] = {
-        ...section,
-        sectionTemplate: updatedTemplate
-      };
-
-      return updatedSections;
-    });
+        // Iterate through the keys of templateData
+        Object.keys(newTemplateData).forEach((key) => {
+          const [sectionIdx, fieldIdx, subFieldIdx] = key.split('+').map(Number);
+          // Remove matching entries
+          if (sectionIdx === index && fieldIdx === fieldIndex) {
+            delete newTemplateData[key];
+          }
+        });
+        return {
+          ...prevFormData,
+          templateData: newTemplateData
+        };
+      });
+    }
   };
-
-
-
-
 
   return (
     <>
@@ -1019,7 +904,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CustomTextField
-                    //  disabled={open === sectionActions.EDIT}
                     error={!!formErrors.templateId}
                     helperText={formErrors.templateId}
                     select
@@ -1030,11 +914,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     id="custom-select"
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       const templateId = Number(e.target.value);
-                      setFormData({
-                        ...formData, templateId
-                        , templateData: {}, sectionData: {}
-                      });
-                      setSections([])
+                      setFormData({ ...formData, templateId });
                       getTemplateIdWiseForm(templateId);
 
                     }}
@@ -1093,6 +973,47 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                       >
                                         <i className="tabler-minus" />
                                       </IconButton>
+                                      {formData.templateData[`${index}+${fieldIndex}`]?.fileType.includes("video") ? (
+                                        <Box
+                                          component="video"
+                                          src={formData.templateData[`${index}+${fieldIndex}`]?.preview}
+                                          controls
+                                          sx={{
+                                            width: "100%",
+                                            maxHeight: "200px",
+                                            objectFit: "contain",
+                                            borderRadius: "4px",
+                                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                                          }}
+                                        />
+                                      ) : (
+                                        <Box
+                                          component="img"
+                                          src={formData.templateData[`${index}+${fieldIndex}`]?.preview}
+                                          alt="Preview"
+                                          sx={{
+                                            width: "100%",
+                                            maxHeight: "200px",
+                                            objectFit: "contain",
+                                            borderRadius: "4px",
+                                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                                          }}
+                                        />
+                                      )}
+                                    </Box>
+                                  )}
+
+                                  {/* {formData.templateData && formData.templateData[`${index}+${fieldIndex}`]?.preview && (
+                                    <Box mt={2} display="flex" flexDirection="column" alignItems="end">
+                                      <IconButton
+                                        size="large"
+                                        onClick={() => handleRemoveFile(index, fieldIndex)}
+                                        aria-label="minus"
+                                        color="error"
+                                        style={{ marginBottom: "8px" }}
+                                      >
+                                        <i className="tabler-minus" />
+                                      </IconButton>
                                       <Box
                                         component="img"
                                         src={formData.templateData[`${index}+${fieldIndex}`]?.preview}
@@ -1106,7 +1027,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                         }}
                                       />
                                     </Box>
-                                  )}
+                                  )} */}
+
                                 </Grid>
                               </>
                             ) : field.fieldType === 'multiple' ? (
@@ -1121,7 +1043,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                       </Grid>
                                       <Grid item xs={2} >
                                         <ButtonGroup variant='tonal' size="small">
-                                          {/* {field.multipleData.length - 1 === fieldIndex && ( */}
+                                          {/* {fieldIndex === section.sectionTemplate.length - 1 && ( */}
                                           <Tooltip title={`Add ${field.fieldLabel}`}>
                                             <Button size="small"
                                               onClick={() =>
@@ -1130,19 +1052,17 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                               <i className="tabler-plus" />
                                             </Button>
                                           </Tooltip>
-                                          {/* )}  */}
+                                          {/* )} */}
                                           {/* {field.multipleData.length > 1 && ( */}
                                           <Tooltip title={`Remove ${field.fieldLabel}`}>
                                             <Button size="small"
-                                              // onClick={() =>
-                                              //   handleRemoveDuplicateForm(index, fieldIndex, field.id)
-                                              // }
-                                              onClick={() => handleRemoveDuplicateForm(index, field.fieldLabel, field.fieldType, field.id)}
-                                            >
+                                              onClick={() =>
+                                                handleRemoveDuplicateForm(index, fieldIndex)
+                                              }>
                                               <i className="tabler-minus" />
                                             </Button>
                                           </Tooltip>
-                                          {/* )}   */}
+                                          {/* )} */}
                                         </ButtonGroup>
                                       </Grid>
                                     </Grid>
@@ -1188,6 +1108,73 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                 inputProps={subField.validation ? JSON.parse(subField.validation) : {}}
                                               />
                                               {formData.templateData &&
+  formData.templateData[
+    `${index}+${fieldIndex}+${subFieldIndex}`
+  ]?.preview && (
+    <Box
+      mt={2}
+      display="flex"
+      flexDirection="column"
+      alignItems="end"
+    >
+      <IconButton
+        size="large"
+        onClick={() =>
+          handleRemoveFile(
+            index,
+            fieldIndex,
+            subFieldIndex
+          )
+        }
+        aria-label="minus"
+        color="error"
+        style={{ marginBottom: '8px' }}
+      >
+        <i className="tabler-minus" />
+      </IconButton>
+      {formData.templateData[
+        `${index}+${fieldIndex}+${subFieldIndex}`
+      ]?.fileType.includes("video") ? (
+        <Box
+          component="video"
+          src={
+            formData.templateData[
+              `${index}+${fieldIndex}+${subFieldIndex}`
+            ]?.preview
+          }
+          controls
+          sx={{
+            width: '100%',
+            maxHeight: '200px',
+            objectFit: 'contain',
+            borderRadius: '4px',
+            boxShadow:
+              '0 2px 4px rgba(0, 0, 0, 0.1)',
+          }}
+        />
+      ) : (
+        <Box
+          component="img"
+          src={
+            formData.templateData[
+              `${index}+${fieldIndex}+${subFieldIndex}`
+            ]?.preview
+          }
+          alt="Preview"
+          sx={{
+            width: '100%',
+            maxHeight: '200px',
+            objectFit: 'contain',
+            borderRadius: '4px',
+            boxShadow:
+              '0 2px 4px rgba(0, 0, 0, 0.1)',
+          }}
+        />
+      )}
+    </Box>
+  )}
+
+                                              {/* {formData.templateData &&
                                                 formData.templateData[
                                                   `${index}+${fieldIndex}+${subFieldIndex}`
                                                 ]?.preview && (
@@ -1230,7 +1217,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                       }}
                                                     />
                                                   </Box>
-                                                )}
+                                                )} */}
                                             </>
                                           ) : (
                                             <CustomTextField
@@ -1278,8 +1265,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                   </CardContent>
                                 </Card>
                               </Grid>
-
-
                             ) : (
                               <Grid item xs={12} sm={12}>
                                 <CustomTextField

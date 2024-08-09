@@ -101,7 +101,7 @@ const ContentBlockForm = ({ open }: Props) => {
   const query = usePathname().split("/");
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false);
   const [expanded, setExpanded] = useState(true)
-
+  const [editAllow, setEditAllow] = useState(false);
   useEffect(() => {
     if (formData.jsonContent.length === 0) {
       handleAddRow();
@@ -233,7 +233,7 @@ const ContentBlockForm = ({ open }: Props) => {
     try {
       const result = await get(`${section.getById}/${slug}`);
       const { data } = result;
-
+      setEditAllow(data.disableSection)
       setFormData({
         ...formData,
         id: data.sectionId,
@@ -253,7 +253,12 @@ const ContentBlockForm = ({ open }: Props) => {
   useEffect(() => {
     if (open === sectionActions.EDIT) {
       getSectionDataById(query[query.length - 1]);
+
     } else {
+      console.log("132123");
+      setEditAllow(false)
+      setFormData(initialData);
+      setFormErrors(initialErrorData);
       setLoading(false);
     }
   }, []);
@@ -298,6 +303,7 @@ const ContentBlockForm = ({ open }: Props) => {
                     placeholder=""
                     value={formData.name}
                     onChange={handleSectionNameChange}
+                    disabled={editAllow ? true : false}
                   />
                 </Grid>
                 <Grid item xs={12} sm={5}>
@@ -310,6 +316,7 @@ const ContentBlockForm = ({ open }: Props) => {
                     placeholder=""
                     value={formData.slug}
                     onChange={handleSlugChange}
+                    disabled={editAllow ? true : false}
                   />
                 </Grid>
                 <Grid item xs={12} sm={1}>
@@ -322,6 +329,7 @@ const ContentBlockForm = ({ open }: Props) => {
                     onChange={(e) =>
                       setFormData({ ...formData, status: e.target.checked })
                     }
+                    disabled={editAllow ? true : false}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -340,7 +348,9 @@ const ContentBlockForm = ({ open }: Props) => {
                               </IconButton>
                             </Tooltip>
                           </TableCell>
-                          <TableCell>Actions </TableCell>
+                          {!editAllow &&
+                                              <TableCell>Actions </TableCell>
+                                            }
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -356,6 +366,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                   renderInput={(params) => <CustomTextField {...params} placeholder="" />}
                                   value={fieldTypeOptions.find((option) => option.value === field.fieldType) || null}
                                   onChange={(e, newValue) => handleChangeField(index, "fieldType", newValue ? newValue.value : "")}
+                                  disabled={editAllow ? true : false}
                                 />
                               </TableCell>
                               <TableCell>
@@ -363,46 +374,51 @@ const ContentBlockForm = ({ open }: Props) => {
                                   fullWidth
                                   value={field.fieldLabel}
                                   onChange={(e) => handleChangeField(index, "fieldLabel", e.target.value)}
+                                  disabled={editAllow ? true : false}
                                 />
                               </TableCell>
                               {/* {field.fieldType !== "multiple" && (<> */}
 
-                                <TableCell>
-                                  <Switch
-                                    checked={field.isRequired}
-                                    onChange={(e) => handleChangeField(index, "isRequired", e.target.checked)}
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <CustomTextField
-                                    fullWidth
-                                    value={field.validation}
-                                    onChange={(e) => handleChangeField(index, "validation", e.target.value)}
-                                    error={!!formErrors.jsonContent[index]}
-                                    helperText={formErrors.jsonContent[index]}
-                                  />
-                                </TableCell>
+                              <TableCell>
+                                <Switch
+                                  checked={field.isRequired}
+                                  onChange={(e) => handleChangeField(index, "isRequired", e.target.checked)}
+                                  disabled={editAllow ? true : false}
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <CustomTextField
+                                  fullWidth
+                                  value={field.validation}
+                                  onChange={(e) => handleChangeField(index, "validation", e.target.value)}
+                                  error={!!formErrors.jsonContent[index]}
+                                  helperText={formErrors.jsonContent[index]}
+                                  disabled={editAllow ? true : false}
+                                />
+                              </TableCell>
                               {/* </>)} */}
                               {/* {field.fieldType === "multiple" ?? (<> */}
-                                {/* <TableCell>&nbsp; s</TableCell>
+                              {/* <TableCell>&nbsp; s</TableCell>
                                 <TableCell>&nbsp; s</TableCell>
                               </>)} */}
-                              <TableCell>
-                                <IconButton size="small" onClick={() => handleRemoveRow(index)} aria-label="minus" color="error">
-                                  <i className="tabler-minus" />
-                                </IconButton>
-                                {index === formData.jsonContent.length - 1 && (
-                                  <IconButton
-                                    size="small"
-                                    onClick={handleAddRow}
-                                    aria-label="plus"
-                                    color="success"
-                                    style={{ marginLeft: 8 }}
-                                  >
-                                    <i className="tabler-plus" />
+                              {!editAllow &&
+                                <TableCell>
+                                  <IconButton size="small" onClick={() => handleRemoveRow(index)} aria-label="minus" color="error">
+                                    <i className="tabler-minus" />
                                   </IconButton>
-                                )}
-                              </TableCell>
+                                  {index === formData.jsonContent.length - 1 && (
+                                    <IconButton
+                                      size="small"
+                                      onClick={handleAddRow}
+                                      aria-label="plus"
+                                      color="success"
+                                      style={{ marginLeft: 8 }}
+                                    >
+                                      <i className="tabler-plus" />
+                                    </IconButton>
+                                  )}
+                                </TableCell>
+                              }
                             </TableRow>
 
                             {field.fieldType === "multiple" && (
@@ -435,7 +451,9 @@ const ContentBlockForm = ({ open }: Props) => {
                                                 </IconButton>
                                               </Tooltip>
                                             </TableCell>
-                                            <TableCell>Actions </TableCell>
+                                            {!editAllow &&
+                                              <TableCell>Actions </TableCell>
+                                            }
                                           </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -450,6 +468,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                                   renderInput={(params) => <CustomTextField {...params} placeholder="" />}
                                                   value={fieldTypeOptionsForMultiple.find((option) => option.value === subField.fieldType) || null}
                                                   onChange={(e, newValue) => handleChangeField(index, "fieldType", newValue ? newValue.value : "", subIndex)}
+                                                  disabled={editAllow ? true : false}
                                                 />
                                               </TableCell>
                                               <TableCell>
@@ -457,6 +476,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                                   fullWidth
                                                   value={subField.fieldLabel}
                                                   onChange={(e) => handleChangeField(index, "fieldLabel", e.target.value, subIndex)}
+                                                  disabled={editAllow ? true : false}
                                                 />
                                               </TableCell>
                                               {/* {field.fieldType !== "multiple" && (<> */}
@@ -464,6 +484,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                                 <Switch
                                                   checked={subField.isRequired}
                                                   onChange={(e) => handleChangeField(index, "isRequired", e.target.checked, subIndex)}
+                                                  disabled={editAllow ? true : false}
                                                 />
                                               </TableCell>
                                               <TableCell>
@@ -473,30 +494,36 @@ const ContentBlockForm = ({ open }: Props) => {
                                                   onChange={(e) => handleChangeField(index, "validation", e.target.value, subIndex)}
                                                   error={!!formErrors.jsonContent[index]?.[subIndex]}
                                                   helperText={formErrors.jsonContent[index]?.[subIndex]}
+                                                  disabled={editAllow ? true : false}
+
                                                 />
                                               </TableCell>
                                               {/* </>)} */}
-                                              <TableCell>
-                                                <IconButton
-                                                  size="small"
-                                                  onClick={() => handleRemoveSubRow(index, subIndex)}
-                                                  aria-label="minus"
-                                                  color="error"
-                                                >
-                                                  <i className="tabler-minus" />
-                                                </IconButton>
-                                                {subIndex === field.multipleData.length - 1 && (
+                                              {!editAllow &&
+                                                <TableCell>
+
+
                                                   <IconButton
                                                     size="small"
-                                                    onClick={() => handleAddSubRow(index)}
-                                                    aria-label="plus"
-                                                    color="success"
-                                                    style={{ marginLeft: 8 }}
+                                                    onClick={() => handleRemoveSubRow(index, subIndex)}
+                                                    aria-label="minus"
+                                                    color="error"
                                                   >
-                                                    <i className="tabler-plus" />
+                                                    <i className="tabler-minus" />
                                                   </IconButton>
-                                                )}
-                                              </TableCell>
+                                                  {subIndex === field.multipleData.length - 1 && (
+                                                    <IconButton
+                                                      size="small"
+                                                      onClick={() => handleAddSubRow(index)}
+                                                      aria-label="plus"
+                                                      color="success"
+                                                      style={{ marginLeft: 8 }}
+                                                    >
+                                                      <i className="tabler-plus" />
+                                                    </IconButton>
+                                                  )}
+                                                </TableCell>
+                                              }
                                             </TableRow>
                                           ))}
                                         </TableBody>

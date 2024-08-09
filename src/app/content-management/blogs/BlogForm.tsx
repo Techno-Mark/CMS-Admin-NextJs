@@ -34,13 +34,6 @@ import { ADD_BLOG, blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
 import dynamic from 'next/dynamic';
 import EditorBasic from "@/components/EditorToolbar";
 
-// Dynamic import for CKEditor
-const CKEditor = dynamic<{ editor: any, data: string, onChange: (event: any, editor: any) => void }>(() =>
-  import('@ckeditor/ckeditor5-react').then((mod: any) => mod.CKEditor), { ssr: false });
-
-const ClassicEditor = dynamic(() => import('@ckeditor/ckeditor5-build-classic').then((mod: any) => mod.default), {
-  ssr: false,
-});
 type blogFormPropsTypes = {
   open: number;
   editingRow: blogDetailType | null;
@@ -407,7 +400,7 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
                 helperText={formErrors.title}
                 label="Blog Title *"
                 fullWidth
-                placeholder="Enter Blog Title"
+                
                 value={formData.title}
                 onChange={handleBlogTitleChange}
               />
