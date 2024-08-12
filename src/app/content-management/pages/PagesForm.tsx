@@ -173,7 +173,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     let valid = true;
     let errors = { ...initialErrorData };
     let updatedSections = [...sections];
-    const slugRegex = /^[a-zA-Z0-9]+$/;
+    const slugRegex = /^[a-zA-Z0-9/-]+$/;
     if (formData.templateId === -1) {
       errors.templateId = "Please select a template";
       valid = false;
@@ -735,8 +735,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
     const newSlug = e.target.value;
-    const slugRegex = /^[a-zA-Z0-9]+$/;
-  
+    const slugRegex = /^[a-zA-Z0-9/-]+$/;
+   
+
     if (!slugRegex.test(newSlug)) {
       setFormErrors({ ...formErrors, slug: "Slug must be alphanumeric with no spaces, dashes, or underscores." });
     } else {
