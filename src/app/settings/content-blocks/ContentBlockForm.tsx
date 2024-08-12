@@ -396,7 +396,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                   fullWidth
                                   value={field.fieldLabel}
                                   onChange={(e) => handleChangeField(index, "fieldLabel", e.target.value)}
-                                  disabled={editAllow ? true : false}
+                                  // disabled={editAllow ? true : false}
                                 />
                               </TableCell>
                               {/* {field.fieldType !== "multiple" && (<> */}
@@ -406,7 +406,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                   fullWidth
                                   value={field.fekey}
                                   onChange={(e) => handleChangeField(index, "fekey", e.target.value)}
-                                  disabled={editAllow ? true : false}
+                                  // disabled={editAllow ? true : false}
                                 />
                               </TableCell>
 
@@ -414,7 +414,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                 <Switch
                                   checked={field.isRequired}
                                   onChange={(e) => handleChangeField(index, "isRequired", e.target.checked)}
-                                  disabled={editAllow ? true : false}
+                                  // disabled={editAllow ? true : false}
                                 />
                               </TableCell>
                               <TableCell>
@@ -424,7 +424,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                   onChange={(e) => handleChangeField(index, "validation", e.target.value)}
                                   error={!!formErrors.jsonContent[index]}
                                   helperText={formErrors.jsonContent[index]}
-                                  disabled={editAllow ? true : false}
+                                  // disabled={editAllow ? true : false}
                                 />
                               </TableCell>
                               {/* </>)} */}
@@ -508,7 +508,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                                   fullWidth
                                                   value={subField.fieldLabel}
                                                   onChange={(e) => handleChangeField(index, "fieldLabel", e.target.value, subIndex)}
-                                                  disabled={editAllow ? true : false}
+                                                  // disabled={editAllow ? true : false}
                                                 />
                                               </TableCell>
                                               {/* {field.fieldType !== "multiple" && (<> */}
@@ -517,14 +517,14 @@ const ContentBlockForm = ({ open }: Props) => {
                                                   fullWidth
                                                   value={subField.fekey}
                                                   onChange={(e) => handleChangeField(index, "fekey", e.target.value, subIndex)}
-                                                  disabled={editAllow ? true : false}
+                                                  // disabled={editAllow ? true : false}
                                                 />
                                               </TableCell>
                                               <TableCell>
                                                 <Switch
                                                   checked={subField.isRequired}
                                                   onChange={(e) => handleChangeField(index, "isRequired", e.target.checked, subIndex)}
-                                                  disabled={editAllow ? true : false}
+                                                  // disabled={editAllow ? true : false}
                                                 />
                                               </TableCell>
                                               <TableCell>
@@ -534,7 +534,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                                   onChange={(e) => handleChangeField(index, "validation", e.target.value, subIndex)}
                                                   error={!!formErrors.jsonContent[index]?.[subIndex]}
                                                   helperText={formErrors.jsonContent[index]?.[subIndex]}
-                                                  disabled={editAllow ? true : false}
+                                                  // disabled={editAllow ? true : false}
 
                                                 />
                                               </TableCell>
