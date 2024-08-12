@@ -67,7 +67,7 @@ const initialData = {
   id: 0,
   name: "",
   slug: "",
-  jsonContent: [{ fieldType: "", fieldLabel: "", isRequired: false, validation: "" }],
+  jsonContent: [{ fieldType: "", fieldLabel: "", fekey:"", isRequired: false, validation: "" }],
   status: false,
 };
 
@@ -151,14 +151,14 @@ const ContentBlockForm = ({ open }: Props) => {
       }
 
       if (field === "fieldType" && value === "multiple") {
-        updatedFields[index].multipleData = [{ fieldType: "", fieldLabel: "", isRequired: false, validation: "" }];
+        updatedFields[index].multipleData = [{ fieldType: "", fieldLabel: "",fekey:"", isRequired: false, validation: "" }];
       }
     }
 
     setFormData({ ...formData, jsonContent: updatedFields });
   };
   const handleAddSubRow = (parentIndex: number) => {
-    const newSubField = { fieldType: "", fieldLabel: "", isRequired: false, validation: "" };
+    const newSubField = { fieldType: "", fieldLabel: "",fekey:"", isRequired: false, validation: "" };
     const updatedFields = [...formData.jsonContent];
     updatedFields[parentIndex].multipleData.push(newSubField);
     setFormData({ ...formData, jsonContent: updatedFields });
@@ -179,15 +179,20 @@ const ContentBlockForm = ({ open }: Props) => {
       jsonContent: data.jsonContent.map(() => ''),
     };
 
+    const slugRegex = /^[a-zA-Z0-9]+$/;
+
     if (data.name.trim().length === 0) {
       errors.name = 'Full Name is required';
       isValid = false;
     }
 
-    if (data.slug.trim().length === 0) {
-      errors.slug = 'Section Slug is required';
-      isValid = false;
-    }
+     if (data.slug.trim().length === 0) {
+    errors.slug = 'Section Slug is required';
+    isValid = false;
+  } else if (!slugRegex.test(data.slug)) {
+    errors.slug = 'Section Slug must be alphanumeric with no spaces or special characters.';
+    isValid = false;
+  }
 
 
     setFormErrors({ ...formErrors, ...errors });
@@ -269,19 +274,37 @@ const ContentBlockForm = ({ open }: Props) => {
     setFormData((prevData) => ({
       ...prevData,
       name: newName,
-      slug: !isSlugManuallyEdited && open === sectionActions.ADD ? newName.replace(/[^\w\s]|_/g, "").replace(/\s+/g, "-").toLowerCase() : prevData.slug,
+      // slug: !isSlugManuallyEdited && open === sectionActions.ADD ? newName.replace(/[^\w\s]|_/g, "").replace(/\s+/g, "-").toLowerCase() : prevData.slug,
     }));
   };
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSlug = e.target.value.toLowerCase();
-    setFormErrors({ ...formErrors, slug: "" });
+    const newSlug = e.target.value;
+    const slugRegex = /^[a-zA-Z0-9]+$/;
+  
+    if (!slugRegex.test(newSlug)) {
+      setFormErrors({ ...formErrors, slug: "Slug must be alphanumeric with no spaces, dashes, or underscores." });
+    } else {
+      setFormErrors({ ...formErrors, slug: "" });
+    }
+  
     setFormData((prevData) => ({
       ...prevData,
       slug: newSlug,
     }));
     setIsSlugManuallyEdited(true);
   };
+  
+
+  // const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const newSlug = e.target.value;
+  //   setFormErrors({ ...formErrors, slug: "" });
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     slug: newSlug,
+  //   }));
+  //   setIsSlugManuallyEdited(true);
+  // };
   const handleChange = () => {
     setExpanded(!expanded)
   }
@@ -340,6 +363,7 @@ const ContentBlockForm = ({ open }: Props) => {
                         <TableRow>
                           <TableCell>Field Type</TableCell>
                           <TableCell>Field Label</TableCell>
+                          <TableCell>Frontend side Key</TableCell>
                           <TableCell>Is Required</TableCell>
                           <TableCell>Validation
                             <Tooltip placement="top" title={<pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(tooltipContent, null, 2)}</pre>}>
@@ -348,9 +372,7 @@ const ContentBlockForm = ({ open }: Props) => {
                               </IconButton>
                             </Tooltip>
                           </TableCell>
-                          {!editAllow &&
-                                              <TableCell>Actions </TableCell>
-                                            }
+                          {!editAllow &&<TableCell>Actions </TableCell> }
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -378,6 +400,15 @@ const ContentBlockForm = ({ open }: Props) => {
                                 />
                               </TableCell>
                               {/* {field.fieldType !== "multiple" && (<> */}
+
+                              <TableCell>
+                                <CustomTextField
+                                  fullWidth
+                                  value={field.fekey}
+                                  onChange={(e) => handleChangeField(index, "fekey", e.target.value)}
+                                  disabled={editAllow ? true : false}
+                                />
+                              </TableCell>
 
                               <TableCell>
                                 <Switch
@@ -443,6 +474,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                           <TableRow>
                                             <TableCell>Field Type</TableCell>
                                             <TableCell>Field Label</TableCell>
+                                            <TableCell>Frontend side Key</TableCell>
                                             <TableCell>Is Required</TableCell>
                                             <TableCell>Validation
                                               <Tooltip placement="top" title={<pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(tooltipContent, null, 2)}</pre>}>
@@ -480,6 +512,14 @@ const ContentBlockForm = ({ open }: Props) => {
                                                 />
                                               </TableCell>
                                               {/* {field.fieldType !== "multiple" && (<> */}
+                                                <TableCell>
+                                                <CustomTextField
+                                                  fullWidth
+                                                  value={subField.fekey}
+                                                  onChange={(e) => handleChangeField(index, "fekey", e.target.value, subIndex)}
+                                                  disabled={editAllow ? true : false}
+                                                />
+                                              </TableCell>
                                               <TableCell>
                                                 <Switch
                                                   checked={subField.isRequired}

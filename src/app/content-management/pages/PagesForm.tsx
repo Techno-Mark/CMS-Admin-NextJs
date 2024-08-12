@@ -257,9 +257,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
           const sectionId = content.templateSectionId;
           const keyMultiple = content.keyMultiple;
           const sectionMultipleId = content.templateSectionMultipleId;
-          let contentBlock = formattedData.find(block => block[`${sectionName}-${mainKey}`]);
+          let contentBlock = formattedData.find(block => block[`${sectionName}`]);
           if (!contentBlock) {
-            contentBlock = { [`${sectionName}-${mainKey}`]: [] };
+            contentBlock = { [`${sectionName}`]: [] };
             formattedData.push(contentBlock);
           }
           let formattedContent;
@@ -328,10 +328,10 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
               break;
           }
           if (sectionMultipleId) {
-            let nestedSection = contentBlock[`${sectionName}-${mainKey}`].find((section: { [x: string]: any; }) => section[`${content.fieldLabel}`]);
+            let nestedSection = contentBlock[`${sectionName}`].find((section: { [x: string]: any; }) => section[`${content.fieldLabel}`]);
             if (!nestedSection) {
               nestedSection = { [`${content.fieldLabel}`]: [] };
-              contentBlock[`${sectionName}-${mainKey}`].push(nestedSection);
+              contentBlock[`${sectionName}`].push(nestedSection);
             }
             let groupedArray = nestedSection[`${content.fieldLabel}`].find((item: any) => item.keyMultiple === keyMultiple);
             if (!groupedArray) {
@@ -340,7 +340,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
             }
             groupedArray.items.push({ ...formattedContent });
           } else {
-            contentBlock[`${sectionName}-${mainKey}`].push(formattedContent);
+            contentBlock[`${sectionName}`].push(formattedContent);
           }
         });
         const endpoint = editingRow ? pages.update : pages.create;
@@ -737,6 +737,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       };
     });
   }
+  
   const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
     const newSectionTemplate = [...sections[index].sectionTemplate];
     const duplicateField = { ...newSectionTemplate[fieldIndex] };
