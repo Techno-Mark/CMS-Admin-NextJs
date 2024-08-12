@@ -278,7 +278,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 // Value: content.email || "",
 
-                [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.email || ""
+                //   [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.email || ""
+
+                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.email || ""
 
               };
               break;
@@ -288,8 +290,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 // Value: content.file || "",
                 // Preview: content.preview || "",
 
-                [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.preview
-
+                // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.preview
+                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.preview
               };
               break;
             case 'url':
@@ -297,15 +299,17 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 // Value: content.url || "",
 
-                [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.url
+                // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.url
+
+                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.url
               };
               break;
             case 'date':
               formattedContent = {
                 // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 // Value: content.date || "",
-                [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.date
-
+                // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.date
+                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.date
               };
               break;
             case 'number':
@@ -313,8 +317,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 // Value: content.number || "",
 
-                [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.number
-
+                // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.number
+                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.number
               };
               break;
             case 'textarea':
@@ -322,8 +326,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 // Value: content.textarea || "",
 
-                [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.textarea
-
+                // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.textarea
+                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.textarea
               };
               break;
             case 'text':
@@ -332,7 +336,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 // Value: content.text || "",
 
-                [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.text
+                // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.text
+                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.text
               };
               break;
           }
@@ -380,7 +385,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     section?: any,
     fieldLabel?: string,
     subField?: string,
-    fieldType?: string
+    fieldType?: string,
+    feKey?:string
   ) => {
     const { name, value, files } = event.target;
 
@@ -415,7 +421,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                           subField: subField,
                           fieldType: fieldType,
                           keyMultiple: temIndex,
-                          fileType: file.type, // Track the type of file
+                          fileType: file.type,
+                          feKey:feKey
                         },
                       },
                     }));
@@ -439,7 +446,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                           fieldLabel: fieldLabel,
                           subField: subField,
                           fieldType: fieldType,
-                          fileType: file.type, // Track the type of file
+                          fileType: file.type,
+                          feKey:feKey
                         },
                       },
                     }));
@@ -489,6 +497,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                         subField: subField,
                         fieldType: fieldType,
                         keyMultiple: temIndex,
+                        feKey:feKey
                       },
                     },
                   }));
@@ -522,6 +531,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                         subField: subField,
                         fieldType: fieldType,
                         keyMultiple: temIndex,
+                        feKey:feKey
                       },
                     },
                   }));
@@ -976,7 +986,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
                                       handleInputChange(
                                         e, section.sectionId, index, fieldIndex, 'null', section,
-                                        field.fieldLabel, '', field.fieldType)
+                                        field.fieldLabel, '', field.fieldType,field.fekey)
                                     }
                                     //@ts-ignore
                                     error={
@@ -1126,7 +1136,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                     section,
                                                     field.fieldLabel,
                                                     subField.fieldLabel,
-                                                    subField.fieldType
+                                                    subField.fieldType,
+                                                    subField.fekey
                                                   )
                                                 }
                                                 error={subField.error && subField.error}
@@ -1270,7 +1281,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                   section,
                                                   field.fieldLabel,
                                                   subField.fieldLabel,
-                                                  subField.fieldType
+                                                  subField.fieldType,
+                                                  subField.fekey
                                                 )
                                               }
                                               fullWidth
@@ -1310,7 +1322,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                       fieldIndex,
                                       null,
                                       section,
-                                      field.fieldLabel, '', field.fieldType)
+                                      field.fieldLabel, '', field.fieldType, field.fekey)
                                   }
                                   fullWidth
                                   margin="normal"
