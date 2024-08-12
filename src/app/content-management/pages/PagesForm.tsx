@@ -739,7 +739,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
    
 
     if (!slugRegex.test(newSlug)) {
-      setFormErrors({ ...formErrors, slug: "Slug must be alphanumeric with no spaces, dashes, or underscores." });
+      setFormErrors({ ...formErrors, slug: "Slug must be alphanumeric with no spaces or underscores" });
     } else {
       setFormErrors({ ...formErrors, slug: "" });
     }
