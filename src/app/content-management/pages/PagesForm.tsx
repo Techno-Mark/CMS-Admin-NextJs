@@ -173,6 +173,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     let valid = true;
     let errors = { ...initialErrorData };
     let updatedSections = [...sections];
+    const slugRegex = /^[a-zA-Z0-9]+$/;
     if (formData.templateId === -1) {
       errors.templateId = "Please select a template";
       valid = false;
@@ -181,8 +182,16 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       errors.title = "Title is required";
       valid = false;
     }
-    if (!formData.slug) {
-      errors.slug = "Slug is required";
+    // if (!formData.slug) {
+    //   errors.slug = "Slug is required";
+    //   valid = false;
+    // }
+
+    if (formData.slug.trim().length === 0) {
+      errors.slug = 'Slug is required';
+      valid = false;
+    } else if (!slugRegex.test(formData.slug)) {
+      errors.slug = 'Slug must be alphanumeric with no spaces or special characters.';
       valid = false;
     }
     if (!formData.content) {
@@ -703,24 +712,39 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     setFormData((prevData) => ({
       ...prevData,
       title: newName,
-      slug:
-        !isSlugManuallyEdited && open === sectionActions.ADD
-          ? newName
-            .replace(/[^\w\s]|_/g, "")
-            .replace(/\s+/g, "-")
-            .toLowerCase()
-          : prevData.slug,
+      // slug:
+      //   !isSlugManuallyEdited && open === sectionActions.ADD
+      //     ? newName
+      //       .replace(/[^\w\s]|_/g, "")
+      //       .replace(/\s+/g, "-")
+      //       .toLowerCase()
+      //     : prevData.slug,
     }));
   };
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSlug = e.target.value.toLowerCase();
-    setFormErrors({ ...formErrors, slug: "" });
+
+    const newSlug = e.target.value;
+    const slugRegex = /^[a-zA-Z0-9]+$/;
+  
+    if (!slugRegex.test(newSlug)) {
+      setFormErrors({ ...formErrors, slug: "Slug must be alphanumeric with no spaces, dashes, or underscores." });
+    } else {
+      setFormErrors({ ...formErrors, slug: "" });
+    }
+  
     setFormData((prevData) => ({
       ...prevData,
       slug: newSlug,
     }));
     setIsSlugManuallyEdited(true);
+    // const newSlug = e.target.value.toLowerCase();
+    // setFormErrors({ ...formErrors, slug: "" });
+    // setFormData((prevData) => ({
+    //   ...prevData,
+    //   slug: newSlug,
+    // }));
+    // setIsSlugManuallyEdited(true);
   };
 
   const handleRemoveFile = (sectionIndex: number, fieldIndex: number, subFieldIndex?: number) => {
