@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { post } from "@/services/apiService";
 import { getRoleList } from "@/services/endpoint/users/roles";
 import RolesListTable from "./RolesListTable";
-
+const orgId = localStorage.getItem('selectedOrgId');
 const initialBody = {
   page: 0,
   limit: 10,
   search: "",
-  organizationId: 1,
+  organizationId: orgId,
   active: null,
 };
 
