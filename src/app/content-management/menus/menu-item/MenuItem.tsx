@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import DraggableIcon from "../_svg/_DraggableIcon";
+import DraggableIcon from "./_svg/DraggableIcon";
 import { Box, Button, Card, Fab, Grid } from "@mui/material";
 import KanbanDrawer from "../KanbanDrawer";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
