@@ -39,8 +39,9 @@ import {
   redirectToEditPage,
 } from "@/services/endpoint/users/roles";
 import RoleCards from "./RolesCard";
-import { Chip } from "@mui/material";
+import { Chip, MenuItem } from "@mui/material";
 import { formatDate } from "@/utils/formatDate";
+import RoleDialog from "./RoleDialog";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -118,6 +119,7 @@ const RolesListTable = ({
     limit: number;
     search: string;
     organizationId: string | number;
+    active: boolean | null;
   }) => void;
   initialBody: {
     page: number;
@@ -131,6 +133,9 @@ const RolesListTable = ({
   const [globalFilter, setGlobalFilter] = useState("");
   const [deletingId, setDeletingId] = useState<number>(0);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [editId, setEditId] = useState<number>(0);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
 
   const columns = useMemo<ColumnDef<RolesTypeWithAction, any>[]>(
     () => [
@@ -150,19 +155,19 @@ const RolesListTable = ({
           </Typography>
         ),
       }),
-      columnHelper.accessor("roleDescription", {
-        header: "Description",
-        cell: ({ row }) => (
-          <Typography color="text.primary" className="font-medium">
-            {row.original.roleDescription}
-          </Typography>
-        ),
-      }),
+      // columnHelper.accessor("roleDescription", {
+      //   header: "Description",
+      //   cell: ({ row }) => (
+      //     <Typography color="text.primary" className="font-medium">
+      //       {row.original.roleDescription}
+      //     </Typography>
+      //   ),
+      // }),
       columnHelper.accessor("createdAt", {
         header: "Created At",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {formatDate(row.original.createdAt)}
+            {row.original.createdAt}
           </Typography>
         ),
       }),
@@ -187,7 +192,8 @@ const RolesListTable = ({
             <div className="flex items-center">
               <IconButton
                 onClick={() => {
-                  router.push(redirectToEditPage(row.original.roleId));
+                  setEditId(row.original.roleId);
+                  setOpenDialog(true);
                 }}
               >
                 <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -238,41 +244,71 @@ const RolesListTable = ({
       page: table.getState().pagination.pageIndex,
       limit: table.getState().pagination.pageSize,
       search: globalFilter,
+      active: activeFilter,
     });
   }, [
     table.getState().pagination.pageSize,
     table.getState().pagination.pageIndex,
     globalFilter,
+    activeFilter,
   ]);
 
   useEffect(() => {
-    if (deletingId === 0) {
+    if (deletingId === 0 || !openDialog) {
       getList({
         ...initialBody,
         page: table.getState().pagination.pageIndex,
         limit: table.getState().pagination.pageSize,
         search: globalFilter,
+        active: activeFilter,
       });
     }
-  }, [deletingId]);
+  }, [deletingId, openDialog]);
 
   return (
     <>
       <div className="my-2">
-        <RoleCards />
+        <RoleCards openDialog={openDialog} setOpenDialog={setOpenDialog} />
       </div>
       <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
         <BreadCrumbList />
         <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-          <IconButton>
-            <i className="tabler-filter text-[22px] text-textSecondary" />
-          </IconButton>
           <DebouncedInput
             value={globalFilter ?? ""}
             onChange={(value) => setGlobalFilter(String(value))}
             placeholder="Search"
             className="is-full sm:is-auto"
           />
+          <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
+            <Typography>Status:</Typography>
+            <CustomTextField
+              select
+              fullWidth
+              defaultValue="all"
+              id="custom-select"
+              value={
+                activeFilter === null
+                  ? "all"
+                  : activeFilter === true
+                    ? "active"
+                    : "inactive"
+              }
+              onChange={(e) => {
+                const value = e.target.value;
+                setActiveFilter(
+                  value === "active"
+                    ? true
+                    : value === "inactive"
+                      ? false
+                      : null
+                );
+              }}
+            >
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="inactive">Inactive</MenuItem>
+            </CustomTextField>
+          </div>
           {/* <Button
             variant="contained"
             startIcon={<i className="tabler-plus" />}
@@ -370,14 +406,22 @@ const RolesListTable = ({
           }}
         />
       </Card>
+
       <ConfirmationDialog
         open={isDeleting}
         setDeletingId={setDeletingId}
         setOpen={(arg1: boolean) => setIsDeleting(arg1)}
         deletePayload={{
           roleId: deletingId,
-          organizationId: 1, // will be dynamic in future
+          organizationId: 1,
         }}
+      />
+
+      <RoleDialog
+        open={openDialog}
+        setOpen={setOpenDialog}
+        title={"Edit"}
+        editId={editId}
       />
     </>
   );

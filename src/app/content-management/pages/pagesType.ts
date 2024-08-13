@@ -11,5 +11,7 @@ export type PagesType = {
     scheduleDate: string,
     templateData: [],
     pageId:string,
-    sectionTemplate:string
+    sectionTemplate:string,
+    sectionData:any,
+    sections:any
 }

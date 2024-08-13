@@ -27,8 +27,12 @@ import { category } from "@/services/endpoint/category";
 import { tag } from "@/services/endpoint/tag";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
-import EditorCustom from "./RichEditor";
+// import EditorCustom from "./RichEditor";
 import { ADD_BLOG, blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
+// import { CKEditor } from "@ckeditor/ckeditor5-react";
+// import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import dynamic from 'next/dynamic';
+import EditorBasic from "@/components/EditorToolbar";
 
 type blogFormPropsTypes = {
   open: number;
@@ -172,9 +176,9 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
       slug:
         !isSlugManuallyEdited && open === sectionActions.ADD
           ? newName
-              .replace(/[^\w\s]|_/g, "")
-              .replace(/\s+/g, "-")
-              .toLowerCase()
+            .replace(/[^\w\s]|_/g, "")
+            .replace(/\s+/g, "-")
+            .toLowerCase()
           : prevData.slug,
     }));
     if (newName?.length) {
@@ -350,6 +354,26 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
       }
     }
   };
+  const handleEditorChange = (content: string) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      description: content
+    }));
+    if (content?.length) {
+      setFormErrors((prevFormErrors) => ({
+        ...prevFormErrors,
+        description: ""
+      }));
+    }
+  };
+
+  const handleContentChange = (content: any) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      description: content,
+    }));
+   
+  };
 
   return (
     <>
@@ -360,7 +384,7 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
             <BreadCrumbList />
           </Grid>
           <Grid item xs={12} sm={1}>
-            <IconButton color="info" onClick={() => {}}>
+            <IconButton color="info" onClick={() => { }}>
               <i className="tabler-external-link text-textSecondary"></i>
             </IconButton>
           </Grid>
@@ -376,7 +400,7 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
                 helperText={formErrors.title}
                 label="Blog Title *"
                 fullWidth
-                placeholder="Enter Blog Title"
+                
                 value={formData.title}
                 onChange={handleBlogTitleChange}
               />
@@ -402,10 +426,48 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
             </Grid>
             <Grid item xs={12} sm={12}>
               <p className="text-[#4e4b5a]">Description *</p>
-              <EditorCustom
+              {/* <CKEditor
+                editor={ClassicEditor}
+                data={formData.description}
+                onChange={(event: any, editor: any) => {
+                  if (editor) {
+                    const data = editor.getData();
+                    setFormData((prevFormData) => ({ ...prevFormData, description: data }));
+                    if (data?.length) {
+                      setFormErrors((prevFormErrors) => ({ ...prevFormErrors, description: "" }));
+                    }
+                  }
+                }}
+              /> */}
+              {/* <EditorCustom
+               setContent={setFormData}
+               content={formData.description}
+                // content={formData.description}
+                // setContent={(content:any) => setFormData((prev) => ({ ...prev, description: content }))}
+              /> */}
+
+              <EditorBasic
+                content={formData.description}
+                onContentChange={handleContentChange}
+
+                // onContentChange={(content: string) => {
+                //   setFormData({ ...formData, 
+                //     description: content })
+
+
+                //   // if (content.length) {
+                //   //   setFormErrors({ ...formErrors, description: "" });
+                //   // }
+                // }}
+                error={!!formErrors.description}
+                helperText={formErrors.description}
+              />
+
+
+              {/* <EditorCustom
                 setContent={setFormData}
                 content={formData.description}
-              />
+              /> */}
             </Grid>
             <Grid item xs={12} sm={12}>
               <CustomTextField

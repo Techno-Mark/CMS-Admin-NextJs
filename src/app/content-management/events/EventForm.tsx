@@ -26,6 +26,17 @@ import Close from "@/@menu/svg/Close";
 import EditorBasic from "@/components/EditorToolbar";
 import { toast } from "react-toastify";
 import { ADD_EVENT, EDIT_EVENT, eventDetailType } from "@/types/apps/eventType";
+// import { CKEditor } from "@ckeditor/ckeditor5-react";
+// import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import dynamic from 'next/dynamic';
+// Dynamic import for CKEditor
+// const CKEditor = dynamic<{ editor: any, data: string, onChange: (event: any, editor: any) => void }>(() =>
+//   import('@ckeditor/ckeditor5-react').then((mod: any) => mod.CKEditor), { ssr: false });
+
+// const ClassicEditor = dynamic(() => import('@ckeditor/ckeditor5-build-classic').then((mod: any) => mod.default), {
+//   ssr: false,
+// });
+
 
 type EventFormPropsTypes = {
   open: number;
@@ -106,9 +117,9 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
       slug:
         !isSlugManuallyEdited && open === ADD_EVENT
           ? newName
-              .replace(/[^\w\s]|_/g, "")
-              .replace(/\s+/g, "-")
-              .toLowerCase()
+            .replace(/[^\w\s]|_/g, "")
+            .replace(/\s+/g, "-")
+            .toLowerCase()
           : prevData.slug,
     }));
     if (newName?.length) {
@@ -240,7 +251,25 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
       }
     }
   };
-
+  const handleEditorChange = (content: string) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      description: content
+    }));
+    if (content?.length) {
+      setFormErrors((prevFormErrors) => ({
+        ...prevFormErrors,
+        description: ""
+      }));
+    }
+  };
+  const handleContentChange = (content: any) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      description: content,
+    }));
+   
+  };
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -290,13 +319,13 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
                         selected={
                           formData.startTime
                             ? dayjs()
-                                .hour(
-                                  parseInt(formData.startTime.split(":")[0])
-                                )
-                                .minute(
-                                  parseInt(formData.startTime.split(":")[1])
-                                )
-                                .toDate()
+                              .hour(
+                                parseInt(formData.startTime.split(":")[0])
+                              )
+                              .minute(
+                                parseInt(formData.startTime.split(":")[1])
+                              )
+                              .toDate()
                             : null
                         }
                         timeIntervals={15}
@@ -338,11 +367,11 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
                         selected={
                           formData.endTime
                             ? dayjs()
-                                .hour(parseInt(formData.endTime.split(":")[0]))
-                                .minute(
-                                  parseInt(formData.endTime.split(":")[1])
-                                )
-                                .toDate()
+                              .hour(parseInt(formData.endTime.split(":")[0]))
+                              .minute(
+                                parseInt(formData.endTime.split(":")[1])
+                              )
+                              .toDate()
                             : null
                         }
                         timeIntervals={15}
@@ -436,7 +465,18 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
                       <label className="text-[0.8125rem] leading-[1.153]">
                         Description *
                       </label>
+
+
                       <EditorBasic
+                         content={formData.description}
+                         onContentChange={handleContentChange}
+        
+                         error={!!formErrors.description}
+                         helperText={formErrors.description}
+                      />
+
+                      {/* <EditorCustom /> */}
+                      {/* <EditorBasic
                         content={formData.description}
                         onContentChange={(content: string) => {
                           setFormData({
@@ -448,7 +488,21 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
                           }
                         }}
                         error={!!formErrors.description}
-                      />
+                      /> */}
+                      {/* <CKEditor
+                        editor={ClassicEditor}
+                        data={formData.description}
+                        onChange={(event: any, editor: any) => {
+                          if (editor) {
+                            const data = editor.getData();
+                            setFormData((prevFormData) => ({ ...prevFormData, description: data }));
+                            if (data?.length) {
+                              setFormErrors((prevFormErrors) => ({ ...prevFormErrors, description: "" }));
+                            }
+                          }
+                        }}
+                      /> */}
+
                       {formErrors.description && (
                         <p className="ml-[-2px] mt-2 MuiFormHelperText-root Mui-error MuiFormHelperText-sizeSmall MuiFormHelperText-contained mui-1ou7mfh-MuiFormHelperText-root">
                           {formErrors.description}

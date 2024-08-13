@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { toast } from "react-toastify";
 import { post } from "@/services/apiService";
-import { deletePermission } from "@/services/endpoint/users/permissions";
+import { deleteUser } from "@/services/endpoint/users/management";
 
 type ConfirmationDialogProps = {
   open: boolean;
@@ -23,7 +23,8 @@ const ConfirmationDialog = ({
 }: ConfirmationDialogProps) => {
   const handleDeletePermission = async () => {
     try {
-      const result = await post(deletePermission, deletePayload);
+      const result = await post(deleteUser, deletePayload);
+
       if (result.status === "success") {
         toast.success(result.message);
       } else {
@@ -42,7 +43,8 @@ const ConfirmationDialog = ({
       <DialogContent className="flex items-center flex-col text-center sm:pbs-16 sm:pbe-6 sm:pli-16">
         <i className="tabler-alert-circle text-[88px] mbe-6 text-warning" />
         <Typography variant="h5">
-          Are you sure you want to delete the content block?
+          Are you sure you want to delete this user? This action cannot be
+          undone.
         </Typography>
       </DialogContent>
       <DialogActions className="justify-center pbs-0 sm:pbe-16 sm:pli-16">

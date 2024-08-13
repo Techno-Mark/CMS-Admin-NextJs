@@ -10,50 +10,74 @@ const initialBody = {
   page: 0,
   limit: 10,
   search: "",
-  // organizationName: "pabs",
   active: true,
-  // status: "",
 };
 
-const page = () => {
+const Page = () => {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [pagesData, setPagesData] = useState([]);
   const [loading, setLoading] = useState<boolean>(true);
+
   const getList = async (body: any) => {
     try {
       setLoading(true);
       const result = await post(pages.list, body);
       setTotalCount(result.data.totalRoles);
-      setPagesData(
-        result.data.pages.map((item: any) => ({
-          id: item.pageId,
-          name: item.pageTitle,
-          slug: item.pageSlug,
-          jsonContent: item.pageContent,
-          createdAt: item.createdAt,
-          active: item.active,
-        }))
-      );
-      setLoading(false);
+      console.log(result.data);
+      // if (result.data) {
+        setPagesData(
+          result.data.pages.map((item: any) => ({
+            id: item.pageId,
+            name: item.pageTitle,
+            slug: item.pageSlug,
+            jsonContent: item.pageContent,
+            createdAt: item.createdAt,
+            active: item.active,
+          }))
+
+        );
+      // } else {
+        // setPagesData([]);
+      // }
     } catch (error) {
       console.error(error);
-      setLoading(false);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    const fetchData = async () => {
+      const storedOrgName = localStorage.getItem('selectedOrgId');
+      const newBody = { ...initialBody, organizationName: storedOrgName || "" };
+      await getList(newBody);
+    };
+
+    fetchData();
+
     const handleDropdownChange = async (value: any) => {
       const newBody = { ...initialBody, organizationName: value };
-      getList(newBody);
+      await getList(newBody);
     };
 
     eventBus.on("dropdownChange", handleDropdownChange);
 
-    setLoading(false);
     return () => {
       eventBus.remove("dropdownChange", handleDropdownChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleStorageUpdate = async () => {
+      const storedOrgName = localStorage.getItem('selectedOrgId');
+      const newBody = { ...initialBody, organizationName: storedOrgName || "" };
+      await getList(newBody);
+    };
+
+    window.addEventListener('localStorageUpdate', handleStorageUpdate);
+
+    return () => {
+      window.removeEventListener('localStorageUpdate', handleStorageUpdate);
     };
   }, []);
 
@@ -70,4 +94,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

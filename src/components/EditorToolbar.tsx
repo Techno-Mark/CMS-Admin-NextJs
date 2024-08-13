@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { Underline } from "@tiptap/extension-underline";
@@ -7,7 +7,7 @@ import { TextAlign } from "@tiptap/extension-text-align";
 import Divider from "@mui/material/Divider";
 import CustomIconButton from "@core/components/mui/IconButton";
 
-const EditorToolbar = ({ editor }: { editor: any }) => {
+const EditorToolbar = ({ editor }:any) => {
   if (!editor) {
     return null;
   }
@@ -70,11 +70,7 @@ const EditorBasic = ({
   content,
   onContentChange,
   error,
-}: {
-  content?: string;
-  onContentChange: (content: string) => void;
-  error: boolean;
-}) => {
+}:any) => {
   const editor = useEditor({
     extensions: [
       StarterKit,

@@ -1,35 +1,37 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import Card from "@mui/material/Card";
-import { MenuItem, TablePagination, TextFieldProps } from "@mui/material";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import classnames from "classnames";
-import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
 import {
+  Button,
+  Card,
+  IconButton,
+  MenuItem,
+  TablePagination,
+  TextFieldProps,
+  Typography,
+} from "@mui/material";
+import React, { useEffect, useMemo, useState } from "react";
+import LoadingBackdrop from "@/components/LoadingBackdrop";
+import BreadCrumbList from "@/components/BreadCrumbList";
+import CustomTextField from "@/@core/components/mui/TextField";
+import {
+  ColumnDef,
   createColumnHelper,
+  FilterFn,
   flexRender,
   getCoreRowModel,
-  useReactTable,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  useReactTable,
 } from "@tanstack/react-table";
-import type { ColumnDef, FilterFn } from "@tanstack/react-table";
-import CustomTextField from "@core/components/mui/TextField";
+import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
 import tableStyles from "@core/styles/table.module.css";
-// import ConfirmationDialog from "./ConfirmationDialog";
-import { postDataToOrganizationAPIs } from "@/services/apiService";
+import { useRouter } from "next/navigation";
+import { getUsersList } from "@/services/endpoint/users/management";
+import { post } from "@/services/apiService";
 import CustomChip from "@/@core/components/mui/Chip";
-import { TemplateType } from "@/types/apps/templateType";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import LoadingBackdrop from "@/components/LoadingBackdrop";
-import { truncateText } from "@/utils/common";
-import { blogsType } from "@/types/apps/blogsType";
-import { blogPost } from "@/services/endpoint/blogpost";
+import classnames from "classnames";
+import { userType } from "@/types/apps/userType";
 import ConfirmationDialog from "./ConfirmationDialog";
 
 declare module "@tanstack/table-core" {
@@ -41,7 +43,7 @@ declare module "@tanstack/table-core" {
   }
 }
 
-type BlogTypeWithAction = blogsType & {
+type EventTypeWithAction = userType & {
   action?: string;
 };
 
@@ -83,15 +85,15 @@ const DebouncedInput = ({
   );
 };
 
-const columnHelper = createColumnHelper<BlogTypeWithAction>();
+const columnHelper = createColumnHelper<EventTypeWithAction>();
 
-const BlogListTable = () => {
+const UserListTable = () => {
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
   const router = useRouter();
 
-  const [data, setData] = useState<TemplateType[]>([]);
+  const [data, setData] = useState<userType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<number>(0);
@@ -105,16 +107,18 @@ const BlogListTable = () => {
     const getData = async () => {
       setLoading(true);
       try {
-        const result = await postDataToOrganizationAPIs(blogPost.list, {
+        const result = await post(getUsersList, {
           page: page + 1,
           limit: pageSize,
           search: globalFilter,
           active: activeFilter,
         });
-        setData(result.data.blogs);
-        setTotalRows(result.data.totalBlogs);
+        setData(result.data.users);
+        setTotalRows(result.data.totalUsers);
       } catch (error: any) {
         setError(error.message);
+        setData([]);
+        setTotalRows(2);
       } finally {
         setLoading(false);
       }
@@ -122,37 +126,7 @@ const BlogListTable = () => {
     getData();
   }, [page, pageSize, globalFilter, deletingId, activeFilter]);
 
-  useEffect(() => {
-    const handleStorageUpdate = async () => {
-      const storedOrgName = localStorage.getItem('selectedOrgId');
-      const getData = async () => {
-        setLoading(true);
-        try {
-          const result = await postDataToOrganizationAPIs(blogPost.list, {
-            page: page + 1,
-            limit: pageSize,
-            search: globalFilter,
-            active: activeFilter,
-          });
-          setData(result.data.blogs);
-          setTotalRows(result.data.totalBlogs);
-        } catch (error: any) {
-          setError(error.message);
-        } finally {
-          setLoading(false);
-        }
-      };
-      getData();
-    };
-
-    window.addEventListener('localStorageUpdate', handleStorageUpdate);
-
-    return () => {
-      window.removeEventListener('localStorageUpdate', handleStorageUpdate);
-    };
-  }, []);
-
-  const columns = useMemo<ColumnDef<BlogTypeWithAction, any>[]>(
+  const columns = useMemo<ColumnDef<EventTypeWithAction, any>[]>(
     () => [
       columnHelper.accessor("srNo", {
         header: "Sr. No.",
@@ -163,32 +137,23 @@ const BlogListTable = () => {
         ),
         enableSorting: false,
       }),
-      columnHelper.accessor("blogTitle", {
-        header: "Blog Title",
+      columnHelper.accessor("Username", {
+        header: "User",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {row.original.blogTitle}
+            {row.original.Username}
           </Typography>
         ),
       }),
-      columnHelper.accessor("blogSlug", {
-        header: "Slug",
-        cell: ({ row }) => (
-          <Typography color="text.primary" className="font-medium">
-            {truncateText(row.original.blogSlug, 25)}
-          </Typography>
-        ),
-        enableSorting: false,
-      }),
-      columnHelper.accessor("authorName", {
-        header: "Author Name",
-        cell: ({ row }) => (
-          <Typography color="text.primary" className="font-medium">
-            {truncateText(row.original.authorName, 25)}
-          </Typography>
-        ),
-        enableSorting: false,
-      }),
+      // columnHelper.accessor("role", {
+      //   header: "Role",
+      //   cell: ({ row }) => (
+      //     <Typography color="text.primary" className="font-medium">
+      //       {row.original.role}
+      //     </Typography>
+      //   ),
+      //   enableSorting: false,
+      // }),
       columnHelper.accessor("createdAt", {
         header: "Created At",
         cell: ({ row }) => (
@@ -198,31 +163,29 @@ const BlogListTable = () => {
         ),
       }),
 
-      columnHelper.accessor("active", {
+      columnHelper.accessor("Status", {
         header: "Status",
         cell: ({ row }) => (
           <div className="flex items-center">
             <CustomChip
               size="small"
               round="true"
-              label={row.original.active ? "Publish" : "Draft"}
+              label={row.original.Status}
               variant="tonal"
-              color={row.original.active ? "success" : "warning"}
+              color={row.original.Status === "Active" ? "success" : "warning"}
             />
           </div>
         ),
         enableSorting: false,
       }),
 
-      columnHelper.accessor("blogId", {
+      columnHelper.accessor("UserId", {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
             <IconButton
               onClick={() =>
-                router.push(
-                  `/content-management/blogs/edit/${row.original.blogId}`
-                )
+                router.push(`/users/management/edit/${row.original.UserId}`)
               }
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -230,7 +193,7 @@ const BlogListTable = () => {
             <IconButton
               onClick={() => {
                 setIsDeleting(true);
-                setDeletingId(row.original.blogId);
+                setDeletingId(row.original.UserId);
               }}
             >
               <i className="tabler-trash text-[22px] text-textSecondary" />
@@ -315,17 +278,17 @@ const BlogListTable = () => {
                 }}
               >
                 <MenuItem value="all">All</MenuItem>
-                <MenuItem value="active">Publish</MenuItem>
-                <MenuItem value="inactive">Draft</MenuItem>
+                <MenuItem value="active">Active</MenuItem>
+                <MenuItem value="inactive">Inactive</MenuItem>
               </CustomTextField>
             </div>
             <Button
               variant="contained"
               startIcon={<i className="tabler-plus" />}
-              onClick={() => router.push("/content-management/blogs/add")}
+              onClick={() => router.push("/users/management/add")}
               className="is-full sm:is-auto"
             >
-              Add Blog
+              Add User
             </Button>
           </div>
         </div>
@@ -409,13 +372,13 @@ const BlogListTable = () => {
         </Card>
         <ConfirmationDialog
           open={isDeleting}
-          deletingId={deletingId}
           setDeletingId={setDeletingId}
           setOpen={(arg1: boolean) => setIsDeleting(arg1)}
+          deletePayload={{ userId: deletingId }}
         />
       </div>
     </>
   );
 };
 
-export default BlogListTable;
+export default UserListTable;

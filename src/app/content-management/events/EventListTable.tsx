@@ -121,6 +121,36 @@ const BlogListTable = () => {
     getData();
   }, [page, pageSize, globalFilter, deletingId, activeFilter]);
 
+  useEffect(() => {
+    const handleStorageUpdate = async () => {
+      const storedOrgName = localStorage.getItem('selectedOrgId');
+      const getData = async () => {
+        setLoading(true);
+        try {
+          const result = await postDataToOrganizationAPIs(event.list, {
+            page: page + 1,
+            limit: pageSize,
+            search: globalFilter,
+            active: activeFilter,
+          });
+          setData(result.data.events);
+          setTotalRows(result.data.totalEvents);
+        } catch (error: any) {
+          setError(error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+      getData();
+    };
+
+    window.addEventListener('localStorageUpdate', handleStorageUpdate);
+
+    return () => {
+      window.removeEventListener('localStorageUpdate', handleStorageUpdate);
+    };
+  }, []);
+
   const columns = useMemo<ColumnDef<EventTypeWithAction, any>[]>(
     () => [
       columnHelper.accessor("srNo", {

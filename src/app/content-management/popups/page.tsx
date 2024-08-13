@@ -53,6 +53,21 @@ const page = () => {
     };
   }, []);
 
+
+  useEffect(() => {
+    const handleStorageUpdate = async () => {
+      const storedOrgName = localStorage.getItem('selectedOrgId');
+      const newBody = { ...initialBody, organizationName: storedOrgName || "" };
+      await getList(newBody);
+    };
+
+    window.addEventListener('localStorageUpdate', handleStorageUpdate);
+
+    return () => {
+      window.removeEventListener('localStorageUpdate', handleStorageUpdate);
+    };
+  }, []);
+
   return (
     <>
       <LoadingBackdrop isLoading={loading} />

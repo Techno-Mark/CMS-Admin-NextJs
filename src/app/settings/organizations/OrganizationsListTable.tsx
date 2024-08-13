@@ -335,8 +335,7 @@ const OrganizationsListTable = () => {
                     colSpan={table.getVisibleFlatColumns().length}
                     className="text-center"
                   >
-                    Currently there is no record found, you may Add Organization
-                    to continue
+                    No data available
                   </td>
                 </tr>
               </tbody>
