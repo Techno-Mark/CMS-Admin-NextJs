@@ -251,30 +251,30 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
         const param =
           open == EDIT_USER
             ? {
-                userId: editingRow?.UserId,
-                userName: formData.userName,
-                email: formData.userEmail,
-                active: formData.active,
-                organizations: company.map(
-                  (c) =>
-                    new Object({
-                      roleId: c.roleId,
-                      organizationId: c.organizationId,
-                    })
-                ),
-              }
+              userId: editingRow?.UserId,
+              userName: formData.userName,
+              email: formData.userEmail,
+              active: formData.active,
+              organizations: company.map(
+                (c) =>
+                  new Object({
+                    roleId: c.roleId,
+                    organizationId: c.organizationId,
+                  })
+              ),
+            }
             : {
-                userName: formData.userName,
-                email: formData.userEmail,
-                active: formData.active,
-                organizations: company.map(
-                  (c) =>
-                    new Object({
-                      roleId: c.roleId,
-                      organizationId: c.organizationId,
-                    })
-                ),
-              };
+              userName: formData.userName,
+              email: formData.userEmail,
+              active: formData.active,
+              organizations: company.map(
+                (c) =>
+                  new Object({
+                    roleId: c.roleId,
+                    organizationId: c.organizationId,
+                  })
+              ),
+            };
 
         let result = null;
         if (open == EDIT_USER) {
@@ -407,6 +407,46 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                         <Grid item xs={12} sm={3}>
                           <CustomTextField
                             error={!!roleIdError[index]}
+                            helperText={roleIdError[index] ? "Please select role" : ""}
+                            select
+                            fullWidth
+                            defaultValue=""
+                            value={field.roleId}
+                            label="Select Role"
+                            id="custom-select"
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                              handleRoleChange(Number(e.target.value), index)
+                            }
+                          >
+                            <MenuItem value={-1}>
+                              <em>Select Role</em>
+                            </MenuItem>
+                            {field.roles.length > 0 &&
+                              field.roles.map((role: any) => {
+                                // Check if this role has already been selected for this company
+                                const isRoleSelected = company.some(
+                                  (item, idx) =>
+                                    item.organizationId === field.organizationId &&
+                                    item.roleId === role.id &&
+                                    idx !== index // exclude the current index
+                                );
+                                return (
+                                  <MenuItem
+                                    value={role.id}
+                                    key={role.id}
+                                    disabled={isRoleSelected} // Disable the option if the role is already selected
+                                  >
+                                    {role.name}
+                                  </MenuItem>
+                                );
+                              })}
+                          </CustomTextField>
+                        </Grid>
+
+
+                        {/* <Grid item xs={12} sm={3}>
+                          <CustomTextField
+                            error={!!roleIdError[index]}
                             helperText={
                               roleIdError[index] ? "Please select role" : ""
                             }
@@ -432,11 +472,11 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                                 );
                               })}
                           </CustomTextField>
-                        </Grid>
+                        </Grid> */}
                         <Grid item xs={12} sm={4}>
                           {index === 0 &&
-                          company[0].organizationId > 0 &&
-                          company[0].roleId > 0 ? (
+                            company[0].organizationId > 0 &&
+                            company[0].roleId > 0 ? (
                             <>
                               <span
                                 className="cursor-pointer"
