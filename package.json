@@ -22,7 +22,6 @@
     "@emotion/react": "11.11.4",
     "@emotion/styled": "11.11.0",
     "@floating-ui/react": "0.26.9",
-    "@formatjs/intl-localematcher": "0.5.4",
     "@fullcalendar/common": "5.11.5",
     "@fullcalendar/core": "6.1.11",
     "@fullcalendar/daygrid": "6.1.11",
@@ -65,7 +64,6 @@
     "quill": "^2.0.2",
     "react": "18.2.0",
     "react-apexcharts": "1.4.1",
-    "react-beautiful-dnd": "^13.1.1",
     "react-colorful": "5.6.1",
     "react-datepicker": "6.2.0",
     "react-dom": "18.2.0",
@@ -86,7 +84,7 @@
     "tiptap": "^1.32.2",
     "tsx": "4.7.1",
     "uuid": "^10.0.0",
-    "valibot": "0.29.0",
+    "valibot": "^0.31.1",
     "yup": "^1.4.0"
   },
   "devDependencies": {
@@ -97,7 +95,6 @@
     "@types/negotiator": "^0.6.3",
     "@types/node": "^20.11.25",
     "@types/react": "^18.3.3",
-    "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-datepicker": "^6.0.3",
     "@types/react-dom": "^18.3.0",
     "@types/react-draft-wysiwyg": "^1.13.8",

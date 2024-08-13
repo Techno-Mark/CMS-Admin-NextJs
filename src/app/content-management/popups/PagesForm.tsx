@@ -21,14 +21,10 @@ import BreadCrumbList from "@/components/BreadCrumbList";
 
 import { popups } from "@/services/endpoint/popup";
 
-
 import { PopupTypes } from "./popupTypes";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 
 import EditorBasic from "@/components/EditorToolbar";
-
-
-
 
 // import { CKEditor } from "@ckeditor/ckeditor5-react";
 // import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
@@ -36,7 +32,6 @@ import EditorBasic from "@/components/EditorToolbar";
 // const CKEditor = dynamic(() => import("@ckeditor/ckeditor5-react"), {
 //   ssr: false,
 // });
-
 
 // const CKEditor = dynamic(
 //   () => import('@ckeditor/ckeditor5-react').then((mod) => mod.CKEditor),
@@ -77,7 +72,6 @@ const initialFormData = {
   active: false,
   buttonText: "",
   buttonRedirectLink: "",
-
 };
 
 const initialErrorData = {
@@ -90,24 +84,17 @@ const initialErrorData = {
   active: null,
 };
 
-function PopupForm({
-  open,
-  handleClose,
-  setEditingRow,
-  editingRow,
-}: Props) {
+function PopupForm({ open, handleClose, setEditingRow, editingRow }: Props) {
   const router = useRouter();
 
   // State management hooks
   const [popupFile, setPopupFile] = useState<File | null>(null);
-  const [formData, setFormData] = useState<typeof initialFormData>(
-    initialFormData
-  );
+  const [formData, setFormData] =
+    useState<typeof initialFormData>(initialFormData);
 
   // Error handler hooks
-  const [formErrors, setFormErrors] = useState<typeof initialErrorData>(
-    initialErrorData
-  );
+  const [formErrors, setFormErrors] =
+    useState<typeof initialErrorData>(initialErrorData);
 
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -124,13 +111,15 @@ function PopupForm({
         }));
       }
 
-
       if (editingRow.popupFile) {
-        const fileUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL + '/' + editingRow.popupFile;
+        const fileUrl =
+          process.env.NEXT_PUBLIC_BACKEND_BASE_URL + "/" + editingRow.popupFile;
         fetch(fileUrl)
           .then(async (res) => {
             const blob = await res.blob();
-            const file = new File([blob], editingRow.popupFile, { type: blob.type });
+            const file = new File([blob], editingRow.popupFile, {
+              type: blob.type,
+            });
             setPopupFile(file);
           })
           .catch((err) => console.error("Failed to fetch popup file:", err));
@@ -143,26 +132,25 @@ function PopupForm({
     }
   }, [editingRow]);
 
-
   // Custom hooks
-  const { getRootProps: getBannerRootProps, getInputProps: getBannerInputProps } =
-    useDropzone({
-      multiple: false,
-      accept: validFileTypes.reduce((acc: any, type) => {
-        const [category] = type.split("/");
-        if (!acc[category]) {
-          acc[category] = [];
-        }
-        acc[category].push(`.${type.split("/")[1]}`);
-        return acc;
-      }, {}),
-      onDrop: (acceptedFiles: File[]) => {
-        setFormErrors({ ...formErrors, popupFileError: "" });
-        setPopupFile(acceptedFiles[0]);
-      },
-    });
-
-
+  const {
+    getRootProps: getBannerRootProps,
+    getInputProps: getBannerInputProps,
+  } = useDropzone({
+    multiple: false,
+    accept: validFileTypes.reduce((acc: any, type) => {
+      const [category] = type.split("/");
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(`.${type.split("/")[1]}`);
+      return acc;
+    }, {}),
+    onDrop: (acceptedFiles: File[]) => {
+      setFormErrors({ ...formErrors, popupFileError: "" });
+      setPopupFile(acceptedFiles[0]);
+    },
+  });
 
   // Validation before submit
   const validateForm = () => {
@@ -232,8 +220,9 @@ function PopupForm({
           console.log(popupFile);
         }
         const result = await postContentBlock(
-          editingRow?.popupId ? popups.update :
-            popups.create, formDataToSend);
+          editingRow?.popupId ? popups.update : popups.create,
+          formDataToSend
+        );
         setLoading(false);
         if (result.status === "success") {
           toast.success(result.message);
@@ -250,12 +239,12 @@ function PopupForm({
   const handleEditorChange = (content: string) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
-      description: content
+      description: content,
     }));
     if (content?.length) {
       setFormErrors((prevFormErrors) => ({
         ...prevFormErrors,
-        description: ""
+        description: "",
       }));
     }
   };
@@ -277,7 +266,7 @@ function PopupForm({
             <BreadCrumbList />
           </Grid>
           <Grid item xs={12} sm={1}>
-            <IconButton color="info" onClick={() => { }}>
+            <IconButton color="info" onClick={() => {}}>
               <i className="tabler-external-link text-textSecondary"></i>
             </IconButton>
           </Grid>
@@ -328,7 +317,10 @@ function PopupForm({
                   fullWidth
                   value={formData.buttonRedirectLink}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    setFormData({ ...formData, buttonRedirectLink: e.target.value });
+                    setFormData({
+                      ...formData,
+                      buttonRedirectLink: e.target.value,
+                    });
                     if (e.target?.value?.length) {
                       setFormErrors({ ...formErrors, buttonRedirectLink: "" });
                     }
@@ -340,7 +332,7 @@ function PopupForm({
                   Status
                 </Typography>
                 <Switch
-                  size='medium'
+                  size="medium"
                   checked={formData.active}
                   onChange={(e) =>
                     setFormData({ ...formData, active: e.target.checked })
@@ -350,15 +342,12 @@ function PopupForm({
               <Grid item xs={12} sm={12}>
                 <p className="text-[#4e4b5a]">Description *</p>
 
-
                 <EditorBasic
                   content={formData.description}
                   onContentChange={handleContentChange}
-
                   // onContentChange={(content: string) => {
-                  //   setFormData({ ...formData, 
+                  //   setFormData({ ...formData,
                   //     description: content })
-
 
                   //   // if (content.length) {
                   //   //   setFormErrors({ ...formErrors, description: "" });
@@ -392,12 +381,11 @@ function PopupForm({
               <Grid item xs={12} sm={12}>
                 <p className="text-[#4e4b5a]">Popup File * </p>
                 <div
-                  className={`flex items-center flex-col w-[400px] h-[400px] border border-dashed border-gray-300 rounded-md ${!!formErrors.popupFileError && "border-red-400"
-                    }`}
+                  className={`flex items-center flex-col w-[400px] h-[400px] border border-dashed border-gray-300 rounded-md ${
+                    !!formErrors.popupFileError && "border-red-400"
+                  }`}
                 >
-                  <Box
-                    {...getBannerRootProps({ className: "dropzone" })}
-                  >
+                  <Box {...getBannerRootProps({ className: "dropzone" })}>
                     <input {...getBannerInputProps()} />
                     <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
                       {popupFile ? (
@@ -446,7 +434,9 @@ function PopupForm({
                       )}
                     </div>
                     {!!formErrors.popupFileError && (
-                      <p className="text-[#ff5054]">{formErrors.popupFileError}</p>
+                      <p className="text-[#ff5054]">
+                        {formErrors.popupFileError}
+                      </p>
                     )}
                   </Box>
                 </div>
@@ -455,11 +445,7 @@ function PopupForm({
           </Box>
         </form>
       </Card>
-      <Grid
-        item
-        xs={12}
-        style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-      >
+      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
         <Box
           p={7}
           display="flex"
@@ -467,12 +453,20 @@ function PopupForm({
           justifyContent="end"
           bgcolor="background.paper"
         >
-          <Button variant="outlined" color="error" onClick={() => handleClose()}>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => handleClose()}
+          >
             Cancel
           </Button>
-          <Button variant="contained" type="submit" onClick={(event) => {
-            handleSubmit(event)
-          }}>
+          <Button
+            variant="contained"
+            type="submit"
+            onClick={(event) => {
+              handleSubmit(event);
+            }}
+          >
             {open === -1 ? "Add" : "Edit"} Popup
           </Button>
         </Box>

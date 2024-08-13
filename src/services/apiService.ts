@@ -147,8 +147,6 @@ export const postDataToOrganizationAPIs = async (
   }
 };
 
-
-
 // import { getSession, signOut } from "next-auth/react";
 // import { toast } from "react-toastify";
 

@@ -1,7 +1,7 @@
-export default function Page() {
-  return (
-    <>
-      <h1>Menus page!</h1>
-    </>
-  );
-}
+import MenuListTable from "./MenusListTable";
+
+const KanbanPage = () => {
+  return <MenuListTable />;
+};
+
+export default KanbanPage;
