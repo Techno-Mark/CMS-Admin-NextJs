@@ -3,7 +3,12 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@mui/material/Card";
-import { MenuItem, TablePagination, TextFieldProps } from "@mui/material";
+import {
+  MenuItem,
+  TablePagination,
+  TextFieldProps,
+  Tooltip,
+} from "@mui/material";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
@@ -23,13 +28,9 @@ import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
 // import ConfirmationDialog from "./ConfirmationDialog";
 import { postDataToOrganizationAPIs } from "@/services/apiService";
-import CustomChip from "@/@core/components/mui/Chip";
-import { TemplateType } from "@/types/apps/templateType";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import { truncateText } from "@/utils/common";
-import { blogsType } from "@/types/apps/blogsType";
-import { blogPost } from "@/services/endpoint/blogpost";
 import { contactUsType } from "@/types/apps/contactUsType";
 import { contactUs } from "@/services/endpoint/contactUs";
 // import ConfirmationDialog from "./ConfirmationDialog";
@@ -126,27 +127,8 @@ const ContactUsListTable = () => {
 
   useEffect(() => {
     const handleStorageUpdate = async () => {
-      const storedOrgName = localStorage.getItem("selectedOrgId");
-      const getData = async () => {
-        setLoading(true);
-        try {
-          const result = await postDataToOrganizationAPIs(contactUs.list, {
-            page: page + 1,
-            limit: pageSize,
-            search: globalFilter,
-            active: activeFilter,
-          });
-          setData(result.data.contacts);
-          setTotalRows(result.data.totalContacts);
-        } catch (error: any) {
-          setError(error.message);
-        } finally {
-          setLoading(false);
-        }
-      };
       getData();
     };
-
     window.addEventListener("localStorageUpdate", handleStorageUpdate);
 
     return () => {
@@ -202,11 +184,22 @@ const ContactUsListTable = () => {
       }),
       columnHelper.accessor("message", {
         header: "Message",
-        cell: ({ row }) => (
-          <Typography color="text.primary" className="font-medium">
-            {truncateText(row.original.message, 40)}
-          </Typography>
-        ),
+        cell: ({ row }) => {
+          const message = row.original.message;
+          const truncatedMessage = truncateText(message, 40);
+
+          return message?.length > 40 ? (
+            <Tooltip title={message}>
+              <Typography color="text.primary" className="font-medium">
+                {truncatedMessage}
+              </Typography>
+            </Tooltip>
+          ) : (
+            <Typography color="text.primary" className="font-medium">
+              {truncatedMessage}
+            </Typography>
+          );
+        },
         enableSorting: false,
       }),
       columnHelper.accessor("createdAt", {
