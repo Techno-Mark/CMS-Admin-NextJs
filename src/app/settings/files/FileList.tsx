@@ -1,38 +1,38 @@
 "use client";
 
+import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import Card from "@mui/material/Card";
+import { Box, MenuItem, TablePagination, TextFieldProps } from "@mui/material";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import classnames from "classnames";
+import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
 import {
-  Button,
-  Card,
-  IconButton,
-  MenuItem,
-  TablePagination,
-  TextFieldProps,
-  Typography,
-} from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
-import LoadingBackdrop from "@/components/LoadingBackdrop";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import CustomTextField from "@/@core/components/mui/TextField";
-import {
-  ColumnDef,
   createColumnHelper,
-  FilterFn,
   flexRender,
   getCoreRowModel,
+  useReactTable,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
 } from "@tanstack/react-table";
-import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
+import type { ColumnDef, FilterFn } from "@tanstack/react-table";
+import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
-import { useRouter } from "next/navigation";
-import { getUsersList } from "@/services/endpoint/users/management";
-import { post } from "@/services/apiService";
-import CustomChip from "@/@core/components/mui/Chip";
-import classnames from "classnames";
-import { userType } from "@/types/apps/userType";
+
+import { postDataToOrganizationAPIs } from "@/services/apiService";
+
+import { TemplateType } from "@/types/apps/templateType";
+import BreadCrumbList from "@/components/BreadCrumbList";
+import LoadingBackdrop from "@/components/LoadingBackdrop";
+
+import { media } from "@/services/endpoint/media";
+import { filesType } from "@/types/apps/FilesTypes";
+import { toast } from "react-toastify";
 import ConfirmationDialog from "./ConfirmationDialog";
+// import defaultFileIcon from "../../../../public/images/files.png";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -43,7 +43,7 @@ declare module "@tanstack/table-core" {
   }
 }
 
-type EventTypeWithAction = userType & {
+type BlogTypeWithAction = filesType & {
   action?: string;
 };
 
@@ -85,15 +85,15 @@ const DebouncedInput = ({
   );
 };
 
-const columnHelper = createColumnHelper<EventTypeWithAction>();
+const columnHelper = createColumnHelper<BlogTypeWithAction>();
 
-const UserListTable = () => {
+const FileListTable = () => {
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
   const router = useRouter();
 
-  const [data, setData] = useState<userType[]>([]);
+  const [data, setData] = useState<TemplateType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<number>(0);
@@ -107,26 +107,57 @@ const UserListTable = () => {
     const getData = async () => {
       setLoading(true);
       try {
-        const result = await post(getUsersList, {
+        const result = await postDataToOrganizationAPIs(media.list, {
           page: page + 1,
           limit: pageSize,
           search: globalFilter,
           active: activeFilter,
         });
-        setData(result.data.users);
-        setTotalRows(result.data.totalUsers);
+        setData(result.data.mediaLists);
+        setTotalRows(result.data.totalMediaFiles);
       } catch (error: any) {
         setError(error.message);
-        setData([]);
-        setTotalRows(2);
       } finally {
         setLoading(false);
       }
     };
     getData();
   }, [page, pageSize, globalFilter, deletingId, activeFilter]);
+  const validImageTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
+  const defaultFileIcon = "public/images/files.png";
 
-  const columns = useMemo<ColumnDef<EventTypeWithAction, any>[]>(
+  
+  useEffect(() => {
+    const handleStorageUpdate = async () => {
+      const storedOrgName = localStorage.getItem('selectedOrgId');
+      const getData = async () => {
+        setLoading(true);
+        try {
+          const result = await postDataToOrganizationAPIs(media.list, {
+            page: page + 1,
+            limit: pageSize,
+            search: globalFilter,
+            active: activeFilter,
+          });
+          setData(result.data.blogs);
+          setTotalRows(result.data.totalBlogs);
+        } catch (error: any) {
+          setError(error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+      getData();
+    };
+
+    window.addEventListener('localStorageUpdate', handleStorageUpdate);
+
+    return () => {
+      window.removeEventListener('localStorageUpdate', handleStorageUpdate);
+    };
+  }, []);
+
+  const columns = useMemo<ColumnDef<BlogTypeWithAction, any>[]>(
     () => [
       columnHelper.accessor("srNo", {
         header: "Sr. No.",
@@ -137,67 +168,81 @@ const UserListTable = () => {
         ),
         enableSorting: false,
       }),
-      columnHelper.accessor("Username", {
-        header: "User",
-        cell: ({ row }) => (
-          <Typography color="text.primary" className="font-medium">
-            {row.original.Username}
-          </Typography>
-        ),
-      }),
-      // columnHelper.accessor("role", {
-      //   header: "Role",
-      //   cell: ({ row }) => (
-      //     <Typography color="text.primary" className="font-medium">
-      //       {row.original.role}
-      //     </Typography>
-      //   ),
-      //   enableSorting: false,
-      // }),
-      columnHelper.accessor("createdAt", {
-        header: "Created At",
-        cell: ({ row }) => (
-          <Typography color="text.primary" className="font-medium">
-            {row.original.createdAt}
-          </Typography>
-        ),
-      }),
-
-      columnHelper.accessor("Status", {
-        header: "Status",
-        cell: ({ row }) => (
-          <div className="flex items-center">
-            <CustomChip
-              size="small"
-              round="true"
-              label={row.original.Status}
-              variant="tonal"
-              color={row.original.Status === "Active" ? "success" : "warning"}
-            />
-          </div>
-        ),
-        enableSorting: false,
+      columnHelper.accessor("filePath", {
+        header: "File Name",
+        cell: ({ row }) => {
+          const { filePath, mediaType, fileName } = row.original;
+      
+          // Construct the full URL for the file
+          const fileUrl = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${filePath}`;
+      
+          // Determine if the file is an image
+          const isImage = validImageTypes.includes(mediaType);
+      
+          return (
+            <Box display="flex" alignItems="center">
+              {mediaType === 'image' ? (
+                <img
+                  src={fileUrl}
+                  alt={filePath}
+                  width={50} 
+                  height={50} 
+                  style={{ objectFit: 'cover', borderRadius: '4px' }} 
+                />
+              ) : (
+                <i className="tabler-file text-[20px]" />
+              )}
+              <Typography color="text.primary" className="font-medium" marginLeft={1}>
+                {fileName}
+              </Typography>
+            </Box>
+          );
+        },
       }),
 
-      columnHelper.accessor("UserId", {
+      columnHelper.accessor("mediaId", {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
             <IconButton
-              onClick={() =>
-                router.push(`/users/management/edit/${row.original.UserId}`)
-              }
+              onClick={() => {
+                // Construct the correct URL
+                const url = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${row.original.filePath}`;
+                console.log(url);
+
+                // Open the URL in a new tab
+                window.open(url, '_blank');
+              }}
             >
-              <i className="tabler-edit text-[22px] text-textSecondary" />
+              <i className="tabler-eye text-[22px] " />
             </IconButton>
+
             <IconButton
               onClick={() => {
+                const url = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${row.original.filePath}`;
+
+                navigator.clipboard.writeText(url)
+                  .then(() => {
+                    console.log('URL copied to clipboard!');
+                    toast.success(`URL copied to clipboard!`);
+                  })
+                  .catch(err => {
+                    console.error('Failed to copy URL:', err);
+                    toast.error('Failed to copy URL:');
+                  });
+              }}
+            >
+              <i className="tabler-copy text-[22px]" />
+            </IconButton>
+             <IconButton
+              onClick={() => {
                 setIsDeleting(true);
-                setDeletingId(row.original.UserId);
+                //@ts-ignore
+                setDeletingId(row.original.mediaId);
               }}
             >
               <i className="tabler-trash text-[22px] text-textSecondary" />
-            </IconButton>
+            </IconButton> 
           </div>
         ),
         enableSorting: false,
@@ -252,7 +297,7 @@ const UserListTable = () => {
               placeholder="Search"
               className="is-full sm:is-auto"
             />
-            <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
+            {/* <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
               <Typography>Status:</Typography>
               <CustomTextField
                 select
@@ -278,17 +323,17 @@ const UserListTable = () => {
                 }}
               >
                 <MenuItem value="all">All</MenuItem>
-                <MenuItem value="active">Active</MenuItem>
-                <MenuItem value="inactive">Inactive</MenuItem>
+                <MenuItem value="active">Publish</MenuItem>
+                <MenuItem value="inactive">Draft</MenuItem>
               </CustomTextField>
-            </div>
+            </div> */}
             <Button
               variant="contained"
               startIcon={<i className="tabler-plus" />}
-              onClick={() => router.push("/users/management/add")}
+              onClick={() => router.push("/settings/files/add")}
               className="is-full sm:is-auto"
             >
-              Add User
+              Add File
             </Button>
           </div>
         </div>
@@ -372,13 +417,13 @@ const UserListTable = () => {
         </Card>
         <ConfirmationDialog
           open={isDeleting}
+          deletingId={deletingId}
           setDeletingId={setDeletingId}
           setOpen={(arg1: boolean) => setIsDeleting(arg1)}
-          deletePayload={{ userId: deletingId }}
         />
       </div>
     </>
   );
 };
 
-export default UserListTable;
+export default FileListTable;
