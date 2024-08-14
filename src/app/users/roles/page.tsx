@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { post } from "@/services/apiService";
 import { getRoleList } from "@/services/endpoint/users/roles";
 import RolesListTable from "./RolesListTable";
-const orgId = localStorage.getItem('selectedOrgId');
+// const orgId = localStorage.getItem('selectedOrgId');
 const initialBody = {
   page: 0,
   limit: 10,
   search: "",
-  organizationId: orgId,
+  // organizationId: orgId,
   active: null,
 };
 
@@ -36,6 +36,7 @@ const page = () => {
         totalCount={totalCount}
         tableData={rolesData}
         getList={getList}
+        //@ts-ignore
         initialBody={initialBody}
       />
     </>
