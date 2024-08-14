@@ -264,7 +264,7 @@ const RolesListTable = ({
       });
     }
   }, [deletingId, openDialog]);
-  // const orgId = localStorage.getItem('selectedOrgId');
+  const orgId = localStorage.getItem('selectedOrgId');
   return (
     <>
       <div className="my-2">
@@ -413,7 +413,7 @@ const RolesListTable = ({
         setOpen={(arg1: boolean) => setIsDeleting(arg1)}
         deletePayload={{
           roleId: deletingId,
-          // organizationId:orgId,
+          organizationId:orgId,
         }}
       />
 

@@ -57,7 +57,7 @@ const RolesForm = ({ open }: Props) => {
     roleDescription: string;
   }>(initialErrorData);
 
-  // const orgId = localStorage.getItem('selectedOrgId');
+  const orgId = localStorage.getItem('selectedOrgId');
 
   const validateFormData = (arg1: {
     roleName: string;
@@ -92,14 +92,14 @@ const RolesForm = ({ open }: Props) => {
         open === sectionActions.EDIT ? updateRole : createRole,
         open === sectionActions.EDIT
           ? {
-              // organizationId: orgId,
+              organizationId: orgId,
               roleId: formData.roleId,
               roleName: formData.roleName,
               roleDescription: formData.roleDescription,
               active: formData.active,
             }
           : {
-              // organizationId: orgId,
+              organizationId: orgId,
               roleName: formData.roleName,
               roleDescription: formData.roleDescription,
               active: formData.active,
