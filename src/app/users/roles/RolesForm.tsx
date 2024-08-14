@@ -99,7 +99,7 @@ const RolesForm = ({ open }: Props) => {
               active: formData.active,
             }
           : {
-              organizationId: Number(orgId),,
+              organizationId: Number(orgId),
               roleName: formData.roleName,
               roleDescription: formData.roleDescription,
               active: formData.active,
