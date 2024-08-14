@@ -32,7 +32,7 @@ const page = () => {
     if (orgId) {
       setInitialBody((prevBody:any) => ({
         ...prevBody,
-        organizationId: orgId,
+        organizationId: Number(orgId),
       }));
     }
   }, []);
