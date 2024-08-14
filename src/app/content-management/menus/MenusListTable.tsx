@@ -101,26 +101,36 @@ const MenuListTable = () => {
   const [deletingId, setDeletingId] = useState<number>(0);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
+  const getData = async () => {
+    setLoading(true);
+    try {
+      const result = await postDataToOrganizationAPIs(menu.list, {
+        page: page + 1,
+        limit: pageSize,
+        search: globalFilter,
+        active: activeFilter,
+      });
+      setData(result.data.menus);
+      setTotalRows(result.data.totalMenus);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const getData = async () => {
-      setLoading(true);
-      try {
-        const result = await postDataToOrganizationAPIs(menu.list, {
-          page: page + 1,
-          limit: pageSize,
-          search: globalFilter,
-          active: activeFilter,
-        });
-        setData(result.data.menus);
-        setTotalRows(result.data.totalMenus);
-      } catch (error: any) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
     getData();
   }, [page, pageSize, globalFilter, deletingId, activeFilter]);
+
+  useEffect(() => {
+    const handleStorageUpdate = async () => {
+      getData();
+    };
+    window.addEventListener("localStorageUpdate", handleStorageUpdate);
+    return () => {
+      window.removeEventListener("localStorageUpdate", handleStorageUpdate);
+    };
+  }, []);
 
   const columns = useMemo<ColumnDef<BlogTypeWithAction, any>[]>(
     () => [
