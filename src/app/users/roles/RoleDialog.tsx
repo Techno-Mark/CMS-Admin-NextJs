@@ -128,7 +128,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
 
     return valid;
   };
-  // const orgId = localStorage.getItem('selectedOrgId');
+  const orgId = localStorage.getItem('selectedOrgId');
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
@@ -138,14 +138,14 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
         const payload =
           editId > 0
             ? {
-                // organizationId: orgId,
+                organizationId: Number(orgId),
                 roleName: roleName,
                 roleId: editId,
                 roleActionMapping: selectedCheckbox,
                 active: active,
               }
             : {
-                // organizationId: orgId,
+                organizationId: Number(orgId),
                 roleName: roleName,
                 roleActionMapping: selectedCheckbox,
                 active: active,
