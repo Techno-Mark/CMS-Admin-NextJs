@@ -131,6 +131,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }
   };
   const validateField = (value: string, validation: any, field?: any) => {
+
     if (!value && field?.isRequired) {
       return `${field?.fieldLabel} is required`;
     }
@@ -140,6 +141,16 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
         return `Invalid email format`;
       }
     }
+
+    // Updated URL validation for file input type
+  if (field?.fieldType === 'file') {
+    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
+    const extendedUrlRegex = /^(https?|ftp):\/\/[^\s/$.?#].*[^\s]*\.[^\s]*$/i;
+    if (!urlRegex.test(value) && !extendedUrlRegex.test(value)) {
+      return `Invalid URL format`;
+    }
+  }
+
     if (validation.maxLength && value.length > validation.maxLength) {
       return `Maximum length is ${validation.maxLength}`;
     }
@@ -291,7 +302,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 // Preview: content.preview || "",
 
                 // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.preview
-                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.preview
+                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.file
               };
               break;
             case 'url':
@@ -386,173 +397,91 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     fieldLabel?: string,
     subField?: string,
     fieldType?: string,
-    feKey?:string
+    feKey?: string
   ) => {
     const { name, value, files } = event.target;
-
-    if (files && files[0]) {
-      const file = files[0];
-      const reader = new FileReader();
-
-      reader.onloadend = () => {
-        setSections((prevSections) => {
-          const updatedSections = prevSections.map((sec, mainIndex) => {
-            if (mainIndex === index) {
-              const updatedSectionTemplate = sec.sectionTemplate.map((secTemplate: any, temIndex: any) => {
-                if (temIndex === fieldIndex) {
-                  if (subFieldIndex !== undefined && secTemplate.fieldType === "multiple") {
-                    secTemplate.multipleData[subFieldIndex][name] = value;
-                    const validation = JSON.parse(secTemplate.multipleData[subFieldIndex].validation || "{}");
-                    const error = validateField(value, validation, secTemplate.multipleData[subFieldIndex]);
-                    setFormData((prevData) => ({
-                      ...prevData,
-                      templateData: {
-                        ...prevData.templateData,
-                        [`${index}+${fieldIndex}+${subFieldIndex}`]: {
-                          file,
-                          preview: reader.result as string,
-                          error: error,
-                          sectionName: section.sectionSlug,
-                          orderId: section.sectionOrder,
-                          templateId: index,
-                          templateSectionId: temIndex,
-                          templateSectionMultipleId: subFieldIndex.toString(),
-                          fieldLabel: fieldLabel,
-                          subField: subField,
-                          fieldType: fieldType,
-                          keyMultiple: temIndex,
-                          fileType: file.type,
-                          feKey:feKey
-                        },
-                      },
-                    }));
-                  } else {
-                    secTemplate[name] = value;
-                    const validation = JSON.parse(secTemplate.validation || "{}");
-                    const error = validateField(value, validation, secTemplate);
-                    setFormData((prevData) => ({
-                      ...prevData,
-                      templateData: {
-                        ...prevData.templateData,
-                        [`${index}+${temIndex}`]: {
-                          file,
-                          preview: reader.result as string,
-                          error: error,
-                          sectionName: section.sectionSlug,
-                          orderId: section.sectionOrder,
-                          templateId: index,
-                          templateSectionId: temIndex,
-                          templateSectionMultipleId: "",
-                          fieldLabel: fieldLabel,
-                          subField: subField,
-                          fieldType: fieldType,
-                          fileType: file.type,
-                          feKey:feKey
-                        },
-                      },
-                    }));
-                  }
-                }
-                return secTemplate;
-              });
-              return { ...sec, sectionTemplate: updatedSectionTemplate };
-            }
-            return sec;
-          });
-          return updatedSections;
-        });
-      };
-
-      // Handling image and video previews
-      if (file.type.startsWith('video/')) {
-        reader.readAsDataURL(file); // For video, use Data URL
-      } else {
-        reader.readAsDataURL(file); // Default to Data URL (e.g., images)
-      }
-    } else {
-      // Handling non-file input changes
-      setSections((prevSections) => {
-        const updatedSections = prevSections.map((sec, mainIndex) => {
-          if (mainIndex === index) {
-            const updatedSectionTemplate = sec.sectionTemplate.map((secTemplate: any, temIndex: any) => {
-              if (temIndex === fieldIndex) {
-                if (subFieldIndex !== undefined && secTemplate.fieldType === "multiple") {
-                  secTemplate.multipleData[subFieldIndex][name] = value;
-                  const validation = JSON.parse(secTemplate.multipleData[subFieldIndex].validation || "{}");
-                  const error = validateField(value, validation, secTemplate.multipleData[subFieldIndex]);
-                  setFormData((prevData) => ({
-                    ...prevData,
-                    templateData: {
-                      ...prevData.templateData,
-                      [`${index}+${fieldIndex}+${subFieldIndex}`]: {
-                        ...prevData.templateData[`${index}+${fieldIndex}+${subFieldIndex}`],
-                        [name]: value,
-                        error: error,
-                        sectionName: section.sectionSlug,
-                        orderId: section.sectionOrder,
-                        templateId: index,
-                        templateSectionId: temIndex,
-                        templateSectionMultipleId: subFieldIndex.toString(),
-                        fieldLabel: fieldLabel,
-                        subField: subField,
-                        fieldType: fieldType,
-                        keyMultiple: temIndex,
-                        feKey:feKey
-                      },
+    // Handling non-file input changes
+    setSections((prevSections) => {
+      const updatedSections = prevSections.map((sec, mainIndex) => {
+        if (mainIndex === index) {
+          const updatedSectionTemplate = sec.sectionTemplate.map((secTemplate: any, temIndex: any) => {
+            if (temIndex === fieldIndex) {
+              if (subFieldIndex !== undefined && secTemplate.fieldType === "multiple") {
+                secTemplate.multipleData[subFieldIndex][name] = value;
+                const validation = JSON.parse(secTemplate.multipleData[subFieldIndex].validation || "{}");
+                const error = validateField(value, validation, secTemplate.multipleData[subFieldIndex]);
+                setFormData((prevData) => ({
+                  ...prevData,
+                  templateData: {
+                    ...prevData.templateData,
+                    [`${index}+${fieldIndex}+${subFieldIndex}`]: {
+                      ...prevData.templateData[`${index}+${fieldIndex}+${subFieldIndex}`],
+                      [name]: value,
+                      error: error,
+                      sectionName: section.sectionSlug,
+                      orderId: section.sectionOrder,
+                      templateId: index,
+                      templateSectionId: temIndex,
+                      templateSectionMultipleId: subFieldIndex.toString(),
+                      fieldLabel: fieldLabel,
+                      subField: subField,
+                      fieldType: fieldType,
+                      keyMultiple: temIndex,
+                      feKey: feKey
                     },
-                  }));
-                  return {
-                    ...secTemplate,
-                    multipleData: secTemplate.multipleData.map((data: any, idx: any) => {
-                      if (idx === subFieldIndex) {
-                        return { ...data, error };
-                      }
-                      return data;
-                    }),
-                  };
-                } else {
-                  secTemplate[name] = value;
-                  const validation = JSON.parse(secTemplate.validation || "{}");
-                  const error = validateField(value, validation, secTemplate);
-                  setFormData((prevData) => ({
-                    ...prevData,
-                    templateData: {
-                      ...prevData.templateData,
-                      [`${index}+${temIndex}`]: {
-                        ...prevData.templateData[`${index}+${temIndex}`],
-                        [name]: value,
-                        error: error,
-                        sectionName: section.sectionSlug,
-                        orderId: section.sectionOrder,
-                        templateId: index,
-                        templateSectionId: temIndex,
-                        templateSectionMultipleId: "",
-                        fieldLabel: fieldLabel,
-                        subField: subField,
-                        fieldType: fieldType,
-                        keyMultiple: temIndex,
-                        feKey:feKey
-                      },
+                  },
+                }));
+                return {
+                  ...secTemplate,
+                  multipleData: secTemplate.multipleData.map((data: any, idx: any) => {
+                    if (idx === subFieldIndex) {
+                      return { ...data, error };
+                    }
+                    return data;
+                  }),
+                };
+              } else {
+                secTemplate[name] = value;
+                const validation = JSON.parse(secTemplate.validation || "{}");
+                const error = validateField(value, validation, secTemplate);
+                setFormData((prevData) => ({
+                  ...prevData,
+                  templateData: {
+                    ...prevData.templateData,
+                    [`${index}+${temIndex}`]: {
+                      ...prevData.templateData[`${index}+${temIndex}`],
+                      [name]: value,
+                      error: error,
+                      sectionName: section.sectionSlug,
+                      orderId: section.sectionOrder,
+                      templateId: index,
+                      templateSectionId: temIndex,
+                      templateSectionMultipleId: "",
+                      fieldLabel: fieldLabel,
+                      subField: subField,
+                      fieldType: fieldType,
+                      keyMultiple: temIndex,
+                      feKey: feKey
                     },
-                  }));
-                  return {
-                    ...secTemplate,
-                    error,
-                  };
-                }
+                  },
+                }));
+                return {
+                  ...secTemplate,
+                  error,
+                };
               }
-              return secTemplate;
-            });
-            return {
-              ...sec,
-              sectionTemplate: updatedSectionTemplate,
-            };
-          }
-          return sec;
-        });
-        return updatedSections;
+            }
+            return secTemplate;
+          });
+          return {
+            ...sec,
+            sectionTemplate: updatedSectionTemplate,
+          };
+        }
+        return sec;
       });
-    }
+      return updatedSections;
+    });
   };
 
   // const handleInputChange = (
@@ -736,14 +665,14 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
 
     const newSlug = e.target.value;
     const slugRegex = /^[a-zA-Z0-9/-]+$/;
-   
+
 
     if (!slugRegex.test(newSlug)) {
       setFormErrors({ ...formErrors, slug: "Slug must be alphanumeric with no spaces, or underscores." });
     } else {
       setFormErrors({ ...formErrors, slug: "" });
     }
-  
+
     setFormData((prevData) => ({
       ...prevData,
       slug: newSlug,
@@ -772,7 +701,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       };
     });
   }
-  
+
   const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
     const newSectionTemplate = [...sections[index].sectionTemplate];
     const duplicateField = { ...newSectionTemplate[fieldIndex] };
@@ -975,101 +904,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                         <Typography variant="h5">{section.sectionName}</Typography>
                         {section.sectionTemplate.map((field: any, fieldIndex: number) => (
                           <Grid container key={`${index}+${fieldIndex}`} spacing={2}>
-                            {field.fieldType === "file" ? (
-                              <>
-                                <Grid item xs={12} sm={12}>
-                                  <CustomTextField
-                                    label={field.isRequired ? `${field.fieldLabel} *` : field.fieldLabel}
-                                    name={field.fieldType}
-                                    type="file"
-                                    fullWidth
-                                    margin="normal"
-                                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                      handleInputChange(
-                                        e, section.sectionId, index, fieldIndex, 'null', section,
-                                        field.fieldLabel, '', field.fieldType,field.fekey)
-                                    }
-                                    //@ts-ignore
-                                    error={
-                                      field.error && field.error
-                                    }
-                                    helperText={field.error && field.error}
-                                    // InputLabelProps={{ shrink: true }}
-                                    inputProps={field.validation ? JSON.parse(field.validation) : {}}
-
-                                  />
-                                  {formData.templateData && formData.templateData[`${index}+${fieldIndex}`]?.preview && (
-                                    <Box mt={2} display="flex" flexDirection="column" alignItems="end">
-                                      <IconButton
-                                        size="large"
-                                        onClick={() => handleRemoveFile(index, fieldIndex)}
-                                        aria-label="minus"
-                                        color="error"
-                                        style={{ marginBottom: "8px" }}
-                                      >
-                                        <i className="tabler-minus" />
-                                      </IconButton>
-                                      {
-                                      formData.templateData[`${index}+${fieldIndex}`]?.fileType  &&
-                                      formData.templateData[`${index}+${fieldIndex}`]?.fileType.includes("video") ? (
-                                        <Box
-                                          component="video"
-                                          src={formData.templateData[`${index}+${fieldIndex}`]?.preview}
-                                          controls
-                                          sx={{
-                                            width: "100%",
-                                            maxHeight: "200px",
-                                            objectFit: "contain",
-                                            borderRadius: "4px",
-                                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                                          }}
-                                        />
-                                      ) : (
-                                        <Box
-                                          component="img"
-                                          src={formData.templateData[`${index}+${fieldIndex}`]?.preview}
-                                          alt="Preview"
-                                          sx={{
-                                            width: "100%",
-                                            maxHeight: "200px",
-                                            objectFit: "contain",
-                                            borderRadius: "4px",
-                                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                                          }}
-                                        />
-                                      )}
-                                    </Box>
-                                  )}
-
-                                  {/* {formData.templateData && formData.templateData[`${index}+${fieldIndex}`]?.preview && (
-                                    <Box mt={2} display="flex" flexDirection="column" alignItems="end">
-                                      <IconButton
-                                        size="large"
-                                        onClick={() => handleRemoveFile(index, fieldIndex)}
-                                        aria-label="minus"
-                                        color="error"
-                                        style={{ marginBottom: "8px" }}
-                                      >
-                                        <i className="tabler-minus" />
-                                      </IconButton>
-                                      <Box
-                                        component="img"
-                                        src={formData.templateData[`${index}+${fieldIndex}`]?.preview}
-                                        alt="Preview"
-                                        sx={{
-                                          width: "100%",
-                                          maxHeight: "200px",
-                                          objectFit: "contain",
-                                          borderRadius: "4px",
-                                          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                                        }}
-                                      />
-                                    </Box>
-                                  )} */}
-
-                                </Grid>
-                              </>
-                            ) : field.fieldType === 'multiple' ? (
+                            {field.fieldType === 'multiple' ? (
                               <Grid item xs={12} style={{ marginBottom: '10px' }}>
                                 <Card variant="outlined">
                                   <CardActions>
@@ -1115,154 +950,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                           item
                                           xs={12}
                                           sm={12}>
-                                          {subField.fieldType === 'file' ? (
-                                            <>
-                                              <CustomTextField
-                                                label={
-                                                  subField.isRequired
-                                                    ? `${subField.fieldLabel} *`
-                                                    : subField.fieldLabel
-                                                }
-                                                name={subField.fieldType}
-                                                type="file"
-                                                fullWidth
-                                                margin="normal"
-                                                onChange={(e: any) =>
-                                                  handleInputChange(
-                                                    e,
-                                                    section.sectionId,
-                                                    index,
-                                                    fieldIndex,
-                                                    subFieldIndex,
-                                                    section,
-                                                    field.fieldLabel,
-                                                    subField.fieldLabel,
-                                                    subField.fieldType,
-                                                    subField.fekey
-                                                  )
-                                                }
-                                                error={subField.error && subField.error}
-                                                helperText={subField.error && subField.error}
-                                                // InputLabelProps={{ shrink: true }}
-                                                inputProps={subField.validation ? JSON.parse(subField.validation) : {}}
-                                              />
-                                              {formData.templateData &&
-                                                formData.templateData[
-                                                  `${index}+${fieldIndex}+${subFieldIndex}`
-                                                ]?.preview && (
-                                                  <Box
-                                                    mt={2}
-                                                    display="flex"
-                                                    flexDirection="column"
-                                                    alignItems="end"
-                                                  >
-                                                    <IconButton
-                                                      size="large"
-                                                      onClick={() =>
-                                                        handleRemoveFile(
-                                                          index,
-                                                          fieldIndex,
-                                                          subFieldIndex
-                                                        )
-                                                      }
-                                                      aria-label="minus"
-                                                      color="error"
-                                                      style={{ marginBottom: '8px' }}
-                                                    >
-                                                      <i className="tabler-minus" />
-                                                    </IconButton>
-                                                    {
-                                                    formData.templateData[
-                                                      `${index}+${fieldIndex}+${subFieldIndex}`
-                                                    ]?.fileType &&
-                                                    formData.templateData[
-                                                      `${index}+${fieldIndex}+${subFieldIndex}`
-                                                    ]?.fileType.includes("video") ? (
-                                                      <Box
-                                                        component="video"
-                                                        src={
-                                                          formData.templateData[
-                                                            `${index}+${fieldIndex}+${subFieldIndex}`
-                                                          ]?.preview
-                                                        }
-                                                        controls
-                                                        sx={{
-                                                          width: '100%',
-                                                          maxHeight: '200px',
-                                                          objectFit: 'contain',
-                                                          borderRadius: '4px',
-                                                          boxShadow:
-                                                            '0 2px 4px rgba(0, 0, 0, 0.1)',
-                                                        }}
-                                                      />
-                                                    ) : (
-                                                      <Box
-                                                        component="img"
-                                                        src={
-                                                          formData.templateData[
-                                                            `${index}+${fieldIndex}+${subFieldIndex}`
-                                                          ]?.preview
-                                                        }
-                                                        alt="Preview"
-                                                        sx={{
-                                                          width: '100%',
-                                                          maxHeight: '200px',
-                                                          objectFit: 'contain',
-                                                          borderRadius: '4px',
-                                                          boxShadow:
-                                                            '0 2px 4px rgba(0, 0, 0, 0.1)',
-                                                        }}
-                                                      />
-                                                    )}
-                                                  </Box>
-                                                )}
-
-                                              {/* {formData.templateData &&
-                                                formData.templateData[
-                                                  `${index}+${fieldIndex}+${subFieldIndex}`
-                                                ]?.preview && (
-                                                  <Box
-                                                    mt={2}
-                                                    display="flex"
-                                                    flexDirection="column"
-                                                    alignItems="end"
-                                                  >
-                                                    <IconButton
-                                                      size="large"
-                                                      onClick={() =>
-                                                        handleRemoveFile(
-                                                          index,
-                                                          fieldIndex,
-                                                          subFieldIndex
-                                                        )
-                                                      }
-                                                      aria-label="minus"
-                                                      color="error"
-                                                      style={{ marginBottom: '8px' }}
-                                                    >
-                                                      <i className="tabler-minus" />
-                                                    </IconButton>
-                                                    <Box
-                                                      component="img"
-                                                      src={
-                                                        formData.templateData[
-                                                          `${index}+${fieldIndex}+${subFieldIndex}`
-                                                        ]?.preview
-                                                      }
-                                                      alt="Preview"
-                                                      sx={{
-                                                        width: '100%',
-                                                        maxHeight: '200px',
-                                                        objectFit: 'contain',
-                                                        borderRadius: '4px',
-                                                        boxShadow:
-                                                          '0 2px 4px rgba(0, 0, 0, 0.1)',
-                                                      }}
-                                                    />
-                                                  </Box>
-                                                )} */}
-                                            </>
-                                          ) : (
+                                          {
                                             <CustomTextField
                                               multiline
                                               label={
@@ -1301,7 +989,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                 ]?.[subField.fieldType] || ''
                                               }
                                             />
-                                          )}
+                                          }
                                         </Grid>
                                       )
                                     )
@@ -1349,7 +1037,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
               </Grid>
             </Box>
           </form>
-        </div>      </Card >
+        </div>
+      </Card >
       <Grid
         item
         xs={12}
