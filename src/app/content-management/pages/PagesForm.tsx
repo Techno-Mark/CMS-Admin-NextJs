@@ -2,17 +2,14 @@
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import { Button, Box, Card, Grid, MenuItem, Typography, IconButton, CardContent, CardActions, ButtonGroup, Tooltip, } from "@mui/material";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { useDropzone } from "react-dropzone";
 import { get, post } from "@/services/apiService";
 import { template } from "@/services/endpoint/template";
 import CustomTextField from "@/@core/components/mui/TextField";
-import { useRouter } from "next/navigation";
 import { PagesType } from "./pagesType";
 import { pages } from "@/services/endpoint/pages";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
-
-const sectionActions = { ADD: -1, EDIT: 1 };
+import { v4 as uuidv4 } from 'uuid'; 
 
 const initialFormData = {
   pageId: "",
@@ -69,11 +66,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   >([]);
   const [sections, setSections] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [PDStatus, setPDStatus] = useState<boolean>(false);
 
   useEffect(() => {
     if (editingRow) {
-      
       setLoading(true);
       setFormData(editingRow);
       // getTemplateIdWiseForm(editingRow.templateId);
@@ -86,15 +81,12 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
           }, {}),
         }));
         setSections(sectionsWithErrors);
-        // setTimeout(() => {
-          
           setLoading(false);
-        // }, 3000);
       }
      
     } else {
       setFormData(initialFormData);
-      // setLoading(false);
+      setLoading(false);
     }
   }, [editingRow]);
   useEffect(() => {
@@ -149,7 +141,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       }
     }
 
-    // Updated URL validation for file input type
   if (field?.fieldType === 'file') {
     const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
     const extendedUrlRegex = /^(https?|ftp):\/\/[^\s/$.?#].*[^\s]*\.[^\s]*$/i;
@@ -200,10 +191,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       errors.title = "Title is required";
       valid = false;
     }
-    // if (!formData.slug) {
-    //   errors.slug = "Slug is required";
-    //   valid = false;
-    // }
 
     if (formData.slug.trim().length === 0) {
       errors.slug = 'Slug is required';
@@ -271,17 +258,13 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   };
   const handleSubmit = async (event: React.FormEvent, pdStatus: boolean) => {
     event.preventDefault();
-    // console.log(PDStatus);
-    // setPDStatus(pdStatus)
     if (validateForm()) {
       try {
         setLoading(true);
         const formattedData: any[] = [];
         Object.keys(formData.templateData).forEach(key => {
           const content = formData.templateData[key];
-          const mainKey = content.templateId;
           const sectionName = content.sectionName;
-          const sectionId = content.templateSectionId;
           const keyMultiple = content.keyMultiple;
           const sectionMultipleId = content.templateSectionMultipleId;
           let contentBlock = formattedData.find(block => block[`${sectionName}`]);
@@ -295,9 +278,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
               formattedContent = {
                 // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 // Value: content.email || "",
-
                 //   [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.email || ""
-
                 [sectionMultipleId ? content.feKey : content.feKey || ""]: content.email || ""
 
               };
@@ -307,7 +288,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 // Value: content.file || "",
                 // Preview: content.preview || "",
-
                 // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.preview
                 [sectionMultipleId ? content.feKey : content.feKey || ""]: content.file
               };
@@ -316,9 +296,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
               formattedContent = {
                 // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 // Value: content.url || "",
-
                 // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.url
-
                 [sectionMultipleId ? content.feKey : content.feKey || ""]: content.url
               };
               break;
@@ -334,7 +312,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
               formattedContent = {
                 // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 // Value: content.number || "",
-
                 // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.number
                 [sectionMultipleId ? content.feKey : content.feKey || ""]: content.number
               };
@@ -343,7 +320,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
               formattedContent = {
                 // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 // Value: content.textarea || "",
-
                 // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.textarea
                 [sectionMultipleId ? content.feKey : content.feKey || ""]: content.textarea
               };
@@ -353,7 +329,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
               formattedContent = {
                 // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
                 // Value: content.text || "",
-
                 // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.text
                 [sectionMultipleId ? content.feKey : content.feKey || ""]: content.text
               };
@@ -410,6 +385,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     // Handling non-file input changes
     setSections((prevSections) => {
       const updatedSections = prevSections.map((sec, mainIndex) => {
+        
+        
         if (mainIndex === index) {
           const updatedSectionTemplate = sec.sectionTemplate.map((secTemplate: any, temIndex: any) => {
             if (temIndex === fieldIndex) {
@@ -491,163 +468,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     });
   };
 
-  // const handleInputChange = (
-  //   event: ChangeEvent<HTMLInputElement>, sectionId: number, index: number, fieldIndex: number,
-  //   subFieldIndex?: any, section?: any, fieldLabel?: string, subField?: string, fieldType?: string
-  // ) => {
-  //   const { name, value, files } = event.target;
-  //   if (files && files[0]) {
-  //     const file = files[0];
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       setSections((prevSections) => {
-  //         const updatedSections = prevSections.map((sec, mainIndex) => {
-  //           if (mainIndex === index) {
-  //             const updatedSectionTemplate = sec.sectionTemplate.map((secTemplate: any, temIndex: any) => {
-  //               if (temIndex === fieldIndex) {
-  //                 if (subFieldIndex !== undefined && secTemplate.fieldType === "multiple") {
-  //                   secTemplate.multipleData[subFieldIndex][name] = value;
-  //                   const validation = JSON.parse(secTemplate.multipleData[subFieldIndex].validation || "{}");
-  //                   const error = validateField(value, validation, secTemplate.multipleData[subFieldIndex]);
-  //                   setFormData((prevData) => ({
-  //                     ...prevData,
-  //                     templateData: {
-  //                       ...prevData.templateData,
-  //                       [`${index}+${fieldIndex}+${subFieldIndex}`]: {
-  //                         file,
-  //                         preview: reader.result as string,
-  //                         error: error,
-  //                         sectionName: section.sectionSlug,
-  //                         orderId: section.sectionOrder,
-  //                         templateId: index,
-  //                         templateSectionId: temIndex,
-  //                         templateSectionMultipleId: subFieldIndex.toString(),
-  //                         fieldLabel: fieldLabel,
-  //                         subField: subField,
-  //                         fieldType: fieldType,
-  //                         keyMultiple: temIndex
-
-  //                       },
-  //                     },
-  //                   }));
-  //                 } else {
-  //                   secTemplate[name] = value;
-  //                   const validation = JSON.parse(secTemplate.validation || "{}");
-  //                   const error = validateField(value, validation, secTemplate);
-  //                   setFormData((prevData) => ({
-  //                     ...prevData,
-  //                     templateData: {
-  //                       ...prevData.templateData,
-  //                       [`${index}+${temIndex}`]: {
-  //                         file,
-  //                         preview: reader.result as string,
-  //                         error: error,
-  //                         sectionName: section.sectionSlug,
-  //                         orderId: section.sectionOrder,
-  //                         templateId: index,
-  //                         templateSectionId: temIndex,
-  //                         templateSectionMultipleId: "",
-  //                         fieldLabel: fieldLabel,
-  //                         subField: subField,
-  //                         fieldType: fieldType
-  //                       },
-  //                     },
-  //                   }));
-  //                 }
-  //               }
-  //               return secTemplate;
-  //             });
-  //             return { ...sec, sectionTemplate: updatedSectionTemplate };
-  //           }
-  //           return sec;
-  //         });
-  //         return updatedSections;
-  //       });
-  //     };
-  //     reader.readAsDataURL(file);
-  //   } else {
-  //     setSections((prevSections) => {
-  //       const updatedSections = prevSections.map((sec, mainIndex) => {
-  //         if (mainIndex === index) {
-  //           const updatedSectionTemplate = sec.sectionTemplate.map((secTemplate: any, temIndex: any) => {
-  //             if (temIndex === fieldIndex) {
-  //               if (subFieldIndex !== undefined && secTemplate.fieldType === "multiple") {
-  //                 secTemplate.multipleData[subFieldIndex][name] = value;
-  //                 const validation = JSON.parse(secTemplate.multipleData[subFieldIndex].validation || "{}");
-  //                 const error = validateField(value, validation, secTemplate.multipleData[subFieldIndex]);
-  //                 setFormData((prevData) => ({
-  //                   ...prevData,
-  //                   templateData: {
-  //                     ...prevData.templateData,
-  //                     [`${index}+${fieldIndex}+${subFieldIndex}`]: {
-  //                       ...prevData.templateData[`${index}+${fieldIndex}+${subFieldIndex}`],
-  //                       [name]: value,
-  //                       error: error,
-  //                       sectionName: section.sectionSlug,
-  //                       orderId: section.sectionOrder,
-  //                       templateId: index,
-  //                       templateSectionId: temIndex,
-  //                       templateSectionMultipleId: subFieldIndex.toString(),
-  //                       fieldLabel: fieldLabel,
-  //                       subField: subField,
-  //                       fieldType: fieldType,
-  //                       keyMultiple: temIndex
-  //                     },
-  //                   },
-  //                 }));
-  //                 return {
-  //                   ...secTemplate,
-  //                   multipleData: secTemplate.multipleData.map((data: any, idx: any) => {
-  //                     if (idx === subFieldIndex) {
-  //                       return { ...data, error };
-  //                     }
-  //                     return data;
-  //                   }),
-  //                 };
-  //               } else {
-  //                 secTemplate[name] = value;
-  //                 const validation = JSON.parse(secTemplate.validation || "{}");
-  //                 const error = validateField(value, validation, secTemplate);
-  //                 setFormData((prevData) => ({
-  //                   ...prevData,
-  //                   templateData: {
-  //                     ...prevData.templateData,
-  //                     [`${index}+${temIndex}`]: {
-  //                       ...prevData.templateData[`${index}+${temIndex}`],
-  //                       [name]: value,
-  //                       error: error,
-  //                       sectionName: section.sectionSlug,
-  //                       orderId: section.sectionOrder,
-  //                       templateId: index,
-  //                       templateSectionId: temIndex,
-  //                       templateSectionMultipleId: "",
-  //                       fieldLabel: fieldLabel,
-  //                       subField: subField,
-  //                       fieldType: fieldType,
-  //                       keyMultiple: temIndex
-  //                     },
-  //                   },
-  //                 }));
-  //                 return {
-  //                   ...secTemplate,
-  //                   error,
-  //                 };
-  //               }
-  //             }
-  //             return secTemplate;
-  //           });
-  //           return {
-  //             ...sec,
-  //             sectionTemplate: updatedSectionTemplate,
-  //           };
-  //         }
-  //         return sec;
-  //       });
-  //       return updatedSections;
-  //     });
-  //   }
-  // };
-
+ 
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(
     false
   );
@@ -658,13 +479,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     setFormData((prevData) => ({
       ...prevData,
       title: newName,
-      // slug:
-      //   !isSlugManuallyEdited && open === sectionActions.ADD
-      //     ? newName
-      //       .replace(/[^\w\s]|_/g, "")
-      //       .replace(/\s+/g, "-")
-      //       .toLowerCase()
-      //     : prevData.slug,
     }));
   };
 
@@ -685,83 +499,162 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       slug: newSlug,
     }));
     setIsSlugManuallyEdited(true);
-    // const newSlug = e.target.value.toLowerCase();
-    // setFormErrors({ ...formErrors, slug: "" });
-    // setFormData((prevData) => ({
-    //   ...prevData,
-    //   slug: newSlug,
-    // }));
-    // setIsSlugManuallyEdited(true);
+
   };
 
-  const handleRemoveFile = (sectionIndex: number, fieldIndex: number, subFieldIndex?: number) => {
-    setFormData((prevData) => {
-      const updatedTemplateData = { ...prevData.templateData };
-      if (subFieldIndex) {
-        delete updatedTemplateData[`${sectionIndex}+${fieldIndex}+${subFieldIndex}`];
-      } else {
-        delete updatedTemplateData[`${sectionIndex}+${fieldIndex}`];
-      }
-      return {
-        ...prevData,
-        templateData: updatedTemplateData,
-      };
-    });
-  }
+  // const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
+  //   const newSectionTemplate = [...sections[index].sectionTemplate];
+  //   const duplicateField = { ...newSectionTemplate[fieldIndex] };
+  //   newSectionTemplate.push({ ...duplicateField });
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     updatedSections[index].sectionTemplate = newSectionTemplate;
+  //     return updatedSections;
+  //   });
+  // };
 
-  const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
-    const newSectionTemplate = [...sections[index].sectionTemplate];
-    const duplicateField = { ...newSectionTemplate[fieldIndex] };
-    newSectionTemplate.push({ ...duplicateField });
+
+  const handleAddDuplicateForm = (sectionIndex: number, fieldIndex: number) => {
     setSections((prevSections) => {
+      // Copy the existing sections
       const updatedSections = [...prevSections];
-      updatedSections[index].sectionTemplate = newSectionTemplate;
+      // Access the section template that contains the multiple field
+      const sectionTemplate = updatedSections[sectionIndex].sectionTemplate;
+  
+      // Get the object that needs to be duplicated
+      const multipleField = sectionTemplate[fieldIndex];
+  
+      if (multipleField.fieldType === "multiple") {
+        // Create a deep copy of the entire multiple field object
+        const duplicatedMultipleField = {
+          ...multipleField,
+          multipleData: multipleField.multipleData.map((item: any) => ({
+            ...item,
+          })),
+        };
+  
+        // Append the duplicated multiple field object to the section template
+        sectionTemplate.splice(fieldIndex + 1, 0, duplicatedMultipleField);
+      }
+  
       return updatedSections;
     });
   };
-  // const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
-  //   const newSectionTemplate = [...sections[index].sectionTemplate];
-  //   if (newSectionTemplate.length > 1) {
-  //     newSectionTemplate.splice(fieldIndex, 1);
-  //     setSections((prevSections) => {
-  //       const updatedSections = [...prevSections];
-  //       updatedSections[index].sectionTemplate = newSectionTemplate;
-  //       return updatedSections;
-  //     });
-  //   }
+  // const handleAddDuplicateForm = (sectionIndex: number, fieldIndex: number) => {
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     const section = updatedSections[sectionIndex];
+  //     const sectionTemplate = [...section.sectionTemplate];
+  
+  //     // Create a duplicate of the field and assign a new unique key
+  //     const fieldToDuplicate = sectionTemplate[fieldIndex];
+  //     const duplicateField = { ...fieldToDuplicate, fekey: uuidv4() };
+  
+  //     // Add the duplicate field to the sectionTemplate
+  //     sectionTemplate.push(duplicateField);
+  
+  //     updatedSections[sectionIndex] = {
+  //       ...section,
+  //       sectionTemplate,
+  //     };
+  
+  //     return updatedSections;
+  //   });
+  
+  //   // Optionally, handle formData here if needed
   // };
 
-  const handleRemoveDuplicateForm = (index: number, fieldIndex: number) => {
-    const newSectionTemplate = [...sections[index].sectionTemplate];
-
-    if (newSectionTemplate.length > 1) {
-
-      newSectionTemplate.splice(fieldIndex, 1);
-      // Update sections state
-      setSections((prevSections) => {
-        const updatedSections = [...prevSections];
-        updatedSections[index].sectionTemplate = newSectionTemplate;
-        return updatedSections;
-      });
-      // Update formData.templateData
-      setFormData((prevFormData) => {
-        const newTemplateData = { ...prevFormData.templateData };
-
-        // Iterate through the keys of templateData
-        Object.keys(newTemplateData).forEach((key) => {
-          const [sectionIdx, fieldIdx, subFieldIdx] = key.split('+').map(Number);
-          // Remove matching entries
-          if (sectionIdx === index && fieldIdx === fieldIndex) {
-            delete newTemplateData[key];
-          }
-        });
-        return {
-          ...prevFormData,
-          templateData: newTemplateData
+  const handleRemoveDuplicateForm = (sectionIndex: number, fieldIndex: number) => {
+    setSections((prevSections) => {
+      const updatedSections = [...prevSections];
+      const section = updatedSections[sectionIndex];
+      const sectionTemplate = [...section.sectionTemplate];
+  
+      // Remove the specific field from the template
+      if (sectionTemplate.length > 1) {
+        sectionTemplate.splice(fieldIndex, 1);
+        updatedSections[sectionIndex] = {
+          ...section,
+          sectionTemplate,
         };
+      }
+  
+      return updatedSections;
+    });
+  
+    setFormData((prevFormData) => {
+      const newTemplateData = { ...prevFormData.templateData };
+  
+      // Clean up formData related to the removed field
+      Object.keys(newTemplateData).forEach((key) => {
+        const [secIdx, fldIdx] = key.split('+').map(Number);
+  
+        // Remove entries corresponding to the removed field
+        if (secIdx === sectionIndex && fldIdx === fieldIndex) {
+          delete newTemplateData[key];
+        }
+  
+        // Adjust keys for fields that come after the removed one
+        if (secIdx === sectionIndex && fldIdx > fieldIndex) {
+          const newKey = `${secIdx}+${fldIdx - 1}`;
+          newTemplateData[newKey] = newTemplateData[key];
+          delete newTemplateData[key];
+        }
       });
-    }
+  
+      return {
+        ...prevFormData,
+        templateData: newTemplateData,
+      };
+    });
   };
+  
+
+  // const handleRemoveDuplicateForm = (sectionIndex: number, fieldIndex: number) => {
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     const section = updatedSections[sectionIndex];
+  //     const sectionTemplate = [...section.sectionTemplate];
+  
+  //     // Remove the field from the sectionTemplate if more than one field exists
+  //     if (sectionTemplate.length > 1) {
+  //       sectionTemplate.splice(fieldIndex, 1);
+  //       updatedSections[sectionIndex] = {
+  //         ...section,
+  //         sectionTemplate,
+  //       };
+  //     }
+  
+  //     return updatedSections;
+  //   });
+  
+  //   setFormData((prevFormData) => {
+  //     const newTemplateData = { ...prevFormData.templateData };
+  
+  //     // Clean up formData related to the removed field
+  //     Object.keys(newTemplateData).forEach((key) => {
+  //       const [secIdx, fldIdx] = key.split('+').map(Number);
+  
+  //       if (secIdx === sectionIndex && fldIdx === fieldIndex) {
+  //         delete newTemplateData[key];
+  //       }
+  
+  //       // Adjust keys for fields that come after the removed one
+  //       if (secIdx === sectionIndex && fldIdx > fieldIndex) {
+  //         const newKey = `${secIdx}+${fldIdx - 1}`;
+  //         newTemplateData[newKey] = newTemplateData[key];
+  //         delete newTemplateData[key];
+  //       }
+  //     });
+  
+  //     return {
+  //       ...prevFormData,
+  //       templateData: newTemplateData,
+  //     };
+  //   });
+  // };
+  
+  
 
   return (
     <>
@@ -769,9 +662,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       <BreadCrumbList />
       <Card>
         <div>
-          <form className="flex flex-col gap-6 p-6"
-          // onSubmit={handleSubmit}
-          >
+          <form className="flex flex-col gap-6 p-6" // onSubmit={handleSubmit}
+           >
             <Box display="flex" alignItems="center">
               <Grid container spacing={4}>
                 <Grid item xs={12} sm={6}>
@@ -923,7 +815,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                       </Grid>
                                       <Grid item xs={2} >
                                         <ButtonGroup variant='tonal' size="small">
-                                          {/* {fieldIndex === section.sectionTemplate.length - 1 && ( */}
                                           <Tooltip title={`Add ${field.fieldLabel}`}>
                                             <Button size="small"
                                               onClick={() =>
@@ -932,8 +823,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                               <i className="tabler-plus" />
                                             </Button>
                                           </Tooltip>
-                                          {/* )} */}
-                                          {/* {field.multipleData.length > 1 && ( */}
+                                      
                                           <Tooltip title={`Remove ${field.fieldLabel}`}>
                                             <Button size="small"
                                               onClick={() =>
@@ -942,7 +832,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                               <i className="tabler-minus" />
                                             </Button>
                                           </Tooltip>
-                                          {/* )} */}
                                         </ButtonGroup>
                                       </Grid>
                                     </Grid>
@@ -1054,17 +943,10 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
           <Button variant="contained" size="small" color="error" type="reset" onClick={handleClose}>
             Cancel
           </Button>
-          <Button color="warning" variant="contained" size="small" type="submit" onClick={(event) => {
-            // setPDStatus(false); 
-            handleSubmit(event, false);
-          }}>
+          <Button color="warning" variant="contained" size="small" type="submit" onClick={(event) => {handleSubmit(event, false)}}>
             Save as Draft
           </Button>
-          <Button variant="contained" type="submit" size="small"
-            onClick={(event) => {
-              // setPDStatus(true); 
-              handleSubmit(event, true);
-            }}>
+          <Button variant="contained" type="submit" size="small" onClick={(event) => { handleSubmit(event, true)}}>
             Save & Publish
           </Button>
         </Box>
