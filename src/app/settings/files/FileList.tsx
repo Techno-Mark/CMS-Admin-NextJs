@@ -187,7 +187,7 @@ const FileListTable = () => {
                   alt={filePath}
                   width={50} 
                   height={50} 
-                  style={{ objectFit: 'cover', borderRadius: '4px' }} 
+                  style={{ objectFit: 'contain', borderRadius: '4px' }} 
                 />
               ) : (
                 <i className="tabler-file text-[20px]" />
