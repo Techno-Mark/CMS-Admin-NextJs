@@ -72,9 +72,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   const [PDStatus, setPDStatus] = useState<boolean>(false);
 
   useEffect(() => {
-    setLoading(true);
     if (editingRow) {
-     
+      
+      setLoading(true);
       setFormData(editingRow);
       // getTemplateIdWiseForm(editingRow.templateId);
       if (editingRow.sectionData) {
@@ -86,32 +86,35 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
           }, {}),
         }));
         setSections(sectionsWithErrors);
-        setLoading(false);
+        // setTimeout(() => {
+          
+          setLoading(false);
+        // }, 3000);
       }
      
     } else {
       setFormData(initialFormData);
-      setLoading(false);
+      // setLoading(false);
     }
   }, [editingRow]);
   useEffect(() => {
-    // setLoading(true);
+    setLoading(true);
     async function getTemplate() {
       await getActiveTemplateList();
-      // setLoading(false);
+      setLoading(false);
     }
     getTemplate();
   }, []);
   const getActiveTemplateList = async () => {
     try {
-      // setLoading(true);
+      setLoading(true);
       const result = await post(`${template.active}`, {});
       const { data } = result;
       setTemplateList(data.templates);
-      // setLoading(false);
+      setLoading(false);
     } catch (error) {
       console.error(error);
-      // setLoading(false);
+      setLoading(false);
     }
   };
   const getTemplateIdWiseForm = async (templateId: number) => {
