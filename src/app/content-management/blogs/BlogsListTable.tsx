@@ -120,15 +120,6 @@ const BlogListTable = () => {
   };
   useEffect(() => {
     getData();
-  }, [page, pageSize, globalFilter, activeFilter]);
-
-  useEffect(() => {
-    if (deletingId == -1) {
-      getData();
-    }
-  }, [deletingId]);
-
-  useEffect(() => {
     const handleStorageUpdate = async () => {
       getData();
     };
@@ -138,7 +129,13 @@ const BlogListTable = () => {
     return () => {
       window.removeEventListener("localStorageUpdate", handleStorageUpdate);
     };
-  }, []);
+  }, [page, pageSize, globalFilter, activeFilter]);
+
+  useEffect(() => {
+    if (deletingId == -1) {
+      getData();
+    }
+  }, [deletingId]);
 
   const columns = useMemo<ColumnDef<BlogTypeWithAction, any>[]>(
     () => [
