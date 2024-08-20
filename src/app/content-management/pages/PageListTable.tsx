@@ -29,9 +29,11 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import ConfirmationDialog from "./ConfirmationDialog";
 
-
 import tableStyles from "@core/styles/table.module.css";
-import { redirectToAddPage, redirectToEditPage } from "@/services/endpoint/pages";
+import {
+  redirectToAddPage,
+  redirectToEditPage,
+} from "@/services/endpoint/pages";
 import CustomChip from "@/@core/components/mui/Chip";
 import BreadCrumbList from "@/components/BreadCrumbList";
 
@@ -54,7 +56,6 @@ const DebouncedInput = ({
   onChange: (value: string | number) => void;
   debounce?: number;
 } & Omit<TextFieldProps, "onChange">) => {
-  
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
@@ -104,7 +105,7 @@ const PageListTable = ({
   const router = useRouter();
   // States
   const [globalFilter, setGlobalFilter] = useState("");
-  const [deletingId, setDeletingId] = useState<number>(0);
+  const [deletingId, setDeletingId] = useState<number>(-1);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
 
@@ -136,14 +137,15 @@ const PageListTable = ({
       }),
       columnHelper.accessor("status", {
         header: "Status",
-        cell: ({ row }) =>
+        cell: ({ row }) => (
           <CustomChip
             size="small"
             round="true"
-            label={row.original.active ? 'Publish' : 'Draft'}
+            label={row.original.active ? "Publish" : "Draft"}
             variant="tonal"
-            color={row.original.active ? 'success' : 'warning'}
+            color={row.original.active ? "success" : "warning"}
           />
+        ),
       }),
       columnHelper.accessor("id", {
         header: "Actions",
@@ -218,7 +220,6 @@ const PageListTable = ({
         limit: table.getState().pagination.pageSize,
         search: globalFilter,
         active: activeFilter,
-        
       });
     }
   }, [deletingId]);
