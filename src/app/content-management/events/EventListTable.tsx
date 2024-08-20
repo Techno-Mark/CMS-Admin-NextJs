@@ -100,56 +100,43 @@ const BlogListTable = () => {
   const [deletingId, setDeletingId] = useState<number>(0);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
-  useEffect(() => {
-    const getData = async () => {
-      setLoading(true);
-      try {
-        const result = await postDataToOrganizationAPIs(event.list, {
-          page: page + 1,
-          limit: pageSize,
-          search: globalFilter,
-          active: activeFilter,
-        });
-        setData(result.data.events);
-        setTotalRows(result.data.totalEvents);
-      } catch (error: any) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    getData();
-  }, [page, pageSize, globalFilter, deletingId, activeFilter]);
+  const getData = async () => {
+    setLoading(true);
+    try {
+      const result = await postDataToOrganizationAPIs(event.list, {
+        page: page + 1,
+        limit: pageSize,
+        search: globalFilter,
+        active: activeFilter,
+      });
+      setData(result.data.events);
+      setTotalRows(result.data.totalEvents);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
+    getData();
+
     const handleStorageUpdate = async () => {
-      const storedOrgName = localStorage.getItem('selectedOrgId');
-      const getData = async () => {
-        setLoading(true);
-        try {
-          const result = await postDataToOrganizationAPIs(event.list, {
-            page: page + 1,
-            limit: pageSize,
-            search: globalFilter,
-            active: activeFilter,
-          });
-          setData(result.data.events);
-          setTotalRows(result.data.totalEvents);
-        } catch (error: any) {
-          setError(error.message);
-        } finally {
-          setLoading(false);
-        }
-      };
       getData();
     };
 
-    window.addEventListener('localStorageUpdate', handleStorageUpdate);
+    window.addEventListener("localStorageUpdate", handleStorageUpdate);
 
     return () => {
-      window.removeEventListener('localStorageUpdate', handleStorageUpdate);
+      window.removeEventListener("localStorageUpdate", handleStorageUpdate);
     };
-  }, []);
+  }, [page, pageSize, globalFilter, activeFilter]);
+
+  useEffect(() => {
+    if (deletingId == -1) {
+      getData();
+    }
+  }, [deletingId]);
 
   const columns = useMemo<ColumnDef<EventTypeWithAction, any>[]>(
     () => [

@@ -160,7 +160,7 @@ const PermissionsListTable = ({
         header: "Created At",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
-            {formatDate(row.original.createdAt)}
+            {row.original.createdAt}
           </Typography>
         ),
       }),
