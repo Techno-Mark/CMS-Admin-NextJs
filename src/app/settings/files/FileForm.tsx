@@ -29,7 +29,8 @@ type blogFormPropsTypes = {
     handleClose: Function;
 };
 
-const validImageType = ["image/png","image/jpeg","image/jpg","image/gif","image/svg","video/mp4", "video/webm" ];   
+const validImageType = ["image/png","image/jpeg","image/jpg","image/gif","image/svg","image/svg+xml","video/mp4", "video/webm" ];  
+
 const MAX_FILES = 10;
 
 const initialFormData = {
