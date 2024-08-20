@@ -290,7 +290,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
             </table>
           </div>
         </DialogContent>
-        <DialogActions className="justify-center pbs-0 sm:pbe-16 sm:pli-16 mb-[-3rem]">
+        <DialogActions className="justify-end pbs-0 sm:pbe-16 sm:pli-16 mb-[-3rem]">
           <Button variant="contained" type="submit">
             Submit
           </Button>
