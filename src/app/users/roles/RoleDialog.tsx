@@ -11,7 +11,6 @@ import Button from "@mui/material/Button";
 import DialogCloseButton from "@components/Dialogs/DialogCloseButton";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
-import axios from "axios";
 import React from "react";
 import {
   createRole,
@@ -128,7 +127,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
 
     return valid;
   };
-  const orgId = localStorage.getItem('selectedOrgId');
+  const orgId = localStorage.getItem("selectedOrgId");
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
@@ -184,7 +183,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
         </Typography>
       </DialogTitle>
       <form onSubmit={handleSubmit}>
-        <DialogContent className="overflow-visible flex flex-col gap-6 pbs-0 sm:pli-16 mt-[-2rem] mb-[-10px]">
+        <DialogContent className="overflow-visible flex flex-col gap-4 pbs-0 sm:pli-16 mt-[-2rem] mb-[-10px]">
           <CustomTextField
             label="Role Name"
             variant="outlined"
@@ -210,38 +209,49 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
           <Typography variant="h5" className="min-is-[225px]">
             Role Permissions
           </Typography>
-          <div className="overflow-x-auto max-h-[15rem]">
+          <div className="overflow-x-auto max-h-[18rem]">
+            <div className="flex">
+              <div className="flex-1 "></div>
+              <div className="mx-4">
+                <FormControlLabel
+                  className="mie-0 capitalize flex text-end"
+                  control={
+                    <Checkbox
+                      onChange={handleSelectAllCheckbox}
+                      indeterminate={isIndeterminateCheckbox}
+                      checked={
+                        selectedCheckbox.length > 0 &&
+                        defaultData.length > 0 &&
+                        selectedCheckbox.length ===
+                          defaultData.flatMap(
+                            (module: any) => module.permissions
+                          ).length
+                      }
+                    />
+                  }
+                  label="Select All"
+                />
+              </div>
+            </div>
+
             <table className={tableStyles.table}>
               <tbody>
-                <tr className="border-bs-0">
-                  <th className="pis-0">
-                    <Typography
-                      color="text.primary"
-                      className="font-medium whitespace-nowrap flex-grow min-is-[225px]"
-                    >
-                      {/* Module Name */}
-                    </Typography>
-                  </th>
-                  <th className="!text-end pie-0 !pr-4">
-                    <FormControlLabel
-                      className="mie-0 capitalize"
-                      control={
-                        <Checkbox
-                          onChange={handleSelectAllCheckbox}
-                          indeterminate={isIndeterminateCheckbox}
-                          checked={
-                            selectedCheckbox.length > 0 &&
-                            defaultData.length > 0 &&
-                            selectedCheckbox.length ===
-                              defaultData.flatMap(
-                                (module: any) => module.permissions
-                              ).length
-                          }
-                        />
-                      }
-                      label="Select All"
-                    />
-                  </th>
+                <tr>
+                  <td></td>
+                  {Array.isArray(defaultData) &&
+                    defaultData.length > 0 &&
+                    defaultData[0]?.permissions?.map((perm: any) => (
+                      <td className="!text-end pie-0 !pr-4">
+                        <FormGroup className="flex-row justify-end flex-nowrap gap-6">
+                          <FormControlLabel
+                            key={perm.id}
+                            className="mie-0"
+                            control={<></>}
+                            label={perm.name}
+                          />
+                        </FormGroup>
+                      </td>
+                    ))}
                 </tr>
                 {defaultData.length > 0 &&
                   defaultData.map((module: any, index: number) => (
@@ -255,9 +265,9 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
                             {module.moduleName}
                           </Typography>
                         </td>
-                        <td className="!text-end pie-0 !pr-4">
-                          <FormGroup className="flex-row justify-end flex-nowrap gap-6">
-                            {module.permissions.map((perm: any) => (
+                        {module.permissions.map((perm: any) => (
+                          <td className="!text-end pie-0 !pr-4">
+                            <FormGroup className="flex-row justify-end flex-nowrap gap-6">
                               <FormControlLabel
                                 key={perm.id}
                                 className="mie-0"
@@ -270,9 +280,9 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
                                 }
                                 label={perm.permissionName}
                               />
-                            ))}
-                          </FormGroup>
-                        </td>
+                            </FormGroup>
+                          </td>
+                        ))}
                       </tr>
                     </React.Fragment>
                   ))}
@@ -280,7 +290,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
             </table>
           </div>
         </DialogContent>
-        <DialogActions className="justify-center pbs-0 sm:pbe-16 sm:pli-16 mb-[-3rem]">
+        <DialogActions className="justify-end pbs-0 sm:pbe-16 sm:pli-16 mb-[-3rem]">
           <Button variant="contained" type="submit">
             Submit
           </Button>
