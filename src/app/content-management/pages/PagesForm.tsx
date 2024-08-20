@@ -369,6 +369,106 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       }
     }
   };
+  // const handleInputChange = (
+  //   event: ChangeEvent<HTMLInputElement>,
+  //   sectionId: number,
+  //   index: number,
+  //   fieldIndex: number,
+  //   subFieldIndex?: any,
+  //   section?: any,
+  //   fieldLabel?: string,
+  //   subField?: string,
+  //   fieldType?: string,
+  //   feKey?: string
+  // ) => {
+  //   const { name, value, files } = event.target;
+  //   // Handling non-file input changes
+  //   setSections((prevSections) => {
+  //     const updatedSections = prevSections.map((sec, mainIndex) => {
+        
+        
+  //       if (mainIndex === index) {
+  //         const updatedSectionTemplate = sec.sectionTemplate.map((secTemplate: any, temIndex: any) => {
+  //           if (temIndex === fieldIndex) {
+  //             if (subFieldIndex !== undefined && secTemplate.fieldType === "multiple") {
+  //               secTemplate.multipleData[subFieldIndex][name] = value;
+  //               const validation = JSON.parse(secTemplate.multipleData[subFieldIndex].validation || "{}");
+  //               const error = validateField(value, validation, secTemplate.multipleData[subFieldIndex]);
+  //               setFormData((prevData) => ({
+  //                 ...prevData,
+  //                 templateData: {
+  //                   ...prevData.templateData,
+  //                   [`${index}+${fieldIndex}+${subFieldIndex}`]: {
+  //                     ...prevData.templateData[`${index}+${fieldIndex}+${subFieldIndex}`],
+  //                     [name]: value,
+  //                     error: error,
+  //                     sectionName: section.sectionSlug,
+  //                     orderId: section.sectionOrder,
+  //                     templateId: index,
+  //                     templateSectionId: temIndex,
+  //                     templateSectionMultipleId: subFieldIndex.toString(),
+  //                     fieldLabel: fieldLabel,
+  //                     subField: subField,
+  //                     fieldType: fieldType,
+  //                     keyMultiple: temIndex,
+  //                     feKey: feKey
+  //                   },
+  //                 },
+  //               }));
+  //               return {
+  //                 ...secTemplate,
+  //                 multipleData: secTemplate.multipleData.map((data: any, idx: any) => {
+  //                   if (idx === subFieldIndex) {
+  //                     return { ...data, error };
+  //                   }
+  //                   return data;
+  //                 }),
+  //               };
+  //             } else {
+  //               secTemplate[name] = value;
+  //               const validation = JSON.parse(secTemplate.validation || "{}");
+  //               const error = validateField(value, validation, secTemplate);
+  //               setFormData((prevData) => ({
+  //                 ...prevData,
+  //                 templateData: {
+  //                   ...prevData.templateData,
+  //                   [`${index}+${temIndex}`]: {
+  //                     ...prevData.templateData[`${index}+${temIndex}`],
+  //                     [name]: value,
+  //                     error: error,
+  //                     sectionName: section.sectionSlug,
+  //                     orderId: section.sectionOrder,
+  //                     templateId: index,
+  //                     templateSectionId: temIndex,
+  //                     templateSectionMultipleId: "",
+  //                     fieldLabel: fieldLabel,
+  //                     subField: subField,
+  //                     fieldType: fieldType,
+  //                     keyMultiple: temIndex,
+  //                     feKey: feKey
+  //                   },
+  //                 },
+  //               }));
+  //               return {
+  //                 ...secTemplate,
+  //                 error,
+  //               };
+  //             }
+  //           }
+  //           return secTemplate;
+  //         });
+  //         return {
+  //           ...sec,
+  //           sectionTemplate: updatedSectionTemplate,
+  //         };
+  //       }
+  //       return sec;
+  //     });
+  //     return updatedSections;
+  //   });
+  // };
+
+
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement>,
     sectionId: number,
@@ -385,49 +485,61 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     // Handling non-file input changes
     setSections((prevSections) => {
       const updatedSections = prevSections.map((sec, mainIndex) => {
-        
-        
         if (mainIndex === index) {
           const updatedSectionTemplate = sec.sectionTemplate.map((secTemplate: any, temIndex: any) => {
             if (temIndex === fieldIndex) {
+              // Handle multiple data with subFieldIndex
               if (subFieldIndex !== undefined && secTemplate.fieldType === "multiple") {
-                secTemplate.multipleData[subFieldIndex][name] = value;
-                const validation = JSON.parse(secTemplate.multipleData[subFieldIndex].validation || "{}");
-                const error = validateField(value, validation, secTemplate.multipleData[subFieldIndex]);
-                setFormData((prevData) => ({
-                  ...prevData,
-                  templateData: {
-                    ...prevData.templateData,
-                    [`${index}+${fieldIndex}+${subFieldIndex}`]: {
-                      ...prevData.templateData[`${index}+${fieldIndex}+${subFieldIndex}`],
-                      [name]: value,
-                      error: error,
-                      sectionName: section.sectionSlug,
-                      orderId: section.sectionOrder,
-                      templateId: index,
-                      templateSectionId: temIndex,
-                      templateSectionMultipleId: subFieldIndex.toString(),
-                      fieldLabel: fieldLabel,
-                      subField: subField,
-                      fieldType: fieldType,
-                      keyMultiple: temIndex,
-                      feKey: feKey
-                    },
-                  },
-                }));
-                return {
-                  ...secTemplate,
-                  multipleData: secTemplate.multipleData.map((data: any, idx: any) => {
-                    if (idx === subFieldIndex) {
-                      return { ...data, error };
+                const updatedMultipleData = secTemplate.multipleData.map((data: any, idx: any) => {
+                  if (idx === subFieldIndex) {
+                    // Replace preview key with empty string and update value
+                    if (data.hasOwnProperty('preview')) {
+                      data.preview = '';
                     }
-                    return data;
-                  }),
-                };
+                    data[name] = value;
+  
+                    const validation = JSON.parse(data.validation || "{}");
+                    const error = validateField(value, validation, data);
+  
+                    setFormData((prevData) => ({
+                      ...prevData,
+                      templateData: {
+                        ...prevData.templateData,
+                        [`${index}+${fieldIndex}+${subFieldIndex}`]: {
+                          ...prevData.templateData[`${index}+${fieldIndex}+${subFieldIndex}`],
+                          [name]: value,
+                          preview: data.preview,  // Update preview if needed
+                          error: error,
+                          sectionName: section.sectionSlug,
+                          orderId: section.sectionOrder,
+                          templateId: index,
+                          templateSectionId: temIndex,
+                          templateSectionMultipleId: subFieldIndex.toString(),
+                          fieldLabel: fieldLabel,
+                          subField: subField,
+                          fieldType: fieldType,
+                          keyMultiple: temIndex,
+                          feKey: feKey
+                        },
+                      },
+                    }));
+  
+                    return { ...data, error };
+                  }
+                  return data;
+                });
+  
+                return { ...secTemplate, multipleData: updatedMultipleData };
               } else {
+                // Handle non-multiple data
+                if (secTemplate.hasOwnProperty('preview')) {
+                  secTemplate.preview = '';
+                }
                 secTemplate[name] = value;
+  
                 const validation = JSON.parse(secTemplate.validation || "{}");
                 const error = validateField(value, validation, secTemplate);
+  
                 setFormData((prevData) => ({
                   ...prevData,
                   templateData: {
@@ -435,6 +547,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     [`${index}+${temIndex}`]: {
                       ...prevData.templateData[`${index}+${temIndex}`],
                       [name]: value,
+                      preview: secTemplate.preview,  // Update preview if needed
                       error: error,
                       sectionName: section.sectionSlug,
                       orderId: section.sectionOrder,
@@ -449,24 +562,23 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     },
                   },
                 }));
-                return {
-                  ...secTemplate,
-                  error,
-                };
+  
+                return { ...secTemplate, error };
               }
             }
             return secTemplate;
           });
-          return {
-            ...sec,
-            sectionTemplate: updatedSectionTemplate,
-          };
+            console.log(formData);
+            
+          return { ...sec, sectionTemplate: updatedSectionTemplate };
         }
         return sec;
       });
+  
       return updatedSections;
     });
   };
+  
 
  
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(
