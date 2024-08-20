@@ -2,7 +2,6 @@
 import { useEffect, useState, useMemo } from "react";
 // MUI Imports
 import Card from "@mui/material/Card";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import TablePagination from "@mui/material/TablePagination";
@@ -34,13 +33,8 @@ import { useRouter } from "next/navigation";
 import BreadCrumbList from "@components/BreadCrumbList";
 // Type Imports
 import { RolesType } from "@/types/apps/rolesType";
-import {
-  redirectToAddPage,
-  redirectToEditPage,
-} from "@/services/endpoint/users/roles";
 import RoleCards from "./RolesCard";
 import { Chip, MenuItem } from "@mui/material";
-import { formatDate } from "@/utils/formatDate";
 import RoleDialog from "./RoleDialog";
 
 declare module "@tanstack/table-core" {
@@ -155,14 +149,6 @@ const RolesListTable = ({
           </Typography>
         ),
       }),
-      // columnHelper.accessor("roleDescription", {
-      //   header: "Description",
-      //   cell: ({ row }) => (
-      //     <Typography color="text.primary" className="font-medium">
-      //       {row.original.roleDescription}
-      //     </Typography>
-      //   ),
-      // }),
       columnHelper.accessor("createdAt", {
         header: "Created At",
         cell: ({ row }) => (
@@ -264,12 +250,9 @@ const RolesListTable = ({
       });
     }
   }, [deletingId, openDialog]);
-  const orgId = localStorage.getItem('selectedOrgId');
+  const orgId = localStorage.getItem("selectedOrgId");
   return (
     <>
-      <div className="my-2">
-        <RoleCards openDialog={openDialog} setOpenDialog={setOpenDialog} />
-      </div>
       <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
         <BreadCrumbList />
         <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
@@ -309,14 +292,7 @@ const RolesListTable = ({
               <MenuItem value="inactive">Inactive</MenuItem>
             </CustomTextField>
           </div>
-          {/* <Button
-            variant="contained"
-            startIcon={<i className="tabler-plus" />}
-            onClick={() => router.push(redirectToAddPage)}
-            className="is-full sm:is-auto"
-          >
-            Add Role
-          </Button> */}
+          <RoleCards openDialog={openDialog} setOpenDialog={setOpenDialog} />
         </div>
       </div>
 
@@ -413,7 +389,7 @@ const RolesListTable = ({
         setOpen={(arg1: boolean) => setIsDeleting(arg1)}
         deletePayload={{
           roleId: deletingId,
-          organizationId:orgId,
+          organizationId: orgId,
         }}
       />
 
