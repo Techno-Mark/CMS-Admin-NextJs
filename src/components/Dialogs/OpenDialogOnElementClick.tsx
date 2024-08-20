@@ -5,7 +5,7 @@ import { useState } from "react";
 import type { ComponentType } from "react";
 
 type OpenDialogOnElementClickProps = {
-  element: ComponentType<any>;
+  element: ComponentType<any>; 
   dialog: ComponentType<any>;
   elementProps?: any;
   dialogProps?: any;

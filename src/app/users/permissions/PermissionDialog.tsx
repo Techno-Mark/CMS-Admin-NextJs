@@ -70,7 +70,7 @@ const PermissionForm = ({
           });
         }}
       />
-      <FormControlLabel
+      {/* <FormControlLabel
         control={
           <Switch
             checked={permissionData.status}
@@ -83,7 +83,7 @@ const PermissionForm = ({
           />
         }
         label="Status"
-      />
+      /> */}
     </DialogContent>
     <DialogActions className="flex max-sm:flex-col max-sm:items-center max-sm:gap-2 justify-center pbs-0 sm:pbe-16 sm:pli-16">
       <Button type="submit" variant="contained" onClick={handleSubmit}>
@@ -110,7 +110,7 @@ const PermissionDialog = ({
   const initialPermissionData: PermissionDataType = {
     permissionId: 0,
     permissionName: "",
-    status: false,
+    status: true,
   };
 
   const [permissionData, setPermissionData] = useState<PermissionDataType>(

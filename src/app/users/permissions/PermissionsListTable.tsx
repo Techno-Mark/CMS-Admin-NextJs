@@ -164,26 +164,26 @@ const PermissionsListTable = ({
           </Typography>
         ),
       }),
-      columnHelper.accessor("active", {
-        header: "Status",
-        cell: ({ row }) => (
-          <div className="flex items-center gap-3">
-            <Chip
-              variant="tonal"
-              className="capitalize"
-              label={row.original.active ? "Active" : "Inactive"}
-              color={row.original.active ? "success" : "error"}
-              size="small"
-            />
-          </div>
-        ),
-      }),
+      // columnHelper.accessor("active", {
+      //   header: "Status",
+      //   cell: ({ row }) => (
+      //     <div className="flex items-center gap-3">
+      //       <Chip
+      //         variant="tonal"
+      //         className="capitalize"
+      //         label={row.original.active ? "Active" : "Inactive"}
+      //         color={row.original.active ? "success" : "error"}
+      //         size="small"
+      //       />
+      //     </div>
+      //   ),
+      // }),
       columnHelper.accessor("permissionId", {
         header: "Action",
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
-              <IconButton
+              {/* <IconButton
                 onClick={() => {
                   setOpen(true);
                   setAddOpen(true);
@@ -191,7 +191,7 @@ const PermissionsListTable = ({
                 }}
               >
                 <i className="tabler-edit text-[22px] text-textSecondary" />
-              </IconButton>
+              </IconButton> */}
               <IconButton
                 onClick={() => {
                   setIsDeleting(true);
