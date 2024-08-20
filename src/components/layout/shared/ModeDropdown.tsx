@@ -42,7 +42,7 @@ const ModeDropdown = () => {
   
         if (storedOrgId) {
           const parsedOrgId = parseInt(storedOrgId, 10);
-          const matchingOrg = orgs.find(org => org.id === parsedOrgId);
+          const matchingOrg = orgs.find(org => parseInt(org.id) === parsedOrgId);
   
           if (matchingOrg) {
             setSelectedOrgId(parsedOrgId);
