@@ -178,33 +178,33 @@ const PermissionsListTable = ({
       //     </div>
       //   ),
       // }),
-      columnHelper.accessor("permissionId", {
-        header: "Action",
-        cell: ({ row }) => {
-          return (
-            <div className="flex items-center">
-              {/* <IconButton
-                onClick={() => {
-                  setOpen(true);
-                  setAddOpen(true);
-                  setEditValue(row.original.permissionId);
-                }}
-              >
-                <i className="tabler-edit text-[22px] text-textSecondary" />
-              </IconButton> */}
-              <IconButton
-                onClick={() => {
-                  setIsDeleting(true);
-                  setDeletingId(row.original.permissionId);
-                }}
-              >
-                <i className="tabler-trash text-[22px] text-textSecondary" />
-              </IconButton>
-            </div>
-          );
-        },
-        enableSorting: false,
-      }),
+      // columnHelper.accessor("permissionId", {
+      //   header: "Action",
+      //   cell: ({ row }) => {
+      //     return (
+      //       <div className="flex items-center">
+      //         {/* <IconButton
+      //           onClick={() => {
+      //             setOpen(true);
+      //             setAddOpen(true);
+      //             setEditValue(row.original.permissionId);
+      //           }}
+      //         >
+      //           <i className="tabler-edit text-[22px] text-textSecondary" />
+      //         </IconButton> */}
+      //         <IconButton
+      //           onClick={() => {
+      //             setIsDeleting(true);
+      //             setDeletingId(row.original.permissionId);
+      //           }}
+      //         >
+      //           <i className="tabler-trash text-[22px] text-textSecondary" />
+      //         </IconButton>
+      //       </div>
+      //     );
+      //   },
+      //   enableSorting: false,
+      // }),
     ],
     []
   );
