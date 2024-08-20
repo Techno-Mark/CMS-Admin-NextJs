@@ -1,38 +1,15 @@
 
 import LoadingBackdrop from "@/components/LoadingBackdrop";
-import {
-  Button,
-  Box,
-  Card,
-  Grid,
-  MenuItem,
-  Typography,
-  TextField,
-  Switch,
-  IconButton,
-} from "@mui/material";
+import { Button, Box, Card, Grid, MenuItem, Typography, IconButton, CardContent, CardActions, ButtonGroup, Tooltip, } from "@mui/material";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { useDropzone } from "react-dropzone";
 import { get, post } from "@/services/apiService";
 import { template } from "@/services/endpoint/template";
 import CustomTextField from "@/@core/components/mui/TextField";
-import { useRouter } from "next/navigation";
-import { boolean } from "valibot";
-import AppReactDatepicker from "@/libs/styles/AppReactDatepicker";
 import { PagesType } from "./pagesType";
 import { pages } from "@/services/endpoint/pages";
 import { toast } from "react-toastify";
-
-type FileProp = {
-  name: string;
-  type: string;
-  size: number;
-};
-
-const sectionActions = {
-  ADD: -1,
-  EDIT: 1,
-};
+import BreadCrumbList from "@/components/BreadCrumbList";
+import { v4 as uuidv4 } from 'uuid'; 
 
 const initialFormData = {
   pageId: "",
@@ -43,9 +20,21 @@ const initialFormData = {
   metaTitle: "",
   metaDescription: "",
   metaKeywords: "",
-  // scheduleDate: new Date().toISOString().split('T')[0],
   templateData: {} as Record<string, any>,
-  // status: false
+  sectionData: {} as Record<string, any>,
+  sections: [
+    {
+      sectionName: 'Section 1',
+      sectionTemplate: [
+        {
+          fieldLabel: 'Field 1',
+          fieldType: 'multiple',
+          isRequired: true,
+          validation: '{}',
+          multipleData: [{ fieldType: 'text', fieldLabel: 'Subfield 1', isRequired: true, validation: '{}', },
+          ],
+        }]
+    }]
 };
 
 const initialErrorData = {
@@ -57,7 +46,6 @@ const initialErrorData = {
   metaDescription: "",
   metaKeywords: "",
   templateData: {} as Record<string, any>,
-  // scheduleDate: ""
 };
 type Props = {
   open: -1 | 0 | 1;
@@ -66,8 +54,7 @@ type Props = {
   setEditingRow: React.Dispatch<React.SetStateAction<PagesType | null>>;
 };
 function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
-  const router = useRouter();
-  const [files, setFiles] = useState<File[]>([]);
+
   const [formData, setFormData] = useState<typeof initialFormData>(
     initialFormData
   );
@@ -79,35 +66,37 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   >([]);
   const [sections, setSections] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [PDStatus, setPDStatus] = useState<boolean>(false);
-  const { getRootProps, getInputProps } = useDropzone({
-    multiple: false,
-    accept: {
-      "image/*": [".png", ".jpg", ".jpeg"],
-    },
-    onDrop: (acceptedFiles: File[]) => {
-      setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
-    },
-  });
 
   useEffect(() => {
-    setLoading(true);
     if (editingRow) {
+      setLoading(true);
       setFormData(editingRow);
-      getTemplateIdWiseForm(editingRow.templateId);
-      setLoading(false);
+      // getTemplateIdWiseForm(editingRow.templateId);
+      if (editingRow.sectionData) {
+        const sectionsWithErrors = editingRow.sectionData.map((section: any) => ({
+          ...section,
+          errors: section.sectionTemplate.reduce((acc: any, field: any) => {
+            acc[field.fieldType] = "";
+            return acc;
+          }, {}),
+        }));
+        setSections(sectionsWithErrors);
+          setLoading(false);
+      }
+     
     } else {
       setFormData(initialFormData);
       setLoading(false);
     }
   }, [editingRow]);
   useEffect(() => {
+    setLoading(true);
     async function getTemplate() {
       await getActiveTemplateList();
+      setLoading(false);
     }
     getTemplate();
   }, []);
-
   const getActiveTemplateList = async () => {
     try {
       setLoading(true);
@@ -120,9 +109,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       setLoading(false);
     }
   };
-
-
-
   const getTemplateIdWiseForm = async (templateId: number) => {
     setLoading(true);
     try {
@@ -135,7 +121,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
             return acc;
           }, {}),
         }));
-
         setSections(sectionsWithErrors);
         setLoading(false);
       }
@@ -144,20 +129,10 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       setLoading(false);
     }
   };
-
-  const resetSectionsAndData = () => {
-    setSections([]);
-    setFormData((prevData) => ({
-      ...prevData,
-      templateData: {},
-    }));
-  };
-
   const validateField = (value: string, validation: any, field?: any) => {
-    console.log(field);
 
     if (!value && field?.isRequired) {
-      return `${field?.fieldLabel} is required`
+      return `${field?.fieldLabel} is required`;
     }
     if (field?.fieldType == 'email') {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -166,16 +141,20 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       }
     }
 
+  if (field?.fieldType === 'file') {
+    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
+    const extendedUrlRegex = /^(https?|ftp):\/\/[^\s/$.?#].*[^\s]*\.[^\s]*$/i;
+    if (!urlRegex.test(value) && !extendedUrlRegex.test(value)) {
+      return `Invalid URL format`;
+    }
+  }
+
     if (validation.maxLength && value.length > validation.maxLength) {
       return `Maximum length is ${validation.maxLength}`;
     }
-
-
     if (validation.minLength && value.length < validation.minLength) {
       return `Minimum length is ${validation.minLength}`;
     }
-
-
     if (validation.min !== undefined && validation.max !== undefined) {
       if (parseFloat(value) > parseFloat(validation.max)) {
         return `Maximum value is ${validation.max}`;
@@ -184,11 +163,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
         return `Minimum value is ${validation.min}`;
       }
     } else {
-
       if (validation.min !== undefined && parseFloat(value) < parseFloat(validation.min)) {
         return `Minimum value is ${validation.min}`;
       }
-
       if (validation.max !== undefined && parseFloat(value) > parseFloat(validation.max)) {
         return `Maximum value is ${validation.max}`;
       }
@@ -199,118 +176,188 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
         return `Value does not match the required pattern`;
       }
     }
-
-
-    // if (validation.accept) {
-    //   const acceptedTypes = validation.accept.split(',').map((type: any) => type.trim());
-    //   const fileExtension = value.split('.').pop();
-    //   if (fileExtension && !acceptedTypes.includes(`.${fileExtension}`)) {
-    //     return `Only accept ${validation.accept}`;
-    //   }
-    // }
-
-    // if (validation.accept) {
-    //   const acceptedTypes = validation.accept.split(',').map((type: any) => type.trim());
-    //   const fileExtension = value.split('.').pop();
-    //   if (fileExtension && !acceptedTypes.includes(`.${fileExtension}`)) {
-    //     return `Only accept ${validation.accept}`;
-    //   }
-    // }
-
     return "";
   };
-
   const validateForm = () => {
     let valid = true;
     let errors = { ...initialErrorData };
     let updatedSections = [...sections];
-
-    // Validate form-level fields
+    const slugRegex = /^[a-zA-Z0-9/-]+$/;
     if (formData.templateId === -1) {
       errors.templateId = "Please select a template";
       valid = false;
     }
-
     if (!formData.title) {
       errors.title = "Title is required";
       valid = false;
     }
 
-    if (!formData.slug) {
-      errors.slug = "Slug is required";
+    if (formData.slug.trim().length === 0) {
+      errors.slug = 'Slug is required';
+      valid = false;
+    } else if (!slugRegex.test(formData.slug)) {
+      errors.slug = 'Slug must be alphanumeric with no spaces or special characters.';
       valid = false;
     }
-
     if (!formData.content) {
       errors.content = "Content is required";
       valid = false;
     }
-
     if (!formData.metaTitle) {
       errors.metaTitle = "Meta Title is required";
       valid = false;
     }
-
     if (!formData.metaDescription) {
       errors.metaDescription = "Meta Description is required";
       valid = false;
     }
-
     if (!formData.metaKeywords) {
       errors.metaKeywords = "Meta Keywords are required";
       valid = false;
     }
 
-    updatedSections = updatedSections.map((section, secIndex) => {
-      const updatedSectionTemplate = section.sectionTemplate.map((field:
-        {
-          fieldLabel: string;
-          fieldType: string;
-          isRequired: boolean;
-          validation: string;
-        },
-        fieldIndex: any) => {
-        const value = formData.templateData[`${secIndex}+${fieldIndex}`]?.[field.fieldType] || '';
-        const validation = JSON.parse(field.validation || "{}");
-
-        const error = validateField(value, validation, field);
-
-        if (error) {
-          valid = false;
-        }
-
+    if (formData.templateData) {
+      updatedSections = updatedSections.map((section, secIndex) => {
+        const updatedSectionTemplate = section.sectionTemplate.map((field: any, fieldIndex: any) => {
+          let error = "";
+          const value = formData.templateData[`${secIndex}+${fieldIndex}`]?.[field.fieldType] || '';
+          const validation = JSON.parse(field.validation || "{}");
+          if (field.fieldType === "multiple") {
+            field.multipleData = field.multipleData.map((subField: any, subFieldIndex: any) => {
+              const subValue = formData.templateData[`${secIndex}+${fieldIndex}+${subFieldIndex}`]?.[subField.fieldType] || '';
+              const subValidation = JSON.parse(subField.validation || "{}");
+              const subError = validateField(subValue, subValidation, subField);
+              if (subError) {
+                valid = false;
+              }
+              return {
+                ...subField,
+                error: subError,
+              };
+            });
+          } else {
+            error = validateField(value, validation, field);
+            if (error) {
+              valid = false;
+            }
+          }
+          return {
+            ...field,
+            error,
+          };
+        });
         return {
-          ...field,
-          error,
+          ...section,
+          sectionTemplate: updatedSectionTemplate,
         };
       });
-
-      return {
-        ...section,
-        sectionTemplate: updatedSectionTemplate,
-      };
-    });
-
+    }
     setSections(updatedSections);
     setFormErrors(errors);
-    console.log(sections);
-    console.log(formData);
-
     return valid;
   };
-
-
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent, pdStatus: boolean) => {
     event.preventDefault();
     if (validateForm()) {
       try {
         setLoading(true);
+        const formattedData: any[] = [];
+        Object.keys(formData.templateData).forEach(key => {
+          const content = formData.templateData[key];
+          const sectionName = content.sectionName;
+          const keyMultiple = content.keyMultiple;
+          const sectionMultipleId = content.templateSectionMultipleId;
+          let contentBlock = formattedData.find(block => block[`${sectionName}`]);
+          if (!contentBlock) {
+            contentBlock = { [`${sectionName}`]: [] };
+            formattedData.push(contentBlock);
+          }
+          let formattedContent;
+          switch (content.fieldType) {
+            case 'email':
+              formattedContent = {
+                // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
+                // Value: content.email || "",
+                //   [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.email || ""
+                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.email || ""
+
+              };
+              break;
+            case 'file':
+              formattedContent = {
+                // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
+                // Value: content.file || "",
+                // Preview: content.preview || "",
+                // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.preview
+                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.file
+              };
+              break;
+            case 'url':
+              formattedContent = {
+                // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
+                // Value: content.url || "",
+                // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.url
+                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.url
+              };
+              break;
+            case 'date':
+              formattedContent = {
+                // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
+                // Value: content.date || "",
+                // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.date
+                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.date
+              };
+              break;
+            case 'number':
+              formattedContent = {
+                // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
+                // Value: content.number || "",
+                // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.number
+                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.number
+              };
+              break;
+            case 'textarea':
+              formattedContent = {
+                // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
+                // Value: content.textarea || "",
+                // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.textarea
+                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.textarea
+              };
+              break;
+            case 'text':
+            default:
+              formattedContent = {
+                // Label: sectionMultipleId ? content.subField : content.fieldLabel || "",
+                // Value: content.text || "",
+                // [sectionMultipleId ? content.subField : content.fieldLabel || ""]: content.text
+                [sectionMultipleId ? content.feKey : content.feKey || ""]: content.text
+              };
+              break;
+          }
+          if (sectionMultipleId) {
+            let nestedSection = contentBlock[`${sectionName}`].find((section: { [x: string]: any; }) => section[`${content.fieldLabel}`]);
+            if (!nestedSection) {
+              nestedSection = { [`${content.fieldLabel}`]: [] };
+              contentBlock[`${sectionName}`].push(nestedSection);
+            }
+            let groupedArray = nestedSection[`${content.fieldLabel}`].find((item: any) => item.keyMultiple === keyMultiple);
+            if (!groupedArray) {
+              groupedArray = { keyMultiple, items: [] };
+              nestedSection[`${content.fieldLabel}`].push(groupedArray);
+            }
+            groupedArray.items.push({ ...formattedContent });
+          } else {
+            contentBlock[`${sectionName}`].push(formattedContent);
+          }
+        });
         const endpoint = editingRow ? pages.update : pages.create;
         const result = await post(endpoint, {
           ...formData,
           pageId: editingRow ? formData.pageId : undefined,
           templateData: formData.templateData,
-          active: PDStatus
+          formatData: formattedData,
+          sectionData: sections,
+          active: pdStatus
         });
         toast.success(result.message);
         handleClose();
@@ -322,108 +369,106 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       }
     }
   };
-
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement>,
     sectionId: number,
     index: number,
-    fieldIndex: number
+    fieldIndex: number,
+    subFieldIndex?: any,
+    section?: any,
+    fieldLabel?: string,
+    subField?: string,
+    fieldType?: string,
+    feKey?: string
   ) => {
     const { name, value, files } = event.target;
-
-    if (files && files[0]) {
-      const file = files[0];
-      const reader = new FileReader();
-
-      reader.onloadend = () => {
-        setSections((prevSections) => {
-          const updatedSections = prevSections.map((sec, mainIndex) => {
-            if (mainIndex === index) {
-              const sectionName = sec.sectionName;
-
-              const updatedSectionsTemp = sec.sectionTemplate.map(
-                (secTemplate: any, temIndex: any) => {
-                  if (temIndex === fieldIndex) {
-                    sec.sectionTemplate[temIndex][name] = value;
-                    const validation = JSON.parse(secTemplate.validation || "{}");
-                    const error = validateField(value, validation);
-                    setFormData((prevData) => ({
-                      ...prevData,
-                      templateData: {
-                        ...prevData.templateData,
-                        [`${index}+${temIndex}`]: {
-                          file,
-                          preview: reader.result as string,
-                          error: error,
-                        },
-                      },
-                    }));
-                  }
-                }
-              );
-            }
-            return sec;
-          });
-          return updatedSections;
-        });
-
-
-
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setSections((prevSections) => {
-        const updatedSections = prevSections.map((sec, mainIndex) => {
-          if (mainIndex === index) {
-            const sectionName = sec.sectionName;
-
-            const updatedSectionTemplate = sec.sectionTemplate.map(
-              (secTemplate: any, temIndex: any) => {
-                if (temIndex === fieldIndex) {
-                  secTemplate[name] = value;
-                  console.log(value);
-
-                  const validation = JSON.parse(secTemplate.validation || "{}");
-                  const error = validateField(value, validation);
-
-                  // Update formData with value and error
-                  setFormData((prevData) => ({
-                    ...prevData,
-                    templateData: {
-                      ...prevData.templateData,
-                      [`${index}+${temIndex}`]: {
-                        ...prevData.templateData[sectionName],
-                        [name]: value,
-                        error: error,
-                      },
-
+    // Handling non-file input changes
+    setSections((prevSections) => {
+      const updatedSections = prevSections.map((sec, mainIndex) => {
+        
+        
+        if (mainIndex === index) {
+          const updatedSectionTemplate = sec.sectionTemplate.map((secTemplate: any, temIndex: any) => {
+            if (temIndex === fieldIndex) {
+              if (subFieldIndex !== undefined && secTemplate.fieldType === "multiple") {
+                secTemplate.multipleData[subFieldIndex][name] = value;
+                const validation = JSON.parse(secTemplate.multipleData[subFieldIndex].validation || "{}");
+                const error = validateField(value, validation, secTemplate.multipleData[subFieldIndex]);
+                setFormData((prevData) => ({
+                  ...prevData,
+                  templateData: {
+                    ...prevData.templateData,
+                    [`${index}+${fieldIndex}+${subFieldIndex}`]: {
+                      ...prevData.templateData[`${index}+${fieldIndex}+${subFieldIndex}`],
+                      [name]: value,
+                      error: error,
+                      sectionName: section.sectionSlug,
+                      orderId: section.sectionOrder,
+                      templateId: index,
+                      templateSectionId: temIndex,
+                      templateSectionMultipleId: subFieldIndex.toString(),
+                      fieldLabel: fieldLabel,
+                      subField: subField,
+                      fieldType: fieldType,
+                      keyMultiple: temIndex,
+                      feKey: feKey
                     },
-                  }));
-
-                  return {
-                    ...secTemplate,
-                    error
-                  };
-                }
-                return secTemplate;
+                  },
+                }));
+                return {
+                  ...secTemplate,
+                  multipleData: secTemplate.multipleData.map((data: any, idx: any) => {
+                    if (idx === subFieldIndex) {
+                      return { ...data, error };
+                    }
+                    return data;
+                  }),
+                };
+              } else {
+                secTemplate[name] = value;
+                const validation = JSON.parse(secTemplate.validation || "{}");
+                const error = validateField(value, validation, secTemplate);
+                setFormData((prevData) => ({
+                  ...prevData,
+                  templateData: {
+                    ...prevData.templateData,
+                    [`${index}+${temIndex}`]: {
+                      ...prevData.templateData[`${index}+${temIndex}`],
+                      [name]: value,
+                      error: error,
+                      sectionName: section.sectionSlug,
+                      orderId: section.sectionOrder,
+                      templateId: index,
+                      templateSectionId: temIndex,
+                      templateSectionMultipleId: "",
+                      fieldLabel: fieldLabel,
+                      subField: subField,
+                      fieldType: fieldType,
+                      keyMultiple: temIndex,
+                      feKey: feKey
+                    },
+                  },
+                }));
+                return {
+                  ...secTemplate,
+                  error,
+                };
               }
-            );
-
-            return {
-              ...sec,
-              sectionTemplate: updatedSectionTemplate,
-            };
-          }
-          return sec;
-        });
-        console.log(updatedSections);
-        return updatedSections;
+            }
+            return secTemplate;
+          });
+          return {
+            ...sec,
+            sectionTemplate: updatedSectionTemplate,
+          };
+        }
+        return sec;
       });
-
-    }
+      return updatedSections;
+    });
   };
 
-
+ 
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(
     false
   );
@@ -434,54 +479,191 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     setFormData((prevData) => ({
       ...prevData,
       title: newName,
-      slug:
-        !isSlugManuallyEdited && open === sectionActions.ADD
-          ? newName
-            .replace(/[^\w\s]|_/g, "")
-            .replace(/\s+/g, "-")
-            .toLowerCase()
-          : prevData.slug,
     }));
   };
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSlug = e.target.value.toLowerCase();
-    setFormErrors({ ...formErrors, slug: "" });
+
+    const newSlug = e.target.value;
+    const slugRegex = /^[a-zA-Z0-9/-]+$/;
+
+
+    if (!slugRegex.test(newSlug)) {
+      setFormErrors({ ...formErrors, slug: "Slug must be alphanumeric with no spaces, or underscores." });
+    } else {
+      setFormErrors({ ...formErrors, slug: "" });
+    }
+
     setFormData((prevData) => ({
       ...prevData,
       slug: newSlug,
     }));
     setIsSlugManuallyEdited(true);
+
   };
 
+  // const handleAddDuplicateForm = (index: number, fieldIndex: number) => {
+  //   const newSectionTemplate = [...sections[index].sectionTemplate];
+  //   const duplicateField = { ...newSectionTemplate[fieldIndex] };
+  //   newSectionTemplate.push({ ...duplicateField });
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     updatedSections[index].sectionTemplate = newSectionTemplate;
+  //     return updatedSections;
+  //   });
+  // };
 
-  const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedTemplateId = parseInt(e.target.value);
-    setFormErrors({ ...formErrors, templateId: "" });
-    setFormData((prevData) => ({
-      ...prevData,
-      templateId: selectedTemplateId,
-    }));
-    resetSectionsAndData();
-    getTemplateIdWiseForm(selectedTemplateId);
+
+  const handleAddDuplicateForm = (sectionIndex: number, fieldIndex: number) => {
+    setSections((prevSections) => {
+      // Copy the existing sections
+      const updatedSections = [...prevSections];
+      // Access the section template that contains the multiple field
+      const sectionTemplate = updatedSections[sectionIndex].sectionTemplate;
+  
+      // Get the object that needs to be duplicated
+      const multipleField = sectionTemplate[fieldIndex];
+  
+      if (multipleField.fieldType === "multiple") {
+        // Create a deep copy of the entire multiple field object
+        const duplicatedMultipleField = {
+          ...multipleField,
+          multipleData: multipleField.multipleData.map((item: any) => ({
+            ...item,
+          })),
+        };
+  
+        // Append the duplicated multiple field object to the section template
+        sectionTemplate.splice(fieldIndex + 1, 0, duplicatedMultipleField);
+      }
+  
+      return updatedSections;
+    });
   };
-  const handleRemoveFile = (sectionIndex: number, fieldIndex: number) => {
-    setFormData((prevData) => {
-      const updatedTemplateData = { ...prevData.templateData };
-      delete updatedTemplateData[`${sectionIndex}+${fieldIndex}`];
+  // const handleAddDuplicateForm = (sectionIndex: number, fieldIndex: number) => {
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     const section = updatedSections[sectionIndex];
+  //     const sectionTemplate = [...section.sectionTemplate];
+  
+  //     // Create a duplicate of the field and assign a new unique key
+  //     const fieldToDuplicate = sectionTemplate[fieldIndex];
+  //     const duplicateField = { ...fieldToDuplicate, fekey: uuidv4() };
+  
+  //     // Add the duplicate field to the sectionTemplate
+  //     sectionTemplate.push(duplicateField);
+  
+  //     updatedSections[sectionIndex] = {
+  //       ...section,
+  //       sectionTemplate,
+  //     };
+  
+  //     return updatedSections;
+  //   });
+  
+  //   // Optionally, handle formData here if needed
+  // };
 
+  const handleRemoveDuplicateForm = (sectionIndex: number, fieldIndex: number) => {
+    setSections((prevSections) => {
+      const updatedSections = [...prevSections];
+      const section = updatedSections[sectionIndex];
+      const sectionTemplate = [...section.sectionTemplate];
+  
+      // Remove the specific field from the template
+      if (sectionTemplate.length > 1) {
+        sectionTemplate.splice(fieldIndex, 1);
+        updatedSections[sectionIndex] = {
+          ...section,
+          sectionTemplate,
+        };
+      }
+  
+      return updatedSections;
+    });
+  
+    setFormData((prevFormData) => {
+      const newTemplateData = { ...prevFormData.templateData };
+  
+      // Clean up formData related to the removed field
+      Object.keys(newTemplateData).forEach((key) => {
+        const [secIdx, fldIdx] = key.split('+').map(Number);
+  
+        // Remove entries corresponding to the removed field
+        if (secIdx === sectionIndex && fldIdx === fieldIndex) {
+          delete newTemplateData[key];
+        }
+  
+        // Adjust keys for fields that come after the removed one
+        if (secIdx === sectionIndex && fldIdx > fieldIndex) {
+          const newKey = `${secIdx}+${fldIdx - 1}`;
+          newTemplateData[newKey] = newTemplateData[key];
+          delete newTemplateData[key];
+        }
+      });
+  
       return {
-        ...prevData,
-        templateData: updatedTemplateData,
+        ...prevFormData,
+        templateData: newTemplateData,
       };
     });
-  }
+  };
+  
+
+  // const handleRemoveDuplicateForm = (sectionIndex: number, fieldIndex: number) => {
+  //   setSections((prevSections) => {
+  //     const updatedSections = [...prevSections];
+  //     const section = updatedSections[sectionIndex];
+  //     const sectionTemplate = [...section.sectionTemplate];
+  
+  //     // Remove the field from the sectionTemplate if more than one field exists
+  //     if (sectionTemplate.length > 1) {
+  //       sectionTemplate.splice(fieldIndex, 1);
+  //       updatedSections[sectionIndex] = {
+  //         ...section,
+  //         sectionTemplate,
+  //       };
+  //     }
+  
+  //     return updatedSections;
+  //   });
+  
+  //   setFormData((prevFormData) => {
+  //     const newTemplateData = { ...prevFormData.templateData };
+  
+  //     // Clean up formData related to the removed field
+  //     Object.keys(newTemplateData).forEach((key) => {
+  //       const [secIdx, fldIdx] = key.split('+').map(Number);
+  
+  //       if (secIdx === sectionIndex && fldIdx === fieldIndex) {
+  //         delete newTemplateData[key];
+  //       }
+  
+  //       // Adjust keys for fields that come after the removed one
+  //       if (secIdx === sectionIndex && fldIdx > fieldIndex) {
+  //         const newKey = `${secIdx}+${fldIdx - 1}`;
+  //         newTemplateData[newKey] = newTemplateData[key];
+  //         delete newTemplateData[key];
+  //       }
+  //     });
+  
+  //     return {
+  //       ...prevFormData,
+  //       templateData: newTemplateData,
+  //     };
+  //   });
+  // };
+  
+  
+
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
+      <BreadCrumbList />
       <Card>
         <div>
-          <form className="flex flex-col gap-6 p-6" onSubmit={handleSubmit}>
+          <form className="flex flex-col gap-6 p-6" // onSubmit={handleSubmit}
+           >
             <Box display="flex" alignItems="center">
               <Grid container spacing={4}>
                 <Grid item xs={12} sm={6}>
@@ -497,7 +679,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <CustomTextField
-                    disabled={open === sectionActions.EDIT}
+                    // disabled={open === sectionActions.EDIT}
                     error={!!formErrors.slug}
                     helperText={formErrors.slug}
                     label="Slug *"
@@ -507,8 +689,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     onChange={handleSlugChange}
                   />
                 </Grid>
-
-
                 <Grid item xs={12} sm={6}>
                   <CustomTextField
                     error={!!formErrors.content}
@@ -586,7 +766,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     }}
                   />
                 </Grid>
-
                 <Grid item xs={12} sm={12}>
                   <CustomTextField
                     error={!!formErrors.templateId}
@@ -601,6 +780,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                       const templateId = Number(e.target.value);
                       setFormData({ ...formData, templateId });
                       getTemplateIdWiseForm(templateId);
+
                     }}
                     inputProps={{}}
                   >
@@ -616,175 +796,160 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                       ))}
                   </CustomTextField>
                 </Grid>
-                {sections.map((section, index) => (
-                  <Grid item xs={6} key={index}>
-                    <Typography variant="h6">{section.sectionName}</Typography>
-                    {section.sectionTemplate.map(
-                      (
-                        field: {
-                          fieldLabel: string;
-                          fieldType: string;
-                          isRequired: boolean;
-                          validation: string;
-                          error: string
-                        },
-                        fieldIndex: number
-                      ) => (
-                        <div key={fieldIndex}>
-                          {field.fieldType === "file" ? (
-                            <>
-                              <CustomTextField
-                                label={field.isRequired === true ? `${field.fieldLabel} *` : field.fieldLabel}
-                                name={field.fieldType}
-                                // required={!editingRow == field.isRequired}
-                                type="file"
-                                fullWidth
-                                margin="normal"
-                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                  handleInputChange(
-                                    e,
-                                    section.sectionId,
-                                    index,
-                                    fieldIndex
-                                  )
-                                }
-                                //@ts-ignore
-                                error={
-                                  field.error && field.error
-                                }
-                                helperText={field.error && field.error}
-                                InputLabelProps={{ shrink: true }}
-                              />
-                              {formData.templateData &&
-                                formData.templateData[`${index}+${fieldIndex}`]?.preview && (
-                                  <Box mt={2} display="flex" flexDirection="column" alignItems="end">
-                                  <IconButton 
-                                    size="large"
-                                    onClick={() => handleRemoveFile(index, fieldIndex)}
-                                    aria-label="minus"
-                                    color="error"
-                                    style={{ marginBottom: '8px' }}
-                                  >
-                                    <i className="tabler-minus" />
-                                  </IconButton>
-                                
-                                  <Box
-                                    component="img"
-                                    src={formData.templateData[`${index}+${fieldIndex}`]?.preview}
-                                    alt="Preview"
-                                    sx={{
-                                      width: "100%",
-                                      maxHeight: "200px",
-                                      objectFit: "contain",
-                                      borderRadius: '4px',
-                                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                                    }}
-                                  />
-                                </Box>
-                                
-                                  // <Box mt={2}>
-
-                                    
-                                  //   <IconButton 
-                                  //     size="large"
-                                  //     onClick={() => handleRemoveFile(index, fieldIndex)}
-                                  //     aria-label="minus"
-                                  //     color="error"
+                <Grid item xs={12} sm={12}>
+                  {sections.map((section, index) => (
+                    <Card key={index} variant="outlined" style={{ marginBottom: '10px' }} >
+                      <CardContent>
+                        <Typography variant="h5">{section.sectionName}</Typography>
+                        {section.sectionTemplate.map((field: any, fieldIndex: number) => (
+                          <Grid container key={`${index}+${fieldIndex}`} spacing={2}>
+                            {field.fieldType === 'multiple' ? (
+                              <Grid item xs={12} style={{ marginBottom: '10px' }}>
+                                <Card variant="outlined">
+                                  <CardActions>
+                                    <Grid container xs={12} sm={12} spacing={2}>
+                                      <Grid item xs={10}>
+                                        <Typography variant="h6" component="div">
+                                          {field.fieldLabel}
+                                        </Typography>
+                                      </Grid>
+                                      <Grid item xs={2} >
+                                        <ButtonGroup variant='tonal' size="small">
+                                          <Tooltip title={`Add ${field.fieldLabel}`}>
+                                            <Button size="small"
+                                              onClick={() =>
+                                                handleAddDuplicateForm(index, fieldIndex)
+                                              }>
+                                              <i className="tabler-plus" />
+                                            </Button>
+                                          </Tooltip>
                                       
-                                  //   >
-                                  //     <i className="tabler-minus" />
-                                  //   </IconButton>
-
-                                  
-                                  //   <img
-                                  //     src={
-                                  //       formData.templateData[`${index}+${fieldIndex}`]?.preview
-                                  //     }
-                                  //     alt="Preview"
-                                  //     style={{
-                                  //       width: "100%",
-                                  //       maxHeight: "200px",
-                                  //       objectFit: "contain",
-                                  //     }}
-                                  //   />
-                                  // </Box>
-                                )}
-                            </>
-                          ) : (
-                            <CustomTextField
-                              label={field.isRequired === true ? `${field.fieldLabel} *` : field.fieldLabel}
-                              type={field.fieldType}
-                              // required={field.isRequired}
-                              name={field.fieldType}
-                              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                handleInputChange(
-                                  e,
-                                  section.sectionId,
-                                  index,
-                                  fieldIndex
-                                )
-                              }
-                              fullWidth
-                              margin="normal"
-                              //@ts-ignore
-                              error={
-                                field.error &&
-                                field.error
-                              }
-                              helperText={
-                                field.error &&
-                                field.error
-                              }
-                              inputProps={
-                                field.validation
-                                  ? JSON.parse(field.validation)
-                                  : {}
-                              }
-                              value={
-                                (formData.templateData &&
-                                  formData.templateData[
-                                  `${index}+${fieldIndex}`
-                                  ]?.[field.fieldType]) ||
-                                ""
-                              }
-                            />
-                          )}
-                        </div>
-                      )
-                    )}
-                  </Grid>
-                ))}
-
-                <Grid
-                  item
-                  xs={12}
-                  style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-                >
-                  <Box
-                    p={7}
-                    display="flex"
-                    gap={2}
-                    justifyContent="end"
-                    bgcolor="background.paper"
-                  >
-                    <Button variant="contained" color="error" type="reset" onClick={handleClose}>
-                      Cancel
-                    </Button>
-                    <Button color="warning" variant="contained" type="submit" onClick={() => setPDStatus(false)}>
-                      Save as Draft
-                    </Button>
-                    <Button variant="contained" type="submit" onClick={() => setPDStatus(true)}>
-                      Save & Publish
-                    </Button>
-                  </Box>
+                                          <Tooltip title={`Remove ${field.fieldLabel}`}>
+                                            <Button size="small"
+                                              onClick={() =>
+                                                handleRemoveDuplicateForm(index, fieldIndex)
+                                              }>
+                                              <i className="tabler-minus" />
+                                            </Button>
+                                          </Tooltip>
+                                        </ButtonGroup>
+                                      </Grid>
+                                    </Grid>
+                                  </CardActions>
+                                  <CardContent>
+                                    {field.multipleData?.map(
+                                      (subField: any, subFieldIndex: number) => (
+                                        <Grid
+                                          container
+                                          key={`${index}+${fieldIndex}+${subFieldIndex}`}
+                                          spacing={2}
+                                          item
+                                          xs={12}
+                                          sm={12}>
+                                          {
+                                            <CustomTextField
+                                              multiline
+                                              label={
+                                                subField.isRequired
+                                                  ? `${subField.fieldLabel} *`
+                                                  : subField.fieldLabel
+                                              }
+                                              type={subField.fieldType}
+                                              name={subField.fieldType}
+                                              onChange={(e: any) =>
+                                                handleInputChange(
+                                                  e,
+                                                  section.sectionId,
+                                                  index,
+                                                  fieldIndex,
+                                                  subFieldIndex,
+                                                  section,
+                                                  field.fieldLabel,
+                                                  subField.fieldLabel,
+                                                  subField.fieldType,
+                                                  subField.fekey
+                                                )
+                                              }
+                                              fullWidth
+                                              margin="normal"
+                                              error={subField.error && subField.error}
+                                              helperText={subField.error && subField.error}
+                                              inputProps={
+                                                subField.validation
+                                                  ? JSON.parse(subField.validation)
+                                                  : {}
+                                              }
+                                              value={
+                                                formData.templateData?.[
+                                                `${index}+${fieldIndex}+${subFieldIndex}`
+                                                ]?.[subField.fieldType] || ''
+                                              }
+                                            />
+                                          }
+                                        </Grid>
+                                      )
+                                    )
+                                    }
+                                  </CardContent>
+                                </Card>
+                              </Grid>
+                            ) : (
+                              <Grid item xs={12} sm={12}>
+                                <CustomTextField
+                                  multiline
+                                  label={field.isRequired ? `${field.fieldLabel} *` : field.fieldLabel}
+                                  type={field.fieldType}
+                                  name={field.fieldType}
+                                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                    handleInputChange(e,
+                                      section.sectionId,
+                                      index,
+                                      fieldIndex,
+                                      null,
+                                      section,
+                                      field.fieldLabel, '', field.fieldType, field.fekey)
+                                  }
+                                  fullWidth
+                                  margin="normal"
+                                  //@ts-ignore
+                                  error={field.error &&
+                                    field.error}
+                                  //@ts-ignore
+                                  helperText={field.error &&
+                                    field.error}
+                                  inputProps={field.validation ? JSON.parse(field.validation) : {}}
+                                  value={
+                                    formData.templateData?.[`${index}+${fieldIndex}`]?.[field.fieldType] || ""
+                                  }
+                                />
+                              </Grid>
+                            )}
+                          </Grid>
+                        ))}
+                      </CardContent>
+                    </Card>
+                  ))}
                 </Grid>
               </Grid>
             </Box>
           </form>
         </div>
-      </Card>
-    </>
-  );
-}
-
-export default PagesForm;
+      </Card >
+      <Grid
+        item
+        xs={12}
+        style={{ position: "sticky", bottom: 0, zIndex: 10 }} >
+        <Box p={5} display="flex" gap={2} justifyContent="end" bgcolor="background.paper"        >
+          <Button variant="contained" size="small" color="error" type="reset" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button color="warning" variant="contained" size="small" type="submit" onClick={(event) => {handleSubmit(event, false)}}>
+            Save as Draft
+          </Button>
+          <Button variant="contained" type="submit" size="small" onClick={(event) => { handleSubmit(event, true)}}>
+            Save & Publish
+          </Button>
+        </Box>
+      </Grid>
+    </>);
+} export default PagesForm;

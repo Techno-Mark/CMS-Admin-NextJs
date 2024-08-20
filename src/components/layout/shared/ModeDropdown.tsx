@@ -15,6 +15,7 @@ import { useSettings } from '@core/hooks/useSettings';
 // API Imports
 import { organization } from "@/services/endpoint/organization";
 import { post } from "@/services/apiService";
+import { setLocalStorageItem } from '@/utils/localStorageHelper';
 
 interface Organization {
   id: string;
@@ -30,20 +31,6 @@ const ModeDropdown = () => {
   const selectedOrgName = organizations.find((org) => org.id === selectedOrgId)?.name || 'Select Organization';
   const avatarText = selectedOrgName.split(' ').map((n) => n[0]).join('');
 
-  // useEffect(() => {
-  //   const fetchOrganizations = async () => {
-  //     try {
-  //       const response = await post(organization.active, {});
-  //       const orgs = response.data.organizations as Organization[];
-  //       setOrganizations(orgs);
-  //     } catch (error) {
-  //       console.error('Error fetching organizations:', error);
-  //     }
-  //   };
-
-  //   fetchOrganizations();
-  // }, []);
-
   useEffect(() => {
     const fetchOrganizations = async () => {
       try {
@@ -52,14 +39,20 @@ const ModeDropdown = () => {
         setOrganizations(orgs);
         
         const storedOrgId = localStorage.getItem('selectedOrgId');
-
+     
+        
 
         if (storedOrgId) {
           const parsedOrgId = parseInt(storedOrgId, 10); 
           setSelectedOrgId(parsedOrgId);
         } else if (orgs.length > 0) {
-          setSelectedOrgId(orgs[0].id);
-          localStorage.setItem('selectedOrgId', orgs[0].id);
+          console.log(orgs[0].id);
+          const parsedOrgId = parseInt(orgs[0].id, 10); 
+
+          setSelectedOrgId(parsedOrgId);
+          setLocalStorageItem('selectedOrgId',parsedOrgId);
+
+          // localStorage.setItem('selectedOrgId', orgs[0].id);
         }
       } catch (error) {
         console.error('Error fetching organizations:', error);
@@ -77,9 +70,12 @@ const ModeDropdown = () => {
     setOpen((prevOpen) => !prevOpen);
   };
 
-  const handleModeSwitch = (orgId: string) => {
+  const handleModeSwitch = (orgId: string, event: React.MouseEvent) => {
+    event.preventDefault();
     setSelectedOrgId(orgId);
-    localStorage.setItem('selectedOrgId', orgId);
+    // localStorage.setItem('selectedOrgId', orgId);
+    setLocalStorageItem('selectedOrgId', orgId);
+    // window.location.reload();
     handleClose();
   };
 
@@ -122,7 +118,8 @@ const ModeDropdown = () => {
                     <MenuItem
                       key={org.id}
                       className="gap-3"
-                      onClick={() => handleModeSwitch(org.id)}
+                      // onClick={() => handleModeSwitch(org.id)}
+                      onClick={(e) => handleModeSwitch(org.id, e)}
                       selected={selectedOrgId === org.id}
                     >
                       <Avatar

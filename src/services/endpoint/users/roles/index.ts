@@ -1,15 +1,16 @@
 //redirections url
-export const redirectToAddPage = "/users/roles/add"
-export const redirectToEditPage = (slug: number | string) => { return `/users/roles/edit/${slug}` }
-
+export const redirectToAddPage = "/users/roles/add";
+export const redirectToEditPage = (slug: number | string) => {
+  return `/users/roles/edit/${slug}`;
+};
 
 //api endpoints
-export const getRoleList = "role/list"
+export const getRoleList = "role/list";
 
-// export const getRoleById = (slug: string | number) => { return `role/getBySlug/${slug}` }
+export const createRole = "role/create";
 
-export const createRole = "role/create"
+export const getRoleById = "role/getById";
 
-export const updateRole = "role/update"
+export const updateRole = "role/update";
 
-export const deleteRole = "role/delete"
+export const deleteRole = "role/delete";

@@ -24,7 +24,6 @@ const ConfirmationDialog = ({
   const handleDeletePermission = async () => {
     try {
       const result = await post(deletePermission, deletePayload);
-
       if (result.status === "success") {
         toast.success(result.message);
       } else {

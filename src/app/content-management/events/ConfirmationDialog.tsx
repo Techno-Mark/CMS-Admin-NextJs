@@ -35,7 +35,7 @@ const ConfirmationDialog = ({
     } catch (error) {
       console.error(error);
     } finally {
-      setDeletingId(0);
+      setDeletingId(-1);
       setOpen(false);
     }
   };

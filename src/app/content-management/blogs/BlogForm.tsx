@@ -27,8 +27,8 @@ import { category } from "@/services/endpoint/category";
 import { tag } from "@/services/endpoint/tag";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
-import EditorCustom from "./RichEditor";
 import { ADD_BLOG, blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
+import EditorBasic from "@/components/EditorToolbar";
 
 type blogFormPropsTypes = {
   open: number;
@@ -350,6 +350,25 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
       }
     }
   };
+  const handleEditorChange = (content: string) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      description: content,
+    }));
+    if (content?.length) {
+      setFormErrors((prevFormErrors) => ({
+        ...prevFormErrors,
+        description: "",
+      }));
+    }
+  };
+
+  const handleContentChange = (content: any) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      description: content,
+    }));
+  };
 
   return (
     <>
@@ -376,7 +395,6 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
                 helperText={formErrors.title}
                 label="Blog Title *"
                 fullWidth
-                placeholder="Enter Blog Title"
                 value={formData.title}
                 onChange={handleBlogTitleChange}
               />
@@ -402,14 +420,16 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
             </Grid>
             <Grid item xs={12} sm={12}>
               <p className="text-[#4e4b5a]">Description *</p>
-              <EditorCustom
-                setContent={setFormData}
+
+              <EditorBasic
                 content={formData.description}
+                onContentChange={handleContentChange}
+                error={!!formErrors.description}
+                helperText={formErrors.description}
               />
             </Grid>
             <Grid item xs={12} sm={12}>
               <CustomTextField
-                // disabled={true}
                 multiline
                 maxRows={2}
                 minRows={2}
@@ -636,8 +656,6 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
             <Grid item xs={12} sm={12}>
               <Grid item xs={12} sm={12}>
                 <CustomTextField
-                  // disabled={open === sectionActions.EDIT}
-                  // error={!!formErrors.slug}
                   error={!!formErrors.authorName}
                   helperText={formErrors.authorName}
                   label="Author Name *"

@@ -1,5 +1,5 @@
 // React Imports
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // MUI Imports
 import Button from "@mui/material/Button";
 // Component Imports
@@ -8,16 +8,18 @@ import BreadCrumbList from "@components/BreadCrumbList";
 import CustomTextField from "@core/components/mui/TextField";
 
 import { toast } from "react-toastify";
-import { post } from "@/services/apiService";
+import { post, get } from "@/services/apiService";
 import { usePathname, useRouter } from "next/navigation";
 import { ADD_ROLE, EDIT_ROLE, RolesType } from "@/types/apps/rolesType";
 import { createRole, updateRole } from "@/services/endpoint/users/roles";
+import { getSectionById } from "@/services/endpoint/content-block";
 
 type Props = {
   open: ADD_ROLE | EDIT_ROLE;
 };
 
 type FormDataType = {
+  id: number;
   roleId: number;
   roleName: string;
   roleDescription: string;
@@ -32,6 +34,7 @@ const sectionActions = {
 
 // Vars
 const initialData = {
+  id: 0,
   roleId: 0,
   roleName: "",
   roleDescription: "",
@@ -53,6 +56,8 @@ const RolesForm = ({ open }: Props) => {
     roleName: string;
     roleDescription: string;
   }>(initialErrorData);
+
+  const orgId = localStorage.getItem('selectedOrgId');
 
   const validateFormData = (arg1: {
     roleName: string;
@@ -87,14 +92,14 @@ const RolesForm = ({ open }: Props) => {
         open === sectionActions.EDIT ? updateRole : createRole,
         open === sectionActions.EDIT
           ? {
-              organizationId: 1, //will be dynamic in future
+              organizationId: Number(orgId),
               roleId: formData.roleId,
               roleName: formData.roleName,
               roleDescription: formData.roleDescription,
               active: formData.active,
             }
           : {
-              organizationId: 1, //will be dynamic in future
+              organizationId: Number(orgId),
               roleName: formData.roleName,
               roleDescription: formData.roleDescription,
               active: formData.active,
@@ -116,28 +121,29 @@ const RolesForm = ({ open }: Props) => {
     router.back();
   };
 
-  //   const getSectionDataById = async (slug: string | number) => {
-  //     try {
-  //       //   const result = await get(getSectionById(slug));
-  //       //   const { data } = result;
-  //       //   setFormData({
-  //       //     ...formData,
-  //       //     id: data.sectionId,
-  //       //     name: data.sectionName,
-  //       //     slug: data.sectionSlug,
-  //       //     jsonContent: JSON.stringify(data.sectionTemplate),
-  //       //     status: data.active,
-  //       //   });
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
+  const getSectionDataById = async (slug: string | number) => {
+    try {
+      const result = await get(getSectionById(slug));
+      const { data } = result;
+      console.log(data);
+      setFormData({
+        ...formData,
+        id: 0,
+        roleId: 0,
+        roleName: "",
+        roleDescription: "",
+        active: false,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  //   useEffect(() => {
-  //     if (open === sectionActions.EDIT) {
-  //       getSectionDataById(query[query.length - 1]);
-  //     }
-  //   }, []);
+  useEffect(() => {
+    if (open === sectionActions.EDIT) {
+      getSectionDataById(query[query.length - 1]);
+    }
+  }, []);
 
   return (
     <>
