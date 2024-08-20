@@ -130,7 +130,13 @@ const BlogListTable = () => {
     return () => {
       window.removeEventListener("localStorageUpdate", handleStorageUpdate);
     };
-  }, [page, pageSize, globalFilter, deletingId, activeFilter]);
+  }, [page, pageSize, globalFilter, activeFilter]);
+
+  useEffect(() => {
+    if (deletingId == -1) {
+      getData();
+    }
+  }, [deletingId]);
 
   const columns = useMemo<ColumnDef<EventTypeWithAction, any>[]>(
     () => [

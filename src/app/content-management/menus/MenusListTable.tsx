@@ -120,9 +120,6 @@ const MenuListTable = () => {
   };
   useEffect(() => {
     getData();
-  }, [page, pageSize, globalFilter, deletingId, activeFilter]);
-
-  useEffect(() => {
     const handleStorageUpdate = async () => {
       getData();
     };
@@ -130,7 +127,13 @@ const MenuListTable = () => {
     return () => {
       window.removeEventListener("localStorageUpdate", handleStorageUpdate);
     };
-  }, []);
+  }, [page, pageSize, globalFilter, activeFilter]);
+
+  useEffect(() => {
+    if (deletingId == -1) {
+      getData();
+    }
+  }, [deletingId]);
 
   const columns = useMemo<ColumnDef<BlogTypeWithAction, any>[]>(
     () => [
