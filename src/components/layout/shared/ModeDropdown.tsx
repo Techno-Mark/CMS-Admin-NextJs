@@ -37,29 +37,61 @@ const ModeDropdown = () => {
         const response = await post(organization.active, {});
         const orgs = response.data.organizations as Organization[];
         setOrganizations(orgs);
-        
+  
         const storedOrgId = localStorage.getItem('selectedOrgId');
-     
-        
-
+  
         if (storedOrgId) {
-          const parsedOrgId = parseInt(storedOrgId, 10); 
-          setSelectedOrgId(parsedOrgId);
+          const parsedOrgId = parseInt(storedOrgId, 10);
+          const matchingOrg = orgs.find(org => org.id === parsedOrgId);
+  
+          if (matchingOrg) {
+            setSelectedOrgId(parsedOrgId);
+          } else if (orgs.length > 0) {
+            setSelectedOrgId(orgs[0].id);
+            setLocalStorageItem('selectedOrgId', orgs[0].id);
+          }
         } else if (orgs.length > 0) {
-          console.log(orgs[0].id);
-          const parsedOrgId = parseInt(orgs[0].id, 10); 
-
-          setSelectedOrgId(parsedOrgId);
-          setLocalStorageItem('selectedOrgId',parsedOrgId);
-
-          // localStorage.setItem('selectedOrgId', orgs[0].id);
+          setSelectedOrgId(orgs[0].id);
+          setLocalStorageItem('selectedOrgId', orgs[0].id);
         }
       } catch (error) {
         console.error('Error fetching organizations:', error);
       }
     };
+  
     fetchOrganizations();
   }, []);
+  
+
+  // useEffect(() => {
+  //   const fetchOrganizations = async () => {
+  //     try {
+  //       const response = await post(organization.active, {});
+  //       const orgs = response.data.organizations as Organization[];
+  //       setOrganizations(orgs);
+        
+  //       const storedOrgId = localStorage.getItem('selectedOrgId');
+     
+        
+
+  //       if (storedOrgId) {
+  //         const parsedOrgId = parseInt(storedOrgId, 10); 
+  //         setSelectedOrgId(parsedOrgId);
+  //       } else if (orgs.length > 0) {
+  //         console.log(orgs[0].id);
+  //         const parsedOrgId = parseInt(orgs[0].id, 10); 
+
+  //         setSelectedOrgId(parsedOrgId);
+  //         setLocalStorageItem('selectedOrgId',parsedOrgId);
+
+  //         // localStorage.setItem('selectedOrgId', orgs[0].id);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching organizations:', error);
+  //     }
+  //   };
+  //   fetchOrganizations();
+  // }, []);
 
 
   const handleClose = () => {
