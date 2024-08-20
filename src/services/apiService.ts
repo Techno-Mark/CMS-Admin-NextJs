@@ -32,6 +32,13 @@ const handleResponse = async (response: Response) => {
         toast.error(message || "Validation error");
         throw new Error(message || "Validation error");
       }
+    } else if (
+      response.status === 403 ||
+      response.status === 400 ||
+      response.status === 500
+    ) {
+      const errorResponse = await response.json();
+      toast.error(errorResponse.message);
     } else {
       // Other errors
       const error = await response.text();
