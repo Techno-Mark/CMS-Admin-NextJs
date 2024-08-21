@@ -131,6 +131,8 @@ const RolesListTable = ({
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
 
+  let orgId = null;
+
   const columns = useMemo<ColumnDef<RolesTypeWithAction, any>[]>(
     () => [
       columnHelper.accessor("srNo", {
@@ -232,6 +234,7 @@ const RolesListTable = ({
       search: globalFilter,
       active: activeFilter,
     });
+    
   }, [
     table.getState().pagination.pageSize,
     table.getState().pagination.pageIndex,
@@ -249,8 +252,10 @@ const RolesListTable = ({
         active: activeFilter,
       });
     }
+    if(localStorage !== undefined) orgId = localStorage.getItem("selectedOrgId");
+  
   }, [deletingId, openDialog]);
-  const orgId = localStorage.getItem("selectedOrgId");
+ 
   return (
     <>
       <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
