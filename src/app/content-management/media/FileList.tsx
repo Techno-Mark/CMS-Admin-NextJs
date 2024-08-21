@@ -330,7 +330,7 @@ const FileListTable = () => {
             <Button
               variant="contained"
               startIcon={<i className="tabler-plus" />}
-              onClick={() => router.push("/settings/files/add")}
+              onClick={() => router.push("/content-management/media/add")}
               className="is-full sm:is-auto"
             >
               Add File
