@@ -1,8 +1,8 @@
 export const organization = {
-  list: `organization/list`,
-  create: `organization/create`,
-  update: `organization/update`,
-  getById: `organization/getById`,
-  delete: `organization/delete`,
-  active: `organization/active`,
+  list: `master-organization/list`,
+  create: `master-organization/create`,
+  update: `master-organization/update`,
+  getById: `master-organization/getById`,
+  delete: `master-organization/delete`,
+  active: `master-organization/active`,
 };
