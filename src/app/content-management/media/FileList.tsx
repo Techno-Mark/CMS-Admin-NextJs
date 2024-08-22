@@ -206,11 +206,9 @@ const FileListTable = () => {
           <div className="flex items-center">
             <IconButton
               onClick={() => {
-                // Construct the correct URL
+                
                 const url = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${row.original.filePath}`;
-                console.log(url);
-
-                // Open the URL in a new tab
+              
                 window.open(url, '_blank');
               }}
             >
@@ -223,7 +221,7 @@ const FileListTable = () => {
 
                 navigator.clipboard.writeText(url)
                   .then(() => {
-                    console.log('URL copied to clipboard!');
+                   
                     toast.success(`URL copied to clipboard!`);
                   })
                   .catch(err => {

@@ -217,7 +217,6 @@ function PopupForm({ open, handleClose, setEditingRow, editingRow }: Props) {
         formDataToSend.set("active", formData.active.toString());
         if (popupFile) {
           formDataToSend.append("popupFile", popupFile as Blob);
-          console.log(popupFile);
         }
         const result = await postContentBlock(
           editingRow?.popupId ? popups.update : popups.create,

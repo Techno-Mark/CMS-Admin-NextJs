@@ -120,10 +120,7 @@ const ContentBlockForm = ({ open }: Props) => {
   };
 
   const handleChangeField = (index: number, field: string, value: any, subIndex?: number) => {
-    console.log(index, field, value);
-
     const updatedFields = [...formData.jsonContent];
-
     if (subIndex !== undefined) {
       updatedFields[index].multipleData[subIndex][field] = value;
     } else {
@@ -258,9 +255,7 @@ const ContentBlockForm = ({ open }: Props) => {
   useEffect(() => {
     if (open === sectionActions.EDIT) {
       getSectionDataById(query[query.length - 1]);
-
-    } else {
-      console.log("132123");
+    } else { 
       setEditAllow(false)
       setFormData(initialData);
       setFormErrors(initialErrorData);

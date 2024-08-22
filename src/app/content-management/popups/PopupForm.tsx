@@ -305,7 +305,7 @@ function PopupForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
         formDataToSend.set("active", String(active));
         formDataToSend.set("tags", formData.tags.join(","));
         formDataToSend.set("categories", formData.categories.join(","));
-        // console.log(formDataToSend.get("bannerImage"));
+    
         const result = await postContentBlock(blogPost.create, formDataToSend);
         setLoading(false);
         if (result.status === "success") {

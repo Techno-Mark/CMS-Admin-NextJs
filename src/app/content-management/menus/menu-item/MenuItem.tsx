@@ -103,7 +103,7 @@ const MenuItem: React.FC = () => {
     } else {
       newMenuItems[parentId].children.splice(targetIndex, 0, removedItem);
       setMenuItems(newMenuItems);
-      console.log(targetIndex, parentId);
+      
     }
   };
 

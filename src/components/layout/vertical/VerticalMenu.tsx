@@ -54,7 +54,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
 
   const { data: session } = useSession();
-  console.log(session);
+
  
 
   return (

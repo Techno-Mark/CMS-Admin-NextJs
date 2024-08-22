@@ -23,7 +23,7 @@ const Page = () => {
       setLoading(true);
       const result = await post(pages.list, body);
       setTotalCount(result.data.totalRoles);
-      console.log(result.data);
+      
       // if (result.data) {
         setPagesData(
           result.data.pages.map((item: any) => ({
