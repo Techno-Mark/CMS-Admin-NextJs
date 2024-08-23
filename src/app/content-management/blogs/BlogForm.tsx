@@ -403,6 +403,11 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
               <CustomTextField
                 // disabled={open === sectionActions.EDIT}
                 // error={!!formErrors.slug}
+                InputProps={{
+                  startAdornment: (
+                    '/blog/'
+                  )
+                }}
                 error={!!formErrors.slug}
                 helperText={formErrors.slug}
                 label="Slug *"

@@ -152,6 +152,33 @@ export const postDataToOrganizationAPIs = async (
   }
 };
 
+
+export const withoutAuthPost = async (
+  endpoint: string,
+  data: any,
+  options: RequestInit = {}
+) => {
+  try {
+    const orgId = localStorage.getItem("selectedOrgId");
+    const response = await fetch(`${API_URL}/${endpoint}`, {
+      method: 'POST',
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(orgId ? { "organization-id": orgId } : {}),
+        ...options.headers,
+      },
+      body: JSON.stringify(data),
+    });
+
+    return await handleResponse(response);
+  } catch (error: any) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+
 // import { getSession, signOut } from "next-auth/react";
 // import { toast } from "react-toastify";
 

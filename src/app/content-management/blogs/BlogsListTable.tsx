@@ -156,15 +156,15 @@ const BlogListTable = () => {
           </Typography>
         ),
       }),
-      columnHelper.accessor("blogSlug", {
-        header: "Slug",
-        cell: ({ row }) => (
-          <Typography color="text.primary" className="font-medium">
-            {truncateText(row.original.blogSlug, 25)}
-          </Typography>
-        ),
-        enableSorting: false,
-      }),
+      // columnHelper.accessor("blogSlug", {
+      //   header: "Slug",
+      //   cell: ({ row }) => (
+      //     <Typography color="text.primary" className="font-medium">
+      //       {truncateText(row.original.blogSlug, 25)}
+      //     </Typography>
+      //   ),
+      //   enableSorting: false,
+      // }),
       columnHelper.accessor("authorName", {
         header: "Author Name",
         cell: ({ row }) => (
