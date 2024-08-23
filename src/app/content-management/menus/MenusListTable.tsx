@@ -210,7 +210,7 @@ const MenuListTable = () => {
               <i className="tabler-trash text-[22px] text-textSecondary" />
             </IconButton>
             <IconButton
-              onClick={() => router.push(`/content-management/menus/menu-item`)}
+              onClick={() => router.push(`/content-management/menus/menu-item/${row.original.menuId}`)}
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
             </IconButton>

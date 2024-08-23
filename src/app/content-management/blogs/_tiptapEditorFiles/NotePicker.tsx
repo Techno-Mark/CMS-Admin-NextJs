@@ -15,7 +15,6 @@ const Todo = () => {
       id: uuidv4(),
       content: content,
     };
-    console.log(data);
     const existingDataString = localStorage.getItem("myData");
     const existingData = existingDataString
       ? JSON.parse(existingDataString)

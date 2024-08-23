@@ -93,7 +93,7 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
           ...menuItems,
           { name: formData.name, link: formData.link, children: [], logo: "" },
         ];
-        console.log(newMenus);
+      
         setMenuItems(newMenus);
       } else if (open == 1) {
         const { index, parentId } = dataRequired;

@@ -568,7 +568,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
             }
             return secTemplate;
           });
-            console.log(formData);
+           
             
           return { ...sec, sectionTemplate: updatedSectionTemplate };
         }
