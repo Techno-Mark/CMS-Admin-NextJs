@@ -34,7 +34,7 @@ import BreadCrumbList from "@components/BreadCrumbList";
 // Type Imports
 import { RolesType } from "@/types/apps/rolesType";
 import RoleCards from "./RolesCard";
-import { Chip, MenuItem } from "@mui/material";
+import { Chip, MenuItem, Tooltip } from "@mui/material";
 import RoleDialog from "./RoleDialog";
 
 declare module "@tanstack/table-core" {
@@ -176,22 +176,26 @@ const RolesListTable = ({
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
-              <IconButton
-                onClick={() => {
-                  setEditId(row.original.roleId);
-                  setOpenDialog(true);
-                }}
-              >
-                <i className="tabler-edit text-[22px] text-textSecondary" />
-              </IconButton>
-              <IconButton
-                onClick={() => {
-                  setIsDeleting(true);
-                  setDeletingId(row.original.roleId);
-                }}
-              >
-                <i className="tabler-trash text-[22px] text-textSecondary" />
-              </IconButton>
+              <Tooltip title={'Edit'}>
+                <IconButton
+                  onClick={() => {
+                    setEditId(row.original.roleId);
+                    setOpenDialog(true);
+                  }}
+                >
+                  <i className="tabler-edit text-[22px] text-textSecondary" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={'Delete'}>
+                <IconButton
+                  onClick={() => {
+                    setIsDeleting(true);
+                    setDeletingId(row.original.roleId);
+                  }}
+                >
+                  <i className="tabler-trash text-[22px] text-textSecondary" />
+                </IconButton>
+              </Tooltip>
             </div>
           );
         },

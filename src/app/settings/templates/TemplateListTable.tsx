@@ -176,6 +176,7 @@ const TemplateListTable = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
+            <Tooltip title={'Edit'}>
             <IconButton
               onClick={() =>
                 router.push(`/settings/templates/edit/${row.original.templateId}`)
@@ -183,12 +184,15 @@ const TemplateListTable = () => {
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
             </IconButton>
+            </Tooltip>
+            <Tooltip title={'Delete'}>
             <IconButton onClick={() => {
               setIsDeleting(true);
               setDeletingId(row.original.templateId);
             }}>
               <i className="tabler-trash text-[22px] text-textSecondary" />
             </IconButton>
+            </Tooltip>
           </div>
         ),
         enableSorting: false,

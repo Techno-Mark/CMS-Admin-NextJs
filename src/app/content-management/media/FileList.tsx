@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@mui/material/Card";
-import { Box, MenuItem, TablePagination, TextFieldProps } from "@mui/material";
+import { Box, MenuItem, TablePagination, TextFieldProps, Tooltip } from "@mui/material";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
@@ -204,6 +204,8 @@ const FileListTable = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
+            <Tooltip title={'View The File'}>
+
             <IconButton
               onClick={() => {
                 
@@ -214,6 +216,8 @@ const FileListTable = () => {
             >
               <i className="tabler-eye text-[22px] " />
             </IconButton>
+            </Tooltip>
+            <Tooltip title={'Copy The URL'}>
 
             <IconButton
               onClick={() => {
@@ -232,6 +236,10 @@ const FileListTable = () => {
             >
               <i className="tabler-copy text-[22px]" />
             </IconButton>
+            </Tooltip>
+
+            <Tooltip title={'Delete'}>
+
              <IconButton
               onClick={() => {
                 setIsDeleting(true);
@@ -240,7 +248,8 @@ const FileListTable = () => {
               }}
             >
               <i className="tabler-trash text-[22px] text-textSecondary" />
-            </IconButton> 
+            </IconButton>
+            </Tooltip> 
           </div>
         ),
         enableSorting: false,

@@ -7,6 +7,7 @@ import {
   MenuItem,
   TablePagination,
   TextFieldProps,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { rankItem } from "@tanstack/match-sorter-utils";
@@ -152,21 +153,25 @@ const PageListTable = ({
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
-              <IconButton
-                onClick={() => {
-                  router.push(redirectToEditPage(row.original.id));
-                }}
-              >
-                <i className="tabler-edit text-[22px] text-textSecondary" />
-              </IconButton>
-              <IconButton
-                onClick={() => {
-                  setIsDeleting(true);
-                  setDeletingId(row.original.id);
-                }}
-              >
-                <i className="tabler-trash text-[22px] text-textSecondary" />
-              </IconButton>
+              <Tooltip title={'Edit'}>
+                <IconButton
+                  onClick={() => {
+                    router.push(redirectToEditPage(row.original.id));
+                  }}
+                >
+                  <i className="tabler-edit text-[22px] text-textSecondary" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={'Delete'}>
+                <IconButton
+                  onClick={() => {
+                    setIsDeleting(true);
+                    setDeletingId(row.original.id);
+                  }}
+                >
+                  <i className="tabler-trash text-[22px] text-textSecondary" />
+                </IconButton>
+              </Tooltip>
             </div>
           );
         },

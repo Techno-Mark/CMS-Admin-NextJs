@@ -7,6 +7,7 @@ import {
   MenuItem,
   TablePagination,
   TextFieldProps,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
@@ -215,21 +216,25 @@ const UserListTable = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
-            <IconButton
-              onClick={() =>
-                router.push(`/users/management/edit/${row.original.UserId}`)
-              }
-            >
-              <i className="tabler-edit text-[22px] text-textSecondary" />
-            </IconButton>
-            <IconButton
-              onClick={() => {
-                setIsDeleting(true);
-                setDeletingId(row.original.UserId);
-              }}
-            >
-              <i className="tabler-trash text-[22px] text-textSecondary" />
-            </IconButton>
+            <Tooltip title={'Edit'}>
+              <IconButton
+                onClick={() =>
+                  router.push(`/users/management/edit/${row.original.UserId}`)
+                }
+              >
+                <i className="tabler-edit text-[22px] text-textSecondary" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={'Delete'}>
+              <IconButton
+                onClick={() => {
+                  setIsDeleting(true);
+                  setDeletingId(row.original.UserId);
+                }}
+              >
+                <i className="tabler-trash text-[22px] text-textSecondary" />
+              </IconButton>
+            </Tooltip>
           </div>
         ),
         enableSorting: false,
