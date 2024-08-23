@@ -127,12 +127,13 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
 
     return valid;
   };
-  const orgId = localStorage.getItem("selectedOrgId");
+  
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-
+  
     if (validateForm()) {
       try {
+        const orgId = localStorage.getItem("selectedOrgId");
         const endpoint = editId > 0 ? updateRole : createRole;
         const payload =
           editId > 0
