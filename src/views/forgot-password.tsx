@@ -27,16 +27,34 @@ import { useSettings } from '@core/hooks/useSettings'
 import { useState } from 'react'
 import { withoutAuthPost } from '@/services/apiService'
 import { authnetication } from '@/services/endpoint/auth'
-
+import { toast } from 'react-toastify'
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 // API Call
 const forgotPasswordAPI = async (email: string) => {
-  // This is a placeholder. Replace it with your actual API call.
-  const response = await withoutAuthPost(authnetication.forgot_password, { email })
+  try {
+    const response = await fetch(`${API_URL}/${authnetication.forgot_password}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
 
-  console.log(response.json());
+    if (!response.ok) {
+      // Handle non-200 responses
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to send reset password email');
+    }
 
-  // return response.json()
-}
+    // Parse and return the response data
+    const data = await response.json();
+    return data;
+  } catch (error: any) {
+    console.error('Error during forgot password API call:', error.message);
+    throw error;
+  }
+};
+
 
 // Validation Schema
 const validationSchema = yup.object({
@@ -106,9 +124,11 @@ const ForgotPassword = ({ mode }: { mode: SystemMode }) => {
     // API Call
     try {
       await forgotPasswordAPI(email)
-      setStatus('Reset link sent successfully!')
+      // setStatus('Reset link sent successfully!')
+      toast.success('Reset link sent successfully!')
     } catch (apiError: any) {
       setError(apiError.message)
+      toast.error(apiError.message)
     } finally {
       setIsSubmitting(false)
     }
