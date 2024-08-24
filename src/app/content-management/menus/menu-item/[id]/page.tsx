@@ -22,7 +22,7 @@ const Page = ({ params }: { params: { id: string } }) => {
           throw new Error("Failed to fetch data");
         }
         const data = await response;
-        setEditingRow(data.data.menuJSONData);
+        setEditingRow(data.data?.menuJSONData);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);

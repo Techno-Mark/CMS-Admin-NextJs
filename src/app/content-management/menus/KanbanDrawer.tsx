@@ -20,11 +20,13 @@ type KanbanDrawerProps = {
 const initialFormData = {
   name: "",
   link: "",
+  logo: "",
 };
 
 const initialErrorData = {
   name: "",
   link: "",
+  logo: "",
 };
 
 const KanbanDrawer = (props: KanbanDrawerProps) => {
@@ -61,7 +63,7 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
     let errors = { ...initialErrorData };
 
     if (!formData.name) {
-      errors.name = "Please enter a menu name";
+      errors.name = "menu name is required";
       valid = false;
     } else if (formData.name.length < 3) {
       errors.name = "name must be at least 3 characters long";
@@ -71,13 +73,17 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
       valid = false;
     }
     if (!formData.link) {
-      errors.link = "Please add a link";
-      valid = false;
-    } else if (formData.link.length < 7) {
-      errors.link = "link must be at least 7 characters long";
+      errors.link = "link is required";
       valid = false;
     } else if (formData.link.length > 1000) {
       errors.link = "link must be at most 1000 characters long";
+      valid = false;
+    }
+    if (!formData.logo) {
+      errors.logo = "logo link  is required";
+      valid = false;
+    } else if (formData.logo.length > 1000) {
+      errors.logo = "logo link must be at most 1000 characters long";
       valid = false;
     }
 
@@ -91,18 +97,25 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
       if (open == -1) {
         const newMenus = [
           ...menuItems,
-          { name: formData.name, link: formData.link, children: [], logo: "" },
+          {
+            name: formData.name,
+            link: formData.link,
+            children: [],
+            logo: formData.logo,
+          },
         ];
-      
+
         setMenuItems(newMenus);
       } else if (open == 1) {
         const { index, parentId } = dataRequired;
         if (parentId == -1) {
           menuItems[index].name = formData.name;
           menuItems[index].link = formData.link;
+          menuItems[index].logo = formData.logo;
         } else {
           menuItems[parentId].children[index].name = formData.name;
           menuItems[parentId].children[index].link = formData.link;
+          menuItems[parentId].children[index].logo = formData.logo;
         }
       }
       handleClose();
@@ -112,18 +125,23 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
   useEffect(() => {
     if (open == 1) {
       const { index, parentId } = dataRequired;
-      let name = "",
-        link = "";
+      let name,
+        link,
+        logo = "";
+
       if (parentId == -1) {
         name = menuItems[index].name;
         link = menuItems[index].link;
+        logo = menuItems[index].logo;
       } else {
         name = menuItems[parentId].children[index].name;
         link = menuItems[parentId].children[index].link;
+        logo = menuItems[parentId].children[index].logo;
       }
       setFormData({
         name: name,
         link: link,
+        logo: logo,
       });
     }
     setLoading(false);
@@ -140,7 +158,10 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
         onClose={handleClose}
       >
         <div className="flex justify-between items-center pli-6 plb-5 border-be">
-          <Typography variant="h5">Add Menu</Typography>
+          <Typography variant="h5">
+            {" "}
+            {open == -1 ? "Add " : "Edit"} Menu
+          </Typography>
           <IconButton size="small" onClick={handleClose}>
             <i className="tabler-x text-2xl text-textPrimary" />
           </IconButton>
@@ -172,6 +193,20 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
                 setFormData({ ...formData, link: e.target.value });
                 if (e.target?.value?.length) {
                   setFormErrors({ ...formErrors, link: "" });
+                }
+              }}
+            />
+            <CustomTextField
+              error={!!formErrors.logo}
+              helperText={formErrors.logo}
+              label="Logo Link *"
+              fullWidth
+              placeholder=""
+              value={formData.logo}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                setFormData({ ...formData, logo: e.target.value });
+                if (e.target?.value?.length) {
+                  setFormErrors({ ...formErrors, logo: "" });
                 }
               }}
             />

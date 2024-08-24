@@ -9,43 +9,16 @@ import { postDataToOrganizationAPIs } from "@/services/apiService";
 import { menu } from "@/services/endpoint/menu";
 import { toast } from "react-toastify";
 
-const MenuItem = ({menuData,menuId,handleClose}:{menuData:any,menuId:string,handleClose:Function}) => {
+const MenuItem = ({
+  menuData,
+  menuId,
+  handleClose,
+}: {
+  menuData: any;
+  menuId: string;
+  handleClose: Function;
+}) => {
   const [loading, setLoading] = useState<boolean>(false);
-  // const [menuItems, setMenuItems] = useState<any[]>([
-  //   {
-  //     name: "Item 1",
-  //     logo: "",
-  //     link: "/item-1",
-  //     children: [
-  //       {
-  //         name: "Subitem 1-1",
-  //         children: [],
-  //         logo: "",
-  //         link: "/item-1",
-  //       },
-  //       { name: "Subitem 1-2", children: [], logo: "", link: "/item-1" },
-  //       { name: "Subitem 1-3", children: [], logo: "", link: "/item-1" },
-  //     ],
-  //   },
-  //   {
-  //     name: "Item 2",
-  //     children: [
-  //       { name: "Subitem 2-1", children: [], logo: "", link: "/item-1" },
-  //     ],
-  //     logo: "",
-  //     link: "/item-1",
-  //   },
-  //   {
-  //     name: "Item 3",
-  //     children: [
-  //       { name: "Subitem 3-1", children: [], logo: "", link: "/item-1" },
-  //       { name: "Subitem 3-2", children: [], logo: "", link: "/item-1" },
-  //     ],
-  //     logo: "",
-  //     link: "/item-1",
-  //   },
-  // ]);
-
   const [menuItems, setMenuItems] = useState<any[] | null>(menuData);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -79,12 +52,18 @@ const MenuItem = ({menuData,menuId,handleClose}:{menuData:any,menuId:string,hand
   ) => {
     const data = JSON.parse(event.dataTransfer.getData("text/plain"));
 
-    if(!menuItems) return
+    if (!menuItems) return;
+
+    if (
+      data.draggedItemParentIndex === -1 &&
+      menuItems[data.draggedIndex].children.length > 0  && parentId !== -1 
+    ) {
+      return;
+    }
     const newMenuItems = [...menuItems];
 
     const removedItem = removeMenuItem(newMenuItems, data);
     addMenuItem(newMenuItems, removedItem, targetIndex, parentId);
-
     return;
   };
 
@@ -100,13 +79,12 @@ const MenuItem = ({menuData,menuId,handleClose}:{menuData:any,menuId:string,hand
     } else {
       newMenuItems[parentId].children.splice(targetIndex, 0, removedItem);
       setMenuItems(newMenuItems);
-     
     }
   };
 
   const removeMenuItem = (newMenuItems: any, data: any) => {
-    if(!menuItems) return;
-    
+    if (!menuItems) return;
+
     if (data.draggedItemParentIndex == -1) {
       const removedItem = menuItems[data.draggedIndex];
       newMenuItems.splice(data.draggedIndex, 1);
@@ -129,42 +107,43 @@ const MenuItem = ({menuData,menuId,handleClose}:{menuData:any,menuId:string,hand
 
   const handleDelete = () => {};
 
-  const handleSubmit = async () =>{
-    
-    try{
+  const handleSubmit = async () => {
+    try {
       setLoading(true);
 
-      let response = await postDataToOrganizationAPIs(menu.menuItemCreateAndUpdate,{
-        menuId:menuId,
-        menuJSONData: menuItems
-      });
+      let response = await postDataToOrganizationAPIs(
+        menu.menuItemCreateAndUpdate,
+        {
+          menuId: menuId,
+          menuJSONData: menuItems,
+        }
+      );
 
-      setLoading(false)
+      setLoading(false);
 
-      if(response.status === "success"){
+      if (response.status === "success") {
         toast.success(response.message);
         handleClose();
         return;
-      }
-      else{
+      } else {
         toast.error(response.message);
       }
-    }catch(error){
+    } catch (error) {
       console.error(error);
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const renderMenuItems = (items: any[], parentId: number): React.ReactNode => {
     return items.map((item, index) => (
-      <ul key={index}>
+      <ul key={index+1}>
         {" "}
         <li
-          className="flex items-center border-b-black border-b p-1"
+          className="flex items-center border-b-black border-b"
           draggable
-          onDragStart={(e) => handleDragStart(e, index, parentId)}
-          onDrop={(e) => handleDrop(e, index, parentId)}
-          onDragOver={(e) => handleDropOver(e, index, parentId)}
+          onDragStart={(e) => handleDragStart(e, index, -1)}
+          onDrop={(e) => handleDrop(e, index, -1)}
+          onDragOver={(e) => handleDropOver(e, index, -1)}
         >
           <div className="flex-1 flex items-center">
             <DraggableIcon />
@@ -174,7 +153,7 @@ const MenuItem = ({menuData,menuId,handleClose}:{menuData:any,menuId:string,hand
             <div className=" bg-white border-r p-1">
               <button
                 className="bg-white text-black cursor-pointer"
-                onClick={() => handleEdit(index, parentId)}
+                onClick={() => handleEdit(index, -1)}
               >
                 Edit
               </button>
@@ -184,7 +163,46 @@ const MenuItem = ({menuData,menuId,handleClose}:{menuData:any,menuId:string,hand
             </div>
           </div>
         </li>
-        {item.children && renderMenuItems(item.children, index)}
+        {parentId == -1 && !item.children?.length && (
+          <div
+            className="p-2 m-2"
+            onDrop={(e) => handleDrop(e, 0, index)}
+            onDragOver={(e) => handleDropOver(e, 0, index)}
+          >
+            handle Drop here
+          </div>
+        )}
+        {item.children &&
+          item.children?.map((childItem: any, childIndex: number) => (
+            <ul key={childIndex + 1}>
+              {" "}
+              <li
+                className="flex items-center border-b-black border-b p-1"
+                draggable
+                onDragStart={(e) => handleDragStart(e, childIndex, index)}
+                onDrop={(e) => handleDrop(e, childIndex, index)}
+                onDragOver={(e) => handleDropOver(e, childIndex, index)}
+              >
+                <div className="flex-1 flex items-center">
+                  <DraggableIcon />
+                  {childItem.name}
+                </div>
+                <div className="flex rounded-md border cursor-pointer">
+                  <div className=" bg-white border-r p-1">
+                    <button
+                      className="bg-white text-black cursor-pointer"
+                      onClick={() => handleEdit(childIndex, index)}
+                    >
+                      Edit
+                    </button>
+                  </div>
+                  <div className="p-1">
+                    <button className="bg-white cursor-pointer">Delete</button>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          ))}
       </ul>
     ));
   };
@@ -193,7 +211,7 @@ const MenuItem = ({menuData,menuId,handleClose}:{menuData:any,menuId:string,hand
       <LoadingBackdrop isLoading={loading} />
       <BreadCrumbList />
       <Card>
-        <div className="bg-white p-2 max-w-[70%] m-auto">
+        <div className="bg-white p-1 max-w-[70%] m-auto">
           {menuItems && renderMenuItems(menuItems, -1)}
           <Fab
             variant="extended"
@@ -224,15 +242,15 @@ const MenuItem = ({menuData,menuId,handleClose}:{menuData:any,menuId:string,hand
             />
           )}
         </div>
-        <Box display="flex" gap={4}>
-          <Grid container spacing={2} sm={12}>
+        <Box display="flex" gap={2}>
+          <Grid container spacing={2}>
             <Grid
               item
               xs={12}
               style={{ position: "sticky", bottom: 0, zIndex: 10 }}
             >
               <Box
-                p={7}
+                p={2}
                 display="flex"
                 gap={2}
                 justifyContent="end"
@@ -242,14 +260,11 @@ const MenuItem = ({menuData,menuId,handleClose}:{menuData:any,menuId:string,hand
                   variant="contained"
                   color="error"
                   type="reset"
-                  onClick={()=>handleClose()}
+                  onClick={() => handleClose()}
                 >
                   Cancel
                 </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => handleSubmit()}
-                >
+                <Button variant="contained" onClick={() => handleSubmit()}>
                   Save
                 </Button>
               </Box>
