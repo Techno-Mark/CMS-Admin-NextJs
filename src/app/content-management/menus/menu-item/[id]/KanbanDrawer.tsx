@@ -94,18 +94,22 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
   // Handle Sunmit
   const handleSubmit = (d: any) => {
     if (validateForm()) {
+      let newItem = {
+        name: formData.name,
+        link: formData.link,
+        children: [],
+        logo: formData.logo,
+      };
       if (open == -1) {
-        const newMenus = [
-          ...menuItems,
-          {
-            name: formData.name,
-            link: formData.link,
-            children: [],
-            logo: formData.logo,
-          },
-        ];
-
-        setMenuItems(newMenus);
+        if(!menuItems){
+          setMenuItems([newItem]);
+        }else{
+          const newMenus = [
+            ...menuItems,
+            newItem
+          ];
+          setMenuItems(newMenus);
+        }
       } else if (open == 1) {
         const { index, parentId } = dataRequired;
         if (parentId == -1) {

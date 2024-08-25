@@ -15,14 +15,19 @@ const Page = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await postDataToOrganizationAPIs(menu.menuItemGetById, {
-          id: params.id,
-        });
+        const response = await postDataToOrganizationAPIs(
+          menu.menuItemGetById,
+          {
+            id: params.id,
+          }
+        );
         if (response.statusCode !== 200) {
           throw new Error("Failed to fetch data");
         }
         const data = await response;
+
         setEditingRow(data.data?.menuJSONData);
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -35,9 +40,13 @@ const Page = ({ params }: { params: { id: string } }) => {
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
-      {!loading && editingRow && (
+      {!loading && (
         <>
-        <MenuItem menuData={editingRow} menuId={params.id} handleClose={() => router.push("/content-management/menus")}/>
+          <MenuItem
+            menuData={editingRow}
+            menuId={params.id}
+            handleClose={() => router.push("/content-management/menus")}
+          />
         </>
       )}
     </>

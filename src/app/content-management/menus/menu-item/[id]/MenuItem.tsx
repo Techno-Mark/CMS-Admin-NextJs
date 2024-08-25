@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Box, Button, Card, Fab, Grid } from "@mui/material";
-import KanbanDrawer from "../../KanbanDrawer";
+import KanbanDrawer from "./KanbanDrawer";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import DraggableIcon from "../_svg/DraggableIcon";
@@ -137,7 +137,6 @@ const MenuItem = ({
   const renderMenuItems = (items: any[], parentId: number): React.ReactNode => {
     return items.map((item, index) => (
       <ul key={index+1}>
-        {" "}
         <li
           className="flex items-center border-b-black border-b"
           draggable
@@ -165,17 +164,16 @@ const MenuItem = ({
         </li>
         {parentId == -1 && !item.children?.length && (
           <div
-            className="p-2 m-2"
-            onDrop={(e) => handleDrop(e, 0, index)}
-            onDragOver={(e) => handleDropOver(e, 0, index)}
+            className="m-2 ml-4"
+            onDrop={(e:any) => handleDrop(e, 0, index)}
+            onDragOver={(e:any) => handleDropOver(e, 0, index)}
           >
-            handle Drop here
+            Drop sub-item
           </div>
         )}
         {item.children &&
           item.children?.map((childItem: any, childIndex: number) => (
             <ul key={childIndex + 1}>
-              {" "}
               <li
                 className="flex items-center border-b-black border-b p-1"
                 draggable
@@ -212,10 +210,12 @@ const MenuItem = ({
       <BreadCrumbList />
       <Card>
         <div className="bg-white p-1 max-w-[70%] m-auto">
-          {menuItems && renderMenuItems(menuItems, -1)}
+          {menuItems ? renderMenuItems(menuItems, -1):
+            <p className="text-xl p-4"> No Menu Created Yet, Add new Menu and save</p>
+          }
           <Fab
             variant="extended"
-            className="w-7 h-7"
+            className="w-7 h-7 m-4"
             onClick={() => setDrawerOpen(true)}
           >
             <i className="tabler-plus mie-1" />

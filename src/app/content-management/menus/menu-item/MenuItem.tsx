@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import DraggableIcon from "./_svg/DraggableIcon";
 import { Box, Button, Card, Fab, Grid } from "@mui/material";
-import KanbanDrawer from "../KanbanDrawer";
+import KanbanDrawer from "./[id]/KanbanDrawer";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
