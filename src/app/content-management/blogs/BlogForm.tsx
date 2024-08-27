@@ -449,10 +449,9 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
                 onChange={handleEditorChangeCKEditor}
                 initialValue={formData.description}
               />
-              <div>
-                {/* <h2>Description :</h2> */}
+              {/* <div>
                 <div dangerouslySetInnerHTML={{ __html: formData.description }} />
-              </div>
+              </div> */}
 
               {/* <EditorBasic
                 content={formData.description}
