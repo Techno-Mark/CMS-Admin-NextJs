@@ -4,48 +4,42 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { toast } from "react-toastify";
-import { postDataToOrganizationAPIs } from "@/services/apiService";
-import { blogPost } from "@/services/endpoint/blogpost";
 
 type ConfirmationDialogProps = {
-  deletingId: number;
-  open: boolean;
+  deleteData: any;
+  menuItems: any;
+  setMenuItems: React.Dispatch<React.SetStateAction<any>>;
   setOpen: (open: boolean) => void;
-  setDeletingId: React.Dispatch<React.SetStateAction<number>>;
 };
 
 const ConfirmationDialog = ({
-  deletingId,
-  open,
+  deleteData,
+  menuItems,
+  setMenuItems,
   setOpen,
-  setDeletingId,
 }: ConfirmationDialogProps) => {
   const deleteTemplate = async () => {
     try {
-      const result = await postDataToOrganizationAPIs(blogPost.delete, {
-        blogId: deletingId,
-      });
+      if (!menuItems) return;
 
-      if (result.status === "success") {
-        toast.success(result.message);
+      if (deleteData.parentId == -1) {
+        menuItems.splice(deleteData.index, 1);
       } else {
-        toast.error(result.message);
+        menuItems[deleteData.parentId].children.splice(deleteData.index, 1);
       }
     } catch (error) {
       console.error(error);
     } finally {
-      setDeletingId(-1);
       setOpen(false);
     }
   };
 
   return (
-    <Dialog fullWidth maxWidth="xs" open={open} onClose={() => setOpen(false)}>
+    <Dialog fullWidth maxWidth="xs" open={true} onClose={() => setOpen(false)}>
       <DialogContent className="flex items-center flex-col text-center sm:pbs-16 sm:pbe-6 sm:pli-16">
         <i className="tabler-alert-circle text-[88px] mbe-6 text-warning" />
         <Typography variant="h5">
-          Are you sure you want to delete the Blog Post?
+          Are you sure you want to delete Menu Item?
         </Typography>
       </DialogContent>
       <DialogActions className="justify-center pbs-0 sm:pbe-16 sm:pli-16">

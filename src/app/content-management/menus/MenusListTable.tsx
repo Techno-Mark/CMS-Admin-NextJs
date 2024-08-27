@@ -215,7 +215,7 @@ const MenuListTable = () => {
             </Tooltip>
             <Tooltip title={'Sort'}>
             <IconButton
-              onClick={() => router.push(`/content-management/menus/menu-item`)}
+              onClick={() => router.push(`/content-management/menus/menu-item/${row.original.menuId}`)}
             >
               <i className="tabler-arrows-sort text-[22px] text-textSecondary" />
             </IconButton>

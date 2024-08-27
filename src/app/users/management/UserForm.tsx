@@ -137,7 +137,6 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
     fetchEditingRowData();
   }, [open, editingRow]);
 
-
   const addCompany = () => {
     setCompany([
       ...company,
