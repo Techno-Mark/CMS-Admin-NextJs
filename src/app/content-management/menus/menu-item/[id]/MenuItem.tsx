@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Box, Button, Card, Fab, Grid } from "@mui/material";
+import { Box, Button, Card, Fab, Grid, Typography } from "@mui/material";
 import KanbanDrawer from "./KanbanDrawer";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import BreadCrumbList from "@/components/BreadCrumbList";
@@ -9,6 +9,7 @@ import { postDataToOrganizationAPIs } from "@/services/apiService";
 import { menu } from "@/services/endpoint/menu";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "./ConfirmationDialog";
+import Image from "next/image";
 
 const MenuItem = ({
   menuData,
@@ -151,9 +152,11 @@ const MenuItem = ({
           onDrop={(e) => handleDrop(e, index, -1)}
           onDragOver={(e) => handleDropOver(e, index, -1)}
         >
-          <div className="flex-1 flex items-center">
+          <div className="flex-1 flex items-center gap-x-2">
             <DraggableIcon />
-            {item.name}
+            <img src={item.logo} alt="icon" width={30} height={30} />
+            <Typography variant="h5"> {item.name} </Typography>
+            <Typography variant="subtitle1"> ({item.link}) </Typography>
           </div>
           <div className="flex rounded-md border cursor-pointer">
             <div className=" bg-white border-r p-1">
@@ -196,9 +199,19 @@ const MenuItem = ({
                 onDrop={(e) => handleDrop(e, childIndex, index)}
                 onDragOver={(e) => handleDropOver(e, childIndex, index)}
               >
-                <div className="flex-1 flex items-center">
+                <div className="flex-1 flex items-center gap-x-2">
                   <DraggableIcon />
-                  {childItem.name}
+                  <img
+                    src={childItem.logo}
+                    alt="icon"
+                    width={30}
+                    height={30}
+                  />
+                  <Typography variant="h5"> {childItem.name} </Typography>
+                  <Typography variant="subtitle1">
+                    {" "}
+                    ({childItem.link}){" "}
+                  </Typography>
                 </div>
                 <div className="flex rounded-md border cursor-pointer">
                   <div className=" bg-white border-r p-1">
