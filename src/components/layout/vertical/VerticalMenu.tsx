@@ -23,6 +23,8 @@ import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNav
 // Style Imports
 import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
+import { useSession } from 'next-auth/react'
+import { useState } from 'react'
 
 type RenderExpandIconProps = {
   open?: boolean
@@ -51,19 +53,23 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
   const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
 
+  const { data: session } = useSession();
+
+ 
+
   return (
     // eslint-disable-next-line lines-around-comment
     /* Custom scrollbar instead of browser scroll, remove if you want browser scroll only */
     <ScrollWrapper
       {...(isBreakpointReached
         ? {
-            className: 'bs-full overflow-y-auto overflow-x-hidden',
-            onScroll: container => scrollMenu(container, false)
-          }
+          className: 'bs-full overflow-y-auto overflow-x-hidden',
+          onScroll: container => scrollMenu(container, false)
+        }
         : {
-            options: { wheelPropagation: false, suppressScrollX: true },
-            onScrollY: container => scrollMenu(container, true)
-          })}
+          options: { wheelPropagation: false, suppressScrollX: true },
+          onScrollY: container => scrollMenu(container, true)
+        })}
     >
       {/* Incase you also want to scroll NavHeader to scroll with Vertical Menu, remove NavHeader from above and paste it below this comment */}
       {/* Vertical Menu */}
@@ -98,26 +104,30 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         <MenuItem href='/content-management/recrutments' icon={<i className='tabler-briefcase' />}>
           Recrutments
         </MenuItem>
-        <SubMenu
-          label={"Users"}
-          icon={<i className='tabler-users-group' />}
-        >
-          <MenuItem href={`/users/management`} icon={<i className='tabler-users'></i>}>Users</MenuItem>
-          <MenuItem href={`/users/roles`} icon={<i className='tabler-user-cog'></i>}>Roles</MenuItem>
-          <MenuItem href={`/users/permissions`} icon={<i className='tabler-accessible'></i>}>Permissions</MenuItem>
-        </SubMenu>
-        <SubMenu
-          label={"Settings"}
-          icon={<i className='tabler-settings' />}
-        >
-          <MenuItem href={`/settings/organizations`} icon={<i className='tabler-affiliate'></i>}>Organization</MenuItem>
-          <MenuItem href={`/settings/content-blocks`} icon={<i className='tabler-box-margin'></i>}>Content Blocks</MenuItem>
-          <MenuItem href={`/settings/templates`} icon={<i className='tabler-template'></i>}>Templates</MenuItem>
-          <MenuItem href={`/settings/modules`} icon={<i className='tabler-stack-middle'></i>}>Modules</MenuItem>
-          <MenuItem href={`/settings/general`} icon={<i className='tabler-file-settings'></i>}>General</MenuItem>
-          <MenuItem href={`/settings/files`} icon={<i className='tabler-file-upload'></i>}>File Upload</MenuItem>
+        <MenuItem href={`/content-management/media`} icon={<i className='tabler-file-upload'></i>}>media</MenuItem>
+        {session?.user?.id == '1' && <>
+          <SubMenu
+            label={"Users"}
+            icon={<i className='tabler-users-group' />}
+          >
+            <MenuItem href={`/users/management`} icon={<i className='tabler-users'></i>}>Users</MenuItem>
+            <MenuItem href={`/users/roles`} icon={<i className='tabler-user-cog'></i>}>Roles</MenuItem>
+            <MenuItem href={`/users/permissions`} icon={<i className='tabler-accessible'></i>}>Permissions</MenuItem>
+          </SubMenu>
+          <SubMenu
+            label={"Settings"}
+            icon={<i className='tabler-settings' />}
+          >
+            <MenuItem href={`/settings/organizations`} icon={<i className='tabler-affiliate'></i>}>Organization</MenuItem>
+            <MenuItem href={`/settings/content-blocks`} icon={<i className='tabler-box-margin'></i>}>Content Blocks</MenuItem>
+            <MenuItem href={`/settings/templates`} icon={<i className='tabler-template'></i>}>Templates</MenuItem>
+            <MenuItem href={`/settings/modules`} icon={<i className='tabler-stack-middle'></i>}>Modules</MenuItem>
+            <MenuItem href={`/settings/general`} icon={<i className='tabler-file-settings'></i>}>General</MenuItem>
+            {/* <MenuItem href={`/settings/files`} icon={<i className='tabler-file-upload'></i>}>File Upload</MenuItem> */}
 
-        </SubMenu>
+          </SubMenu>
+        </>
+        }
       </Menu>
       {/* <Menu
         popoutMenuOffset={{ mainAxis: 23 }}

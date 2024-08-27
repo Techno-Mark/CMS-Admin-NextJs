@@ -1,4 +1,4 @@
 export default function Page() {
-    return <h1>General page!</h1>
+    return <h4>General page!</h4>
 }
   

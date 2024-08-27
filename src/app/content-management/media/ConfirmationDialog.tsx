@@ -24,6 +24,7 @@ const ConfirmationDialog = ({
 }: ConfirmationDialogProps) => {
   const deleteTemplate = async () => {
     try {
+      
       const result = await postDataToOrganizationAPIs(media.deleteMediaResource, {
         mediaId: deletingId,
       });

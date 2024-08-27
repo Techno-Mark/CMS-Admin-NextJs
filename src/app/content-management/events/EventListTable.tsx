@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@mui/material/Card";
-import { MenuItem, TablePagination, TextFieldProps } from "@mui/material";
+import { MenuItem, TablePagination, TextFieldProps, Tooltip } from "@mui/material";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
@@ -213,6 +213,7 @@ const BlogListTable = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
+             <Tooltip title={'Edit'}>
             <IconButton
               onClick={() =>
                 router.push(
@@ -222,6 +223,8 @@ const BlogListTable = () => {
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
             </IconButton>
+            </Tooltip>
+            <Tooltip title={'Delete'}>
             <IconButton
               onClick={() => {
                 setIsDeleting(true);
@@ -230,6 +233,7 @@ const BlogListTable = () => {
             >
               <i className="tabler-trash text-[22px] text-textSecondary" />
             </IconButton>
+            </Tooltip>
           </div>
         ),
         enableSorting: false,

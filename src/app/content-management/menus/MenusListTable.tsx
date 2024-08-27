@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@mui/material/Card";
-import { MenuItem, TablePagination, TextFieldProps } from "@mui/material";
+import { MenuItem, TablePagination, TextFieldProps, Tooltip } from "@mui/material";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
@@ -192,15 +192,18 @@ const MenuListTable = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
-            <IconButton
-              onClick={() =>
-                router.push(
-                  `/content-management/menus/edit/${row.original.menuId}`
-                )
-              }
-            >
-              <i className="tabler-edit text-[22px] text-textSecondary" />
-            </IconButton>
+            <Tooltip title={'Edit'}>
+              <IconButton
+                onClick={() =>
+                  router.push(
+                    `/content-management/menus/edit/${row.original.menuId}`
+                  )
+                }
+              >
+                <i className="tabler-edit text-[22px] text-textSecondary" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={'Delete'}>
             <IconButton
               onClick={() => {
                 setIsDeleting(true);
@@ -209,11 +212,14 @@ const MenuListTable = () => {
             >
               <i className="tabler-trash text-[22px] text-textSecondary" />
             </IconButton>
+            </Tooltip>
+            <Tooltip title={'Sort'}>
             <IconButton
               onClick={() => router.push(`/content-management/menus/menu-item/${row.original.menuId}`)}
             >
-              <i className="tabler-edit text-[22px] text-textSecondary" />
+              <i className="tabler-arrows-sort text-[22px] text-textSecondary" />
             </IconButton>
+            </Tooltip>
           </div>
         ),
         enableSorting: false,

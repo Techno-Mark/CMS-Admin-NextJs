@@ -8,5 +8,5 @@ export type PermissionsType = {
     updatedAt: string | null;
 }
 
-export type ADD_PERMISSION = -1
-export type EDIT_PERMISSION = 1
+export type ADD_Modules = -1
+export type EDIT_Modules = 1

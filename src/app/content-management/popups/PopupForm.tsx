@@ -395,8 +395,9 @@ function PopupForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
                         key={bannerImage.name}
                         alt={bannerImage.name}
                         className="object-contain w-full h-full"
-                        src={URL.createObjectURL(bannerImage)}
-                      />
+                        // src={URL.createObjectURL(bannerImage)}
+                         src={`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${bannerImage}`}
+                        />
                     ) : (
                       <>
                         <Avatar variant="rounded" className="bs-12 is-12 mbe-9">

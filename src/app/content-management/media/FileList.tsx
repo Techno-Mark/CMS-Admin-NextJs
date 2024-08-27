@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@mui/material/Card";
-import { Box, MenuItem, TablePagination, TextFieldProps } from "@mui/material";
+import { Box, MenuItem, TablePagination, TextFieldProps, Tooltip } from "@mui/material";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
@@ -204,17 +204,20 @@ const FileListTable = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
+            <Tooltip title={'View The File'}>
+
             <IconButton
               onClick={() => {
-                // Construct the correct URL
+                
                 const url = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${row.original.filePath}`;
-               
-                // Open the URL in a new tab
+              
                 window.open(url, '_blank');
               }}
             >
               <i className="tabler-eye text-[22px] " />
             </IconButton>
+            </Tooltip>
+            <Tooltip title={'Copy The URL'}>
 
             <IconButton
               onClick={() => {
@@ -222,7 +225,7 @@ const FileListTable = () => {
 
                 navigator.clipboard.writeText(url)
                   .then(() => {
-                
+                   
                     toast.success(`URL copied to clipboard!`);
                   })
                   .catch(err => {
@@ -233,6 +236,10 @@ const FileListTable = () => {
             >
               <i className="tabler-copy text-[22px]" />
             </IconButton>
+            </Tooltip>
+
+            <Tooltip title={'Delete'}>
+
              <IconButton
               onClick={() => {
                 setIsDeleting(true);
@@ -241,7 +248,8 @@ const FileListTable = () => {
               }}
             >
               <i className="tabler-trash text-[22px] text-textSecondary" />
-            </IconButton> 
+            </IconButton>
+            </Tooltip> 
           </div>
         ),
         enableSorting: false,
@@ -329,7 +337,7 @@ const FileListTable = () => {
             <Button
               variant="contained"
               startIcon={<i className="tabler-plus" />}
-              onClick={() => router.push("/settings/files/add")}
+              onClick={() => router.push("/content-management/media/add")}
               className="is-full sm:is-auto"
             >
               Add File

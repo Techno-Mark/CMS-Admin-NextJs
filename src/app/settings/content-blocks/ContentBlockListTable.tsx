@@ -35,7 +35,7 @@ import ConfirmationDialog from "./ConfirmationDialog";
 import { useRouter } from "next/navigation";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import { redirectToAddPage, redirectToEditPage } from "@/services/endpoint/content-block";
-import { MenuItem } from "@mui/material";
+import { MenuItem, Tooltip } from "@mui/material";
 import CustomChip from "@/@core/components/mui/Chip";
 
 declare module "@tanstack/table-core" {
@@ -167,6 +167,7 @@ const UserListTable = ({
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
+              <Tooltip title={'Edit'}>
               <IconButton
                 onClick={() => {
                   router.push(redirectToEditPage(row.original.id));
@@ -174,6 +175,8 @@ const UserListTable = ({
               >
                 <i className="tabler-edit text-[22px] text-textSecondary" />
               </IconButton>
+              </Tooltip>
+              <Tooltip title={'Delete'}>
               <IconButton
                 onClick={() => {
                   setIsDeleting(true);
@@ -182,6 +185,7 @@ const UserListTable = ({
               >
                 <i className="tabler-trash text-[22px] text-textSecondary" />
               </IconButton>
+              </Tooltip>
             </div>
           );
         },

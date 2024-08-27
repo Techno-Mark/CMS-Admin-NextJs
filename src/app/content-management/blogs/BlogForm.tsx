@@ -29,6 +29,14 @@ import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import { ADD_BLOG, blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
 import EditorBasic from "@/components/EditorToolbar";
+import EditorCustom from "./EditorCustom";
+import dynamic from "next/dynamic";
+// import MyCKEditor from "./EditorCustom";
+
+// Dynamically import CKEditor to prevent SSR issues
+const MyCKEditor = dynamic(() => import('./EditorCustom'), {
+  ssr: false
+})
 
 type blogFormPropsTypes = {
   open: number;
@@ -172,9 +180,9 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
       slug:
         !isSlugManuallyEdited && open === sectionActions.ADD
           ? newName
-              .replace(/[^\w\s]|_/g, "")
-              .replace(/\s+/g, "-")
-              .toLowerCase()
+            .replace(/[^\w\s]|_/g, "")
+            .replace(/\s+/g, "-")
+            .toLowerCase()
           : prevData.slug,
     }));
     if (newName?.length) {
@@ -370,6 +378,17 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
     }));
   };
 
+  const [editorData, setEditorData] = useState<string>('')
+
+  const handleEditorChangeCKEditor = (data: any) => {
+    // setEditorData(data)
+    setFormData((prevData) => ({
+      ...prevData,
+      description: data,
+    }));
+    console.log('Editor data:', data)
+  }
+
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -379,7 +398,7 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
             <BreadCrumbList />
           </Grid>
           <Grid item xs={12} sm={1}>
-            <IconButton color="info" onClick={() => {}}>
+            <IconButton color="info" onClick={() => { }}>
               <i className="tabler-external-link text-textSecondary"></i>
             </IconButton>
           </Grid>
@@ -403,6 +422,11 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
               <CustomTextField
                 // disabled={open === sectionActions.EDIT}
                 // error={!!formErrors.slug}
+                InputProps={{
+                  startAdornment: (
+                    '/blog/'
+                  )
+                }}
                 error={!!formErrors.slug}
                 helperText={formErrors.slug}
                 label="Slug *"
@@ -421,12 +445,21 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
             <Grid item xs={12} sm={12}>
               <p className="text-[#4e4b5a]">Description *</p>
 
-              <EditorBasic
+              <MyCKEditor
+                onChange={handleEditorChangeCKEditor}
+                initialValue={formData.description}
+              />
+              <div>
+                {/* <h2>Description :</h2> */}
+                <div dangerouslySetInnerHTML={{ __html: formData.description }} />
+              </div>
+
+              {/* <EditorBasic
                 content={formData.description}
                 onContentChange={handleContentChange}
                 error={!!formErrors.description}
                 helperText={formErrors.description}
-              />
+              /> */}
             </Grid>
             <Grid item xs={12} sm={12}>
               <CustomTextField

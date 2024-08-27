@@ -187,6 +187,7 @@ const OrganizationsListTable = () => {
         header: "Action",
         cell: ({ row }) => (
           <div className="flex items-center">
+             <Tooltip title={'Edit'}>
             <IconButton
               onClick={() =>
                 router.push(`/settings/organizations/edit/${row.original.id}`)
@@ -194,6 +195,8 @@ const OrganizationsListTable = () => {
             >
               <i className="tabler-edit text-[22px] text-textSecondary" />
             </IconButton>
+            </Tooltip>
+            <Tooltip title={'Delete'}>
             <IconButton
               onClick={() => {
                 setIsDeleting(true);
@@ -202,6 +205,7 @@ const OrganizationsListTable = () => {
             >
               <i className="tabler-trash text-[22px] text-textSecondary" />
             </IconButton>
+            </Tooltip>
           </div>
         ),
         enableSorting: false,

@@ -1,4 +1,4 @@
 export default function Page() {
-    return <h1>Popup!</h1>
+    return <h3>Requirements</h3>
 }
   

@@ -1,16 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { EDIT_File } from "@/types/apps/FilesTypes";
-import FileForm from "../../FileForm";
+import FileForm from "../FileForm";
+import { ADD_File } from "@/types/apps/FilesTypes";
 
 const Page = () => {
   const router = useRouter();
 
   return (
     <FileForm
-      open={EDIT_File}
-      handleClose={() => router.push("/settings/files")}
+      open={ADD_File}
+      handleClose={() => router.push("/content-management/media")}
       editingRow={null}
     />
   );

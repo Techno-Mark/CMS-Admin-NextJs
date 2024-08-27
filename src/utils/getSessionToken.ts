@@ -8,7 +8,7 @@ const getSessionToken = async () => {
   const session = await getServerSession(authOptions);
  
   if (!session) {
-    console.log("You must be logged in.");
+
 
     //   res.status(401).json({ message: "You must be logged in." })
     return;

@@ -122,7 +122,6 @@ const ContentBlockForm = ({ open }: Props) => {
   const handleChangeField = (index: number, field: string, value: any, subIndex?: number) => {
   
     const updatedFields = [...formData.jsonContent];
-
     if (subIndex !== undefined) {
       updatedFields[index].multipleData[subIndex][field] = value;
     } else {
