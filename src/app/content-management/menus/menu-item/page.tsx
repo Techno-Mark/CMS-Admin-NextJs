@@ -1,8 +1,7 @@
-import React from "react";
-import MenuItem from "./MenuItem";
+import { redirect } from "next/navigation";
 
 function page() {
-  return <MenuItem />;
+  return redirect('/content-management/menus');
 }
 
 export default page;
