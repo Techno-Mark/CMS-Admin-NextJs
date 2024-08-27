@@ -8,6 +8,7 @@ import DraggableIcon from "../_svg/DraggableIcon";
 import { postDataToOrganizationAPIs } from "@/services/apiService";
 import { menu } from "@/services/endpoint/menu";
 import { toast } from "react-toastify";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 const MenuItem = ({
   menuData,
@@ -24,6 +25,11 @@ const MenuItem = ({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editDrawer, setEditDrawer] = useState(false);
   const [editdata, setEditData] = useState<any>();
+  const [deleteDrawer, setDeleteDrawer] = useState<boolean>(false);
+  const [deleteData, setDeleteData] = useState({
+    index: -1,
+    parentId: -1,
+  });
 
   const handleDragStart = (
     e: React.DragEvent<HTMLLIElement>,
@@ -56,7 +62,8 @@ const MenuItem = ({
 
     if (
       data.draggedItemParentIndex === -1 &&
-      menuItems[data.draggedIndex].children.length > 0  && parentId !== -1 
+      menuItems[data.draggedIndex].children.length > 0 &&
+      parentId !== -1
     ) {
       return;
     }
@@ -136,7 +143,7 @@ const MenuItem = ({
 
   const renderMenuItems = (items: any[], parentId: number): React.ReactNode => {
     return items.map((item, index) => (
-      <ul key={index+1}>
+      <ul key={index + 1}>
         <li
           className="flex items-center border-b-black border-b"
           draggable
@@ -158,15 +165,23 @@ const MenuItem = ({
               </button>
             </div>
             <div className="p-1">
-              <button className="bg-white cursor-pointer">Delete</button>
+              <button
+                onClick={() => {
+                  setDeleteDrawer(true);
+                  setDeleteData({ index: index, parentId: -1 });
+                }}
+                className="bg-white cursor-pointer"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </li>
         {parentId == -1 && !item.children?.length && (
           <div
             className="m-2 ml-4"
-            onDrop={(e:any) => handleDrop(e, 0, index)}
-            onDragOver={(e:any) => handleDropOver(e, 0, index)}
+            onDrop={(e: any) => handleDrop(e, 0, index)}
+            onDragOver={(e: any) => handleDropOver(e, 0, index)}
           >
             Drop sub-item
           </div>
@@ -195,7 +210,15 @@ const MenuItem = ({
                     </button>
                   </div>
                   <div className="p-1">
-                    <button className="bg-white cursor-pointer">Delete</button>
+                    <button
+                      onClick={() => {
+                        setDeleteDrawer(true);
+                        setDeleteData({ index: childIndex, parentId: index });
+                      }}
+                      className="bg-white cursor-pointer"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               </li>
@@ -210,9 +233,14 @@ const MenuItem = ({
       <BreadCrumbList />
       <Card>
         <div className="bg-white p-1 max-w-[70%] m-auto">
-          {menuItems ? renderMenuItems(menuItems, -1):
-            <p className="text-xl p-4"> No Menu Created Yet, Add new Menu and save</p>
-          }
+          {menuItems ? (
+            renderMenuItems(menuItems, -1)
+          ) : (
+            <p className="text-xl p-4">
+              {" "}
+              No Menu Created Yet, Add new Menu and save
+            </p>
+          )}
           <Fab
             variant="extended"
             className="w-7 h-7 m-4"
@@ -239,6 +267,14 @@ const MenuItem = ({
               menuItems={menuItems}
               setMenuItems={setMenuItems}
               open={1}
+            />
+          )}
+          {deleteDrawer && (
+            <ConfirmationDialog
+              setOpen={setDeleteDrawer}
+              menuItems={menuItems}
+              setMenuItems={setMenuItems}
+              deleteData={deleteData}
             />
           )}
         </div>
