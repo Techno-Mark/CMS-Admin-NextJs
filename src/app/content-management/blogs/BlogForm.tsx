@@ -447,7 +447,7 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
 
               <MyCKEditor
                 onChange={handleEditorChangeCKEditor}
-                initialValue={formData.description}
+                initialValue={editingRow?.description}
               />
               {/* <div>
                 <div dangerouslySetInnerHTML={{ __html: formData.description }} />
