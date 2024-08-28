@@ -234,13 +234,13 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
     }
 
     if (!formData.subTitle) {
-      errors.title = "Please enter a sub title";
+      errors.subTitle = "Please enter a sub title";
       valid = false;
-    } else if (formData.subTitle.length < 2) {
-      errors.title = "sub title must be at least 2 characters long";
+    } else if (formData.subTitle.length < 5) {
+      errors.subTitle = "sub title must be at least 5 characters long";
       valid = false;
-    } else if (formData.subTitle.length > 255) {
-      errors.title = "sub title must be at most 255 characters long";
+    } else if (formData.subTitle.length > 1000) {
+      errors.subTitle = "sub title must be at most 1000 characters long";
       valid = false;
     }
 
