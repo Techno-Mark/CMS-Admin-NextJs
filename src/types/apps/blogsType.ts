@@ -21,6 +21,7 @@ export type blogDetailType = {
   authorName: string;
   bannerImageUrl: string;
   thumbnailImageUrl: string;
+  authorImageUrl:string;
   description: string;
   tags: String;
   categories: String;

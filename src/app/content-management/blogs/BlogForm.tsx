@@ -75,6 +75,7 @@ const initialErrorData = {
   authorName: "",
   bannerImageError: "",
   thumbnailImageError: "",
+  authorImageUrl:"",
   categories: "",
   tags: "",
   description: "",
@@ -90,9 +91,11 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
   //state management hook
   const [bannerImage, setBannerImage] = useState<File | null>(null);
   const [thumbnailImage, setThumbnailImage] = useState<File | null>(null);
+  const [authorImageUrl, setAuthorImageUrl] = useState<File | null>(null);
   const [isImageBannerTouched, setIsImageBannerTouched] = useState({
     bannerImage: false,
     thumbnailImage: false,
+    authorImageUrl:false,
   });
   const [formData, setFormData] =
     useState<typeof initialFormData>(initialFormData); // form data hooks
@@ -141,6 +144,24 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
       setIsImageBannerTouched({
         ...isImageBannerTouched,
         thumbnailImage: true,
+      });
+    },
+  });
+  //Author Image
+  const {
+    getRootProps: getAuthorRootProps,
+    getInputProps: getAuthorInputProps,
+  } = useDropzone({
+    multiple: false,
+    accept: {
+      "image/*": [".png", ".jpg", ".jpeg", ".gif"],
+    },
+    onDrop: (acceptedFiles: File[]) => {
+      setFormErrors({ ...formErrors, authorImageUrl: "" });
+      setAuthorImageUrl(acceptedFiles[0]);
+      setIsImageBannerTouched({
+        ...isImageBannerTouched,
+        authorImageUrl: true,
       });
     },
   });
@@ -322,6 +343,16 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
       errors.thumbnailImageError = `Invalid file type for Thumbnail Image. Allowed types ${validImageType.join(",")}`;
       valid = false;
     }
+
+    //validate author image
+    // if (open == ADD_BLOG && !thumbnailImage) {
+    //   errors.thumbnailImageError = "Thumbnail Image is required";
+    //   valid = false;
+    // }
+    if (authorImageUrl && !validImageType.includes(authorImageUrl.type)) {
+      errors.authorImageUrl = `Invalid file type for Author Image. Allowed types ${validImageType.join(",")}`;
+      valid = false;
+    }
     setFormErrors(errors);
     return valid;
   };
@@ -350,6 +381,9 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
         }
         if (thumbnailImage) {
           formDataToSend.append("thumbnailImage", thumbnailImage as Blob);
+        }
+        if (authorImageUrl) {
+          formDataToSend.append("authorImageUrl", authorImageUrl as Blob);
         }
 
         let result = null;
@@ -715,6 +749,71 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
                     <p className="text-[#ff5054]">
                       {" "}
                       {formErrors.thumbnailImageError}
+                    </p>
+                  )}
+                </Box>
+              </div>
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <p className="text-[#4e4b5a] my-2"> Author Image * </p>
+              <div className="flex items-center flex-col w-[250px] h-[170px] border border-dashed border-gray-300 rounded-md">
+                <Box
+                  {...getAuthorRootProps({ className: "dropzone" })}
+                  {...authorImageUrl}
+                >
+                  <input {...getAuthorInputProps()} />
+                  <div className="flex items-center justify-center flex-col w-[250px] h-[170px] border border-dashed border-gray-300 rounded-md p-2">
+                    {open == EDIT_BLOG &&
+                      !isImageBannerTouched.authorImageUrl && (
+                        <img
+                          className="object-contain w-full h-full"
+                          src={
+                            process.env.NEXT_PUBLIC_BACKEND_BASE_URL +
+                            "/" +
+                            editingRow?.authorImageUrl
+                          }
+                        />
+                      )}
+                    {authorImageUrl && isImageBannerTouched.authorImageUrl && (
+                      <img
+                        key={authorImageUrl.name}
+                        alt={authorImageUrl.name}
+                        className="object-contain w-full h-full"
+                        src={URL.createObjectURL(authorImageUrl)}
+                      />
+                    )}
+
+                    {!authorImageUrl &&
+                      !isImageBannerTouched.authorImageUrl &&
+                      open !== EDIT_BLOG && (
+                        <>
+                          <Avatar
+                            variant="rounded"
+                            className="bs-12 is-12 mbe-9"
+                          >
+                            <i className="tabler-upload" />
+                          </Avatar>
+                          <Typography variant="h5" className="mbe-2.5">
+                            Drop files here or click to upload.
+                          </Typography>
+                          <Typography>
+                            Drop files here or click{" "}
+                            <a
+                              href="/"
+                              onClick={(e) => e.preventDefault()}
+                              className="text-textPrimary no-underline"
+                            >
+                              browse
+                            </a>{" "}
+                            through your machine
+                          </Typography>
+                        </>
+                      )}
+                  </div>
+                  {!!formErrors.authorImageUrl && (
+                    <p className="text-[#ff5054]">
+                      {" "}
+                      {formErrors.authorImageUrl}
                     </p>
                   )}
                 </Box>
