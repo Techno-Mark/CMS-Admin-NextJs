@@ -522,12 +522,7 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
                 <div dangerouslySetInnerHTML={{ __html: formData.description }} />
               </div> */}
 
-              {/* <EditorBasic
-                content={formData.description}
-                onContentChange={handleContentChange}
-                error={!!formErrors.description}
-                helperText={formErrors.description}
-              /> */}
+            
             </Grid>
             <Grid item xs={12} sm={12}>
               <CustomTextField
