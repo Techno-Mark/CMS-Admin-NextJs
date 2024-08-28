@@ -28,8 +28,8 @@ import { tag } from "@/services/endpoint/tag";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import { ADD_BLOG, blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
-import EditorBasic from "@/components/EditorToolbar";
-import EditorCustom from "./EditorCustom";
+// import EditorBasic from "@/components/EditorToolbar";
+// import EditorCustom from "./EditorCustom";
 import dynamic from "next/dynamic";
 // import MyCKEditor from "./EditorCustom";
 

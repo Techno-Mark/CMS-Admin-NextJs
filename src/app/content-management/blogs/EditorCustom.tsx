@@ -22,11 +22,36 @@ const MyCKEditor: React.FC<CKEditorProps> = ({ onChange, initialValue = '' }) =>
           onChange(data)
         }}
         config={{
-          // You can add any additional CKEditor configuration here
+          extraPlugins: [CustomBase64Adapter],
+          image: {
+            toolbar: ['imageStyle:full', 'imageStyle:side', '|', 'imageTextAlternative'],
+          },
         }}
       />
     </div>
   )
 }
+
+function CustomBase64Adapter(editor:any) {
+  editor.plugins.get('FileRepository').createUploadAdapter = (loader:any) => {
+    return {
+      upload: () => {
+        return loader.file.then((file:any) => {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+              resolve({
+                default: reader.result,
+              });
+            };
+            reader.onerror = reject;
+          });
+        });
+      },
+    };
+  };
+}
+
 
 export default MyCKEditor
