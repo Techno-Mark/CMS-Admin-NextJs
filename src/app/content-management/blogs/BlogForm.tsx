@@ -55,6 +55,7 @@ const initialFormData = {
   id: -1,
   templateId: -1,
   title: "",
+  subTitle:"",
   slug: "",
   authorName: "",
   categories: [] as string[],
@@ -69,6 +70,7 @@ const initialFormData = {
 const initialErrorData = {
   templateId: "",
   title: "",
+  subTitle:"",
   slug: "",
   authorName: "",
   bannerImageError: "",
@@ -159,6 +161,7 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
           metaTitle: editingRow.metaTitle,
           metaKeywords: editingRow.metaKeywords,
           title: editingRow.title,
+          subTitle: editingRow.subTitle,
           slug: editingRow.slug,
         };
         setFormData({ ...formData, status: 0 });
@@ -229,6 +232,18 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
       errors.title = "title must be at most 255 characters long";
       valid = false;
     }
+
+    if (!formData.subTitle) {
+      errors.title = "Please enter a sub title";
+      valid = false;
+    } else if (formData.subTitle.length < 2) {
+      errors.title = "sub title must be at least 2 characters long";
+      valid = false;
+    } else if (formData.subTitle.length > 255) {
+      errors.title = "sub title must be at most 255 characters long";
+      valid = false;
+    }
+
     if (!formData.slug) {
       errors.slug = "Please add a slug";
       valid = false;
@@ -320,6 +335,7 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
         const formDataToSend = new FormData();
         formDataToSend.set("templateId", String(formData.templateId));
         formDataToSend.set("title", formData.title);
+        formDataToSend.set("subTitle", formData.subTitle);
         formDataToSend.set("slug", formData.slug);
         formDataToSend.set("authorName", formData.authorName);
         formDataToSend.set("description", formData.description);
@@ -416,6 +432,25 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
                 fullWidth
                 value={formData.title}
                 onChange={handleBlogTitleChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <CustomTextField
+                // disabled={true}
+                multiline
+                rows={3}
+                maxRows={5}
+                error={!!formErrors.subTitle}
+                helperText={formErrors.subTitle}
+                label="Sub Title *"
+                fullWidth
+                value={formData.subTitle}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  setFormData({ ...formData, subTitle: e.target.value });
+                  if (e.target?.value?.length) {
+                    setFormErrors({ ...formErrors, subTitle: "" });
+                  }
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={12}>

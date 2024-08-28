@@ -16,6 +16,7 @@ export type blogDetailType = {
   templateId: number;
   templateData: Object;
   title: string;
+  subTitle: string,
   slug: string;
   authorName: string;
   bannerImageUrl: string;
