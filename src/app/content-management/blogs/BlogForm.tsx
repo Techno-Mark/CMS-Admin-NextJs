@@ -10,6 +10,7 @@ import {
   Typography,
   Avatar,
   IconButton,
+  Tooltip,
 } from "@mui/material";
 import CustomTextField from "@/@core/components/mui/TextField";
 import React, { ChangeEvent, useEffect, useState } from "react";
@@ -34,9 +35,9 @@ import dynamic from "next/dynamic";
 // import MyCKEditor from "./EditorCustom";
 
 // Dynamically import CKEditor to prevent SSR issues
-const MyCKEditor = dynamic(() => import('./EditorCustom'), {
-  ssr: false
-})
+const MyCKEditor = dynamic(() => import("./EditorCustom"), {
+  ssr: false,
+});
 
 type blogFormPropsTypes = {
   open: number;
@@ -55,7 +56,7 @@ const initialFormData = {
   id: -1,
   templateId: -1,
   title: "",
-  subTitle:"",
+  subTitle: "",
   slug: "",
   authorName: "",
   categories: [] as string[],
@@ -70,12 +71,12 @@ const initialFormData = {
 const initialErrorData = {
   templateId: "",
   title: "",
-  subTitle:"",
+  subTitle: "",
   slug: "",
   authorName: "",
   bannerImageError: "",
   thumbnailImageError: "",
-  authorImageUrl:"",
+  authorImageUrl: "",
   categories: "",
   tags: "",
   description: "",
@@ -95,7 +96,7 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
   const [isImageBannerTouched, setIsImageBannerTouched] = useState({
     bannerImage: false,
     thumbnailImage: false,
-    authorImageUrl:false,
+    authorImageUrl: false,
   });
   const [formData, setFormData] =
     useState<typeof initialFormData>(initialFormData); // form data hooks
@@ -204,9 +205,9 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
       slug:
         !isSlugManuallyEdited && open === sectionActions.ADD
           ? newName
-            .replace(/[^\w\s]|_/g, "")
-            .replace(/\s+/g, "-")
-            .toLowerCase()
+              .replace(/[^\w\s]|_/g, "")
+              .replace(/\s+/g, "-")
+              .toLowerCase()
           : prevData.slug,
     }));
     if (newName?.length) {
@@ -408,27 +409,112 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
       }
     }
   };
-  const handleEditorChange = (content: string) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      description: content,
-    }));
-    if (content?.length) {
-      setFormErrors((prevFormErrors) => ({
-        ...prevFormErrors,
-        description: "",
-      }));
+
+  const convertImageToBase64 = (file: any) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.readAsDataURL(file);
+
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+
+      reader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
+
+  // handle Preview Generate
+  const handlePreviewGenerateAndRedirect = async () => {
+    if (validateForm()) {
+      try {
+        const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+        setLoading(true);
+        let todayDate: string | Date = new Date();
+        todayDate =
+          todayDate.getDay() +
+          "/" +
+          todayDate.getMonth() +
+          "/" +
+          todayDate.getFullYear();
+
+        const previewData = {
+          title: formData.title,
+          subTitle: formData.subTitle,
+          slug: formData.slug,
+          authorName: formData.authorName,
+          bannerImageUrl: "",
+          thumbnailImageUrl: "",
+          authorImageUrl: "",
+          description: formData.description,
+          tags: formData.tags,
+          // categories: formData.Categories,
+          metaTitle: formData.metaTitle,
+          metaDescription: formData.metaDescription,
+          metaKeywords: formData.metaKeywords,
+          createdAt: editingRow?.createdAt,
+          updatedAt: todayDate,
+        };
+
+        //authorImageUrl
+        if (
+          !isImageBannerTouched.authorImageUrl &&
+          editingRow?.authorImageUrl
+        ) {
+          previewData.authorImageUrl = (BACKEND_URL +
+            "/" +
+            editingRow?.authorImageUrl) as string;
+        } else if (authorImageUrl) {
+          previewData.authorImageUrl = (await convertImageToBase64(
+            authorImageUrl
+          )) as string;
+        }
+
+        //bannerImage
+        if (!isImageBannerTouched.bannerImage && editingRow?.bannerImageUrl) {
+          previewData.bannerImageUrl = (BACKEND_URL +
+            "/" +
+            editingRow?.bannerImageUrl) as string;
+        } else if (bannerImage) {
+          previewData.bannerImageUrl = (await convertImageToBase64(
+            bannerImage
+          )) as string;
+        }
+
+        //thumbnailImage
+        // if (
+        //   !isImageBannerTouched.thumbnailImage &&
+        //   editingRow?.thumbnailImageUrl
+        // ) {
+        //   previewData.thumbnailImageUrl = (BACKEND_URL +
+        //     "/" +
+        //     editingRow?.thumbnailImageUrl) as string;
+        // } else if (thumbnailImage) {
+        //   previewData.thumbnailImageUrl = (await convertImageToBase64(
+        //     thumbnailImage
+        //   )) as string;
+        // }
+
+        let result = await postDataToOrganizationAPIs(
+          blogPost.generatePreview,
+          { data: previewData }
+        );
+        setLoading(false);
+
+        if (result.statusCode === 200) {
+          let redirectURL = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/blogs/${formData.slug}?preview=true&id=${result.data.hash}`;
+          window.open(redirectURL, "_blank");
+        } else {
+          toast.error(result.message);
+        }
+      } catch (error) {
+        console.error(error);
+        setLoading(false);
+      }
     }
   };
-
-  const handleContentChange = (content: any) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      description: content,
-    }));
-  };
-
-  const [editorData, setEditorData] = useState<string>('')
 
   const handleEditorChangeCKEditor = (data: any) => {
     // setEditorData(data)
@@ -436,8 +522,8 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
       ...prevData,
       description: data,
     }));
-    console.log('Editor data:', data)
-  }
+    console.log("Editor data:", data);
+  };
 
   return (
     <>
@@ -448,9 +534,14 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
             <BreadCrumbList />
           </Grid>
           <Grid item xs={12} sm={1}>
-            <IconButton color="info" onClick={() => { }}>
-              <i className="tabler-external-link text-textSecondary"></i>
-            </IconButton>
+            <Tooltip title="preview blog">
+              <IconButton
+                color="info"
+                onClick={() => handlePreviewGenerateAndRedirect()}
+              >
+                <i className="tabler-external-link text-textSecondary"></i>
+              </IconButton>
+            </Tooltip>
           </Grid>
         </Grid>
       </Box>
@@ -492,9 +583,7 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
                 // disabled={open === sectionActions.EDIT}
                 // error={!!formErrors.slug}
                 InputProps={{
-                  startAdornment: (
-                    '/blog/'
-                  )
+                  startAdornment: "/blog/",
                 }}
                 error={!!formErrors.slug}
                 helperText={formErrors.slug}
@@ -521,8 +610,6 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
               {/* <div>
                 <div dangerouslySetInnerHTML={{ __html: formData.description }} />
               </div> */}
-
-            
             </Grid>
             <Grid item xs={12} sm={12}>
               <CustomTextField

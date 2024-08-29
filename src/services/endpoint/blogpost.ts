@@ -6,4 +6,7 @@ export const blogPost = {
   update: `${commonPrefix}/update`,
   getById: `${commonPrefix}/getById`,
   delete: `${commonPrefix}/delete`,
+
+  generatePreview: `organization/preview/generate-hash`,
+
 };
