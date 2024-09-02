@@ -19,6 +19,7 @@ import CustomAutocomplete from '@core/components/mui/Autocomplete';
 import { section } from '@/services/endpoint/section';
 import BreadCrumbList from '@/components/BreadCrumbList';
 import LoadingBackdrop from '@/components/LoadingBackdrop';
+import { v4 as uuidv4 } from 'uuid';
 // import DeleteIcon from '@mui/icons-material/Delete';
 
 type SectionType = {
@@ -47,7 +48,8 @@ const initialData: TemplateType = {
   templateSlug: '',
   sectionIds: [],
   templateSection: [],
-  createdAt: ''
+  createdAt: '',
+  uniqueSectionName:""
 };
 
 const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditingRow }) => {
@@ -123,6 +125,17 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
     setLoading(false);
     return isValid;
   };
+// Helper function to generate unique ID
+const generateUniqueId = (length = 10) => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  const charactersLength = characters.length;
+  for ( let i = 0; i < length; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,8 +160,11 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
           sectionIds: selectedSections.map(section => ({
             sectionId: section.sectionId,
             isCommon: section.isCommon ? 'true' : undefined,
+            uniqueSectionName: editingRow ? formData.uniqueSectionName : `${section.sectionName}_${uuidv4()}`,
           })),
         };
+        console.log(payload);
+        
 
         const response = await post(endpoint, payload);
         toast.success(response.message);
@@ -403,3 +419,4 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
 };
 
 export default TemplateForm;
+
