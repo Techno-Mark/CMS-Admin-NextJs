@@ -280,89 +280,15 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       try {
         setLoading(true);
         const formattedData: any[] = [];
-        Object.keys(formData.templateData).forEach((key) => {
-          const content = formData.templateData[key];
-          const sectionName = content.sectionName;
-          const keyMultiple = content.keyMultiple;
-          const sectionMultipleId = content.templateSectionMultipleId;
-          let contentBlock = formattedData.find(
-            (block) => block[`${sectionName}`]
-          );
-          if (!contentBlock) {
-            contentBlock = { [`${sectionName}`]: [] };
-            formattedData.push(contentBlock);
-          }
-          let formattedContent;
-          switch (content.fieldType) {
-            case "email":
-              formattedContent = {
-                [sectionMultipleId ? content.feKey : content.feKey || ""]:
-                  content.email || "",
-              };
-              break;
-            case "file":
-              formattedContent = {
-                [sectionMultipleId ? content.feKey : content.feKey || ""]:
-                  content.file,
-              };
-              break;
-            case "url":
-              formattedContent = {
-                [sectionMultipleId ? content.feKey : content.feKey || ""]:
-                  content.url,
-              };
-              break;
-            case "date":
-              formattedContent = {
-          
-                [sectionMultipleId ? content.feKey : content.feKey || ""]:
-                  content.date,
-              };
-              break;
-            case "number":
-              formattedContent = {
-             
-                [sectionMultipleId ? content.feKey : content.feKey || ""]:
-                  content.number,
-              };
-              break;
-            case "textarea":
-              formattedContent = {
         
-                [sectionMultipleId ? content.feKey : content.feKey || ""]:
-                  content.textarea,
-              };
-              break;
-            case "text":
-            default:
-              formattedContent = {
-            
-                [sectionMultipleId ? content.feKey : content.feKey || ""]:
-                  content.text,
-              };
-              break;
-          }
-          if (sectionMultipleId) {
-            let nestedSection = contentBlock[`${sectionName}`].find(
-              (section: { [x: string]: any }) =>
-                section[`${content.fieldLabel}`]
-            );
-            if (!nestedSection) {
-              nestedSection = { [`${content.fieldLabel}`]: [] };
-              contentBlock[`${sectionName}`].push(nestedSection);
-            }
-            let groupedArray = nestedSection[`${content.fieldLabel}`].find(
-              (item: any) => item.keyMultiple === keyMultiple
-            );
-            if (!groupedArray) {
-              groupedArray = { keyMultiple, items: [] };
-              nestedSection[`${content.fieldLabel}`].push(groupedArray);
-            }
-            groupedArray.items.push({ ...formattedContent });
-          } else {
-            contentBlock[`${sectionName}`].push(formattedContent);
-          }
-        });
+        Object.keys(sections).forEach((key:any)=>{
+          let uniqueSection =  sections[key]?.uniqueSectionName;
+          const lastUnderscoreIndex = uniqueSection.lastIndexOf("_");
+          let secName = uniqueSection.slice(0,lastUnderscoreIndex);
+          let templateSectionValue = {[secName]: templateValue[uniqueSection]} 
+          formattedData.push(templateSectionValue);
+        })
+      
         const endpoint = editingRow ? pages.update : pages.create;
         const result = await post(endpoint, {
           ...formData,
