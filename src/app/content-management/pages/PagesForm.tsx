@@ -104,7 +104,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }
     getTemplate();
   }, []);
-
   const getActiveTemplateList = async () => {
     try {
       setLoading(true);
@@ -117,7 +116,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       setLoading(false);
     }
   };
-
   const getTemplateIdWiseForm = async (templateId: number) => {
     setLoading(true);
     try {
@@ -131,7 +129,36 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       setLoading(false);
     }
   };
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSlug = e.target.value;
+    const slugRegex = /^[a-zA-Z0-9/-]+$/;
 
+    if (!slugRegex.test(newSlug)) {
+      setFormErrors({
+        ...formErrors,
+        slug: "Slug must be alphanumeric with no spaces, or underscores.",
+      });
+    } else {
+      setFormErrors({ ...formErrors, slug: "" });
+    }
+
+    setFormData((prevData) => ({
+      ...prevData,
+      slug: newSlug,
+    }));
+    setIsSlugManuallyEdited(true);
+  };
+  const handleSectionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value;
+    setFormErrors({ ...formErrors, title: "" });
+    setFormData((prevData) => ({
+      ...prevData,
+      title: newName,
+    }));
+  };
+
+
+  //validate form and submit
   const validateField = (value: string, validation: any, field?: any) => {
     if (!value && field?.isRequired) {
       return `${field?.fieldLabel} is required`;
@@ -186,7 +213,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }
     return "";
   };
-
   const validateForm = () => {
     let valid = true;
     let errors = { ...initialErrorData };
@@ -239,7 +265,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     setFormErrors(errors);
     return valid;
   };
-
   const handleSubmit = async (event: React.FormEvent, pdStatus: boolean) => {
     event.preventDefault();
     if (validateForm()) {
@@ -292,6 +317,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }
   };
 
+
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement>,
     uniqueSectionName: string,
@@ -302,11 +328,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     const { name, value, files } = event.target;
 
     if (multipleIndex !== -1) {
-      // console.log(fekey, multipleIndex, multiFeKey);
-      // return;
       setTemplateValues((prev: any) => {
         const currentMultiple = [...prev?.[uniqueSectionName]?.[fekey]];
-
         currentMultiple[multipleIndex][multiFeKey] = value;
 
         return {
@@ -317,11 +340,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
           },
         };
       });
-
-
       return;
     }
-
     // Handling non-file input changes
     setTemplateValues((prev: any) => {
       return {
@@ -333,36 +353,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       };
     });
   };
-
-  const handleSectionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value;
-    setFormErrors({ ...formErrors, title: "" });
-    setFormData((prevData) => ({
-      ...prevData,
-      title: newName,
-    }));
-  };
-
-  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSlug = e.target.value;
-    const slugRegex = /^[a-zA-Z0-9/-]+$/;
-
-    if (!slugRegex.test(newSlug)) {
-      setFormErrors({
-        ...formErrors,
-        slug: "Slug must be alphanumeric with no spaces, or underscores.",
-      });
-    } else {
-      setFormErrors({ ...formErrors, slug: "" });
-    }
-
-    setFormData((prevData) => ({
-      ...prevData,
-      slug: newSlug,
-    }));
-    setIsSlugManuallyEdited(true);
-  };
-
   function handleAddDuplicateForm(
     sectionName: any,
     feKey: any,
@@ -374,12 +364,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       duplicateData[value?.fekey] = "";
     });
 
-    // Update the state
     setTemplateValues((prev: any) => {
       const currentMultiple = prev?.[sectionName]?.[feKey] || [];
-
       currentMultiple?.splice(index, 0, duplicateData);
-
       return {
         ...prev,
         [sectionName]: {
@@ -389,7 +376,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       };
     });
   }
-
   function handleRemoveDuplicateForm(
     sectionName: any,
     feKey: any,
@@ -409,8 +395,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       };
     });
   }
-
-  console.log("template values", templateValue);
 
   return (
     <>
@@ -553,9 +537,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                   </CustomTextField>
                 </Grid>
                 <Grid item xs={12} sm={12}>
-                  {sections.map((section, index) => (
+                  {sections.map((section, sectionIndex) => (
                     <Card
-                      key={section.uniqueSectionName || index}
+                      key={section.uniqueSectionName || sectionIndex}
                       variant="outlined"
                       style={{ marginBottom: "10px" }}
                     >
@@ -564,13 +548,13 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                           {section.sectionName}
                         </Typography>
                         {section.sectionTemplate.map(
-                          (field: any, fieldIndex: number) => (
+                          (sectionField: any, sectioFieldIndex: number) => (
                             <Grid
                               container
-                              key={`${section.uniqueSectionName}+${field.fekey}`}
+                              key={`${section.uniqueSectionName}+${sectionField.fekey}`}
                               spacing={2}
                             >
-                              {field.fieldType === "multiple" && (
+                              {sectionField.fieldType === "multiple" && (
                                 <Grid
                                   item
                                   xs={12}
@@ -589,7 +573,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                             variant="h6"
                                             component="div"
                                           >
-                                            {field.fieldLabel}
+                                            {sectionField.fieldLabel}
                                           </Typography>
                                         </Grid>
                                         <Grid item xs={2}>
@@ -598,16 +582,16 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                             size="small"
                                           >
                                             <Tooltip
-                                              title={`Add ${field.fieldLabel}`}
+                                              title={`Add ${sectionField.fieldLabel}`}
                                             >
                                               <Button
                                                 size="small"
                                                 onClick={() =>
                                                   handleAddDuplicateForm(
                                                     section.uniqueSectionName,
-                                                    field.fekey,
-                                                    index,
-                                                    field
+                                                    sectionField.fekey,
+                                                    sectionIndex,
+                                                    sectionField
                                                   )
                                                 }
                                               >
@@ -616,15 +600,15 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                             </Tooltip>
 
                                             <Tooltip
-                                              title={`Remove ${field.fieldLabel}`}
+                                              title={`Remove ${sectionField.fieldLabel}`}
                                             >
                                               <Button
                                                 size="small"
                                                 onClick={() =>
                                                   handleRemoveDuplicateForm(
                                                     section.uniqueSectionName,
-                                                    field.fekey,
-                                                    index
+                                                    sectionField.fekey,
+                                                    sectionIndex
                                                   )
                                                 }
                                               >
@@ -638,19 +622,19 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                     <CardContent>
                                       {templateValue?.[
                                         section.uniqueSectionName
-                                      ]?.[field.fekey].map(
+                                      ]?.[sectionField.fekey]?.map(
                                         (
-                                          templaeMultiple: any,
-                                          templateMultipleIndex: any
+                                          multipleSection: any,
+                                          multipleSectionIndex: any
                                         ) =>
-                                          field.multipleData?.map(
+                                          sectionField.multipleData?.map(
                                             (
                                               subField: any,
                                               subFieldIndex: number
                                             ) => (
                                               <Grid
                                                 container
-                                                key={`${index}+${fieldIndex}+${subFieldIndex}`}
+                                                key={`${section.uniqueSectionName}+${section.fekey}+${subField.fekey}`}
                                                 spacing={2}
                                                 item
                                                 xs={12}
@@ -670,8 +654,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                       handleInputChange(
                                                         e,
                                                         section?.uniqueSectionName,
-                                                        field.fekey,
-                                                        templateMultipleIndex,
+                                                        sectionField.fekey,
+                                                        multipleSectionIndex,
                                                         subField.fekey
                                                       )
                                                     }
@@ -696,8 +680,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                       templateValue?.[
                                                         section
                                                           .uniqueSectionName
-                                                      ]?.[field.fekey]?.[
-                                                        templateMultipleIndex
+                                                      ]?.[sectionField.fekey]?.[
+                                                        multipleSectionIndex
                                                       ]?.[subField.fekey] || ""
                                                     }
                                                   />
@@ -711,41 +695,41 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                 </Grid>
                               )}
 
-                              {field.fieldType !== "multiple" && (
+                              {sectionField.fieldType !== "multiple" && (
                                 <Grid item xs={12} sm={12}>
                                   <CustomTextField
                                     multiline
                                     label={
-                                      field.isRequired
-                                        ? `${field.fieldLabel} *`
-                                        : field.fieldLabel
+                                      sectionField.isRequired
+                                        ? `${sectionField.fieldLabel} *`
+                                        : sectionField.fieldLabel
                                     }
-                                    type={field.fieldType}
-                                    name={field.fieldType}
+                                    type={sectionField.fieldType}
+                                    name={sectionField.fieldType}
                                     onChange={(
                                       e: ChangeEvent<HTMLInputElement>
                                     ) =>
                                       handleInputChange(
                                         e,
                                         section.uniqueSectionName,
-                                        field.fekey
+                                        sectionField.fekey
                                       )
                                     }
                                     fullWidth
                                     margin="normal"
                                     //@ts-ignore
-                                    error={field.error && field.error}
+                                    // error={sectioFieldIndex.error && sectioFieldIndex.error}
                                     //@ts-ignore
-                                    helperText={field.error && field.error}
+                                    // helperText={field.error && field.error}
                                     inputProps={
-                                      field.validation
-                                        ? JSON.parse(field.validation)
+                                      sectionField.validation
+                                        ? JSON.parse(sectionField.validation)
                                         : {}
                                     }
                                     value={
                                       templateValue?.[
                                         section.uniqueSectionName
-                                      ]?.[field.fekey] || ""
+                                      ]?.[sectionField.fekey] || ""
                                     }
                                   />
                                 </Grid>
