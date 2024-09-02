@@ -296,12 +296,29 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     event: ChangeEvent<HTMLInputElement>,
     uniqueSectionName: string,
     fekey: string,
-    multiple = false
+    multipleIndex = -1,
+    multiFeKey = ""
   ) => {
     const { name, value, files } = event.target;
 
-    if (multiple) {
-      // console.log(uniqueSectionName, fekey, multiple)
+    if (multipleIndex !== -1) {
+      // console.log(fekey, multipleIndex, multiFeKey);
+      // return;
+      setTemplateValues((prev: any) => {
+        const currentMultiple = [...prev?.[uniqueSectionName]?.[fekey]];
+
+        currentMultiple[multipleIndex][multiFeKey] = value;
+
+        return {
+          ...prev,
+          [uniqueSectionName]: {
+            ...(prev?.[uniqueSectionName] || {}),
+            [fekey]: currentMultiple,
+          },
+        };
+      });
+
+
       return;
     }
 
@@ -310,27 +327,11 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       return {
         ...prev,
         [uniqueSectionName]: {
-          ...(prev?.[uniqueSectionName] || {}), // Safely check if the section exists, create an empty object if not
-          [fekey]: value, // Set the fekey inside the section
+          ...(prev?.[uniqueSectionName] || {}),
+          [fekey]: value,
         },
       };
     });
-
-    // setTemplateValues((prev: any) => {
-    //   return {
-    //     ...prev,
-    //     [uniqueSectionName]: {
-    //       ...(prev?.[uniqueSectionName] || {}), // Ensure the section exists
-    //       [fekey]: {
-    //         ...prev?.[uniqueSectionName]?.[fekey], // Ensure the fekey exists
-    //         multiple: [
-    //           ...(prev?.[uniqueSectionName]?.[fekey]?.multiple || []), // Safely handle the array
-    //           { key: value }, // Insert the new object into the array
-    //         ],
-    //       },
-    //     },
-    //   };
-    // });
   };
 
   const handleSectionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -409,7 +410,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     });
   }
 
-  console.log('template values', templateValue);
+  console.log("template values", templateValue);
 
   return (
     <>
@@ -637,8 +638,11 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                     <CardContent>
                                       {templateValue?.[
                                         section.uniqueSectionName
-                                      ]?.[field.fekey].map((key: any) => 
-                                        
+                                      ]?.[field.fekey].map(
+                                        (
+                                          templaeMultiple: any,
+                                          templateMultipleIndex: any
+                                        ) =>
                                           field.multipleData?.map(
                                             (
                                               subField: any,
@@ -665,9 +669,10 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                     onChange={(e: any) =>
                                                       handleInputChange(
                                                         e,
-                                                        section.sectionId,
-                                                        index,
-                                                        true
+                                                        section?.uniqueSectionName,
+                                                        field.fekey,
+                                                        templateMultipleIndex,
+                                                        subField.fekey
                                                       )
                                                     }
                                                     fullWidth
@@ -692,15 +697,14 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                         section
                                                           .uniqueSectionName
                                                       ]?.[field.fekey]?.[
-                                                        subFieldIndex
-                                                      ]?.[subField] || ""
+                                                        templateMultipleIndex
+                                                      ]?.[subField.fekey] || ""
                                                     }
                                                   />
                                                 }
                                               </Grid>
                                             )
                                           )
-                                        
                                       )}
                                     </CardContent>
                                   </Card>
