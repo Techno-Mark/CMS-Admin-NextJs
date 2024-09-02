@@ -295,9 +295,15 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement>,
     uniqueSectionName: string,
-    fekey: string
+    fekey: string,
+    multiple = false
   ) => {
     const { name, value, files } = event.target;
+
+    if (multiple) {
+      // console.log(uniqueSectionName, fekey, multiple)
+      return;
+    }
 
     // Handling non-file input changes
     setTemplateValues((prev: any) => {
@@ -383,27 +389,28 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     });
   }
 
-
-
   function handleRemoveDuplicateForm(
     sectionName: any,
     feKey: any,
-    index: number  ) {
-      setTemplateValues((prev: any) => {
-        const currentMultiple = prev?.[sectionName]?.[feKey] || [];
-  
-        currentMultiple?.splice(index, 1);
-  
-        return {
-          ...prev,
-          [sectionName]: {
-            ...(prev?.[sectionName] || {}),
-            [feKey]: currentMultiple,
-          },
-        };
-      });
-    }
-    console.log("updaed value", templateValue);
+    index: number
+  ) {
+    setTemplateValues((prev: any) => {
+      const currentMultiple = prev?.[sectionName]?.[feKey] || [];
+
+      currentMultiple?.splice(index, 1);
+
+      return {
+        ...prev,
+        [sectionName]: {
+          ...(prev?.[sectionName] || {}),
+          [feKey]: currentMultiple,
+        },
+      };
+    });
+  }
+
+  console.log('template values', templateValue);
+
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -628,62 +635,72 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                       </Grid>
                                     </CardActions>
                                     <CardContent>
-                                      {field.multipleData?.map(
-                                        (
-                                          subField: any,
-                                          subFieldIndex: number
-                                        ) => (
-                                          <Grid
-                                            container
-                                            key={`${index}+${fieldIndex}+${subFieldIndex}`}
-                                            spacing={2}
-                                            item
-                                            xs={12}
-                                            sm={12}
-                                          >
-                                            {
-                                              <CustomTextField
-                                                multiline
-                                                label={
-                                                  subField.isRequired
-                                                    ? `${subField.fieldLabel} *`
-                                                    : subField.fieldLabel
-                                                }
-                                                type={subField.fieldType}
-                                                name={subField.fieldType}
-                                                onChange={(e: any) =>
-                                                  handleInputChange(
-                                                    e,
-                                                    section.sectionId,
-                                                    index
-                                                  )
-                                                }
-                                                fullWidth
-                                                margin="normal"
-                                                error={
-                                                  subField.error &&
-                                                  subField.error
-                                                }
-                                                helperText={
-                                                  subField.error &&
-                                                  subField.error
-                                                }
-                                                inputProps={
-                                                  subField.validation
-                                                    ? JSON.parse(
-                                                        subField.validation
+                                      {templateValue?.[
+                                        section.uniqueSectionName
+                                      ]?.[field.fekey].map((key: any) => 
+                                        
+                                          field.multipleData?.map(
+                                            (
+                                              subField: any,
+                                              subFieldIndex: number
+                                            ) => (
+                                              <Grid
+                                                container
+                                                key={`${index}+${fieldIndex}+${subFieldIndex}`}
+                                                spacing={2}
+                                                item
+                                                xs={12}
+                                                sm={12}
+                                              >
+                                                {
+                                                  <CustomTextField
+                                                    multiline
+                                                    label={
+                                                      subField.isRequired
+                                                        ? `${subField.fieldLabel} *`
+                                                        : subField.fieldLabel
+                                                    }
+                                                    type={subField.fieldType}
+                                                    name={subField.fieldType}
+                                                    onChange={(e: any) =>
+                                                      handleInputChange(
+                                                        e,
+                                                        section.sectionId,
+                                                        index,
+                                                        true
                                                       )
-                                                    : {}
+                                                    }
+                                                    fullWidth
+                                                    margin="normal"
+                                                    error={
+                                                      subField.error &&
+                                                      subField.error
+                                                    }
+                                                    helperText={
+                                                      subField.error &&
+                                                      subField.error
+                                                    }
+                                                    inputProps={
+                                                      subField.validation
+                                                        ? JSON.parse(
+                                                            subField.validation
+                                                          )
+                                                        : {}
+                                                    }
+                                                    value={
+                                                      templateValue?.[
+                                                        section
+                                                          .uniqueSectionName
+                                                      ]?.[field.fekey]?.[
+                                                        subFieldIndex
+                                                      ]?.[subField] || ""
+                                                    }
+                                                  />
                                                 }
-                                                value={
-                                                  formData.templateData?.[
-                                                    `${index}+${fieldIndex}+${subFieldIndex}`
-                                                  ]?.[subField.fieldType] || ""
-                                                }
-                                              />
-                                            }
-                                          </Grid>
-                                        )
+                                              </Grid>
+                                            )
+                                          )
+                                        
                                       )}
                                     </CardContent>
                                   </Card>
