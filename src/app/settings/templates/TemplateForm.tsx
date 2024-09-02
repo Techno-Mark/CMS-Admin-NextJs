@@ -86,8 +86,6 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
     setLoading(true);
     if (editingRow) {
       setFormData(editingRow);
-
-      console.log(editingRow.templateSection);
       
       const sections = editingRow.templateSection.map((section: any) => ({
         
@@ -147,8 +145,6 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
       setIsSectionsValid(true);
       try {
         const endpoint = editingRow ? template.update : template.create;
-        console.log(selectedSections);
-      
         
         const payload = {
           templateId: editingRow ? formData.templateId : undefined,
@@ -159,12 +155,10 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
           sectionIds: selectedSections.map(section => ({
             sectionId: section.sectionId,
             isCommon: section.isCommon ? 'true' : undefined,
-            uniqueSectionName: editingRow ? section.uniqueSectionName : `${section.sectionName}_${uuidv4()}`,
+            uniqueSectionName:  section?.uniqueSectionName ? section.uniqueSectionName : `${section.sectionName}_${uuidv4()}`,
           })),
         };
-        console.log(payload);
-        
-
+  
         const response = await post(endpoint, payload);
         toast.success(response.message);
         handleClose();
