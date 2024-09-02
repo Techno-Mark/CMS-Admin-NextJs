@@ -25,6 +25,7 @@ import { v4 as uuidv4 } from 'uuid';
 type SectionType = {
   sectionId: number;
   sectionName: string;
+  uniqueSectionName:string;
   isCommon?: boolean;
 };
 
@@ -85,9 +86,15 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
     setLoading(true);
     if (editingRow) {
       setFormData(editingRow);
+
+      console.log(editingRow.templateSection);
+      
       const sections = editingRow.templateSection.map((section: any) => ({
+        
+        
         sectionId: section.sectionId,
         sectionName: section.sectionName,
+        uniqueSectionName: section.uniqueSectionName,
         isCommon: section.isCommon,
       }));
       setSelectedSections(sections);
@@ -125,16 +132,6 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
     setLoading(false);
     return isValid;
   };
-// Helper function to generate unique ID
-const generateUniqueId = (length = 10) => {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  const charactersLength = characters.length;
-  for ( let i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-};
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -150,7 +147,9 @@ const generateUniqueId = (length = 10) => {
       setIsSectionsValid(true);
       try {
         const endpoint = editingRow ? template.update : template.create;
-
+        console.log(selectedSections);
+      
+        
         const payload = {
           templateId: editingRow ? formData.templateId : undefined,
           templateName: formData.templateName,
@@ -160,7 +159,7 @@ const generateUniqueId = (length = 10) => {
           sectionIds: selectedSections.map(section => ({
             sectionId: section.sectionId,
             isCommon: section.isCommon ? 'true' : undefined,
-            uniqueSectionName: editingRow ? formData.uniqueSectionName : `${section.sectionName}_${uuidv4()}`,
+            uniqueSectionName: editingRow ? section.uniqueSectionName : `${section.sectionName}_${uuidv4()}`,
           })),
         };
         console.log(payload);
