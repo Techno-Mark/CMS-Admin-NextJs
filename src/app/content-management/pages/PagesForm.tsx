@@ -92,6 +92,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       setLoading(false);
     }
   }, [editingRow]);
+
   useEffect(() => {
     setLoading(true);
     async function getTemplate() {
@@ -100,6 +101,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }
     getTemplate();
   }, []);
+
   const getActiveTemplateList = async () => {
     try {
       setLoading(true);
@@ -112,6 +114,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       setLoading(false);
     }
   };
+
   const getTemplateIdWiseForm = async (templateId: number) => {
     setLoading(true);
     try {
@@ -125,6 +128,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       setLoading(false);
     }
   };
+
   const validateField = (value: string, validation: any, field?: any) => {
     if (!value && field?.isRequired) {
       return `${field?.fieldLabel} is required`;
@@ -179,6 +183,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }
     return "";
   };
+
   const validateForm = () => {
     let valid = true;
     let errors = { ...initialErrorData };
@@ -218,64 +223,24 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       valid = false;
     }
 
-    if (formData.templateData) {
-      updatedSections = updatedSections.map((section, secIndex) => {
-        const updatedSectionTemplate = section.sectionTemplate.map(
-          (field: any, fieldIndex: any) => {
-            let error = "";
-            const value =
-              formData.templateData[`${secIndex}+${fieldIndex}`]?.[
-                field.fieldType
-              ] || "";
-            const validation = JSON.parse(field.validation || "{}");
-            if (field.fieldType === "multiple") {
-              field.multipleData = field.multipleData.map(
-                (subField: any, subFieldIndex: any) => {
-                  const subValue =
-                    formData.templateData[
-                      `${secIndex}+${fieldIndex}+${subFieldIndex}`
-                    ]?.[subField.fieldType] || "";
-                  const subValidation = JSON.parse(subField.validation || "{}");
-                  const subError = validateField(
-                    subValue,
-                    subValidation,
-                    subField
-                  );
-                  if (subError) {
-                    valid = false;
-                  }
-                  return {
-                    ...subField,
-                    error: subError,
-                  };
-                }
-              );
-            } else {
-              error = validateField(value, validation, field);
-              if (error) {
-                valid = false;
-              }
-            }
-            return {
-              ...field,
-              error,
-            };
-          }
-        );
-        return {
-          ...section,
-          sectionTemplate: updatedSectionTemplate,
-        };
-      });
-    }
+    //validate template Values Data
+    // let sectionsKeysList = new Set(Object.keys(sections).map(
+    //   (key: any) => sections[key]?.uniqueSectionName
+    // ));
+
+    // sectionsKeysList.forEach((secKey:any)=>{
+
+    // })
+
+
     setSections(updatedSections);
     setFormErrors(errors);
     return valid;
   };
+
   const handleSubmit = async (event: React.FormEvent, pdStatus: boolean) => {
     event.preventDefault();
-    // if (validateForm()) {
-    if (true) {
+    if (validateForm()) {
       try {
         setLoading(true);
         const formattedData: any[] = [];
@@ -292,14 +257,16 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
         });
 
         //remove unwanted data from templateData
-        let sectionsKeysList = Object.keys(sections).map((key:any)=>sections[key]?.uniqueSectionName);
+        let sectionsKeysList = new Set(Object.keys(sections).map(
+          (key: any) => sections[key]?.uniqueSectionName
+        ));
+      
         const filteredTemplateValueData = Object.keys(templateValue)
-          .filter((key) => sectionsKeysList.includes(key))
-          .reduce((obj:any, key:any) => {
+          .filter((key) => sectionsKeysList.has(key))
+          .reduce((obj: any, key: any) => {
             obj[key] = templateValue[key];
             return obj;
           }, {});
-          
 
         const endpoint = editingRow ? pages.update : pages.create;
         const result = await post(endpoint, {
@@ -327,6 +294,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     fekey: string
   ) => {
     const { name, value, files } = event.target;
+
     // Handling non-file input changes
     setTemplateValues((prev: any) => {
       return {
@@ -337,6 +305,22 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
         },
       };
     });
+
+    // setTemplateValues((prev: any) => {
+    //   return {
+    //     ...prev,
+    //     [uniqueSectionName]: {
+    //       ...(prev?.[uniqueSectionName] || {}), // Ensure the section exists
+    //       [fekey]: {
+    //         ...prev?.[uniqueSectionName]?.[fekey], // Ensure the fekey exists
+    //         multiple: [
+    //           ...(prev?.[uniqueSectionName]?.[fekey]?.multiple || []), // Safely handle the array
+    //           { key: value }, // Insert the new object into the array
+    //         ],
+    //       },
+    //     },
+    //   };
+    // });
   };
 
   const handleSectionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
