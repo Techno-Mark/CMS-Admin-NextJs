@@ -7,6 +7,9 @@ import {
   MenuItem,
   Typography,
   CardContent,
+  CardActions,
+  ButtonGroup,
+  Tooltip,
 } from "@mui/material";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { get, post } from "@/services/apiService";
@@ -232,7 +235,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
 
     // })
 
-
     setSections(updatedSections);
     setFormErrors(errors);
     return valid;
@@ -257,10 +259,12 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
         });
 
         //remove unwanted data from templateData
-        let sectionsKeysList = new Set(Object.keys(sections).map(
-          (key: any) => sections[key]?.uniqueSectionName
-        ));
-      
+        let sectionsKeysList = new Set(
+          Object.keys(sections).map(
+            (key: any) => sections[key]?.uniqueSectionName
+          )
+        );
+
         const filteredTemplateValueData = Object.keys(templateValue)
           .filter((key) => sectionsKeysList.has(key))
           .reduce((obj: any, key: any) => {
@@ -351,6 +355,42 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }));
     setIsSlugManuallyEdited(true);
   };
+
+  function handleAddDuplicateForm(sectionName: any, feKey: any, index: number, field: any) {
+    // Create the resultObject with keys from multipleData and empty values
+
+    let duplicateData:any = {};
+    field.multipleData?.forEach((value:any)=>{
+      duplicateData[value.fekey] = '';
+    });
+  
+    // Update the state
+    setTemplateValues((prev: any) => {
+      // Get the current state of the multiple array
+      const currentMultiple = prev?.[sectionName]?.[feKey]?.multiple || [];
+      
+      // Clone the array and insert the new object at the specified index
+      const updatedMultiple = [
+        duplicateData, // Insert the new object
+        ...currentMultiple.slice(index), // Elements after the index
+      ];
+  
+      return {
+        ...prev,
+        [sectionName]: {
+          ...(prev?.[sectionName] || {}),
+          [feKey]: {
+            ...prev?.[sectionName]?.[feKey], // Ensure the other properties of feKey are preserved
+            multiple: updatedMultiple // Updated multiple array
+          },
+        },
+      };
+    });
+  }
+
+  console.log('updaed value', templateValue)
+  
+  function handleRemoveDuplicateForm(i1, i2) {}
 
   return (
     <>
@@ -510,43 +550,172 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                               key={`${section.uniqueSectionName}+${field.fekey}`}
                               spacing={2}
                             >
-                              <Grid item xs={12} sm={12}>
-                                <CustomTextField
-                                  multiline
-                                  label={
-                                    field.isRequired
-                                      ? `${field.fieldLabel} *`
-                                      : field.fieldLabel
-                                  }
-                                  type={field.fieldType}
-                                  name={field.fieldType}
-                                  onChange={(
-                                    e: ChangeEvent<HTMLInputElement>
-                                  ) =>
-                                    handleInputChange(
-                                      e,
-                                      section.uniqueSectionName,
-                                      field.fekey
-                                    )
-                                  }
-                                  fullWidth
-                                  margin="normal"
-                                  //@ts-ignore
-                                  error={field.error && field.error}
-                                  //@ts-ignore
-                                  helperText={field.error && field.error}
-                                  inputProps={
-                                    field.validation
-                                      ? JSON.parse(field.validation)
-                                      : {}
-                                  }
-                                  value={
-                                    templateValue?.[
-                                      section.uniqueSectionName
-                                    ]?.[field.fekey] || ""
-                                  }
-                                />
-                              </Grid>
+                              {field.fieldType === "multiple" && (
+                                <Grid
+                                  item
+                                  xs={12}
+                                  style={{ marginBottom: "10px" }}
+                                >
+                                  <Card variant="outlined">
+                                    <CardActions>
+                                      <Grid
+                                        container
+                                        xs={12}
+                                        sm={12}
+                                        spacing={2}
+                                      >
+                                        <Grid item xs={10}>
+                                          <Typography
+                                            variant="h6"
+                                            component="div"
+                                          >
+                                            {field.fieldLabel}
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={2}>
+                                          <ButtonGroup
+                                            variant="tonal"
+                                            size="small"
+                                          >
+                                            <Tooltip
+                                              title={`Add ${field.fieldLabel}`}
+                                            >
+                                              <Button
+                                                size="small"
+                                                onClick={() =>
+                                                  handleAddDuplicateForm(
+                                                    section.uniqueSectionName,
+                                                    field.fekey,
+                                                    index,
+                                                    field
+                                                  )
+                                                }
+                                              >
+                                                <i className="tabler-plus" />
+                                              </Button>
+                                            </Tooltip>
+
+                                            <Tooltip
+                                              title={`Remove ${field.fieldLabel}`}
+                                            >
+                                              <Button
+                                                size="small"
+                                                onClick={() =>
+                                                  handleRemoveDuplicateForm(
+                                                    index,
+                                                    fieldIndex
+                                                  )
+                                                }
+                                              >
+                                                <i className="tabler-minus" />
+                                              </Button>
+                                            </Tooltip>
+                                          </ButtonGroup>
+                                        </Grid>
+                                      </Grid>
+                                    </CardActions>
+                                    <CardContent>
+                                      {field.multipleData?.map(
+                                        (
+                                          subField: any,
+                                          subFieldIndex: number
+                                        ) => (
+                                          <Grid
+                                            container
+                                            key={`${index}+${fieldIndex}+${subFieldIndex}`}
+                                            spacing={2}
+                                            item
+                                            xs={12}
+                                            sm={12}
+                                          >
+                                            {
+                                              <CustomTextField
+                                                multiline
+                                                label={
+                                                  subField.isRequired
+                                                    ? `${subField.fieldLabel} *`
+                                                    : subField.fieldLabel
+                                                }
+                                                type={subField.fieldType}
+                                                name={subField.fieldType}
+                                                onChange={(e: any) =>
+                                                  handleInputChange(
+                                                    e,
+                                                    section.sectionId,
+                                                    index
+                                                  )
+                                                }
+                                                fullWidth
+                                                margin="normal"
+                                                error={
+                                                  subField.error &&
+                                                  subField.error
+                                                }
+                                                helperText={
+                                                  subField.error &&
+                                                  subField.error
+                                                }
+                                                inputProps={
+                                                  subField.validation
+                                                    ? JSON.parse(
+                                                        subField.validation
+                                                      )
+                                                    : {}
+                                                }
+                                                value={
+                                                  formData.templateData?.[
+                                                    `${index}+${fieldIndex}+${subFieldIndex}`
+                                                  ]?.[subField.fieldType] || ""
+                                                }
+                                              />
+                                            }
+                                          </Grid>
+                                        )
+                                      )}
+                                    </CardContent>
+                                  </Card>
+                                </Grid>
+                              )}
+
+                              {field.fieldType !== "multiple" && (
+                                <Grid item xs={12} sm={12}>
+                                  <CustomTextField
+                                    multiline
+                                    label={
+                                      field.isRequired
+                                        ? `${field.fieldLabel} *`
+                                        : field.fieldLabel
+                                    }
+                                    type={field.fieldType}
+                                    name={field.fieldType}
+                                    onChange={(
+                                      e: ChangeEvent<HTMLInputElement>
+                                    ) =>
+                                      handleInputChange(
+                                        e,
+                                        section.uniqueSectionName,
+                                        field.fekey
+                                      )
+                                    }
+                                    fullWidth
+                                    margin="normal"
+                                    //@ts-ignore
+                                    error={field.error && field.error}
+                                    //@ts-ignore
+                                    helperText={field.error && field.error}
+                                    inputProps={
+                                      field.validation
+                                        ? JSON.parse(field.validation)
+                                        : {}
+                                    }
+                                    value={
+                                      templateValue?.[
+                                        section.uniqueSectionName
+                                      ]?.[field.fekey] || ""
+                                    }
+                                  />
+                                </Grid>
+                              )}
                             </Grid>
                           )
                         )}
