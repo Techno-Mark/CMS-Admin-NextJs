@@ -356,42 +356,54 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     setIsSlugManuallyEdited(true);
   };
 
-  function handleAddDuplicateForm(sectionName: any, feKey: any, index: number, field: any) {
-    // Create the resultObject with keys from multipleData and empty values
-
-    let duplicateData:any = {};
-    field.multipleData?.forEach((value:any)=>{
-      duplicateData[value.fekey] = '';
+  function handleAddDuplicateForm(
+    sectionName: any,
+    feKey: any,
+    index: number,
+    field: any
+  ) {
+    let duplicateData: any = {};
+    field.multipleData?.forEach((value: any) => {
+      duplicateData[value?.fekey] = "";
     });
-  
+
     // Update the state
     setTemplateValues((prev: any) => {
-      // Get the current state of the multiple array
-      const currentMultiple = prev?.[sectionName]?.[feKey]?.multiple || [];
-      
-      // Clone the array and insert the new object at the specified index
-      const updatedMultiple = [
-        duplicateData, // Insert the new object
-        ...currentMultiple.slice(index), // Elements after the index
-      ];
-  
+      const currentMultiple = prev?.[sectionName]?.[feKey] || [];
+
+      currentMultiple?.splice(index, 0, duplicateData);
+
       return {
         ...prev,
         [sectionName]: {
           ...(prev?.[sectionName] || {}),
-          [feKey]: {
-            ...prev?.[sectionName]?.[feKey], // Ensure the other properties of feKey are preserved
-            multiple: updatedMultiple // Updated multiple array
-          },
+          [feKey]: currentMultiple,
         },
       };
     });
   }
 
-  console.log('updaed value', templateValue)
-  
-  function handleRemoveDuplicateForm(i1, i2) {}
 
+
+  function handleRemoveDuplicateForm(
+    sectionName: any,
+    feKey: any,
+    index: number  ) {
+      setTemplateValues((prev: any) => {
+        const currentMultiple = prev?.[sectionName]?.[feKey] || [];
+  
+        currentMultiple?.splice(index, 1);
+  
+        return {
+          ...prev,
+          [sectionName]: {
+            ...(prev?.[sectionName] || {}),
+            [feKey]: currentMultiple,
+          },
+        };
+      });
+    }
+    console.log("updaed value", templateValue);
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -602,8 +614,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                 size="small"
                                                 onClick={() =>
                                                   handleRemoveDuplicateForm(
-                                                    index,
-                                                    fieldIndex
+                                                    section.uniqueSectionName,
+                                                    field.fekey,
+                                                    index
                                                   )
                                                 }
                                               >
