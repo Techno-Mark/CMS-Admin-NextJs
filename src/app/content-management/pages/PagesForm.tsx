@@ -87,7 +87,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       setFormData(editingRow);
       getTemplateIdWiseForm(editingRow.templateId);
       setTemplateValues(editingRow?.templateData);
-    
     } else {
       setFormData(initialFormData);
       setLoading(false);
@@ -276,24 +275,37 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   const handleSubmit = async (event: React.FormEvent, pdStatus: boolean) => {
     event.preventDefault();
     // if (validateForm()) {
-    if(true){
+    if (true) {
       try {
         setLoading(true);
         const formattedData: any[] = [];
-        
-        Object.keys(sections).forEach((key:any)=>{
-          let uniqueSection =  sections[key]?.uniqueSectionName;
+
+        // for frontned api key
+        Object.keys(sections).forEach((key: any) => {
+          let uniqueSection = sections[key]?.uniqueSectionName;
           const lastUnderscoreIndex = uniqueSection.lastIndexOf("_");
-          let secName = uniqueSection.slice(0,lastUnderscoreIndex);
-          let templateSectionValue = {[secName]: templateValue[uniqueSection]} 
+          let secName = uniqueSection.slice(0, lastUnderscoreIndex);
+          let templateSectionValue = {
+            [secName]: templateValue[uniqueSection],
+          };
           formattedData.push(templateSectionValue);
-        })
-      
+        });
+
+        //remove unwanted data from templateData
+        let sectionsKeysList = Object.keys(sections).map((key:any)=>sections[key]?.uniqueSectionName);
+        const filteredTemplateValueData = Object.keys(templateValue)
+          .filter((key) => sectionsKeysList.includes(key))
+          .reduce((obj:any, key:any) => {
+            obj[key] = templateValue[key];
+            return obj;
+          }, {});
+          
+
         const endpoint = editingRow ? pages.update : pages.create;
         const result = await post(endpoint, {
           ...formData,
           pageId: editingRow ? formData.pageId : undefined,
-          templateData: templateValue,
+          templateData: filteredTemplateValueData,
           formatData: formattedData,
           sectionData: sections,
           active: pdStatus,
@@ -312,7 +324,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement>,
     uniqueSectionName: string,
-    fekey: string,
+    fekey: string
   ) => {
     const { name, value, files } = event.target;
     // Handling non-file input changes
@@ -325,7 +337,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
         },
       };
     });
-
   };
 
   const handleSectionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -531,7 +542,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                     handleInputChange(
                                       e,
                                       section.uniqueSectionName,
-                                      field.fekey,
+                                      field.fekey
                                     )
                                   }
                                   fullWidth
@@ -546,7 +557,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                       : {}
                                   }
                                   value={
-                                    templateValue?.[section.uniqueSectionName]?.[field.fekey] || ""
+                                    templateValue?.[
+                                      section.uniqueSectionName
+                                    ]?.[field.fekey] || ""
                                   }
                                 />
                               </Grid>
