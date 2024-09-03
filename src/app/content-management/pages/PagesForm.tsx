@@ -524,6 +524,12 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     }}
                     inputProps={{}}
                   >
+                      <MenuItem
+                          key={-1}
+                          value={-1}
+                        >
+                         Please Select Page Tempalte
+                        </MenuItem>
                     {!loading &&
                       !!templateList.length &&
                       templateList.map((template) => (
