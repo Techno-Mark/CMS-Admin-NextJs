@@ -20,6 +20,9 @@ const initialFormData = {
   metaTitle: "",
   metaDescription: "",
   metaKeywords: "",
+  robots:"",
+  canonical:"",
+  schema:"",
   templateData: {} as Record<string, any>,
   sectionData: {} as Record<string, any>,
   sections: [
@@ -45,6 +48,9 @@ const initialErrorData = {
   metaTitle: "",
   metaDescription: "",
   metaKeywords: "",
+  robots:"",
+  canonical:"",
+  schema:"",
   templateData: {} as Record<string, any>,
 };
 type Props = {
@@ -213,6 +219,14 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }
     if (!formData.metaKeywords) {
       errors.metaKeywords = "Meta Keywords are required";
+      valid = false;
+    }
+    if (formData.canonical && formData.canonical.length > 2000) {
+      errors.canonical = "canonical field exceeds the maximum length of 2000 characters.";
+      valid = false;
+    }
+    if (formData.robots && formData.robots.length > 2000) {
+      errors.robots = "robots field exceeds the maximum length of 2000 characters.";
       valid = false;
     }
 
@@ -878,6 +892,71 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                     }}
                   />
                 </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    multiline
+                    minRows={3}
+                    error={!!formErrors.robots}
+                    helperText={formErrors.robots}
+                    label="robots (maximum-character: 2000 )"
+                    fullWidth
+                    placeholder=""
+                    value={formData.robots}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                      setFormData({
+                        ...formData,
+                        robots: e.target.value,
+                      });
+                      if (e.target?.value?.length) {
+                        setFormErrors({ ...formErrors, robots: "" });
+                      }
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    multiline
+                    minRows={3}
+                    error={!!formErrors.canonical}
+                    helperText={formErrors.canonical}
+                    label="Canonical (maximum-character: 2000 )"
+                    fullWidth
+                    placeholder=""
+                    value={formData.canonical}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                      setFormData({
+                        ...formData,
+                        canonical: e.target.value,
+                      });
+                      if (e.target?.value?.length) {
+                        setFormErrors({ ...formErrors, canonical: "" });
+                      }
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <CustomTextField
+                    multiline
+                    minRows={7}
+                    maxRows={12}
+                    error={!!formErrors.schema}
+                    helperText={formErrors.schema}
+                    label="Schema"
+                    fullWidth
+                    placeholder=""
+                    value={formData.schema}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                      setFormData({
+                        ...formData,
+                        schema: e.target.value,
+                      });
+                      if (e.target?.value?.length) {
+                        setFormErrors({ ...formErrors, schema: "" });
+                      }
+                    }}
+                  />
+                </Grid>
+
                 <Grid item xs={12} sm={12}>
                   <CustomTextField
                     error={!!formErrors.templateId}
