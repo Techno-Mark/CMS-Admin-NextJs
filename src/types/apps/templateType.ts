@@ -1,5 +1,6 @@
 
 export type TemplateType = {
+    uniqueSectionName: any;
     srNo?: number;
     templateId: number;
     templateName: string;
