@@ -154,7 +154,7 @@ const MenuItem = ({
         >
           <div className="flex-1 flex items-center gap-x-2">
             <DraggableIcon />
-            <img src={item.logo} alt="icon" width={30} height={30} />
+            {/* <img src={item.logo} alt="icon" width={30} height={30} /> */}
             <Typography variant="h5"> {item.name} </Typography>
             <Typography variant="subtitle1"> ({item.link}) </Typography>
           </div>
@@ -201,12 +201,14 @@ const MenuItem = ({
               >
                 <div className="flex-1 flex items-center gap-x-2">
                   <DraggableIcon />
-                  <img
-                    src={childItem.logo}
-                    alt="icon"
-                    width={30}
-                    height={30}
-                  />
+                  {childItem?.logo && childItem.logo !== "#" && (
+                    <img
+                      src={childItem.logo}
+                      alt="icon"
+                      width={30}
+                      height={30}
+                    />
+                  )}
                   <Typography variant="h5"> {childItem.name} </Typography>
                   <Typography variant="subtitle1">
                     {" "}

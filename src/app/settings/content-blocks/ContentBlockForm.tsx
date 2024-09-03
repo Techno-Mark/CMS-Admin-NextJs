@@ -593,7 +593,7 @@ const ContentBlockForm = ({ open }: Props) => {
                       Cancel
                     </Button>
                     <Button variant="contained" type="submit">
-                      {open === sectionActions.ADD ? "Add" : "Edit"} Content Block
+                      {open === sectionActions.ADD ? "Add" : "Update"} Content Block
                     </Button>
                   </Box>
                 </Grid>
