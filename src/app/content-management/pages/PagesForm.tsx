@@ -562,6 +562,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                 >
                                   <Card variant="outlined">
                                     <CardActions>
+
                                       <Grid
                                         container
                                         xs={12}
@@ -618,8 +619,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                           </ButtonGroup>
                                         </Grid>
                                       </Grid>
+
                                     </CardActions>
-                                    <CardContent>
+                                    {/* <CardContent>
                                       {templateValue?.[
                                         section.uniqueSectionName
                                       ]?.[sectionField.fekey]?.map(
@@ -641,6 +643,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                 sm={12}
                                               >
                                                 {
+                                                  
                                                   <CustomTextField
                                                     multiline
                                                     label={
@@ -685,12 +688,67 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                       ]?.[subField.fekey] || ""
                                                     }
                                                   />
+                                                  
                                                 }
                                               </Grid>
                                             )
                                           )
                                       )}
+                                    </CardContent> */}
+                                    <CardContent>
+                                      {templateValue?.[section.uniqueSectionName]?.[sectionField.fekey]?.map(
+                                        (multipleSection: any, multipleSectionIndex: any) => (
+                                          <Card key={`group-${multipleSectionIndex}`} variant="outlined" style={{ marginBottom: '16px' }}>
+                                            <CardContent>
+                                              {sectionField.multipleData?.map(
+                                                (subField: any, subFieldIndex: number) => (
+                                                  <Box key={`${section.uniqueSectionName}+${section.fekey}+${subField.fekey}`} sx={{ mb: 2 }}>
+                                                    <Grid container spacing={2} item xs={12} sm={12}>
+                                                      <CustomTextField
+                                                        multiline
+                                                        label={
+                                                          subField.isRequired
+                                                            ? `${subField.fieldLabel} *`
+                                                            : subField.fieldLabel
+                                                        }
+                                                        type={subField.fieldType === 'file' ? 'text' :'text'}
+                                                        name={subField.fieldType}
+                                                        onChange={(e: any) =>
+                                                          handleInputChange(
+                                                            e,
+                                                            section?.uniqueSectionName,
+                                                            sectionField.fekey,
+                                                            multipleSectionIndex,
+                                                            subField.fekey
+                                                          )
+                                                        }
+                                                        fullWidth
+                                                        margin="normal"
+                                                        error={subField.error && subField.error}
+                                                        helperText={subField.error && subField.error}
+                                                        inputProps={
+                                                          subField.validation
+                                                            ? JSON.parse(subField.validation)
+                                                            : {}
+                                                        }
+                                                        value={
+                                                          templateValue?.[
+                                                          section.uniqueSectionName
+                                                          ]?.[sectionField.fekey]?.[multipleSectionIndex]?.[
+                                                          subField.fekey
+                                                          ] || ""
+                                                        }
+                                                      />
+                                                    </Grid>
+                                                  </Box>
+                                                )
+                                              )}
+                                            </CardContent>
+                                          </Card>
+                                        )
+                                      )}
                                     </CardContent>
+
                                   </Card>
                                 </Grid>
                               )}
@@ -704,7 +762,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                         ? `${sectionField.fieldLabel} *`
                                         : sectionField.fieldLabel
                                     }
-                                    type={sectionField.fieldType}
+                                    type={sectionField.fieldType === 'file' ? 'text' :'text'}
                                     name={sectionField.fieldType}
                                     onChange={(
                                       e: ChangeEvent<HTMLInputElement>
@@ -728,7 +786,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                     }
                                     value={
                                       templateValue?.[
-                                        section.uniqueSectionName
+                                      section.uniqueSectionName
                                       ]?.[sectionField.fekey] || ""
                                     }
                                   />

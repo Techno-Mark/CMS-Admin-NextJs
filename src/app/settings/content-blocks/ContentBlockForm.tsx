@@ -38,8 +38,8 @@ const tooltipContent = {
 };
 
 const fieldTypeOptions = [
-  { label: 'email', value: 'email' },
-  { label: 'file', value: 'file' },
+  // { label: 'email', value: 'email' },
+  // { label: 'file', value: 'file' },
   { label: 'text', value: 'text' },
   // { label: 'url', value: 'url' },
   // { label: 'date', value: 'date' },
@@ -49,8 +49,8 @@ const fieldTypeOptions = [
 ];
 
 const fieldTypeOptionsForMultiple = [
-  { label: 'email', value: 'email' },
-  { label: 'file', value: 'file' },
+  // { label: 'email', value: 'email' },
+  // { label: 'file', value: 'file' },
   { label: 'text', value: 'text' },
   // { label: 'url', value: 'url' },
   // { label: 'date', value: 'date' },
