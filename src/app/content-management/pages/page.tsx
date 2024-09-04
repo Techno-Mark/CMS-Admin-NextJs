@@ -8,7 +8,7 @@ import eventBus from "@/utils/eventBus";
 
 const initialBody = {
   page: 0,
-  limit: 10,
+  limit: 50,
   search: "",
   active: true,
 };
@@ -22,7 +22,7 @@ const Page = () => {
     try {
       setLoading(true);
       const result = await post(pages.list, body);
-      setTotalCount(result.data.totalRoles);
+      setTotalCount(result.data.totalPages);
      
       // if (result.data) {
         setPagesData(
