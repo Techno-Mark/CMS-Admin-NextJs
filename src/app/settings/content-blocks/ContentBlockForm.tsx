@@ -67,7 +67,7 @@ const initialData = {
   id: 0,
   name: "",
   slug: "",
-  jsonContent: [{ fieldType: "", fieldLabel: "", fekey:"", isRequired: false, validation: "" }],
+  jsonContent: [{ fieldType: "", fieldLabel: "", fekey:"", isRequired: false, validation: "{}" }],
   status: false,
 };
 
@@ -109,7 +109,7 @@ const ContentBlockForm = ({ open }: Props) => {
   }, []);
 
   const handleAddRow = () => {
-    const newField = { fieldType: "", fieldLabel: "", isRequired: false, validation: "" };
+    const newField = { fieldType: "", fieldLabel: "", isRequired: false, validation: "{}" };
     setFormData({ ...formData, jsonContent: [...formData.jsonContent, newField] });
   };
   const handleRemoveRow = (index: number) => {
@@ -149,14 +149,14 @@ const ContentBlockForm = ({ open }: Props) => {
       }
 
       if (field === "fieldType" && value === "multiple") {
-        updatedFields[index].multipleData = [{ fieldType: "", fieldLabel: "",fekey:"", isRequired: false, validation: "" }];
+        updatedFields[index].multipleData = [{ fieldType: "", fieldLabel: "",fekey:"", isRequired: false, validation: "{}" }];
       }
     }
 
     setFormData({ ...formData, jsonContent: updatedFields });
   };
   const handleAddSubRow = (parentIndex: number) => {
-    const newSubField = { fieldType: "", fieldLabel: "",fekey:"", isRequired: false, validation: "" };
+    const newSubField = { fieldType: "", fieldLabel: "",fekey:"", isRequired: false, validation: "{}" };
     const updatedFields = [...formData.jsonContent];
     updatedFields[parentIndex].multipleData.push(newSubField);
     setFormData({ ...formData, jsonContent: updatedFields });
