@@ -101,9 +101,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         <MenuItem href='/content-management/events' icon={<i className='tabler-calendar-event' />}>
           Events
         </MenuItem>
-        <MenuItem href='/content-management/recrutments' icon={<i className='tabler-briefcase' />}>
+        {/* <MenuItem href='/content-management/recrutments' icon={<i className='tabler-briefcase' />}>
           Recrutments
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem href={`/content-management/media`} icon={<i className='tabler-file-upload'></i>}>Media</MenuItem>
         {session?.user?.id == '1' && <>
           <SubMenu
@@ -122,7 +122,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             <MenuItem href={`/settings/content-blocks`} icon={<i className='tabler-box-margin'></i>}>Content Blocks</MenuItem>
             <MenuItem href={`/settings/templates`} icon={<i className='tabler-template'></i>}>Templates</MenuItem>
             <MenuItem href={`/settings/modules`} icon={<i className='tabler-stack-middle'></i>}>Modules</MenuItem>
-            <MenuItem href={`/settings/general`} icon={<i className='tabler-file-settings'></i>}>General</MenuItem>
+            {/* <MenuItem href={`/settings/general`} icon={<i className='tabler-file-settings'></i>}>General</MenuItem> */}
             {/* <MenuItem href={`/settings/files`} icon={<i className='tabler-file-upload'></i>}>File Upload</MenuItem> */}
 
           </SubMenu>

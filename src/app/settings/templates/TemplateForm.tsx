@@ -19,11 +19,13 @@ import CustomAutocomplete from '@core/components/mui/Autocomplete';
 import { section } from '@/services/endpoint/section';
 import BreadCrumbList from '@/components/BreadCrumbList';
 import LoadingBackdrop from '@/components/LoadingBackdrop';
+import { v4 as uuidv4 } from 'uuid';
 // import DeleteIcon from '@mui/icons-material/Delete';
 
 type SectionType = {
   sectionId: number;
   sectionName: string;
+  uniqueSectionName:string;
   isCommon?: boolean;
 };
 
@@ -47,7 +49,8 @@ const initialData: TemplateType = {
   templateSlug: '',
   sectionIds: [],
   templateSection: [],
-  createdAt: ''
+  createdAt: '',
+  uniqueSectionName:""
 };
 
 const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditingRow }) => {
@@ -83,9 +86,13 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
     setLoading(true);
     if (editingRow) {
       setFormData(editingRow);
+      
       const sections = editingRow.templateSection.map((section: any) => ({
+        
+        
         sectionId: section.sectionId,
         sectionName: section.sectionName,
+        uniqueSectionName: section.uniqueSectionName,
         isCommon: section.isCommon,
       }));
       setSelectedSections(sections);
@@ -124,6 +131,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
     return isValid;
   };
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -137,7 +145,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
       setIsSectionsValid(true);
       try {
         const endpoint = editingRow ? template.update : template.create;
-
+        
         const payload = {
           templateId: editingRow ? formData.templateId : undefined,
           templateName: formData.templateName,
@@ -147,9 +155,10 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
           sectionIds: selectedSections.map(section => ({
             sectionId: section.sectionId,
             isCommon: section.isCommon ? 'true' : undefined,
+            uniqueSectionName:  section?.uniqueSectionName ? section.uniqueSectionName : `${section.sectionName}_${uuidv4()}`,
           })),
         };
-
+  
         const response = await post(endpoint, payload);
         toast.success(response.message);
         handleClose();
@@ -403,3 +412,4 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
 };
 
 export default TemplateForm;
+
