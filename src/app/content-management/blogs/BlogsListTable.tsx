@@ -203,26 +203,26 @@ const BlogListTable = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
-          <Tooltip title={'Edit'}>
-            <IconButton
-              onClick={() =>
-                router.push(
-                  `/content-management/blogs/edit/${row.original.blogId}`
-                )
-              }
-            >
-              <i className="tabler-edit text-[22px] text-textSecondary" />
-            </IconButton>
+            <Tooltip title={'Edit'}>
+              <IconButton
+                onClick={() =>
+                  router.push(
+                    `/content-management/blogs/edit/${row.original.blogId}`
+                  )
+                }
+              >
+                <i className="tabler-edit text-[22px] text-textSecondary" />
+              </IconButton>
             </Tooltip>
             <Tooltip title={'Delete'}>
-            <IconButton
-              onClick={() => {
-                setIsDeleting(true);
-                setDeletingId(row.original.blogId);
-              }}
-            >
-              <i className="tabler-trash text-[22px] text-textSecondary" />
-            </IconButton>
+              <IconButton
+                onClick={() => {
+                  setIsDeleting(true);
+                  setDeletingId(row.original.blogId);
+                }}
+              >
+                <i className="tabler-trash text-[22px] text-textSecondary" />
+              </IconButton>
             </Tooltip>
           </div>
         ),
