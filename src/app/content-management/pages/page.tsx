@@ -22,7 +22,7 @@ const Page = () => {
     try {
       setLoading(true);
       const result = await post(pages.list, body);
-      setTotalCount(result.data.totalPages);
+      setTotalCount(result.data.totalPageListCount);
      
       // if (result.data) {
         setPagesData(

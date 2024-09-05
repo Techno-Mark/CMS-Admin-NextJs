@@ -29,9 +29,9 @@ const initialFormData = {
   metaTitle: "",
   metaDescription: "",
   metaKeywords: "",
-  robots:"",
-  canonical:"",
-  schema:"",
+  robots: "",
+  canonical: "",
+  schema: "",
   templateData: {} as Record<string, any>,
   sectionData: {} as Record<string, any>,
   sections: [
@@ -64,9 +64,9 @@ const initialErrorData = {
   metaTitle: "",
   metaDescription: "",
   metaKeywords: "",
-  robots:"",
-  canonical:"",
-  schema:"",
+  robots: "",
+  canonical: "",
+  schema: "",
   templateData: {} as Record<string, any>,
 };
 type Props = {
@@ -163,7 +163,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }));
   };
 
-
   //validate form and submit
   const validateField = (value: string, validation: any, field?: any) => {
     if (!value && field?.isRequired) {
@@ -258,11 +257,13 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       valid = false;
     }
     if (formData.canonical && formData.canonical.length > 2000) {
-      errors.canonical = "canonical field exceeds the maximum length of 2000 characters.";
+      errors.canonical =
+        "canonical field exceeds the maximum length of 2000 characters.";
       valid = false;
     }
     if (formData.robots && formData.robots.length > 2000) {
-      errors.robots = "robots field exceeds the maximum length of 2000 characters.";
+      errors.robots =
+        "robots field exceeds the maximum length of 2000 characters.";
       valid = false;
     }
 
@@ -330,7 +331,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       }
     }
   };
-
 
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement>,
@@ -641,7 +641,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                 >
                                   <Card variant="outlined">
                                     <CardActions>
-
                                       <Grid
                                         container
                                         xs={12}
@@ -662,7 +661,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                             size="small"
                                           >
                                             <Tooltip
-                                              title={`Add ${sectionField.fieldLabel}`}
+                                              title={`Add new at 1st position`}
                                             >
                                               <Button
                                                 size="small"
@@ -670,7 +669,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                   handleAddDuplicateForm(
                                                     section.uniqueSectionName,
                                                     sectionField.fekey,
-                                                    sectionIndex,
+                                                    0,
                                                     sectionField
                                                   )
                                                 }
@@ -678,111 +677,100 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                 <i className="tabler-plus" />
                                               </Button>
                                             </Tooltip>
-
-                                            <Tooltip
-                                              title={`Remove ${sectionField.fieldLabel}`}
-                                            >
-                                              <Button
-                                                size="small"
-                                                onClick={() =>
-                                                  handleRemoveDuplicateForm(
-                                                    section.uniqueSectionName,
-                                                    sectionField.fekey,
-                                                    sectionIndex
-                                                  )
-                                                }
-                                              >
-                                                <i className="tabler-minus" />
-                                              </Button>
-                                            </Tooltip>
                                           </ButtonGroup>
                                         </Grid>
                                       </Grid>
-
                                     </CardActions>
-                                    {/* <CardContent>
+                                 
+                                    <CardContent>
                                       {templateValue?.[
                                         section.uniqueSectionName
                                       ]?.[sectionField.fekey]?.map(
                                         (
                                           multipleSection: any,
                                           multipleSectionIndex: any
-                                        ) =>
-                                          sectionField.multipleData?.map(
-                                            (
-                                              subField: any,
-                                              subFieldIndex: number
-                                            ) => (
+                                        ) => (
+                                          <Card
+                                            key={`group-${multipleSectionIndex}`}
+                                            variant="outlined"
+                                            style={{ marginBottom: "16px" }}
+                                          >
+                                            <CardActions>
                                               <Grid
                                                 container
-                                                key={`${section.uniqueSectionName}+${section.fekey}+${subField.fekey}`}
-                                                spacing={2}
-                                                item
                                                 xs={12}
                                                 sm={12}
+                                                spacing={2}
                                               >
-                                                {
-                                                  
-                                                  <CustomTextField
-                                                    multiline
-                                                    label={
-                                                      subField.isRequired
-                                                        ? `${subField.fieldLabel} *`
-                                                        : subField.fieldLabel
-                                                    }
-                                                    type={subField.fieldType}
-                                                    name={subField.fieldType}
-                                                    onChange={(e: any) =>
-                                                      handleInputChange(
-                                                        e,
-                                                        section?.uniqueSectionName,
-                                                        sectionField.fekey,
-                                                        multipleSectionIndex,
-                                                        subField.fekey
-                                                      )
-                                                    }
-                                                    fullWidth
-                                                    margin="normal"
-                                                    error={
-                                                      subField.error &&
-                                                      subField.error
-                                                    }
-                                                    helperText={
-                                                      subField.error &&
-                                                      subField.error
-                                                    }
-                                                    inputProps={
-                                                      subField.validation
-                                                        ? JSON.parse(
-                                                            subField.validation
+                                                <Grid item xs={10}>
+                                                  <Typography
+                                                    variant="h6"
+                                                    component="div"
+                                                  >
+                                                   <b className="text-lg"> {multipleSectionIndex + 1} </b> Entry of ({section.sectionName + ' -> ' + sectionField.fieldLabel})
+                                                  </Typography>
+                                                </Grid>
+                                                <Grid item xs={2}>
+                                                  <ButtonGroup
+                                                    variant="tonal"
+                                                    size="small"
+                                                  >
+                                                    <Tooltip
+                                                      title={`Add`}
+                                                    >
+                                                      <Button
+                                                        size="small"
+                                                        onClick={() =>
+                                                          handleAddDuplicateForm(
+                                                            section.uniqueSectionName,
+                                                            sectionField.fekey,
+                                                            multipleSectionIndex +
+                                                              1,
+                                                            sectionField
                                                           )
-                                                        : {}
-                                                    }
-                                                    value={
-                                                      templateValue?.[
-                                                        section
-                                                          .uniqueSectionName
-                                                      ]?.[sectionField.fekey]?.[
-                                                        multipleSectionIndex
-                                                      ]?.[subField.fekey] || ""
-                                                    }
-                                                  />
-                                                  
-                                                }
+                                                        }
+                                                      >
+                                                        <i className="tabler-plus" />
+                                                      </Button>
+                                                    </Tooltip>
+
+                                                    <Tooltip
+                                                      title={`Remove`}
+                                                    >
+                                                      <Button
+                                                        size="small"
+                                                        onClick={() =>
+                                                          handleRemoveDuplicateForm(
+                                                            section.uniqueSectionName,
+                                                            sectionField.fekey,
+                                                            multipleSectionIndex
+                                                          )
+                                                        }
+                                                      >
+                                                        <i className="tabler-minus" />
+                                                      </Button>
+                                                    </Tooltip>
+                                                  </ButtonGroup>
+                                                </Grid>
                                               </Grid>
-                                            )
-                                          )
-                                      )}
-                                    </CardContent> */}
-                                    <CardContent>
-                                      {templateValue?.[section.uniqueSectionName]?.[sectionField.fekey]?.map(
-                                        (multipleSection: any, multipleSectionIndex: any) => (
-                                          <Card key={`group-${multipleSectionIndex}`} variant="outlined" style={{ marginBottom: '16px' }}>
+                                            </CardActions>
                                             <CardContent>
                                               {sectionField.multipleData?.map(
-                                                (subField: any, subFieldIndex: number) => (
-                                                  <Box key={`${section.uniqueSectionName}+${section.fekey}+${subField.fekey}`} sx={{ mb: 2 }}>
-                                                    <Grid container spacing={2} item xs={12} sm={12}>
+                                                (
+                                                  subField: any,
+                                                  subFieldIndex: number
+                                                ) => (
+                                                  <Box
+                                                    key={`${section.uniqueSectionName}+${section.fekey}+${subField.fekey}`}
+                                                    sx={{ mb: 2 }}
+                                                  >
+                                                    <Grid
+                                                      container
+                                                      spacing={2}
+                                                      item
+                                                      xs={12}
+                                                      sm={12}
+                                                    >
                                                       <CustomTextField
                                                         multiline
                                                         label={
@@ -790,8 +778,15 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                             ? `${subField.fieldLabel} *`
                                                             : subField.fieldLabel
                                                         }
-                                                        type={subField.fieldType === 'file' ? 'text' :'text'}
-                                                        name={subField.fieldType}
+                                                        type={
+                                                          subField.fieldType ===
+                                                          "file"
+                                                            ? "text"
+                                                            : "text"
+                                                        }
+                                                        name={
+                                                          subField.fieldType
+                                                        }
                                                         onChange={(e: any) =>
                                                           handleInputChange(
                                                             e,
@@ -803,19 +798,31 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                         }
                                                         fullWidth
                                                         margin="normal"
-                                                        error={subField.error && subField.error}
-                                                        helperText={subField.error && subField.error}
+                                                        error={
+                                                          subField.error &&
+                                                          subField.error
+                                                        }
+                                                        helperText={
+                                                          subField.error &&
+                                                          subField.error
+                                                        }
                                                         inputProps={
                                                           subField.validation
-                                                            ? JSON.parse(subField.validation)
+                                                            ? JSON.parse(
+                                                                subField.validation
+                                                              )
                                                             : {}
                                                         }
                                                         value={
                                                           templateValue?.[
-                                                          section.uniqueSectionName
-                                                          ]?.[sectionField.fekey]?.[multipleSectionIndex]?.[
-                                                          subField.fekey
-                                                          ] || ""
+                                                            section
+                                                              .uniqueSectionName
+                                                          ]?.[
+                                                            sectionField.fekey
+                                                          ]?.[
+                                                            multipleSectionIndex
+                                                          ]?.[subField.fekey] ||
+                                                          ""
                                                         }
                                                       />
                                                     </Grid>
@@ -827,7 +834,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                         )
                                       )}
                                     </CardContent>
-
                                   </Card>
                                 </Grid>
                               )}
@@ -841,7 +847,11 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                         ? `${sectionField.fieldLabel} *`
                                         : sectionField.fieldLabel
                                     }
-                                    type={sectionField.fieldType === 'file' ? 'text' :'text'}
+                                    type={
+                                      sectionField.fieldType === "file"
+                                        ? "text"
+                                        : "text"
+                                    }
                                     name={sectionField.fieldType}
                                     onChange={(
                                       e: ChangeEvent<HTMLInputElement>
@@ -865,7 +875,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                     }
                                     value={
                                       templateValue?.[
-                                      section.uniqueSectionName
+                                        section.uniqueSectionName
                                       ]?.[sectionField.fekey] || ""
                                     }
                                   />
