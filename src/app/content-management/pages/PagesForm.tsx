@@ -267,14 +267,55 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       valid = false;
     }
 
-    //validate template Values Data
-    // let sectionsKeysList = new Set(Object.keys(sections).map(
-    //   (key: any) => sections[key]?.uniqueSectionName
-    // ));
+  // Loop through sections to validate each field
+  sections.forEach((section) => {
+    section.sectionTemplate.forEach((field: any) => {
+      const fieldKey = field.fekey;
+      const fieldLabel = field.fieldLabel;
 
-    // sectionsKeysList.forEach((secKey:any)=>{
+      // Handle validation for regular fields
+      if (field.fieldType !== "multiple") {
+        const value = templateValue?.[section.uniqueSectionName]?.[fieldKey];
+        if (field.isRequired && (!value || value.trim() === "")) {
+          valid = false;
+          //@ts-ignore
+          errors[section.uniqueSectionName] = {  ...(errors[section.uniqueSectionName] || {}),
+            [fieldKey]: `${fieldLabel} is required.`,
+          };
+        }
+      }
 
-    // })
+      // Handle validation for multiple fields
+      if (field.fieldType === "multiple") {
+        const multipleEntries = templateValue?.[section.uniqueSectionName]?.[fieldKey];
+        if (Array.isArray(multipleEntries)) {
+          multipleEntries.forEach((entry: any, entryIndex: number) => {
+            field.multipleData.forEach((subField: any) => {
+              const subFieldKey = subField.fekey;
+              const subFieldLabel = subField.fieldLabel;
+              const subFieldValue = entry[subFieldKey];
+
+              if (subField.isRequired && (!subFieldValue || subFieldValue.trim() === "")) {
+                valid = false;
+                //@ts-ignore
+                errors[section.uniqueSectionName] = {  ...(errors[section.uniqueSectionName] || {}),
+                  [fieldKey]: {
+                    //@ts-ignore
+                    ...(errors[section.uniqueSectionName]?.[fieldKey] || {}),
+                    [entryIndex]: {
+                      //@ts-ignore
+                      ...(errors[section.uniqueSectionName]?.[fieldKey]?.[entryIndex] || {}),
+                      [subFieldKey]: `${subFieldLabel} is required.`,
+                    },
+                  },
+                };
+              }
+            });
+          });
+        }
+      }
+    });
+  });
 
     setSections(updatedSections);
     setFormErrors(errors);
@@ -331,7 +372,6 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
       }
     }
   };
-
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement>,
     uniqueSectionName: string,
@@ -339,13 +379,21 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     multipleIndex = -1,
     multiFeKey = ""
   ) => {
-    const { name, value, files } = event.target;
-
+    const { value } = event.target;
+  
+    // Handle input change for multiple fields
     if (multipleIndex !== -1) {
+      // Update template values for multiple fields
       setTemplateValues((prev: any) => {
-        const currentMultiple = [...prev?.[uniqueSectionName]?.[fekey]];
+        const currentMultiple = [...(prev?.[uniqueSectionName]?.[fekey] || [])];
+        
+        // Ensure the multiple field structure exists
+        if (!currentMultiple[multipleIndex]) {
+          currentMultiple[multipleIndex] = {};
+        }
+  
         currentMultiple[multipleIndex][multiFeKey] = value;
-
+  
         return {
           ...prev,
           [uniqueSectionName]: {
@@ -354,19 +402,109 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
           },
         };
       });
-      return;
-    }
-    // Handling non-file input changes
-    setTemplateValues((prev: any) => {
-      return {
+    } else {
+      // Handle input change for single fields
+      setTemplateValues((prev: any) => ({
         ...prev,
         [uniqueSectionName]: {
           ...(prev?.[uniqueSectionName] || {}),
           [fekey]: value,
         },
-      };
-    });
+      }));
+    }
+  
+    // Validation logic
+    const section = sections.find((sec) => sec.uniqueSectionName === uniqueSectionName);
+    const field = section?.sectionTemplate.find((fld: any) => fld.fekey === fekey);
+  
+    if (multipleIndex !== -1) {
+      const subField = field?.multipleData?.find((sub: any) => sub.fekey === multiFeKey);
+  
+      if (subField?.isRequired && (!value || value.trim() === "")) {
+        setFormErrors((prev) => ({
+          ...prev,
+          [uniqueSectionName]: {
+
+            //@ts-ignore
+            ...(prev[uniqueSectionName] || {}),
+            [`${fekey}-${multipleIndex}-${multiFeKey}`]: `${subField.fieldLabel} is required`,
+          },
+        }));
+      } else {
+        setFormErrors((prev) => {
+          const updatedErrors = { ...prev };
+          //@ts-ignore
+          delete updatedErrors[uniqueSectionName]?.[`${fekey}-${multipleIndex}-${multiFeKey}`];
+  //@ts-ignore
+          if (!Object.keys(updatedErrors[uniqueSectionName] || {}).length) {
+            //@ts-ignore
+            delete updatedErrors[uniqueSectionName];
+          }
+  
+          return updatedErrors;
+        });
+      }
+    } else {
+      if (field?.isRequired && (!value || value.trim() === "")) {
+        setFormErrors((prev) => ({
+          ...prev,
+          //@ts-ignore
+          [uniqueSectionName]: {
+            //@ts-ignore
+            ...(prev[uniqueSectionName] || {}),
+            [fekey]: `${field.fieldLabel} is required`,
+          },
+        }));
+      } else {
+        setFormErrors((prev) => {
+          const updatedErrors = { ...prev };//@ts-ignore
+          delete updatedErrors[uniqueSectionName]?.[fekey];
+  //@ts-ignore
+          if (!Object.keys(updatedErrors[uniqueSectionName] || {}).length) {
+            //@ts-ignore
+            delete updatedErrors[uniqueSectionName];
+          }
+  
+          return updatedErrors;
+        });
+      }
+    }
   };
+  // const handleInputChange = (
+  //   event: ChangeEvent<HTMLInputElement>,
+  //   uniqueSectionName: string,
+  //   fekey: string,
+  //   multipleIndex = -1,
+  //   multiFeKey = ""
+  // ) => {
+  //   const { name, value, files } = event.target;
+
+  //   if (multipleIndex !== -1) {
+  //     setTemplateValues((prev: any) => {
+  //       const currentMultiple = [...prev?.[uniqueSectionName]?.[fekey]];
+  //       currentMultiple[multipleIndex][multiFeKey] = value;
+
+  //       return {
+  //         ...prev,
+  //         [uniqueSectionName]: {
+  //           ...(prev?.[uniqueSectionName] || {}),
+  //           [fekey]: currentMultiple,
+  //         },
+  //       };
+  //     });
+  //     return;
+  //   }
+  //   // Handling non-file input changes
+  //   setTemplateValues((prev: any) => {
+  //     return {
+  //       ...prev,
+  //       [uniqueSectionName]: {
+  //         ...(prev?.[uniqueSectionName] || {}),
+  //         [fekey]: value,
+  //       },
+  //     };
+  //   });
+  // };
   function handleAddDuplicateForm(
     sectionName: any,
     feKey: any,
@@ -798,20 +936,31 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                         }
                                                         fullWidth
                                                         margin="normal"
+                                                        // error={
+                                                        //   subField.error &&
+                                                        //   subField.error
+                                                        // }
+                                                        // helperText={
+                                                        //   subField.error &&
+                                                        //   subField.error
+                                                        // }
+                                                        // inputProps={
+                                                        //   subField.validation
+                                                        //     ? JSON.parse(
+                                                        //         subField.validation
+                                                        //       )
+                                                        //     : {}
+                                                        // }
                                                         error={
-                                                          subField.error &&
-                                                          subField.error
+                                                          // @ts-ignore
+                                                          !!formErrors[section.uniqueSectionName]?.[`${sectionField.fekey}-${multipleSectionIndex}-${subField.fekey}`]
                                                         }
                                                         helperText={
-                                                          subField.error &&
-                                                          subField.error
+                                                        // @ts-ignore
+                                                          formErrors[section.uniqueSectionName]?.[`${sectionField.fekey}-${multipleSectionIndex}-${subField.fekey}`] || ""
                                                         }
                                                         inputProps={
-                                                          subField.validation
-                                                            ? JSON.parse(
-                                                                subField.validation
-                                                              )
-                                                            : {}
+                                                          subField.validation ? JSON.parse(subField.validation) : {}
                                                         }
                                                         value={
                                                           templateValue?.[
@@ -868,11 +1017,23 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                     // error={sectioFieldIndex.error && sectioFieldIndex.error}
                                     //@ts-ignore
                                     // helperText={field.error && field.error}
-                                    inputProps={
-                                      sectionField.validation
-                                        ? JSON.parse(sectionField.validation)
-                                        : {}
-                                    }
+                                    // inputProps={
+                                    //   sectionField.validation
+                                    //     ? JSON.parse(sectionField.validation)
+                                    //     : {}
+                                    // }
+
+                                    error={
+                                      // @ts-ignore
+                                     formErrors[section.uniqueSectionName]?.[sectionField.fekey] ? true : false
+                                   }
+                                   helperText={
+                                      // @ts-ignore
+                                     formErrors[section.uniqueSectionName]?.[sectionField.fekey] || ""
+                                   }
+                                   inputProps={
+                                     sectionField.validation ? JSON.parse(sectionField.validation) : {}
+                                   }
                                     value={
                                       templateValue?.[
                                         section.uniqueSectionName
