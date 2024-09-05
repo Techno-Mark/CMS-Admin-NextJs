@@ -267,7 +267,7 @@ const BlogListTable = () => {
 
   return (
     <>
-      <div className="max-h-[75vh]">
+      <div>
         <LoadingBackdrop isLoading={loading} />
         <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
           <BreadCrumbList />

@@ -6,7 +6,7 @@ import { modules } from "@/services/endpoint/modules";
 
 const initialBody = {
   page: 0,
-  limit: 10,
+  limit: 1000,
   search: "",
   active: null,
 };
