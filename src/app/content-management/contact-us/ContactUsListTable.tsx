@@ -283,7 +283,7 @@ const ContactUsListTable = () => {
 
   return (
     <>
-      <div className="max-h-[75vh]">
+      <div >
         <LoadingBackdrop isLoading={loading} />
         <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
           <BreadCrumbList />
@@ -294,48 +294,11 @@ const ContactUsListTable = () => {
               placeholder="Search"
               className="is-full sm:is-auto"
             />
-            {/* <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-              <Typography>Status:</Typography>
-              <CustomTextField
-                select
-                fullWidth
-                defaultValue="all"
-                id="custom-select"
-                value={
-                  activeFilter === null
-                    ? "all"
-                    : activeFilter === true
-                      ? "active"
-                      : "inactive"
-                }
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setActiveFilter(
-                    value === "active"
-                      ? true
-                      : value === "inactive"
-                        ? false
-                        : null
-                  );
-                }}
-              >
-                <MenuItem value="all">All</MenuItem>
-                <MenuItem value="active">Publish</MenuItem>
-                <MenuItem value="inactive">Draft</MenuItem>
-              </CustomTextField>
-            </div> */}
-            {/* <Button
-              variant="contained"
-              startIcon={<i className="tabler-plus" />}
-              onClick={() => router.push("/content-management/blogs/add")}
-              className="is-full sm:is-auto"
-            >
-              Add Blog
-            </Button> */}
+      
           </div>
         </div>
-        <Card className="flex flex-col h-full">
-          <div className="overflow-x-auto h-[470px]">
+        <Card >
+          <div className="overflow-x-auto">
             <table className={tableStyles.table}>
               <thead className="">
                 {table.getHeaderGroups().map((headerGroup) => (

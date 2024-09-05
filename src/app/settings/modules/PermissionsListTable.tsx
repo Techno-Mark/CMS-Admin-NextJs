@@ -400,7 +400,7 @@ const PermissionsListTable = ({
             )}
           </table>
         </div>
-        <TablePagination
+        {/* <TablePagination
           component={() => <TablePaginationComponent table={table} />}
           count={totalCount}
           rowsPerPage={table.getState().pagination.pageSize}
@@ -408,7 +408,7 @@ const PermissionsListTable = ({
           onPageChange={(_, page) => {
             table.setPageIndex(page);
           }}
-        />
+        /> */}
       </Card>
       <ConfirmationDialog
         open={isDeleting}
