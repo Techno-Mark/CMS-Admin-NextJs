@@ -16,9 +16,6 @@ import {
   getCoreRowModel,
   useReactTable,
   getFilteredRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFacetedMinMaxValues,
   getPaginationRowModel,
   getSortedRowModel,
 } from "@tanstack/react-table";
@@ -27,16 +24,21 @@ import type { RankingInfo } from "@tanstack/match-sorter-utils";
 // Type Imports
 import type { UsersType } from "@/types/apps/userTypes";
 // Component Imports
-import TablePaginationComponent from "@components/TablePaginationComponent";
 import CustomTextField from "@core/components/mui/TextField";
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { useRouter } from "next/navigation";
 import BreadCrumbList from "@/components/BreadCrumbList";
-import { redirectToAddPage, redirectToEditPage } from "@/services/endpoint/content-block";
+import {
+  getSectionList,
+  redirectToAddPage,
+  redirectToEditPage,
+} from "@/services/endpoint/content-block";
 import { MenuItem, Tooltip } from "@mui/material";
 import CustomChip from "@/@core/components/mui/Chip";
+import { post } from "@/services/apiService";
+import LoadingBackdrop from "@/components/LoadingBackdrop";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -102,28 +104,51 @@ const DebouncedInput = ({
 // Column Definitions
 const columnHelper = createColumnHelper<UsersTypeWithAction>();
 
-const UserListTable = ({
-  totalCount,
-  tableData,
-  getList,
-  initialBody,
-}: {
-  totalCount: number;
-  tableData?: UsersType[];
-  getList: (arg1: { page: number; limit: number; search: string, active: any }) => void;
-  initialBody: {
-    page: number;
-    limit: number;
-    search: string;
-    active: any
-  };
-}) => {
+const UserListTable = () => {
+  const [rowSelection, setRowSelection] = useState({});
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [totalRows, setTotalRows] = useState<number>(0);
+
   const router = useRouter();
   // States
   const [globalFilter, setGlobalFilter] = useState("");
-  const [deletingId, setDeletingId] = useState<number>(0);
+  const [deletingId, setDeletingId] = useState<number>(-1);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
+
+  const getData = async () => {
+    setLoading(true);
+    try {
+      const result = await post(getSectionList, {
+        page: page + 1,
+        limit: pageSize,
+        search: globalFilter,
+        active: activeFilter,
+      });
+      setData(
+        result.data.sections?.map((item: any) => ({
+          id: item.sectionId,
+          name: item.sectionName,
+          slug: item.sectionSlug,
+          jsonContent: item.sectionTemplate,
+          createdAt: item.createdAt,
+          status: item.active,
+        }))
+      );
+      setTotalRows(result.data.totalSections);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    getData();
+  }, [page, pageSize, globalFilter, activeFilter]);
 
   const columns = useMemo<ColumnDef<UsersTypeWithAction, any>[]>(
     () => [
@@ -153,38 +178,39 @@ const UserListTable = ({
       }),
       columnHelper.accessor("status", {
         header: "Status",
-        cell: ({ row }) =>
+        cell: ({ row }) => (
           <CustomChip
-              size="small"
-              round="true"
-              label={row.original.status ? 'Active' : 'Inactive'}
-              variant="tonal"
-              color={row.original.status ? 'success' : 'error'}
-            />
+            size="small"
+            round="true"
+            label={row.original.status ? "Active" : "Inactive"}
+            variant="tonal"
+            color={row.original.status ? "success" : "error"}
+          />
+        ),
       }),
       columnHelper.accessor("id", {
         header: "Actions",
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
-              <Tooltip title={'Edit'}>
-              <IconButton
-                onClick={() => {
-                  router.push(redirectToEditPage(row.original.id));
-                }}
-              >
-                <i className="tabler-edit text-[22px] text-textSecondary" />
-              </IconButton>
+              <Tooltip title={"Edit"}>
+                <IconButton
+                  onClick={() => {
+                    router.push(redirectToEditPage(row.original.id));
+                  }}
+                >
+                  <i className="tabler-edit text-[22px] text-textSecondary" />
+                </IconButton>
               </Tooltip>
-              <Tooltip title={'Delete'}>
-              <IconButton
-                onClick={() => {
-                  setIsDeleting(true);
-                  setDeletingId(row.original.id);
-                }}
-              >
-                <i className="tabler-trash text-[22px] text-textSecondary" />
-              </IconButton>
+              <Tooltip title={"Delete"}>
+                <IconButton
+                  onClick={() => {
+                    setIsDeleting(true);
+                    setDeletingId(row.original.id);
+                  }}
+                >
+                  <i className="tabler-trash text-[22px] text-textSecondary" />
+                </IconButton>
               </Tooltip>
             </div>
           );
@@ -196,56 +222,47 @@ const UserListTable = ({
   );
 
   const table = useReactTable({
-    data: tableData as UsersType[],
+    data,
     columns,
-    filterFns: {
-      fuzzy: fuzzyFilter,
-    },
-    initialState: {
-      pagination: {
-        pageIndex: initialBody.page,
-        pageSize: initialBody.limit,
-      },
+    filterFns: { fuzzy: fuzzyFilter },
+    state: {
+      rowSelection,
+      globalFilter,
+      pagination: { pageIndex: page, pageSize },
     },
     globalFilterFn: fuzzyFilter,
+    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    manualPagination: true,
+    pageCount: Math.ceil(totalRows / pageSize),
   });
 
-  useEffect(() => {
-    getList({
-      page: table.getState().pagination.pageIndex,
-      limit: table.getState().pagination.pageSize,
-      search: globalFilter,
-      active: activeFilter,
-    });
-  }, [
-    table.getState().pagination.pageSize,
-    table.getState().pagination.pageIndex,
-    globalFilter,
-    activeFilter
-  ]);
+  const handlePageChange = (event: unknown, newPage: number) => {
+    if (newPage !== page) {
+      setPage(newPage);
+    }
+  };
+
+  const handleRowsPerPageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setPageSize(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   useEffect(() => {
     if (deletingId === 0) {
-      getList({
-        page: table.getState().pagination.pageIndex,
-        limit: table.getState().pagination.pageSize,
-        search: globalFilter,
-        active: activeFilter,
-      });
+      getData();
     }
   }, [deletingId]);
 
   return (
     <>
-
+      <LoadingBackdrop isLoading={loading} />
       <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
         <BreadCrumbList />
         {/* <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4"> */}
@@ -264,10 +281,22 @@ const UserListTable = ({
               fullWidth
               defaultValue="all"
               id="custom-select"
-              value={activeFilter === null ? "all" : activeFilter === true ? "active" : "inactive"}
+              value={
+                activeFilter === null
+                  ? "all"
+                  : activeFilter === true
+                    ? "active"
+                    : "inactive"
+              }
               onChange={(e) => {
                 const value = e.target.value;
-                setActiveFilter(value === "active" ? true : value === "inactive" ? false : null);
+                setActiveFilter(
+                  value === "active"
+                    ? true
+                    : value === "inactive"
+                      ? false
+                      : null
+                );
               }}
             >
               <MenuItem value="all">All</MenuItem>
@@ -276,13 +305,13 @@ const UserListTable = ({
             </CustomTextField>
           </div>
           <Button
-          variant="contained"
-          startIcon={<i className="tabler-plus" />}
-          onClick={() => router.push(redirectToAddPage)}
-          className="is-full sm:is-auto"
-        >
-          Add Content Block
-        </Button>
+            variant="contained"
+            startIcon={<i className="tabler-plus" />}
+            onClick={() => router.push(redirectToAddPage)}
+            className="is-full sm:is-auto"
+          >
+            Add Content Block
+          </Button>
         </div>
       </div>
 
@@ -380,13 +409,12 @@ const UserListTable = ({
           </table>
         </div>
         <TablePagination
-          component={() => <TablePaginationComponent table={table} />}
-          count={totalCount}
-          rowsPerPage={table.getState().pagination.pageSize}
-          page={table.getState().pagination.pageIndex}
-          onPageChange={(_, page) => {
-            table.setPageIndex(page);
-          }}
+          component="div"
+          count={totalRows}
+          rowsPerPage={pageSize}
+          page={page}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
         />
       </Card>
       <ConfirmationDialog

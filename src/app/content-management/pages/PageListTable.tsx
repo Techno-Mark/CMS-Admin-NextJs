@@ -17,9 +17,6 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
-  getFacetedMinMaxValues,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
@@ -32,11 +29,14 @@ import ConfirmationDialog from "./ConfirmationDialog";
 
 import tableStyles from "@core/styles/table.module.css";
 import {
+  pages,
   redirectToAddPage,
   redirectToEditPage,
 } from "@/services/endpoint/pages";
 import CustomChip from "@/@core/components/mui/Chip";
 import BreadCrumbList from "@/components/BreadCrumbList";
+import { post } from "@/services/apiService";
+import LoadingBackdrop from "@/components/LoadingBackdrop";
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value);
@@ -82,33 +82,60 @@ const DebouncedInput = ({
 // Column Definitions
 const columnHelper = createColumnHelper<any>();
 
-const PageListTable = ({
-  totalCount,
-  tableData,
-  getList,
-  initialBody,
-}: {
-  totalCount: number;
-  tableData?: any;
-  getList: (arg1: {
-    page: number;
-    limit: number;
-    search: string;
-    active: any;
-  }) => void;
-  initialBody: {
-    page: number;
-    limit: number;
-    search: string;
-    active: any;
-  };
-}) => {
+const PageListTable = () => {
+  const [rowSelection, setRowSelection] = useState({});
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [totalRows, setTotalRows] = useState<number>(0);
+
   const router = useRouter();
   // States
   const [globalFilter, setGlobalFilter] = useState("");
   const [deletingId, setDeletingId] = useState<number>(-1);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
+
+  const getData = async () => {
+    setLoading(true);
+    try {
+      const result = await post(pages.list, {
+        page: page + 1,
+        limit: pageSize,
+        search: globalFilter,
+        active: activeFilter,
+      });
+      setData(
+        result.data.pages.map((item: any) => ({
+          id: item.pageId,
+          name: item.pageTitle,
+          slug: item.pageSlug,
+          jsonContent: item.pageContent,
+          createdAt: item.createdAt,
+          active: item.active,
+        }))
+      );
+      setTotalRows(result.data.totalPageListCount);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    getData();
+    const handleStorageUpdate = async () => {
+      getData();
+    };
+
+    window.addEventListener("localStorageUpdate", handleStorageUpdate);
+
+    return () => {
+      window.removeEventListener("localStorageUpdate", handleStorageUpdate);
+    };
+  }, [page, pageSize, globalFilter, activeFilter]);
 
   const columns = useMemo<ColumnDef<any, any>[]>(
     () => [
@@ -153,7 +180,7 @@ const PageListTable = ({
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
-              <Tooltip title={'Edit'}>
+              <Tooltip title={"Edit"}>
                 <IconButton
                   onClick={() => {
                     router.push(redirectToEditPage(row.original.id));
@@ -162,7 +189,7 @@ const PageListTable = ({
                   <i className="tabler-edit text-[22px] text-textSecondary" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title={'Delete'}>
+              <Tooltip title={"Delete"}>
                 <IconButton
                   onClick={() => {
                     setIsDeleting(true);
@@ -180,57 +207,48 @@ const PageListTable = ({
     ],
     []
   );
-
   const table = useReactTable({
-    data: tableData as any[],
+    data,
     columns,
-    filterFns: {
-      fuzzy: fuzzyFilter,
-    },
-    initialState: {
-      pagination: {
-        pageIndex: initialBody.page,
-        pageSize: initialBody.limit,
-      },
+    filterFns: { fuzzy: fuzzyFilter },
+    state: {
+      rowSelection,
+      globalFilter,
+      pagination: { pageIndex: page, pageSize },
     },
     globalFilterFn: fuzzyFilter,
+    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    manualPagination: true,
+    pageCount: Math.ceil(totalRows / pageSize),
   });
 
-  useEffect(() => {
-    getList({
-      page: table.getState().pagination.pageIndex,
-      limit: table.getState().pagination.pageSize,
-      search: globalFilter,
-      active: activeFilter,
-    });
-  }, [
-    table.getState().pagination.pageSize,
-    table.getState().pagination.pageIndex,
-    globalFilter,
-    activeFilter,
-  ]);
+  const handlePageChange = (event: unknown, newPage: number) => {
+    if (newPage !== page) {
+      setPage(newPage);
+    }
+  };
+
+  const handleRowsPerPageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setPageSize(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   useEffect(() => {
     if (deletingId === 0) {
-      getList({
-        page: table.getState().pagination.pageIndex,
-        limit: table.getState().pagination.pageSize,
-        search: globalFilter,
-        active: activeFilter,
-      });
+      getData();
     }
   }, [deletingId]);
 
   return (
     <>
+      <LoadingBackdrop isLoading={loading} />
       <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
         <BreadCrumbList />
         <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
@@ -357,13 +375,12 @@ const PageListTable = ({
           </table>
         </div>
         <TablePagination
-          component={() => <TablePaginationComponent table={table} />}
-          count={totalCount}
-          rowsPerPage={table.getState().pagination.pageSize}
-          page={table.getState().pagination.pageIndex}
-          onPageChange={(_, page) => {
-            table.setPageIndex(page);
-          }}
+          component="div"
+          count={totalRows}
+          rowsPerPage={pageSize}
+          page={page}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
         />
       </Card>
       <ConfirmationDialog
