@@ -327,7 +327,7 @@ const PermissionsListTable = ({
         </div>
       </div>
       <Card>
-        <div className="overflow-x-auto h-[380px]">
+        <div className="overflow-x-auto">
           <table className={tableStyles.table}>
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -402,15 +402,6 @@ const PermissionsListTable = ({
             )}
           </table>
         </div>
-        <TablePagination
-          component={() => <TablePaginationComponent table={table} />}
-          count={totalCount}
-          rowsPerPage={table.getState().pagination.pageSize}
-          page={table.getState().pagination.pageIndex}
-          onPageChange={(_, page) => {
-            table.setPageIndex(page);
-          }}
-        />
       </Card>
       <ConfirmationDialog
         open={isDeleting}

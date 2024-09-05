@@ -6,7 +6,7 @@ import PermissionsListTable from "./PermissionsListTable";
 
 const initialBody = {
   page: 0,
-  limit: 10,
+  limit: 1000,
   search: "",
   active: null,
 };
