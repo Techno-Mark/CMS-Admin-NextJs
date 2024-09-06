@@ -344,8 +344,8 @@ const FileListTable = () => {
             </Button>
           </div>
         </div>
-        <Card className="flex flex-col h-full">
-          <div className="overflow-x-auto h-[470px]">
+        <Card className="flex flex-col">
+          <div className="overflow-x-auto">
             <table className={tableStyles.table}>
               <thead className="">
                 {table.getHeaderGroups().map((headerGroup) => (
