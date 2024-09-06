@@ -49,6 +49,7 @@ const UserListCards = () => {
       {data.map((item, i) => (
         <Grid key={i} item xs={12} sm={6} md={3}>
           <HorizontalWithSubtitle {...item} />
+          
         </Grid>
       ))}
     </Grid>

@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 import { Switch } from "@mui/material";
 
 type RoleDialogProps = {
+
   open: boolean;
   setOpen: (open: boolean) => void;
   title?: string;
@@ -45,6 +46,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
     setDefaultData([]);
     setSelectedCheckbox([]);
     setIsIndeterminateCheckbox(false);
+    
   };
 
   const togglePermission = (id: number) => {

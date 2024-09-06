@@ -17,6 +17,7 @@ const Layout = ({ children }: Props) => {
 
   return (
     <Providers direction={direction}>
+     
       <BlankLayout systemMode={systemMode}>{children}</BlankLayout>
     </Providers>
   )

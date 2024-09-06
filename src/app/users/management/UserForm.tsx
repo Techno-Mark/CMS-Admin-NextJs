@@ -59,6 +59,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
       roles: [] as LabelValue[],
     },
   ]);
+
   const [companyIdError, setCompanyIdError] = useState([false]);
   const [roleIdError, setRoleIdError] = useState([false]);
   const [deletedCompany, setDeletedCompany] = useState<number[] | []>([]);
@@ -101,6 +102,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
         const orgs = response.data.organizations as LabelValue[];
         setCompanyList(orgs);
       } catch (error) {
+
         console.error("Error fetching organizations:", error);
       }
     };
@@ -118,6 +120,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
           active: editingRow.Status,
         });
 
+
         const rolesOrganizations = await Promise.all(
           editingRow.RolesOrganizations.map(async (i: any) => {
             const roles = await fetchRoles(i.organizationId);
@@ -131,6 +134,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
         );
         setCompany(rolesOrganizations);
       }
+      
       setLoading(false);
     };
 

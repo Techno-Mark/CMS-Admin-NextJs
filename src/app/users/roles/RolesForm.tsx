@@ -16,6 +16,7 @@ import { getSectionById } from "@/services/endpoint/content-block";
 
 type Props = {
   open: ADD_ROLE | EDIT_ROLE;
+  
 };
 
 type FormDataType = {

@@ -41,6 +41,7 @@ const PermissionForm = ({
   permissionDataErr,
   setPermissionData,
   setPermissionDataErr,
+
   isEditMode,
 }: {
   handleClose: () => void;
@@ -63,6 +64,7 @@ const PermissionForm = ({
         helperText={permissionDataErr.name}
         error={!!permissionDataErr.name}
         onChange={(e) => {
+
           setPermissionDataErr({ name: "" });
           setPermissionData({
             ...permissionData,
@@ -91,6 +93,7 @@ const PermissionForm = ({
       </Button>
       <Button
         onClick={handleClose}
+        
         variant="tonal"
         color="secondary"
         className="max-sm:mis-0"

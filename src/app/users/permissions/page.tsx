@@ -15,6 +15,7 @@ const page = () => {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [permissionsData, setPermissionsData] = useState([]);
 
+
   const getList = async (body: any) => {
     try {
       const result = await post(getPermissionsList, body);
@@ -36,6 +37,7 @@ const page = () => {
         tableData={permissionsData}
         getList={getList}
         initialBody={initialBody}
+        
       />
     </>
   );

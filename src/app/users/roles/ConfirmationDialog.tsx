@@ -13,11 +13,13 @@ type ConfirmationDialogProps = {
   setOpen: (open: boolean) => void;
   setDeletingId: React.Dispatch<React.SetStateAction<number>>;
   deletePayload: object;
+
 };
 
 const ConfirmationDialog = ({
   open,
   setOpen,
+
   setDeletingId,
   deletePayload,
 }: ConfirmationDialogProps) => {
@@ -29,6 +31,7 @@ const ConfirmationDialog = ({
         toast.success(result.message);
       } else {
         toast.error(result.message);
+        
       }
     } catch (error) {
       console.error(error);

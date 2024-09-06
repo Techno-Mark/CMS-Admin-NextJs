@@ -18,6 +18,7 @@ const page = () => {
 
   const getList = async (body: any) => {
     try {
+      
       const result = await post(getRoleList, body);
       setTotalCount(result.data.totalRoles);
       setRolesData(result.data.roles);

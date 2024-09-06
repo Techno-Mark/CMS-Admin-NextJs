@@ -67,6 +67,7 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   });
 
   // Return if the item should be filtered in/out
+
   return itemRank.passed;
 };
 
@@ -90,6 +91,7 @@ const DebouncedInput = ({
   useEffect(() => {
     const timeout = setTimeout(() => {
       onChange(value);
+
     }, debounce);
 
     return () => clearTimeout(timeout);
@@ -119,6 +121,7 @@ const PermissionsListTable = ({
     page: number;
     limit: number;
     search: string;
+
     active: boolean | null;
   }) => void;
   initialBody: {
@@ -151,6 +154,7 @@ const PermissionsListTable = ({
       columnHelper.accessor("permissionName", {
         header: "Name",
         cell: ({ row }) => (
+          
           <Typography color="text.primary" className="font-medium">
             {row.original.permissionName}
           </Typography>

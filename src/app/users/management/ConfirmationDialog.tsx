@@ -19,6 +19,7 @@ const ConfirmationDialog = ({
   open,
   setOpen,
   setDeletingId,
+  
   deletePayload,
 }: ConfirmationDialogProps) => {
   const handleDeletePermission = async () => {

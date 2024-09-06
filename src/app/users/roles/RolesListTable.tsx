@@ -17,6 +17,7 @@ import {
   getFilteredRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
+  
   getFacetedMinMaxValues,
   getPaginationRowModel,
   getSortedRowModel,

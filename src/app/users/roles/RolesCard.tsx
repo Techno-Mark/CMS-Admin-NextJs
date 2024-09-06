@@ -18,6 +18,7 @@ const RoleCards = ({ openDialog, setOpenDialog }: any) => {
         className="is-full sm:is-auto"
       >
         Add Role
+        
       </Button>
     ),
   };

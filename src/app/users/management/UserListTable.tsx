@@ -67,6 +67,7 @@ const DebouncedInput = ({
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
+
     setValue(initialValue);
   }, [initialValue]);
 
@@ -110,6 +111,7 @@ const UserListTable = () => {
       try {
         const result = await post(getUsersList, {
           page: page + 1,
+
           limit: pageSize,
           search: globalFilter,
           active: activeFilter,
@@ -147,6 +149,7 @@ const UserListTable = () => {
           setTotalRows(2);
         } finally {
           setLoading(false);
+
         }
       };
       getData();
@@ -161,6 +164,7 @@ const UserListTable = () => {
 
   const columns = useMemo<ColumnDef<EventTypeWithAction, any>[]>(
     () => [
+
       columnHelper.accessor("srNo", {
         header: "Sr. No.",
         cell: ({ row }) => (
@@ -174,6 +178,7 @@ const UserListTable = () => {
         header: "User",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
+
             {row.original.Username}
           </Typography>
         ),
@@ -200,6 +205,7 @@ const UserListTable = () => {
         header: "Status",
         cell: ({ row }) => (
           <div className="flex items-center">
+
             <CustomChip
               size="small"
               round="true"
@@ -220,6 +226,7 @@ const UserListTable = () => {
               <IconButton
                 onClick={() =>
                   router.push(`/users/management/edit/${row.original.UserId}`)
+
                 }
               >
                 <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -246,6 +253,7 @@ const UserListTable = () => {
   const table = useReactTable({
     data,
     columns,
+
     filterFns: { fuzzy: fuzzyFilter },
     state: {
       rowSelection,
@@ -281,6 +289,7 @@ const UserListTable = () => {
       <div className="">
         <LoadingBackdrop isLoading={loading} />
         <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
+
           <BreadCrumbList />
           <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
             <DebouncedInput
@@ -366,6 +375,7 @@ const UserListTable = () => {
               </thead>
               {table.getFilteredRowModel().rows.length === 0 ? (
                 <tbody>
+                  
                   <tr>
                     <td
                       colSpan={table.getVisibleFlatColumns().length}

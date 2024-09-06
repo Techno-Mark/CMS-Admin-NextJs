@@ -12,6 +12,7 @@ type ConfirmationDialogProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
   setDeletingId: React.Dispatch<React.SetStateAction<number>>;
+
   deletePayload: object;
 };
 
@@ -40,6 +41,7 @@ const ConfirmationDialog = ({
   return (
     <Dialog fullWidth maxWidth="xs" open={open} onClose={() => setOpen(false)}>
       <DialogContent className="flex items-center flex-col text-center sm:pbs-16 sm:pbe-6 sm:pli-16">
+
         <i className="tabler-alert-circle text-[88px] mbe-6 text-warning" />
         <Typography variant="h5">
           Are you sure you want to delete the content block?
@@ -50,6 +52,7 @@ const ConfirmationDialog = ({
           Yes
         </Button>
         <Button
+        
           variant="tonal"
           color="secondary"
           onClick={() => {
