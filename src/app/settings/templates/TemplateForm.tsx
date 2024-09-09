@@ -145,18 +145,26 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
       setIsSectionsValid(true);
       try {
         const endpoint = editingRow ? template.update : template.create;
-        
+        //need to update uniqueSectionName for common component
         const payload = {
           templateId: editingRow ? formData.templateId : undefined,
           templateName: formData.templateName,
           templateDescription: formData.templateDescription,
           active: formData.active,
           templateSlug: formData.templateSlug,
-          sectionIds: selectedSections.map(section => ({
-            sectionId: section.sectionId,
-            isCommon: section.isCommon ? 'true' : undefined,
-            uniqueSectionName:  section?.uniqueSectionName ? section.uniqueSectionName : `${section.sectionName}_${uuidv4()}`,
-          })),
+          sectionIds: selectedSections.map(section =>{ 
+            let uniqueSectionName = ''
+            if(section.isCommon){
+              uniqueSectionName = section.sectionName;
+            }else{
+              uniqueSectionName =  section?.uniqueSectionName ? section.uniqueSectionName : `${section.sectionName}_${uuidv4()}`;
+            }
+              return ({
+              sectionId: section.sectionId,
+              isCommon: section.isCommon ? true : false,
+              uniqueSectionName:  uniqueSectionName
+            })
+        }),
         };
   
         const response = await post(endpoint, payload);
@@ -361,6 +369,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                                 <Checkbox
                                   checked={section.isCommon || false}
                                   onChange={() => handleSectionIsCommonChange(index)}
+                                  disabled={true}
                                 />
                               }
                               label={<Typography>{section.sectionName}</Typography>}
