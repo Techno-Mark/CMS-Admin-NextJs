@@ -69,6 +69,7 @@ const initialData = {
   slug: "",
   jsonContent: [{ fieldType: "", fieldLabel: "", fekey:"", isRequired: false, validation: "{}" }],
   status: false,
+  isCommon:false
 };
 
 type Props = {
@@ -87,6 +88,7 @@ type FormDataType = {
   slug: string;
   jsonContent: any[];
   status: boolean;
+  isCommon:boolean
 };
 
 const ContentBlockForm = ({ open }: Props) => {
@@ -102,6 +104,7 @@ const ContentBlockForm = ({ open }: Props) => {
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false);
   const [expanded, setExpanded] = useState(true)
   const [editAllow, setEditAllow] = useState(false);
+  const [initialIsCommon, setInitialIsCommon] = useState(false);
   useEffect(() => {
     if (formData.jsonContent.length === 0) {
       handleAddRow();
@@ -205,13 +208,17 @@ const ContentBlockForm = ({ open }: Props) => {
       try {
         setLoading(true);
         const endpoint = open === sectionActions.EDIT ? section.update : section.create;
+        
+        let sectionName = formData.name;
+        sectionName = sectionName?.split("_")?.join(" ");
 
         const payload = {
           sectionId: open === sectionActions.EDIT ? formData.id : undefined,
-          sectionName: formData.name,
+          sectionName: sectionName,
           sectionSlug: formData.slug,
           sectionTemplate: formData.jsonContent,
           active: formData.status,
+          isCommon:formData.isCommon
         };
 
         const response = await post(endpoint, payload);
@@ -244,9 +251,11 @@ const ContentBlockForm = ({ open }: Props) => {
         slug: data.sectionSlug,
         jsonContent: data.sectionTemplate,
         status: data.active,
+        isCommon: data.isCommon
 
       });
       setIsSlugManuallyEdited(false);
+      setInitialIsCommon(data.isCommon);
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -314,7 +323,7 @@ const ContentBlockForm = ({ open }: Props) => {
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
             <Box display="flex" alignItems="center">
               <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={4}>
                   <CustomTextField
                     error={!!formErrors.name}
                     helperText={formErrors.name}
@@ -323,10 +332,10 @@ const ContentBlockForm = ({ open }: Props) => {
                     placeholder=""
                     value={formData.name}
                     onChange={handleSectionNameChange}
-                    disabled={editAllow ? true : false}
+                    disabled={open ==sectionActions.EDIT ? true : false}
                   />
                 </Grid>
-                <Grid item xs={12} sm={5}>
+                <Grid item xs={12} sm={4}>
                   <CustomTextField
                     // disabled={open === sectionActions.EDIT}
                     error={!!formErrors.slug}
@@ -339,7 +348,7 @@ const ContentBlockForm = ({ open }: Props) => {
                     disabled={editAllow ? true : false}
                   />
                 </Grid>
-                <Grid item xs={12} sm={1}>
+                <Grid item xs={4} sm={1}>
                   <Typography variant="body2" sx={{ mr: 0 }}>
                     Status
                   </Typography>
@@ -350,6 +359,19 @@ const ContentBlockForm = ({ open }: Props) => {
                       setFormData({ ...formData, status: e.target.checked })
                     }
                     disabled={editAllow ? true : false}
+                  />
+                </Grid>
+                <Grid item xs={6} sm={2}>
+                  <Typography variant="body2" sx={{ mr: 0 }}>
+                    is Common Content Block
+                  </Typography>
+                  <Switch
+                    size='medium'
+                    checked={formData.isCommon}
+                    onChange={(e) =>
+                      setFormData({ ...formData, isCommon: e.target.checked })
+                    }
+                    disabled={open == sectionActions.EDIT && !!initialIsCommon? true : false}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -385,7 +407,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                   renderInput={(params) => <CustomTextField {...params} placeholder="" />}
                                   value={fieldTypeOptions.find((option) => option.value === field.fieldType) || null}
                                   onChange={(e, newValue) => handleChangeField(index, "fieldType", newValue ? newValue.value : "")}
-                                  disabled={editAllow ? true : false}
+                                  disabled={open ==sectionActions.EDIT ? true : false}
                                 />
                               </TableCell>
                               <TableCell>
@@ -403,7 +425,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                   fullWidth
                                   value={field.fekey}
                                   onChange={(e) => handleChangeField(index, "fekey", e.target.value)}
-                                  // disabled={editAllow ? true : false}
+                                  disabled={open == sectionActions.EDIT ? true : false}
                                 />
                               </TableCell>
 
@@ -497,7 +519,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                                   renderInput={(params) => <CustomTextField {...params} placeholder="" />}
                                                   value={fieldTypeOptionsForMultiple.find((option) => option.value === subField.fieldType) || null}
                                                   onChange={(e, newValue) => handleChangeField(index, "fieldType", newValue ? newValue.value : "", subIndex)}
-                                                  disabled={editAllow ? true : false}
+                                                  disabled={open ==sectionActions.EDIT ? true : false}
                                                 />
                                               </TableCell>
                                               <TableCell>
@@ -514,7 +536,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                                   fullWidth
                                                   value={subField.fekey}
                                                   onChange={(e) => handleChangeField(index, "fekey", e.target.value, subIndex)}
-                                                  // disabled={editAllow ? true : false}
+                                                  disabled={open == sectionActions.EDIT ? true : false}
                                                 />
                                               </TableCell>
                                               <TableCell>

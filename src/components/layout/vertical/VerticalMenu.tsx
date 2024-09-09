@@ -105,6 +105,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           Recrutments
         </MenuItem> */}
         <MenuItem href={`/content-management/media`} icon={<i className='tabler-file-upload'></i>}>Media</MenuItem>
+        <MenuItem href={`/content-management/static-component`} icon={<i className='tabler-file-upload'></i>}>Static Component</MenuItem>
         {session?.user?.id == '1' && <>
           <SubMenu
             label={"Users"}
