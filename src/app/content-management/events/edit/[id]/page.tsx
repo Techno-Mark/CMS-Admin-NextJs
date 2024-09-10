@@ -7,12 +7,13 @@ import { EDIT_EVENT, eventDetailType } from "@/types/apps/eventType";
 import { event } from "@/services/endpoint/event";
 import { useEffect, useState } from "react";
 import { postDataToOrganizationAPIs } from "@/services/apiService";
+import { usePermission } from "@/utils/permissions";
 
 const Page = ({ params }: { params: { id: string } }) => {
   const [editingRow, setEditingRow] = useState<eventDetailType | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-
+  const { hasPermission } = usePermission()
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -41,6 +42,7 @@ const Page = ({ params }: { params: { id: string } }) => {
           open={EDIT_EVENT}
           handleClose={() => router.push("/content-management/events")}
           editingRow={editingRow}
+          permissionUser={hasPermission('Event', 'Edit')}
         />
       )}
     </>

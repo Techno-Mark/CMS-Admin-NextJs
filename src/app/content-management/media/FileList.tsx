@@ -32,6 +32,7 @@ import { media } from "@/services/endpoint/media";
 import { filesType } from "@/types/apps/FilesTypes";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "./ConfirmationDialog";
+import { usePermission } from "@/utils/permissions";
 // import defaultFileIcon from "../../../../public/images/files.png";
 
 declare module "@tanstack/table-core" {
@@ -88,6 +89,7 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<BlogTypeWithAction>();
 
 const FileListTable = () => {
+  const { hasPermission } = usePermission()
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -237,7 +239,7 @@ const FileListTable = () => {
               <i className="tabler-copy text-[22px]" />
             </IconButton>
             </Tooltip>
-
+            {hasPermission('Media', 'Delete') && (
             <Tooltip title={'Delete'}>
 
              <IconButton
@@ -250,6 +252,7 @@ const FileListTable = () => {
               <i className="tabler-trash text-[22px] text-textSecondary" />
             </IconButton>
             </Tooltip> 
+      )}
           </div>
         ),
         enableSorting: false,
@@ -334,6 +337,8 @@ const FileListTable = () => {
                 <MenuItem value="inactive">Draft</MenuItem>
               </CustomTextField>
             </div> */}
+
+{hasPermission('Media', 'Create') && (
             <Button
               variant="contained"
               startIcon={<i className="tabler-plus" />}
@@ -342,6 +347,8 @@ const FileListTable = () => {
             >
               Add File
             </Button>
+)}
+
           </div>
         </div>
         <Card className="flex flex-col">

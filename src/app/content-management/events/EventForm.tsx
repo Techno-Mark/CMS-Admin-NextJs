@@ -42,6 +42,7 @@ type EventFormPropsTypes = {
   open: number;
   editingRow: eventDetailType | null;
   handleClose: Function;
+  permissionUser: Boolean
 };
 
 const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
@@ -77,7 +78,7 @@ const initialErrorData = {
   organizerPhone: "",
 };
 
-const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
+const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormPropsTypes) => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
   const [formData, setFormData] = useState<typeof initialData>(initialData);
@@ -268,7 +269,7 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
       ...prevData,
       description: content,
     }));
-   
+
   };
   return (
     <>
@@ -468,11 +469,11 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
 
 
                       <EditorBasic
-                         content={formData.description}
-                         onContentChange={handleContentChange}
-        
-                         error={!!formErrors.description}
-                         helperText={formErrors.description}
+                        content={formData.description}
+                        onContentChange={handleContentChange}
+
+                        error={!!formErrors.description}
+                        helperText={formErrors.description}
                       />
 
                       {/* <EditorCustom /> */}
@@ -682,13 +683,15 @@ const EventForm = ({ open, handleClose, editingRow }: EventFormPropsTypes) => {
                     >
                       Cancel
                     </Button>
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      onClick={() => handleSubmit()}
-                    >
-                      {open === ADD_EVENT ? "Add" : "Edit"} Event
-                    </Button>
+                    {permissionUser &&
+                      <Button
+                        variant="contained"
+                        type="submit"
+                        onClick={() => handleSubmit()}
+                      >
+                        {open === ADD_EVENT ? "Add" : "Edit"} Event
+                      </Button>
+                    }
                   </Box>
                 </Grid>
               </Grid>

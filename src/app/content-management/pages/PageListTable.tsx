@@ -37,6 +37,7 @@ import CustomChip from "@/@core/components/mui/Chip";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import { post } from "@/services/apiService";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
+import { usePermission } from "@/utils/permissions";
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value);
@@ -83,6 +84,7 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<any>();
 
 const PageListTable = () => {
+  const { hasPermission } = usePermission()
   const [rowSelection, setRowSelection] = useState({});
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -97,6 +99,7 @@ const PageListTable = () => {
   const [deletingId, setDeletingId] = useState<number>(-1);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
+
 
   const getData = async () => {
     setLoading(true);
@@ -180,15 +183,34 @@ const PageListTable = () => {
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
-              <Tooltip title={"Edit"}>
-                <IconButton
-                  onClick={() => {
-                    router.push(redirectToEditPage(row.original.id));
-                  }}
-                >
-                  <i className="tabler-edit text-[22px] text-textSecondary" />
-                </IconButton>
-              </Tooltip>
+              {hasPermission('Page', 'Edit') ? (
+
+                <Tooltip title={"Edit"}>
+                  <IconButton
+                    onClick={() => {
+                      router.push(redirectToEditPage(row.original.id));
+                    }}
+                  >
+                    <i className="tabler-edit text-[22px] text-textSecondary" />
+                  </IconButton>
+                </Tooltip>
+
+              )
+                :
+                (
+                  <Tooltip title={'View'}>
+                    <IconButton
+                      onClick={() =>
+                        router.push(redirectToEditPage(row.original.id))
+                      }
+                    >
+                      <i className="tabler-eye text-[22px] text-textSecondary" />
+                    </IconButton>
+                  </Tooltip>
+
+                )
+              }
+              {hasPermission('Page', 'Delete') && (
               <Tooltip title={"Delete"}>
                 <IconButton
                   onClick={() => {
@@ -199,6 +221,7 @@ const PageListTable = () => {
                   <i className="tabler-trash text-[22px] text-textSecondary" />
                 </IconButton>
               </Tooltip>
+              )}
             </div>
           );
         },
@@ -288,14 +311,16 @@ const PageListTable = () => {
               <MenuItem value="inactive">Draft</MenuItem>
             </CustomTextField>
           </div>
-          <Button
-            variant="contained"
-            startIcon={<i className="tabler-plus" />}
-            onClick={() => router.push(redirectToAddPage)}
-            className="is-full sm:is-auto"
-          >
-            Add Pages
-          </Button>
+          {hasPermission('Page', 'Create') && (
+            <Button
+              variant="contained"
+              startIcon={<i className="tabler-plus" />}
+              onClick={() => router.push(redirectToAddPage)}
+              className="is-full sm:is-auto"
+            >
+              Add Pages
+            </Button>
+          )}
         </div>
       </div>
       <Card>

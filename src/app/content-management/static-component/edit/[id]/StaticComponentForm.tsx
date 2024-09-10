@@ -26,6 +26,7 @@ type staticContentBlockFormPropsTypes = {
   sectionSchema: any;
   editingRow: any | null;
   handleClose: Function;
+  permissionUser: Boolean
 };
 
 const initialFormData = {
@@ -66,6 +67,7 @@ function StaticComponentForm({
   sectionSchema: formData,
   editingRow,
   handleClose,
+  permissionUser
 }: staticContentBlockFormPropsTypes) {
 
   const router = useRouter();
@@ -452,6 +454,7 @@ function StaticComponentForm({
                 >
                   Cancel
                 </Button>
+                {permissionUser &&
                 <Button
                   variant="contained"
                   type="submit"
@@ -459,6 +462,7 @@ function StaticComponentForm({
                 >
                   Save & Update
                 </Button>
+}
               </Box>
             </Grid>
           </Grid>

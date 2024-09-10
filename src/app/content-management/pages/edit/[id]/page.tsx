@@ -7,6 +7,7 @@ import { post } from '@/services/apiService';
 import { pages } from '@/services/endpoint/pages';
 import { PagesType } from "../../pagesType";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
+import { usePermission } from "@/utils/permissions";
 
 const page = ({ params }: { params: { id: string } }) => {
   const [editingRow, setEditingRow] = useState<PagesType | null>(null);
@@ -32,7 +33,7 @@ const page = ({ params }: { params: { id: string } }) => {
 
     fetchData();
   }, [params.id]);
-
+  const { hasPermission } = usePermission()
   return (<>
     <LoadingBackdrop isLoading={loading} />
     <PagesForm
@@ -40,6 +41,7 @@ const page = ({ params }: { params: { id: string } }) => {
       editingRow={editingRow}
       setEditingRow={setEditingRow}
       handleClose={() => router.push('/content-management/pages')}
+      permissionUser={hasPermission('Page', 'Edit')} 
     /></>
   );
 };

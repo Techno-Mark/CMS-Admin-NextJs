@@ -30,6 +30,7 @@ import { truncateText } from "@/utils/common";
 import { eventsType } from "@/types/apps/eventType";
 import { event } from "@/services/endpoint/event";
 import ConfirmationDialog from "./ConfirmationDialog";
+import { usePermission } from "@/utils/permissions";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -85,6 +86,7 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<EventTypeWithAction>();
 
 const BlogListTable = () => {
+  const { hasPermission } = usePermission()
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -213,27 +215,46 @@ const BlogListTable = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
-             <Tooltip title={'Edit'}>
-            <IconButton
-              onClick={() =>
-                router.push(
-                  `/content-management/events/edit/${row.original.eventId}`
-                )
-              }
-            >
-              <i className="tabler-edit text-[22px] text-textSecondary" />
-            </IconButton>
-            </Tooltip>
-            <Tooltip title={'Delete'}>
-            <IconButton
-              onClick={() => {
-                setIsDeleting(true);
-                setDeletingId(row.original.eventId);
-              }}
-            >
-              <i className="tabler-trash text-[22px] text-textSecondary" />
-            </IconButton>
-            </Tooltip>
+            {hasPermission('Event', 'Create') ? (<>
+
+              <Tooltip title={'Edit'}>
+                <IconButton
+                  onClick={() =>
+                    router.push(
+                      `/content-management/events/edit/${row.original.eventId}`
+                    )
+                  }
+                >
+                  <i className="tabler-edit text-[22px] text-textSecondary" />
+                </IconButton>
+              </Tooltip>
+            </>) : (
+              <Tooltip title={'View'}>
+                <IconButton
+                  onClick={() =>
+                    router.push(
+                      `/content-management/events/edit/${row.original.eventId}`
+                    )
+                  }
+                >
+                  <i className="tabler-eye text-[22px] text-textSecondary" />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {hasPermission('Event', 'Delete') && (
+              <Tooltip title={'Delete'}>
+                <IconButton
+                  onClick={() => {
+                    setIsDeleting(true);
+                    setDeletingId(row.original.eventId);
+                  }}
+                >
+                  <i className="tabler-trash text-[22px] text-textSecondary" />
+                </IconButton>
+              </Tooltip>
+
+            )}
           </div>
         ),
         enableSorting: false,
@@ -318,14 +339,16 @@ const BlogListTable = () => {
                 <MenuItem value="inactive">Draft</MenuItem>
               </CustomTextField>
             </div>
-            <Button
-              variant="contained"
-              startIcon={<i className="tabler-plus" />}
-              onClick={() => router.push("/content-management/events/add")}
-              className="is-full sm:is-auto"
-            >
-              Add Event
-            </Button>
+            {hasPermission('Event', 'Create') && (
+              <Button
+                variant="contained"
+                startIcon={<i className="tabler-plus" />}
+                onClick={() => router.push("/content-management/events/add")}
+                className="is-full sm:is-auto"
+              >
+                Add Event
+              </Button>
+            )}
           </div>
         </div>
         <Card className="flex flex-col h-full">

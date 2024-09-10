@@ -1,5 +1,9 @@
+import { usePermission } from "@/utils/permissions";
 import BlogsListTable from "./BlogsListTable";
 
 export default function Page() {
-  return <BlogsListTable />;
+  // const { hasPermission } = usePermission()
+
+  
+   return <BlogsListTable />;
 }

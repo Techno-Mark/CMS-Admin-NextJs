@@ -76,8 +76,9 @@ type Props = {
   handleClose: () => void;
   editingRow: PagesType | null;
   setEditingRow: React.Dispatch<React.SetStateAction<PagesType | null>>;
+  permissionUser: Boolean
 };
-function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
+function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUser }: Props) {
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] =
     useState<boolean>(false);
 
@@ -270,54 +271,56 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
     }
 
     // Loop through sections to validate each field
-  sections.forEach((section) => {
-    section.sectionTemplate.forEach((field: any) => {
-      const fieldKey = field.fekey;
-      const fieldLabel = field.fieldLabel;
+    sections.forEach((section) => {
+      section.sectionTemplate.forEach((field: any) => {
+        const fieldKey = field.fekey;
+        const fieldLabel = field.fieldLabel;
 
-      // Handle validation for regular fields
-      if (field.fieldType !== "multiple") {
-        const value = templateValue?.[section.uniqueSectionName]?.[fieldKey];
-        if (field.isRequired && (!value || value.trim() === "")) {
-          valid = false;
-          //@ts-ignore
-          errors[section.uniqueSectionName] = {  ...(errors[section.uniqueSectionName] || {}),
-            [fieldKey]: `${fieldLabel} is required.`,
-          };
+        // Handle validation for regular fields
+        if (field.fieldType !== "multiple") {
+          const value = templateValue?.[section.uniqueSectionName]?.[fieldKey];
+          if (field.isRequired && (!value || value.trim() === "")) {
+            valid = false;
+            //@ts-ignore
+            errors[section.uniqueSectionName] = {
+              ...(errors[section.uniqueSectionName] || {}),
+              [fieldKey]: `${fieldLabel} is required.`,
+            };
+          }
         }
-      }
 
-      // Handle validation for multiple fields
-      if (field.fieldType === "multiple") {
-        const multipleEntries = templateValue?.[section.uniqueSectionName]?.[fieldKey];
-        if (Array.isArray(multipleEntries)) {
-          multipleEntries.forEach((entry: any, entryIndex: number) => {
-            field.multipleData.forEach((subField: any) => {
-              const subFieldKey = subField.fekey;
-              const subFieldLabel = subField.fieldLabel;
-              const subFieldValue = entry[subFieldKey];
+        // Handle validation for multiple fields
+        if (field.fieldType === "multiple") {
+          const multipleEntries = templateValue?.[section.uniqueSectionName]?.[fieldKey];
+          if (Array.isArray(multipleEntries)) {
+            multipleEntries.forEach((entry: any, entryIndex: number) => {
+              field.multipleData.forEach((subField: any) => {
+                const subFieldKey = subField.fekey;
+                const subFieldLabel = subField.fieldLabel;
+                const subFieldValue = entry[subFieldKey];
 
-              if (subField.isRequired && (!subFieldValue || subFieldValue.trim() === "")) {
-                valid = false;
-                //@ts-ignore
-                errors[section.uniqueSectionName] = {  ...(errors[section.uniqueSectionName] || {}),
-                  [fieldKey]: {
-                    //@ts-ignore
-                    ...(errors[section.uniqueSectionName]?.[fieldKey] || {}),
-                    [entryIndex]: {
+                if (subField.isRequired && (!subFieldValue || subFieldValue.trim() === "")) {
+                  valid = false;
+                  //@ts-ignore
+                  errors[section.uniqueSectionName] = {
+                    ...(errors[section.uniqueSectionName] || {}),
+                    [fieldKey]: {
                       //@ts-ignore
-                      ...(errors[section.uniqueSectionName]?.[fieldKey]?.[entryIndex] || {}),
-                      [subFieldKey]: `${subFieldLabel} is required.`,
+                      ...(errors[section.uniqueSectionName]?.[fieldKey] || {}),
+                      [entryIndex]: {
+                        //@ts-ignore
+                        ...(errors[section.uniqueSectionName]?.[fieldKey]?.[entryIndex] || {}),
+                        [subFieldKey]: `${subFieldLabel} is required.`,
+                      },
                     },
-                  },
-                };
-              }
+                  };
+                }
+              });
             });
-          });
+          }
         }
-      }
+      });
     });
-  });
 
     setSections(updatedSections);
     setFormErrors(errors);
@@ -333,8 +336,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
         Object.keys(sections).forEach((key: any) => {
           let uniqueSection = sections[key]?.uniqueSectionName;
           const lastUnderscoreIndex = uniqueSection.lastIndexOf("_");
-        
-          if(lastUnderscoreIndex !== -1) {
+
+          if (lastUnderscoreIndex !== -1) {
             let secName = uniqueSection.slice(0, lastUnderscoreIndex);
             let templateSectionValue = {
               [secName]: templateValue[uniqueSection],
@@ -902,7 +905,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                               section.uniqueSectionName,
                                                               sectionField.fekey,
                                                               multipleSectionIndex +
-                                                                1,
+                                                              1,
                                                               sectionField
                                                             )
                                                           }
@@ -955,7 +958,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                           }
                                                           type={
                                                             subField.fieldType ===
-                                                            "file"
+                                                              "file"
                                                               ? "text"
                                                               : "text"
                                                           }
@@ -991,38 +994,38 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                                           error={
                                                             // @ts-ignore
                                                             !!formErrors[
-                                                              section
-                                                                .uniqueSectionName
+                                                            section
+                                                              .uniqueSectionName
                                                             ]?.[
-                                                              `${sectionField.fekey}-${multipleSectionIndex}-${subField.fekey}`
+                                                            `${sectionField.fekey}-${multipleSectionIndex}-${subField.fekey}`
                                                             ]
                                                           }
                                                           helperText={
                                                             // @ts-ignore
                                                             formErrors[
-                                                              section
-                                                                .uniqueSectionName
+                                                            section
+                                                              .uniqueSectionName
                                                             ]?.[
-                                                              `${sectionField.fekey}-${multipleSectionIndex}-${subField.fekey}`
+                                                            `${sectionField.fekey}-${multipleSectionIndex}-${subField.fekey}`
                                                             ] || ""
                                                           }
                                                           inputProps={
                                                             subField.validation
                                                               ? JSON.parse(
-                                                                  subField.validation
-                                                                )
+                                                                subField.validation
+                                                              )
                                                               : {}
                                                           }
                                                           value={
                                                             templateValue?.[
-                                                              section
-                                                                .uniqueSectionName
+                                                            section
+                                                              .uniqueSectionName
                                                             ]?.[
-                                                              sectionField.fekey
+                                                            sectionField.fekey
                                                             ]?.[
-                                                              multipleSectionIndex
+                                                            multipleSectionIndex
                                                             ]?.[
-                                                              subField.fekey
+                                                            subField.fekey
                                                             ] || ""
                                                           }
                                                         />
@@ -1086,7 +1089,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                       helperText={
                                         // @ts-ignore
                                         formErrors[section.uniqueSectionName]?.[
-                                          sectionField.fekey
+                                        sectionField.fekey
                                         ] || ""
                                       }
                                       //  inputProps={
@@ -1094,7 +1097,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
                                       //  }
                                       value={
                                         templateValue?.[
-                                          section.uniqueSectionName
+                                        section.uniqueSectionName
                                         ]?.[sectionField.fekey] || ""
                                       }
                                     />
@@ -1129,27 +1132,29 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow }: Props) {
           >
             Cancel
           </Button>
-          <Button
-            color="warning"
-            variant="contained"
-            size="small"
-            type="submit"
-            onClick={(event) => {
-              handleSubmit(event, false);
-            }}
-          >
-            Save as Draft
-          </Button>
-          <Button
-            variant="contained"
-            type="submit"
-            size="small"
-            onClick={(event) => {
-              handleSubmit(event, true);
-            }}
-          >
-            Save & Publish
-          </Button>
+          {permissionUser &&
+            <><Button
+              color="warning"
+              variant="contained"
+              size="small"
+              type="submit"
+              onClick={(event) => {
+                handleSubmit(event, false);
+              }}
+            >
+              Save as Draft
+            </Button>
+              <Button
+                variant="contained"
+                type="submit"
+                size="small"
+                onClick={(event) => {
+                  handleSubmit(event, true);
+                }}
+              >
+                Save & Publish
+              </Button>
+            </>}
         </Box>
       </Grid>
     </>

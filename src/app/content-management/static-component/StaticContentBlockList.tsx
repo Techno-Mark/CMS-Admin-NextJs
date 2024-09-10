@@ -82,6 +82,7 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<StaticComponentTypeWithAction>();
 
 const StaticContentBlockList = () => {
+  
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 

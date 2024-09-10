@@ -27,6 +27,7 @@ type blogFormPropsTypes = {
     open: number;
     editingRow: blogDetailType | null;
     handleClose: Function;
+    permissionUser:Boolean
 };
 
 const validImageType = ["image/png","image/jpeg","image/jpg","image/gif","image/svg","image/svg+xml","video/mp4", "video/webm" ];  
@@ -51,7 +52,7 @@ type FileProp = {
     size: number;
 };
 
-function FileForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
+function FileForm({ open, editingRow, handleClose ,permissionUser}: blogFormPropsTypes) {
     const router = useRouter();
 
     const [formData, setFormData] = useState<typeof initialFormData>(initialFormData);
@@ -258,6 +259,7 @@ function FileForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
                                 >
                                     Cancel
                                 </Button>
+                                {permissionUser && 
                                 <Button
                                     variant="contained"
                                     onClick={() => handleSubmit(true)}
@@ -265,6 +267,7 @@ function FileForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
                                 >
                                     Save
                                 </Button>
+                                }
                             </Box>
                         </Grid>
                     </Grid>

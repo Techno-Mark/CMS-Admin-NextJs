@@ -6,3 +6,6 @@ export const truncateText = (text: any, charLimit: any): any => {
     }
     return text;
   };
+
+
+  

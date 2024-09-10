@@ -43,6 +43,7 @@ type blogFormPropsTypes = {
   open: number;
   editingRow: blogDetailType | null;
   handleClose: Function;
+  permissionUser:Boolean
 };
 
 const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
@@ -86,7 +87,14 @@ const initialErrorData = {
   metaKeywords: "",
 };
 
-function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
+function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormPropsTypes) {
+
+  console.log(permissionUser);
+  
+  // const { permissionData, hasPermission } = usePermissions();
+
+
+ 
   const router = useRouter();
 
   //state management hook
@@ -205,9 +213,9 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
       slug:
         !isSlugManuallyEdited && open === sectionActions.ADD
           ? newName
-              .replace(/[^\w\s]|_/g, "")
-              .replace(/\s+/g, "-")
-              .toLowerCase()
+            .replace(/[^\w\s]|_/g, "")
+            .replace(/\s+/g, "-")
+            .toLowerCase()
           : prevData.slug,
     }));
     if (newName?.length) {
@@ -1036,22 +1044,24 @@ function BlogForm({ open, editingRow, handleClose }: blogFormPropsTypes) {
                 >
                   Cancel
                 </Button>
-                <Button
-                  color="warning"
-                  variant="contained"
-                  onClick={() => handleSubmit(false)}
-                >
-                  {/* {open === sectionActions.ADD ? "Add" : "Edit"} Content Block */}{" "}
-                  Save as Draft
-                </Button>
-                <Button
-                  variant="contained"
-                  type="submit"
-                  onClick={() => handleSubmit(true)}
-                >
-                  {/* {open === sectionActions.ADD ? "Add" : "Edit"} Content Block */}{" "}
-                  Save & Publish
-                </Button>
+                {permissionUser === true && (<>
+                  <Button
+                    color="warning"
+                    variant="contained"
+                    onClick={() => handleSubmit(false)}
+                  >
+                    {/* {open === sectionActions.ADD ? "Add" : "Edit"} Content Block */}{" "}
+                    Save as Draft
+                  </Button>
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    onClick={() => handleSubmit(true)}
+                  >
+                    {/* {open === sectionActions.ADD ? "Add" : "Edit"} Content Block */}{" "}
+                    Save & Publish
+                  </Button>
+                </>)}
               </Box>
             </Grid>
           </Grid>

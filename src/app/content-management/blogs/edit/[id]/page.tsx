@@ -7,11 +7,13 @@ import { useEffect, useState } from "react";
 import { postDataToOrganizationAPIs } from "@/services/apiService";
 import { blogPost } from "@/services/endpoint/blogpost";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
+import { usePermission } from "@/utils/permissions";
 
 const Page = ({ params }: { params: { id: string } }) => {
   const [editingRow, setEditingRow] = useState<blogDetailType | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,6 +35,10 @@ const Page = ({ params }: { params: { id: string } }) => {
 
     fetchData();
   }, [params.id]);
+
+
+  const { hasPermission } = usePermission()
+
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -41,6 +47,7 @@ const Page = ({ params }: { params: { id: string } }) => {
           open={EDIT_BLOG}
           editingRow={editingRow}
           handleClose={() => router.push("/content-management/blogs")}
+          permissionUser={hasPermission('Blog', 'Edit')}
         />
       )}
     </>

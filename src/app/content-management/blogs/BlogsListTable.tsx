@@ -31,6 +31,8 @@ import { truncateText } from "@/utils/common";
 import { blogsType } from "@/types/apps/blogsType";
 import { blogPost } from "@/services/endpoint/blogpost";
 import ConfirmationDialog from "./ConfirmationDialog";
+import { getDecryptedPermissionData } from "@/utils/storageService";
+import { usePermission } from "@/utils/permissions";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -100,6 +102,33 @@ const BlogListTable = () => {
   const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
   const [deletingId, setDeletingId] = useState<number>(0);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
+  // const [permissionData, setPermissionData] = useState<Record<string, string[]>>({})
+
+
+  // const { permissionData, hasPermission } = usePermissions();
+
+  // const fetchDecryptedData = async () => {
+  //   try {
+  //     const data = await getDecryptedPermissionData()
+  //     if (data) {
+  //       setPermissionData(data)
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching decrypted data:', error)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   fetchDecryptedData()
+  // }, [])
+
+  // const hasPermission = (module: string, action: string) => {
+  //   return permissionData[module]?.includes(action) ?? false
+  // }
+  const { hasPermission } = usePermission()
 
   const getData = async () => {
     setLoading(true);
@@ -203,27 +232,44 @@ const BlogListTable = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
-            <Tooltip title={'Edit'}>
-              <IconButton
-                onClick={() =>
-                  router.push(
-                    `/content-management/blogs/edit/${row.original.blogId}`
-                  )
-                }
-              >
-                <i className="tabler-edit text-[22px] text-textSecondary" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={'Delete'}>
-              <IconButton
-                onClick={() => {
-                  setIsDeleting(true);
-                  setDeletingId(row.original.blogId);
-                }}
-              >
-                <i className="tabler-trash text-[22px] text-textSecondary" />
-              </IconButton>
-            </Tooltip>
+            {hasPermission('Blog', 'Edit') ? (
+              <Tooltip title={'Edit'}>
+                <IconButton
+                  onClick={() =>
+                    router.push(
+                      `/content-management/blogs/edit/${row.original.blogId}` // Edit URL
+                    )
+                  }
+                >
+                  <i className="tabler-edit text-[22px] text-textSecondary" />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title={'View'}>
+                <IconButton
+                  onClick={() =>
+                    router.push(
+                      `/content-management/blogs/view/${row.original.blogId}` // View URL
+                    )
+                  }
+                >
+                  <i className="tabler-eye text-[22px] text-textSecondary" />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {hasPermission('Blog', 'Delete') && (
+              <Tooltip title={'Delete'}>
+                <IconButton
+                  onClick={() => {
+                    setIsDeleting(true);
+                    setDeletingId(row.original.blogId);
+                  }}
+                >
+                  <i className="tabler-trash text-[22px] text-textSecondary" />
+                </IconButton>
+              </Tooltip>
+            )}
           </div>
         ),
         enableSorting: false,
@@ -308,14 +354,16 @@ const BlogListTable = () => {
                 <MenuItem value="inactive">Draft</MenuItem>
               </CustomTextField>
             </div>
-            <Button
-              variant="contained"
-              startIcon={<i className="tabler-plus" />}
-              onClick={() => router.push("/content-management/blogs/add")}
-              className="is-full sm:is-auto"
-            >
-              Add Blog
-            </Button>
+            {hasPermission('Blog', 'Create') && (
+              <Button
+                variant="contained"
+                startIcon={<i className="tabler-plus" />}
+                onClick={() => router.push("/content-management/blogs/add")}
+                className="is-full sm:is-auto"
+              >
+                Add Blog
+              </Button>
+            )}
           </div>
         </div>
         <Card className="flex flex-col h-full">

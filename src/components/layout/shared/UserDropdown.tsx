@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 
 // Next Imports
@@ -24,6 +24,11 @@ import Button from '@mui/material/Button'
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
 import { useSession, signOut } from 'next-auth/react'
+import { authnetication } from '@/services/endpoint/auth'
+import { post } from '@/services/apiService'
+import { encryptData, getKey } from '@/utils/cryptoUtils'
+import { storePermissionData } from '@/utils/storageService'
+
 
 // Styled component for badge content
 const BadgeContentSpan = styled('span')({
@@ -70,8 +75,27 @@ const UserDropdown = () => {
   }
 
   const handleUserLogout = async () => {
+    localStorage.removeItem("encryptedPermissionData");
     await signOut({ callbackUrl: '/login' })
   }
+
+  const getPermissionModule = async () => {
+
+    try {
+      const result = await post(authnetication.user_permission_data, {});
+      console.log(result);
+      await storePermissionData(result.data);
+
+      console.log('Encrypted permission data stored successfully!')
+
+    } catch (error: any) {
+      console.error(error);
+
+    }
+  };
+  useEffect(() => {
+    getPermissionModule();
+  }, []);
 
   return (
     <>

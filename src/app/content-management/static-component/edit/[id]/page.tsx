@@ -7,6 +7,7 @@ import { get, postDataToOrganizationAPIs } from "@/services/apiService";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import { staticContentBlock } from "@/services/endpoint/staticContentBlock";
 import { section } from "@/services/endpoint/section";
+import { usePermission } from "@/utils/permissions";
 
 const Page = ({ params }: { params: { id: string } }) => {
   const [editingRow, setEditingRow] = useState<any | null>(null);
@@ -34,7 +35,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     };
     fetchData();
   }, [params.id]);
-
+  const { hasPermission } = usePermission()
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -45,6 +46,7 @@ const Page = ({ params }: { params: { id: string } }) => {
           handleClose={() =>
             router.push("/content-management/static-component")
           }
+          permissionUser={hasPermission('Static Component', 'Edit')}
         />
       )}
     </>
