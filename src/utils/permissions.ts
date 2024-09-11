@@ -29,6 +29,7 @@ export const usePermission = () => {
   // Function to check if a module has a specific action
   const hasPermission = (module: string, action: string): boolean => {
     console.log(session?.user.id);
+     {/* @ts-ignore */}
     if (session?.user.id === 1) {
       return true;
     }

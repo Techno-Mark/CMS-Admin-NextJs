@@ -65,6 +65,6 @@
     ".next/types/**/*.ts"
 , "src/app/content-management/blogs/RichEditor.tsx", "src/app/(blank-layout-pages)/forgot-password/[token]"  ],
   "exclude": [
-    "node_modules"
+    "node_modules",
   ]
 }

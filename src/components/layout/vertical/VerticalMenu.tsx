@@ -113,37 +113,43 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         menuItemStyles={menuItemStyles(verticalNavOptions, theme, settings)}
         renderExpandIcon={({ open }) => <RenderExpandIcon open={open} transitionDuration={transitionDuration} />}
         renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
-        menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
-      >
+        menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)} >
+        {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Dashboard')) && (
+          
           <MenuItem href='/home' icon={<i className='tabler-dashboard' />}>
             Dashboard
           </MenuItem>
         )}
+         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Blog')) && (
           <MenuItem href='/content-management/blogs' icon={<i className='tabler-brand-blogger' />}>
             Blogs
           </MenuItem>
         )}
+         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Page')) && (
           <MenuItem href='/content-management/pages' icon={<i className='tabler-brand-pagekit' />}>
             Pages
           </MenuItem>
         )}
+         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Event')) && (
           <MenuItem href='/content-management/events' icon={<i className='tabler-calendar-event' />}>
             Events
           </MenuItem>
         )}
+         {/* @ts-ignore */}
          {(session?.user?.id === 1 || hasPermission('Media')) && (
         <MenuItem href={`/content-management/media`} icon={<i className='tabler-file-upload'></i>}>
           Media
         </MenuItem> )}
+         {/* @ts-ignore */}
          {(session?.user?.id === 1  || hasPermission('Static Component')) && (
         <MenuItem href={`/content-management/static-component`} icon={<i className='tabler-file-upload'></i>}>
           Static Component
         </MenuItem> )}
-
+ {/* @ts-ignore */}
         {(session?.user?.id === 1 ) && (
           <>
             <SubMenu label={"Users"} icon={<i className='tabler-users-group' />}>

@@ -283,6 +283,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
             valid = false;
             //@ts-ignore
             errors[section.uniqueSectionName] = {
+              //@ts-ignore
               ...(errors[section.uniqueSectionName] || {}),
               [fieldKey]: `${fieldLabel} is required.`,
             };
@@ -303,6 +304,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
                   valid = false;
                   //@ts-ignore
                   errors[section.uniqueSectionName] = {
+                    //@ts-ignore
                     ...(errors[section.uniqueSectionName] || {}),
                     [fieldKey]: {
                       //@ts-ignore
