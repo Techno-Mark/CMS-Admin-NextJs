@@ -73,7 +73,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   }
 
   useEffect(() => {
-    fetchDecryptedData() // Retrieve and decrypt the permission data on initial load
+    setTimeout(() => {
+      
+      fetchDecryptedData() // Retrieve and decrypt the permission data on initial load
+    }, 3000);
   }, [])
 
   // Detect changes in permission data
