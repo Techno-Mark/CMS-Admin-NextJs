@@ -26,6 +26,7 @@ import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { getDecryptedPermissionData } from '@/utils/storageService'
+import { Skeleton, Stack } from '@mui/material'
 
 type RenderExpandIconProps = {
   open?: boolean
@@ -63,7 +64,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     try {
       const data = await getDecryptedPermissionData()
       if (data) {
-        setPermissionData(data)
+        setPermissionData(data.moduleWisePermissions)
       }
     } catch (error) {
       console.error('Error fetching decrypted data:', error)
@@ -74,31 +75,22 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
   useEffect(() => {
     setTimeout(() => {
-      
+
       fetchDecryptedData() // Retrieve and decrypt the permission data on initial load
     }, 3000);
   }, [])
 
-  // Detect changes in permission data
-  useEffect(() => {
-    if (!loading) {
-      // Handle any logic needed when permissionData changes
-      console.log('Permission data updated:', permissionData)
-    }
-  }, [permissionData, loading]) // Dependency array includes permissionData and loading
-
-
-  // Function to check if a permission exists
   const hasPermission = (menuKey: string) => permissionData && permissionData[menuKey]
 
   if (loading) {
-    // Display a loading indicator or an empty state while loading
-    return <div>Loading menu...</div>
-
-    
+    return <div className=' ml-3'>
+      <Stack spacing={2}>
+        {Array.from({ length: 5 }).map((_, index) => (
+          <Skeleton key={index} variant="rounded" width={240} height={30}   />
+        ))}
+      </Stack>
+    </div>
   }
-  
-  console.log(session?.user?.id);
   return (
     <ScrollWrapper
       {...(isBreakpointReached
@@ -119,41 +111,66 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)} >
         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Dashboard')) && (
-          
+
           <MenuItem href='/home' icon={<i className='tabler-dashboard' />}>
             Dashboard
           </MenuItem>
         )}
-         {/* @ts-ignore */}
+        {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Blog')) && (
           <MenuItem href='/content-management/blogs' icon={<i className='tabler-brand-blogger' />}>
             Blogs
           </MenuItem>
         )}
          {/* @ts-ignore */}
+ {(session?.user?.id === 1 || hasPermission('Contact Us')) && (
+<MenuItem href='/content-management/contact-us' icon={<i className='tabler-address-book' />}>
+          Contact Us
+        </MenuItem>
+)}
+
+
+        {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Page')) && (
           <MenuItem href='/content-management/pages' icon={<i className='tabler-brand-pagekit' />}>
             Pages
           </MenuItem>
         )}
+
+
          {/* @ts-ignore */}
+          {(session?.user?.id === 1 || hasPermission('Menu')) && (
+           <MenuItem href='/content-management/menus' icon={<i className='tabler-menu-2' />}>
+          Menus
+        </MenuItem>
+      )}
+
+          {/* @ts-ignore */}
+          {(session?.user?.id === 1 || hasPermission('Popup')) && (
+         <MenuItem href='/content-management/popups' icon={<i className='tabler-box-model-2' />}>
+         Popup
+       </MenuItem>
+      )}
+       
+       
+        {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Event')) && (
           <MenuItem href='/content-management/events' icon={<i className='tabler-calendar-event' />}>
             Events
           </MenuItem>
         )}
-         {/* @ts-ignore */}
-         {(session?.user?.id === 1 || hasPermission('Media')) && (
-        <MenuItem href={`/content-management/media`} icon={<i className='tabler-file-upload'></i>}>
-          Media
-        </MenuItem> )}
-         {/* @ts-ignore */}
-         {(session?.user?.id === 1  || hasPermission('Static Component')) && (
-        <MenuItem href={`/content-management/static-component`} icon={<i className='tabler-file-upload'></i>}>
-          Static Component
-        </MenuItem> )}
- {/* @ts-ignore */}
-        {(session?.user?.id === 1 ) && (
+        {/* @ts-ignore */}
+        {(session?.user?.id === 1 || hasPermission('Media')) && (
+          <MenuItem href={`/content-management/media`} icon={<i className='tabler-file-upload'></i>}>
+            Media
+          </MenuItem>)}
+        {/* @ts-ignore */}
+        {(session?.user?.id === 1 || hasPermission('Static Component')) && (
+          <MenuItem href={`/content-management/static-component`} icon={<i className='tabler-file-upload'></i>}>
+            Static Component
+          </MenuItem>)}
+        {/* @ts-ignore */}
+        {(session?.user?.id === 1) && (
           <>
             <SubMenu label={"Users"} icon={<i className='tabler-users-group' />}>
               <MenuItem href={`/users/management`} icon={<i className='tabler-users'></i>}>Users</MenuItem>

@@ -15,10 +15,12 @@ const MenuItem = ({
   menuData,
   menuId,
   handleClose,
+  permissionUser
 }: {
   menuData: any;
   menuId: string;
   handleClose: Function;
+  permissionUser:Boolean
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [menuItems, setMenuItems] = useState<any[] | null>(menuData);
@@ -256,6 +258,7 @@ const MenuItem = ({
               No Menu Created Yet, Add new Menu and save
             </p>
           )}
+          {permissionUser &&
           <Fab
             variant="extended"
             className="w-7 h-7 m-4"
@@ -264,6 +267,7 @@ const MenuItem = ({
             <i className="tabler-plus mie-1" />
             Add
           </Fab>
+          }
           {drawerOpen && (
             <KanbanDrawer
               drawerOpen={drawerOpen}
@@ -315,9 +319,11 @@ const MenuItem = ({
                 >
                   Cancel
                 </Button>
+                {permissionUser &&
                 <Button variant="contained" onClick={() => handleSubmit()}>
                   Save
                 </Button>
+                }
               </Box>
             </Grid>
           </Grid>

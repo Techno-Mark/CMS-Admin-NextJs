@@ -21,8 +21,6 @@ const ForgotPasswordPage = async ({ params }: { params: { token: string } }) => 
   if (session) {
     redirect('/home');
   }
-
-  console.log("asdasdasdasdasda");
   
   // Vars
   const mode = getServerMode();

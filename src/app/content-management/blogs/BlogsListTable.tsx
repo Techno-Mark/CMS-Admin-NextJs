@@ -31,7 +31,6 @@ import { truncateText } from "@/utils/common";
 import { blogsType } from "@/types/apps/blogsType";
 import { blogPost } from "@/services/endpoint/blogpost";
 import ConfirmationDialog from "./ConfirmationDialog";
-import { getDecryptedPermissionData } from "@/utils/storageService";
 import { usePermission } from "@/utils/permissions";
 
 declare module "@tanstack/table-core" {
@@ -103,31 +102,6 @@ const BlogListTable = () => {
   const [deletingId, setDeletingId] = useState<number>(0);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
-  // const [permissionData, setPermissionData] = useState<Record<string, string[]>>({})
-
-
-  // const { permissionData, hasPermission } = usePermissions();
-
-  // const fetchDecryptedData = async () => {
-  //   try {
-  //     const data = await getDecryptedPermissionData()
-  //     if (data) {
-  //       setPermissionData(data)
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching decrypted data:', error)
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   fetchDecryptedData()
-  // }, [])
-
-  // const hasPermission = (module: string, action: string) => {
-  //   return permissionData[module]?.includes(action) ?? false
-  // }
   const { hasPermission } = usePermission()
 
   const getData = async () => {
@@ -311,9 +285,13 @@ const BlogListTable = () => {
     setPage(0);
   };
 
+
+
   return (
     <>
       <div>
+
+     
         <LoadingBackdrop isLoading={loading} />
         <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
           <BreadCrumbList />

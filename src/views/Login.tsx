@@ -162,6 +162,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
     });
 
     if (res && res.ok && res.error === null) {
+      
       const redirectURL = searchParams.get("redirectTo") ?? "/home";
       router.push(redirectURL);
       toast.success("Login Successfull");

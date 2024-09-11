@@ -40,7 +40,7 @@ export const authOptions: NextAuthOptions = {
             throw new Error(JSON.stringify(data));
           }
 
-          if (res.status === 200) {
+        if (res.status === 200) {
             return data.data;
           }
 

@@ -147,7 +147,7 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
         toast.error(result.message);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }

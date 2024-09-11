@@ -88,13 +88,6 @@ const initialErrorData = {
 };
 
 function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormPropsTypes) {
-
-  console.log(permissionUser);
-  
-  // const { permissionData, hasPermission } = usePermissions();
-
-
- 
   const router = useRouter();
 
   //state management hook
@@ -530,7 +523,6 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
       ...prevData,
       description: data,
     }));
-    console.log("Editor data:", data);
   };
 
   return (

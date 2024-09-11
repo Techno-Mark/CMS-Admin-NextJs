@@ -6,6 +6,7 @@ import { postDataToOrganizationAPIs } from "@/services/apiService";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import { menu } from "@/services/endpoint/menu";
 import MenuItem from "./MenuItem";
+import { usePermission } from "@/utils/permissions";
 
 const Page = ({ params }: { params: { id: string } }) => {
   const [editingRow, setEditingRow] = useState<any | null>(null);
@@ -37,6 +38,7 @@ const Page = ({ params }: { params: { id: string } }) => {
 
     fetchData();
   }, [params.id]);
+  const { hasPermission } = usePermission()
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -46,6 +48,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             menuData={editingRow}
             menuId={params.id}
             handleClose={() => router.push("/content-management/menus")}
+            permissionUser={hasPermission('Menu', 'Edit')}
           />
         </>
       )}

@@ -27,7 +27,7 @@ import { useSession, signOut } from 'next-auth/react'
 import { authnetication } from '@/services/endpoint/auth'
 import { post } from '@/services/apiService'
 import { encryptData, getKey } from '@/utils/cryptoUtils'
-import { storePermissionData } from '@/utils/storageService'
+import { getDecryptedPermissionData, storePermissionData } from '@/utils/storageService'
 
 
 // Styled component for badge content
@@ -80,20 +80,23 @@ const UserDropdown = () => {
   }
 
   const getPermissionModule = async () => {
+    const data = await getDecryptedPermissionData();
+    if (data) {
+      storePermissionData(data);
+    }
+    if (!data) {
+      try {
+        const result = await post(authnetication.user_permission_data, {});
+        await storePermissionData(result.data);
+      } catch (error: any) {
+        console.error(error);
 
-    try {
-      const result = await post(authnetication.user_permission_data, {});
-      console.log(result);
-      await storePermissionData(result.data);
-
-      console.log('Encrypted permission data stored successfully!')
-
-    } catch (error: any) {
-      console.error(error);
-
+      }
     }
   };
   useEffect(() => {
+
+
     getPermissionModule();
   }, []);
 

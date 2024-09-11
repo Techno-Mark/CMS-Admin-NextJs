@@ -22,6 +22,7 @@ type Props = {
   open: -1 | 0 | 1;
   handleClose: () => void;
   editingRow: menuDetailType | null;
+  permissionUser: Boolean
 };
 
 const initialData = {
@@ -31,7 +32,10 @@ const initialData = {
   active: false,
 };
 
-const MenuForm = ({ open, handleClose, editingRow }: Props) => {
+const MenuForm = ({ open, handleClose, editingRow, permissionUser }: Props) => {
+console.log(permissionUser);
+
+
   const [loading, setLoading] = useState<boolean>(true);
 
   const [formData, setFormData] = useState<typeof initialData>(initialData);
@@ -179,13 +183,15 @@ const MenuForm = ({ open, handleClose, editingRow }: Props) => {
                 <Button variant="outlined" color="error" onClick={handleClose}>
                   Cancel
                 </Button>
-                <Button
-                  variant="contained"
-                  type="submit"
-                  onSubmit={handleSubmit}
-                >
-                  {open === -1 ? "Add" : "Edit"} Menu
-                </Button>
+                {permissionUser &&
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    onSubmit={handleSubmit}
+                  >
+                    {open === -1 ? "Add" : "Edit"} Menu
+                  </Button>
+                }
               </Box>
             </Grid>
           </div>

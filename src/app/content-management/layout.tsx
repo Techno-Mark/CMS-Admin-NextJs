@@ -33,7 +33,7 @@ const Layout = async ({ children }: ChildrenType) => {
   // Vars
   const direction = 'ltr'
   const mode = getMode()
-  const systemMode = getSystemMode()
+  const systemMode = getSystemMode();
 
   return (
     <Providers direction={direction}>

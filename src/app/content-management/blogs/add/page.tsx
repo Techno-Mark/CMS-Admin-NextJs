@@ -9,28 +9,6 @@ import { usePermission } from "@/utils/permissions";
 const Page = () => {
   const router = useRouter();
 
-  // const [permissionData, setPermissionData] = useState<Record<string, string[]>>({})
-
-
-  // const fetchDecryptedData = async () => {
-  //   try {
-  //     const data = await getDecryptedPermissionData()
-  //     if (data) {
-  //       setPermissionData(data)
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching decrypted data:', error)
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   fetchDecryptedData()
-  // }, [])
-
-  // const hasPermission = (module: string, action: string) => {
-  //   return permissionData[module]?.includes(action) ?? false
-  // }
-
   const { hasPermission } = usePermission()
   return (
     <BlogForm

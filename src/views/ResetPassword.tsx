@@ -99,21 +99,14 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
     },
     validationSchema: passwordSchema,
     onSubmit: async values => {
-      
-      console.log('Form values:', values)
       try {
-        
         const response = await axios.post(`${API_URL}/auth/reset-password`, {
           token: token,
           newPassword: values.password
         })
-        console.log(response.data.message);
-        
         toast.success(response.data.message);
         router.push('/login')
-        console.log('Password reset successfully', response.data)
       } catch (error: any) {
-       
         toast.error(error.message);
         console.error('Error resetting password:', error.response?.data || error.message)
       }

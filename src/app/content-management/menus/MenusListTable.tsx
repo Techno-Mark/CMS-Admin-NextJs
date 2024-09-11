@@ -31,6 +31,7 @@ import { truncateText } from "@/utils/common";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { menuType } from "@/types/apps/menusType";
 import { menu } from "@/services/endpoint/menu";
+import { usePermission } from "@/utils/permissions";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -86,6 +87,7 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<BlogTypeWithAction>();
 
 const MenuListTable = () => {
+  const { hasPermission } = usePermission()
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -192,34 +194,44 @@ const MenuListTable = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
-            <Tooltip title={'Edit'}>
-              <IconButton
-                onClick={() =>
-                  router.push(
-                    `/content-management/menus/edit/${row.original.menuId}`
-                  )
-                }
-              >
-                <i className="tabler-edit text-[22px] text-textSecondary" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={'Delete'}>
-            <IconButton
-              onClick={() => {
-                setIsDeleting(true);
-                setDeletingId(row.original.menuId);
-              }}
-            >
-              <i className="tabler-trash text-[22px] text-textSecondary" />
-            </IconButton>
-            </Tooltip>
-            <Tooltip title={'Sort'}>
-            <IconButton
-              onClick={() => router.push(`/content-management/menus/menu-item/${row.original.menuId}`)}
-            >
-              <i className="tabler-arrows-sort text-[22px] text-textSecondary" />
-            </IconButton>
-            </Tooltip>
+
+            {/* {hasPermission('Menu', 'Edit')&& ( */}
+              <>
+                <Tooltip title={'Edit'}>
+                  <IconButton
+                    onClick={() =>
+                      router.push(
+                        `/content-management/menus/edit/${row.original.menuId}`
+                      )
+                    }
+                  >
+                    <i className="tabler-edit text-[22px] text-textSecondary" />
+                  </IconButton>
+                </Tooltip>
+
+                <Tooltip title={'Sort'}>
+                  <IconButton
+                    onClick={() => router.push(`/content-management/menus/menu-item/${row.original.menuId}`)}
+                  >
+                    <i className="tabler-arrows-sort text-[22px] text-textSecondary" />
+                  </IconButton>
+                </Tooltip>
+              </>
+            {/* )} */}
+
+
+            {hasPermission('Menu', 'Delete') &&
+              <Tooltip title={'Delete'}>
+                <IconButton
+                  onClick={() => {
+                    setIsDeleting(true);
+                    setDeletingId(row.original.menuId);
+                  }}
+                >
+                  <i className="tabler-trash text-[22px] text-textSecondary" />
+                </IconButton>
+              </Tooltip>
+            }
           </div>
         ),
         enableSorting: false,
@@ -303,14 +315,17 @@ const MenuListTable = () => {
               <MenuItem value="inactive">Inactive</MenuItem>
             </CustomTextField>
           </div>
-          <Button
-            variant="contained"
-            startIcon={<i className="tabler-plus" />}
-            onClick={() => router.push("/content-management/menus/add")}
-            className="is-full sm:is-auto"
-          >
-            Add Menu
-          </Button>
+
+          {hasPermission('Menu', 'Create') &&
+            <Button
+              variant="contained"
+              startIcon={<i className="tabler-plus" />}
+              onClick={() => router.push("/content-management/menus/add")}
+              className="is-full sm:is-auto"
+            >
+              Add Menu
+            </Button>
+          }
         </div>
       </div>
       <Card>
