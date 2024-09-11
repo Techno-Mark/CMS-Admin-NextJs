@@ -26,9 +26,7 @@ import { useSettings } from '@core/hooks/useSettings'
 import { useSession, signOut } from 'next-auth/react'
 import { authnetication } from '@/services/endpoint/auth'
 import { post } from '@/services/apiService'
-import { encryptData, getKey } from '@/utils/cryptoUtils'
 import { getDecryptedPermissionData, storePermissionData } from '@/utils/storageService'
-
 
 // Styled component for badge content
 const BadgeContentSpan = styled('span')({
@@ -95,8 +93,6 @@ const UserDropdown = () => {
     }
   };
   useEffect(() => {
-
-
     getPermissionModule();
   }, []);
 

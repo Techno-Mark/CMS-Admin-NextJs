@@ -86,7 +86,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     return <div className=' ml-3'>
       <Stack spacing={2}>
         {Array.from({ length: 5 }).map((_, index) => (
-          <Skeleton key={index} variant="rounded" width={240} height={30}   />
+          <Skeleton key={index} variant="rounded" width={240} height={30} />
         ))}
       </Stack>
     </div>
@@ -122,12 +122,12 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             Blogs
           </MenuItem>
         )}
-         {/* @ts-ignore */}
- {(session?.user?.id === 1 || hasPermission('Contact Us')) && (
-<MenuItem href='/content-management/contact-us' icon={<i className='tabler-address-book' />}>
-          Contact Us
-        </MenuItem>
-)}
+        {/* @ts-ignore */}
+        {(session?.user?.id === 1 || hasPermission('Contact Us')) && (
+          <MenuItem href='/content-management/contact-us' icon={<i className='tabler-address-book' />}>
+            Contact Us
+          </MenuItem>
+        )}
 
 
         {/* @ts-ignore */}
@@ -138,21 +138,21 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         )}
 
 
-         {/* @ts-ignore */}
-          {(session?.user?.id === 1 || hasPermission('Menu')) && (
-           <MenuItem href='/content-management/menus' icon={<i className='tabler-menu-2' />}>
-          Menus
-        </MenuItem>
-      )}
+        {/* @ts-ignore */}
+        {(session?.user?.id === 1 || hasPermission('Menu')) && (
+          <MenuItem href='/content-management/menus' icon={<i className='tabler-menu-2' />}>
+            Menus
+          </MenuItem>
+        )}
 
-          {/* @ts-ignore */}
-          {(session?.user?.id === 1 || hasPermission('Popup')) && (
-         <MenuItem href='/content-management/popups' icon={<i className='tabler-box-model-2' />}>
-         Popup
-       </MenuItem>
-      )}
-       
-       
+        {/* @ts-ignore */}
+        {(session?.user?.id === 1 || hasPermission('Popup')) && (
+          <MenuItem href='/content-management/popups' icon={<i className='tabler-box-model-2' />}>
+            Popup
+          </MenuItem>
+        )}
+
+
         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Event')) && (
           <MenuItem href='/content-management/events' icon={<i className='tabler-calendar-event' />}>

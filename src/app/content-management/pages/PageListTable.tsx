@@ -83,8 +83,16 @@ const DebouncedInput = ({
 // Column Definitions
 const columnHelper = createColumnHelper<any>();
 
-const PageListTable = () => {
-  const { hasPermission } = usePermission()
+type Props = {
+  editPer: Boolean;
+  createPer: Boolean;
+  deletePer: Boolean
+};
+
+const PageListTable = (
+  { editPer, createPer, deletePer }: Props
+) => {
+  // const { hasPermission } = usePermission()
   const [rowSelection, setRowSelection] = useState({});
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -99,7 +107,6 @@ const PageListTable = () => {
   const [deletingId, setDeletingId] = useState<number>(-1);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
-
 
   const getData = async () => {
     setLoading(true);
@@ -127,6 +134,7 @@ const PageListTable = () => {
       setLoading(false);
     }
   };
+  
   useEffect(() => {
     getData();
     const handleStorageUpdate = async () => {
@@ -183,7 +191,7 @@ const PageListTable = () => {
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
-              {hasPermission('Page', 'Edit') ? (
+              {editPer ? (
 
                 <Tooltip title={"Edit"}>
                   <IconButton
@@ -210,7 +218,7 @@ const PageListTable = () => {
 
                 )
               }
-              {hasPermission('Page', 'Delete') && (
+              {deletePer && (
               <Tooltip title={"Delete"}>
                 <IconButton
                   onClick={() => {
@@ -311,7 +319,7 @@ const PageListTable = () => {
               <MenuItem value="inactive">Draft</MenuItem>
             </CustomTextField>
           </div>
-          {hasPermission('Page', 'Create') && (
+          {/* {hasPermission('Page', 'Create') && ( */}
             <Button
               variant="contained"
               startIcon={<i className="tabler-plus" />}
@@ -320,7 +328,7 @@ const PageListTable = () => {
             >
               Add Pages
             </Button>
-          )}
+          {/* )} */}
         </div>
       </div>
       <Card>
