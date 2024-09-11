@@ -32,6 +32,7 @@ import BreadCrumbList from "@/components/BreadCrumbList";
 import { blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
 import AppReactDatepicker from "@/libs/styles/AppReactDatepicker";
 import { Heading } from "lucide-react";
+import { pages } from "@/services/endpoint/pages";
 
 type blogFormPropsTypes = {
   open: number;
@@ -69,7 +70,12 @@ const initialErrorData = {
   image: "",
 };
 
-function EventPopupForm({ open, handleClose, editingRow,handleSubmit }: blogFormPropsTypes) {
+function EventPopupForm({
+  open,
+  handleClose,
+  editingRow,
+  handleSubmit,
+}: blogFormPropsTypes) {
   const router = useRouter();
 
   const [allPages, setAllPages] = useState(false);
@@ -82,8 +88,8 @@ function EventPopupForm({ open, handleClose, editingRow,handleSubmit }: blogForm
     useState<typeof initialErrorData>(initialErrorData);
 
   //template list hooks & other list apis data
-  const [templateList, setTemplateList] = useState<
-    [{ templateName: string; templateId: number }] | []
+  const [pageList, setPageList] = useState<
+    [{ pageName: string; pageId: number }] | []
   >([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -114,14 +120,9 @@ function EventPopupForm({ open, handleClose, editingRow,handleSubmit }: blogForm
   const getRequiredData = async () => {
     try {
       setLoading(true);
-      const [templateResponse, categoryResponse, tagResponse] =
-        await Promise.all([
-          post(`${template.active}`, {}),
-          postDataToOrganizationAPIs(`${category.active}`, {}),
-          postDataToOrganizationAPIs(`${tag.active}`, {}),
-        ]);
-      setTemplateList(templateResponse?.data?.templates);
-
+      const [pagesResponse] = await Promise.all([post(`${pages.active}`, {})]);
+      setPageList(pagesResponse?.data?.pages);
+      console.log(pagesResponse,'pages response');
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -138,14 +139,12 @@ function EventPopupForm({ open, handleClose, editingRow,handleSubmit }: blogForm
     return valid;
   };
 
-
   return (
     <>
       <Card className="p-4">
         <Box display="flex" rowGap={4} columnGap={4} alignItems="flex-start">
           <Grid container spacing={4} sm={7}>
-
-          <Grid item xs={12} lg={12}>
+            <Grid item xs={12} lg={12}>
               <FormControlLabel
                 label="is Permenent ?"
                 control={
@@ -160,27 +159,25 @@ function EventPopupForm({ open, handleClose, editingRow,handleSubmit }: blogForm
             </Grid>
 
             <Grid item xs={12} lg={6}>
-        {/* <AppReactDatepicker
+              {/* <AppReactDatepicker
           id='min-date'
           selected={new Date()}
           // minDate={subDays(new Date(), 5)}
           // onChange={(date: Date) => setMinDate(date)}
           customInput={<CustomTextField label='Start Date' fullWidth />}
         /> */}
-      </Grid>
-      <Grid item xs={12} lg={6}>
-        {/* <AppReactDatepicker
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              {/* <AppReactDatepicker
           id='max-date'
           selected={new Date()}
           // maxDate={addDays(new Date(), 5)}
           // onChange={(date: Date) => setMaxDate(date)}
           customInput={<CustomTextField label='End Date' fullWidth />}
         /> */}
-      </Grid>
+            </Grid>
 
-      
-
-          {/* <Grid item xs={12} lg={12}>
+            {/* <Grid item xs={12} lg={12}>
               <FormControlLabel
                 label="for All Pages ?"
                 control={
@@ -194,8 +191,6 @@ function EventPopupForm({ open, handleClose, editingRow,handleSubmit }: blogForm
               />
             </Grid> */}
 
-
-            
             <Grid item xs={12} lg={6}>
               <AppReactDatepicker
                 id="min-date"
@@ -278,8 +273,6 @@ function EventPopupForm({ open, handleClose, editingRow,handleSubmit }: blogForm
               />
             </Grid>
           </Grid>
-
-        
         </Box>
         <Box display="flex" gap={4}>
           <Grid container spacing={2} sm={12}>
