@@ -2,6 +2,7 @@
 import React from "react";
 import PagesForm from "../PagesForm";
 import { useRouter } from "next/navigation";
+import NewPopupForm from "../NewPopupForm";
 
 const ADD_PAGES = -1;
 
@@ -9,10 +10,9 @@ const page = () => {
   const router = useRouter();
 
   return (
-    <PagesForm
+    <NewPopupForm
       open={ADD_PAGES}
       editingRow={null}
-      setEditingRow={() => {}}
       handleClose={() => router.push("/content-management/popups")}
     />
   );
