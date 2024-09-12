@@ -277,11 +277,11 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
               >
                 <MenuItem value={"Event"}>Event</MenuItem>
                 <MenuItem value={"General"}>General</MenuItem>
-                <MenuItem value={"Content Recommendation"}>
+                {/* <MenuItem value={"Content Recommendation"}>
                   Content Recommendation
                 </MenuItem>
                 <MenuItem value={"Downloadable"}>Downloadable</MenuItem>
-                <MenuItem value={"Survey"}>Survey</MenuItem>
+                <MenuItem value={"Survey"}>Survey</MenuItem> */}
                 <MenuItem value={"Exit Intent"}>Exit Intent</MenuItem>
               </CustomTextField>
             </Grid>
