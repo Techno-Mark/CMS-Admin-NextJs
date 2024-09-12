@@ -117,7 +117,7 @@ const BlogListTable = () => {
   };
 
   // const hasCheckModule = (menuKey: string): boolean => !!(userPermissionData && userPermissionData[menuKey]);
-  // const router = useRouter();
+  const router = useRouter();
   // if (!hasCheckModule('Blog')) {
   //   router.push('/401-not-authorized'); 
   //   return null; 

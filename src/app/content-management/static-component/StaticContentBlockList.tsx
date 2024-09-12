@@ -94,12 +94,12 @@ const StaticContentBlockList = () => {
       setUserIdRole(result.data.currentUserId);
       setUserPermissionData(result.data.moduleWisePermissions)
       console.log(result.data.currentUserId);
-      if (userIdRole !== 1) {
-        if (hasCheckModule('Static Component')) {
-          router.push('/401-not-authorized');
-          return null;
-        }
-      }
+      // if (userIdRole !== 1) {
+      //   if (hasCheckModule('Static Component')) {
+      //     router.push('/401-not-authorized');
+      //     return null;
+      //   }
+      // }
       await storePermissionData(result.data);
       setLoading(false);
     } catch (error: any) {
@@ -170,7 +170,7 @@ const StaticContentBlockList = () => {
         ),
         enableSorting: false,
       }),
-      
+
       columnHelper.accessor("sectionName", {
         header: "Section Name",
         cell: ({ row }) => (
