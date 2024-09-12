@@ -29,6 +29,7 @@ import { staticContentBlock } from "@/services/endpoint/staticContentBlock";
 import { staticContentBlockType } from "@/types/apps/staticContentBlockType";
 import { authnetication } from "@/services/endpoint/auth";
 import { storePermissionData } from "@/utils/storageService";
+import { useSession } from "next-auth/react";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -84,19 +85,21 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<StaticComponentTypeWithAction>();
 
 const StaticContentBlockList = () => {
-  
-
   const [userIdRole, setUserIdRole] = useState();
   const [userPermissionData, setUserPermissionData] = useState();
   const getPermissionModule = async () => {
     setLoading(true);
     try {
       const result = await post(authnetication.user_permission_data, {});
-      console.log(result.data);
       setUserIdRole(result.data.currentUserId);
       setUserPermissionData(result.data.moduleWisePermissions)
-      console.log(userIdRole);
-
+      console.log(result.data.currentUserId);
+      if (userIdRole !== 1) {
+        if (hasCheckModule('Static Component')) {
+          router.push('/401-not-authorized');
+          return null;
+        }
+      }
       await storePermissionData(result.data);
       setLoading(false);
     } catch (error: any) {
@@ -114,16 +117,9 @@ const StaticContentBlockList = () => {
 
   const hasCheckModule = (menuKey: string): boolean => !!(userPermissionData && userPermissionData[menuKey]);
   const router = useRouter();
-  if (!hasCheckModule('Static Component')) {
-    router.push('/401-not-authorized'); 
-    return null; 
-  }
 
-  
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
-
-
 
   const [data, setData] = useState<TemplateType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -132,7 +128,6 @@ const StaticContentBlockList = () => {
   const [pageSize, setPageSize] = useState<number>(10);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
-
 
   const getData = async () => {
     setLoading(true);
@@ -152,14 +147,13 @@ const StaticContentBlockList = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     getData();
     const handleStorageUpdate = async () => {
       getData();
     };
-
     window.addEventListener("localStorageUpdate", handleStorageUpdate);
-
     return () => {
       window.removeEventListener("localStorageUpdate", handleStorageUpdate);
     };
@@ -176,6 +170,7 @@ const StaticContentBlockList = () => {
         ),
         enableSorting: false,
       }),
+      
       columnHelper.accessor("sectionName", {
         header: "Section Name",
         cell: ({ row }) => (
@@ -194,6 +189,7 @@ const StaticContentBlockList = () => {
         ),
         enableSorting: false,
       }),
+
       columnHelper.accessor("createdAt", {
         header: "Created At",
         cell: ({ row }) => (
@@ -202,6 +198,7 @@ const StaticContentBlockList = () => {
           </Typography>
         ),
       }),
+
       columnHelper.accessor("sectionId", {
         header: "Actions",
         cell: ({ row }) => (
@@ -238,7 +235,7 @@ const StaticContentBlockList = () => {
         enableSorting: false,
       }),
     ],
-    [router, page, pageSize,userPermissionData]
+    [router, page, pageSize, userPermissionData]
   );
 
   const table = useReactTable({

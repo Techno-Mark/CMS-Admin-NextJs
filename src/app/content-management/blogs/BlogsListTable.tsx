@@ -116,12 +116,12 @@ const BlogListTable = () => {
     return userPermissionData?.[module]?.includes(action) ?? false;
   };
 
-  const hasCheckModule = (menuKey: string): boolean => !!(userPermissionData && userPermissionData[menuKey]);
-  const router = useRouter();
-  if (!hasCheckModule('Blog')) {
-    router.push('/401-not-authorized'); 
-    return null; 
-  }
+  // const hasCheckModule = (menuKey: string): boolean => !!(userPermissionData && userPermissionData[menuKey]);
+  // const router = useRouter();
+  // if (!hasCheckModule('Blog')) {
+  //   router.push('/401-not-authorized'); 
+  //   return null; 
+  // }
 
 
   const [rowSelection, setRowSelection] = useState({});
