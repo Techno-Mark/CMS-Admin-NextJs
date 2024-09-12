@@ -120,13 +120,31 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
   const getRequiredData = async () => {
     try {
       setLoading(true);
-      const [templateResponse, categoryResponse, tagResponse] =
-        await Promise.all([
-          post(`${template.active}`, {}),
-          postDataToOrganizationAPIs(`${category.active}`, {}),
-          postDataToOrganizationAPIs(`${tag.active}`, {}),
-        ]);
-      setTemplateList(templateResponse?.data?.templates);
+      const [pagesResponse] = await Promise.all([post(`${pages.active}`, {})]);
+      let pagesData = pagesResponse?.data?.pages;
+      setPageList(pagesResponse?.data?.pages);
+
+      //Update edit form
+      if (open === popupActions.EDIT) {
+        let data = {
+          ...editingRow?.data,
+        };
+        data.id = editingRow.popupId;
+        data.title = editingRow.title;
+        data.active = editingRow.active;
+        setIsParamanent(editingRow?.data.isParamanent);
+        setAllPages(editingRow?.data?.allPages);
+        setSelectedPages(editingRow?.data?.selectedPages);
+
+        //set all pages option
+        const preSelectedOptions = pagesData.filter((option: any) =>
+          editingRow?.data?.selectedPages?.includes(option.pageId)
+        );
+
+        setSelectedPages(preSelectedOptions);
+
+        setFormData(data);
+      }
 
       setLoading(false);
     } catch (error) {
@@ -151,6 +169,10 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleChange = (event: any, newValue: any[]) => {
+    setSelectedPages(newValue);
   };
 
   return (
@@ -196,11 +218,11 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
               >
                 <MenuItem value={"Event"}>Event</MenuItem>
                 <MenuItem value={"General"}>General</MenuItem>
-                <MenuItem value={"Content Recommendation"}>
+                {/* <MenuItem value={"Content Recommendation"}>
                   Content Recommendation
                 </MenuItem>
                 <MenuItem value={"Downloadable"}>Downloadable</MenuItem>
-                <MenuItem value={"Survey"}>Survey</MenuItem>
+                <MenuItem value={"Survey"}>Survey</MenuItem> */}
                 <MenuItem value={"Exit Intent"}>Exit Intent</MenuItem>
               </CustomTextField>
             </Grid>
