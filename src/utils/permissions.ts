@@ -10,6 +10,8 @@ export const usePermission = () => {
     try {
       const data = await getDecryptedPermissionData(); 
       if (data) {
+        console.log(data);
+        
         setUserId(data.currentUserId)
         setPermissionData(data.moduleWisePermissions);
       }
@@ -25,7 +27,8 @@ export const usePermission = () => {
   const hasPermission = (module: string, action: string): boolean => {
 
     console.log(userId);
-
+    console.log(permissionData);
+    
     console.log(permissionData[module]?.includes(action) ?? false);
     if (userId == 1) {
       return true;
@@ -34,5 +37,5 @@ export const usePermission = () => {
     return permissionData[module]?.includes(action) ?? false;
   };
 
-  return { hasPermission };
+  return { hasPermission ,fetchDecryptedData};
 };

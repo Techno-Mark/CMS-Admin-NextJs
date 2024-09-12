@@ -22,7 +22,7 @@ import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
 
-import { postDataToOrganizationAPIs } from "@/services/apiService";
+import { post, postDataToOrganizationAPIs } from "@/services/apiService";
 
 import { TemplateType } from "@/types/apps/templateType";
 import BreadCrumbList from "@/components/BreadCrumbList";
@@ -33,6 +33,8 @@ import { filesType } from "@/types/apps/FilesTypes";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { usePermission } from "@/utils/permissions";
+import { getDecryptedPermissionData, storePermissionData } from "@/utils/storageService";
+import { authnetication } from "@/services/endpoint/auth";
 // import defaultFileIcon from "../../../../public/images/files.png";
 
 declare module "@tanstack/table-core" {
@@ -88,8 +90,36 @@ const DebouncedInput = ({
 
 const columnHelper = createColumnHelper<BlogTypeWithAction>();
 
+
 const FileListTable = () => {
-  const { hasPermission } = usePermission()
+  // const { hasPermission } = usePermission()
+
+  const [userIdRole,setUserIdRole] = useState();
+  const [userPermissionData,setUserPermissionData] = useState();
+  const getPermissionModule = async () => {
+    setLoading(true);
+      try {
+        const result = await post(authnetication.user_permission_data, {});
+        console.log(result.data);
+        setUserIdRole(result.data.currentUserId);
+        setUserPermissionData(result.data.moduleWisePermissions)
+        console.log(userIdRole);
+        
+        await storePermissionData(result.data);
+        setLoading(false);
+      } catch (error: any) {
+        console.error(error);
+        setLoading(false);
+      }
+  };
+  function hasPermission(module: string, action: string) {
+    if (userIdRole == 1) {
+      return true;
+    }
+    // @ts-ignore
+    return userPermissionData?.[module]?.includes(action) ?? false;
+  };
+
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -115,6 +145,7 @@ const FileListTable = () => {
           search: globalFilter,
           active: activeFilter,
         });
+        getPermissionModule()
         setData(result.data.mediaLists);
         setTotalRows(result.data.totalMediaFiles);
       } catch (error: any) {
@@ -124,11 +155,11 @@ const FileListTable = () => {
       }
     };
     getData();
-  }, [page, pageSize, globalFilter, deletingId, activeFilter]);
+  }, [page, pageSize, globalFilter, deletingId, activeFilter,]);
   const validImageTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
   const defaultFileIcon = "public/images/files.png";
 
-  
+
   useEffect(() => {
     const handleStorageUpdate = async () => {
       const storedOrgName = localStorage.getItem('selectedOrgId');
@@ -174,22 +205,22 @@ const FileListTable = () => {
         header: "File Name",
         cell: ({ row }) => {
           const { filePath, mediaType, fileName } = row.original;
-      
+
           // Construct the full URL for the file
           const fileUrl = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${filePath}`;
-      
+
           // Determine if the file is an image
           const isImage = validImageTypes.includes(mediaType);
-      
+
           return (
             <Box display="flex" alignItems="center">
               {mediaType === 'image' ? (
                 <img
                   src={fileUrl}
                   alt={filePath}
-                  width={50} 
-                  height={50} 
-                  style={{ objectFit: 'contain', borderRadius: '4px' }} 
+                  width={50}
+                  height={50}
+                  style={{ objectFit: 'contain', borderRadius: '4px' }}
                 />
               ) : (
                 <i className="tabler-file text-[20px]" />
@@ -208,57 +239,63 @@ const FileListTable = () => {
           <div className="flex items-center">
             <Tooltip title={'View The File'}>
 
-            <IconButton
-              onClick={() => {
-                
-                const url = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${row.original.filePath}`;
-              
-                window.open(url, '_blank');
-              }}
-            >
-              <i className="tabler-eye text-[22px] " />
-            </IconButton>
+              <IconButton
+                onClick={() => {
+
+                  const url = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${row.original.filePath}`;
+
+                  window.open(url, '_blank');
+                }}
+              >
+                <i className="tabler-eye text-[22px] " />
+              </IconButton>
             </Tooltip>
             <Tooltip title={'Copy The URL'}>
 
-            <IconButton
-              onClick={() => {
-                const url = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${row.original.filePath}`;
+              <IconButton
+                onClick={() => {
+                  const url = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${row.original.filePath}`;
 
-                navigator.clipboard.writeText(url)
-                  .then(() => {
-                   
-                    toast.success(`URL copied to clipboard!`);
-                  })
-                  .catch(err => {
-                    console.error('Failed to copy URL:', err);
-                    toast.error('Failed to copy URL:');
-                  });
-              }}
-            >
-              <i className="tabler-copy text-[22px]" />
-            </IconButton>
+                  navigator.clipboard.writeText(url)
+                    .then(() => {
+
+                      toast.success(`URL copied to clipboard!`);
+                    })
+                    .catch(err => {
+                      console.error('Failed to copy URL:', err);
+                      toast.error('Failed to copy URL:');
+                    });
+                }}
+              >
+                <i className="tabler-copy text-[22px]" />
+              </IconButton>
             </Tooltip>
-            {hasPermission('Media', 'Delete') && (
-            <Tooltip title={'Delete'}>
+            {/* @ts-ignore */}
 
-             <IconButton
-              onClick={() => {
-                setIsDeleting(true);
-                //@ts-ignore
-                setDeletingId(row.original.mediaId);
-              }}
-            >
-              <i className="tabler-trash text-[22px] text-textSecondary" />
-            </IconButton>
-            </Tooltip> 
-      )}
+       
+
+            {userPermissionData && (
+  ( hasPermission('Media', 'Delete')) && (
+    <Tooltip title="Delete">
+      <IconButton
+        onClick={() => {
+          setIsDeleting(true);
+          // @ts-ignore
+          setDeletingId(row.original.mediaId); // no need to ignore TypeScript error here
+        }}
+      >
+        <i className="tabler-trash text-[22px] text-textSecondary" />
+      </IconButton>
+    </Tooltip>
+  )
+) }
+
           </div>
         ),
         enableSorting: false,
       }),
     ],
-    [router, page, pageSize]
+    [router, page, pageSize,userPermissionData]
   );
 
   const table = useReactTable({
@@ -307,47 +344,19 @@ const FileListTable = () => {
               placeholder="Search"
               className="is-full sm:is-auto"
             />
-            {/* <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
-              <Typography>Status:</Typography>
-              <CustomTextField
-                select
-                fullWidth
-                defaultValue="all"
-                id="custom-select"
-                value={
-                  activeFilter === null
-                    ? "all"
-                    : activeFilter === true
-                      ? "active"
-                      : "inactive"
-                }
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setActiveFilter(
-                    value === "active"
-                      ? true
-                      : value === "inactive"
-                        ? false
-                        : null
-                  );
-                }}
-              >
-                <MenuItem value="all">All</MenuItem>
-                <MenuItem value="active">Publish</MenuItem>
-                <MenuItem value="inactive">Draft</MenuItem>
-              </CustomTextField>
-            </div> */}
+        
+{/* @ts-ignore */}
 
-{hasPermission('Media', 'Create') && (
-            <Button
-              variant="contained"
-              startIcon={<i className="tabler-plus" />}
-              onClick={() => router.push("/content-management/media/add")}
-              className="is-full sm:is-auto"
-            >
-              Add File
-            </Button>
-)}
+            { hasPermission('Media', 'Create') && (
+              <Button
+                variant="contained"
+                startIcon={<i className="tabler-plus" />}
+                onClick={() => router.push("/content-management/media/add")}
+                className="is-full sm:is-auto"
+              >
+                Add File
+              </Button>
+            )}
 
           </div>
         </div>
