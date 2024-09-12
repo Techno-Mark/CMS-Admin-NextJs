@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
 import PagesForm from "../../PagesForm";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { post } from "@/services/apiService";
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { post } from '@/services/apiService';
 import { PopupTypes } from "../../popupTypes";
 import { popups } from "@/services/endpoint/popup";
 import NewPopupForm from "../../NewPopupForm";
@@ -17,12 +17,12 @@ const page = ({ params }: { params: { id: string } }) => {
       try {
         const response = await post(popups.getById, { id: params.id });
         if (response.statusCode !== 200) {
-          throw new Error("Failed to fetch data");
+          throw new Error('Failed to fetch data');
         }
         const data = await response;
         setEditingRow(data.data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       }
     };
 
@@ -30,15 +30,11 @@ const page = ({ params }: { params: { id: string } }) => {
   }, [params.id]);
 
   return (
-    <>
-      {editingRow && (
-        <NewPopupForm
-          open={1}
-          editingRow={editingRow}
-          handleClose={() => router.push("/content-management/popups")}
-        />
-      )}
-    </>
+    <NewPopupForm
+      open={1}
+      editingRow={editingRow}
+      handleClose={() => router.push('/content-management/popups')}
+    />
   );
 };
 

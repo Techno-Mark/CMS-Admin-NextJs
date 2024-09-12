@@ -12,19 +12,31 @@ import {
   IconButton,
   FormControlLabel,
   Checkbox,
-  Switch,
 } from "@mui/material";
 import CustomTextField from "@/@core/components/mui/TextField";
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import CustomAutocomplete from "@/@core/components/mui/Autocomplete";
 import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
-import { post, postContentBlock } from "@/services/apiService";
+import {
+  post,
+  postContentBlock,
+  postDataToOrganizationAPIs,
+} from "@/services/apiService";
+import { template } from "@/services/endpoint/template";
+import { blogPost } from "@/services/endpoint/blogpost";
+import { category } from "@/services/endpoint/category";
+import { tag } from "@/services/endpoint/tag";
 import { toast } from "react-toastify";
 import BreadCrumbList from "@/components/BreadCrumbList";
+import { blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
 import AppReactDatepicker from "@/libs/styles/AppReactDatepicker";
+import EventPopupForm from "./EventPopupType";
+import GeneralPopupType from "./GeneralPopupType";
+import SurveyPopupType from "./SurveyPopupType";
+import { section } from "@/services/endpoint/section";
 import { popups } from "@/services/endpoint/popup";
-import { pages } from "@/services/endpoint/pages";
+import { title } from "process";
 
 const popupActions = {
   ADD: -1,
@@ -33,7 +45,6 @@ const popupActions = {
 
 const initialFormData = {
   id: -1,
-  active: false,
   eventDate: new Date().toString(),
   startDate: new Date().toString(),
   endDate: new Date().toString(),
@@ -68,24 +79,23 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
   const router = useRouter();
 
   const [popupType, setPopupType] = useState("Event");
+
   const [allPages, setAllPages] = useState(false);
-  const [selectedPages, setSelectedPages] = useState<
-    Array<{ pageName: string; pageId: number }> | []
-  >([]);
   const [isParamanent, setIsParamanent] = useState(false);
 
   //state management hook
   const [image, setImage] = useState<File | null>(null);
   const [isImageTouched, setIsImageTouched] = useState(false);
   const [formData, setFormData] =
-    useState<typeof initialFormData>(initialFormData);
+    useState<typeof initialFormData>(initialFormData); 
   const [formErrors, setFormErrors] =
     useState<typeof initialErrorData>(initialErrorData);
 
-  //page list hooks & other list apis data
-  const [pageList, setPageList] = useState<
-    Array<{ pageName: string; pageId: number }> | []
+  //template list hooks & other list apis data
+  const [templateList, setTemplateList] = useState<
+    [{ templateName: string; templateId: number }] | []
   >([]);
+
   const [loading, setLoading] = useState<boolean>(true);
 
   const { getRootProps: getImageRootProps, getInputProps: getImageInputProps } =
@@ -106,77 +116,17 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
     getRequiredData();
   }, []);
 
-  const validateForm = () => {
-    const errors = { ...initialErrorData };
-    let isValid = true;
-    if (!formData.title) {
-      errors.title = "title is required";
-      isValid = false;
-    }
-
-    if (popupType === "Event") {
-      if (!formData.eventTitle) {
-        errors.eventTitle = "event title is required";
-        isValid = false;
-      }
-      if (!formData.btnLink) {
-        errors.btnLink = "button link is required";
-        isValid = false;
-      }
-    }
-    if (!formData.heading) {
-      errors.heading = "heading is required";
-      isValid = false;
-    }
-    if (!formData.supportingLine) {
-      errors.supportingLine = "supporting line is required";
-      isValid = false;
-    }
-    if (!formData.btnText) {
-      errors.btnText = "button text is required";
-      isValid = false;
-    }
-
-    if (!image && open == popupActions.ADD) {
-      errors.image = "image is required";
-      isValid = false;
-    }
-
-    setFormErrors(errors);
-    return isValid;
-  };
-
   // Get Active Template List
   const getRequiredData = async () => {
     try {
       setLoading(true);
-      const [pagesResponse] = await Promise.all([post(`${pages.active}`, {})]);
-      setPageList(pagesResponse?.data?.pages);
-
-      //Update edit form
-      if (open === popupActions.EDIT) {
-        let data = {
-          ...editingRow?.data,
-        };
-        data.id = editingRow.popupId;
-        data.title = editingRow.title;
-        data.active = editingRow.active;
-        setIsParamanent(editingRow?.data.isParamanent);
-        setAllPages(editingRow?.data?.allPages);
-        setSelectedPages(editingRow?.data?.selectedPages);
-
-        //set all pages option
-        const preSelectedOptions = pageList.filter((option) =>
-          editingRow?.data?.selectedPages?.includes(option.pageId)
-        );
-        const pages = pageList.filter((option)=>
-          !editingRow.data?.selectedPages?.includes(option.pageId)
-        );
-        setPageList(pages);
-        setSelectedPages(preSelectedOptions);
-
-        setFormData(data);
-      }
+      const [templateResponse, categoryResponse, tagResponse] =
+        await Promise.all([
+          post(`${template.active}`, {}),
+          postDataToOrganizationAPIs(`${category.active}`, {}),
+          postDataToOrganizationAPIs(`${tag.active}`, {}),
+        ]);
+      setTemplateList(templateResponse?.data?.templates);
 
       setLoading(false);
     } catch (error) {
@@ -187,37 +137,9 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
 
   const handleSubmit = async (data: any) => {
     try {
-      if (!validateForm()) {
-        return;
-      }
-
       setLoading(true);
 
-      let data = {
-        ...formData,
-        popupType: popupType,
-        allPages: allPages,
-        selectedPages: selectedPages,
-        isParamanent: isParamanent,
-      };
-      //selected pages
-      //@ts-ignore
-      data.selectedPages = selectedPages.map((item) => item.pageId);
-
-      const finalData = new FormData();
-      finalData.append("title", formData.title);
-      finalData.append("data", JSON.stringify(data));
-      finalData.append("active", String(formData.active));
-      if (image) {
-        finalData.append("image", image as unknown as Blob);
-      }
-      let result;
-      if (open === popupActions.EDIT) {
-        finalData.append("popupId", formData.id.toString());
-        result = await postContentBlock(popups.update, finalData);
-      } else {
-        result = await postContentBlock(popups.create, finalData);
-      }
+      let result = await postDataToOrganizationAPIs(popups.create, data);
       if (result.status === "success") {
         toast.success(result.message);
         handleClose();
@@ -231,16 +153,9 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
     }
   };
 
-  const handleChange = (event: any, newValue: any[]) => {
-    setSelectedPages(newValue);
-  };
-
-  console.log("selected options111", selectedPages);
-
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
-
       <Box display="flex" alignItems="center">
         <Grid container spacing={3}>
           <Grid item xs={12} sm={11}>
@@ -256,7 +171,7 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
       <Card className="p-4">
         <Box display="flex" rowGap={4} columnGap={4} alignItems="flex-start">
           <Grid container spacing={4} xs={12}>
-            <Grid item sm={6}>
+            <Grid item sm={8}>
               <CustomTextField
                 // disabled={true}
                 error={!!formErrors.title}
@@ -289,18 +204,6 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
                 <MenuItem value={"Exit Intent"}>Exit Intent</MenuItem>
               </CustomTextField>
             </Grid>
-            <Grid item sm={2}>
-              <Typography variant="body2" sx={{ mr: 0 }}>
-                Status
-              </Typography>
-              <Switch
-                size="medium"
-                checked={formData.active}
-                onChange={(e) =>
-                  setFormData({ ...formData, active: e.target.checked })
-                }
-              />
-            </Grid>
 
             <Grid item xs={12} lg={12}>
               <FormControlLabel
@@ -326,19 +229,17 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
                 customInput={<CustomTextField label="Start Date" fullWidth />}
               />
             </Grid>
-            {!isParamanent && (
-              <Grid item xs={12} lg={6}>
-                <AppReactDatepicker
-                  id="max-date"
-                  selected={new Date(formData.endDate)}
-                  minDate={new Date(formData.startDate)}
-                  onChange={(date: Date) =>
-                    setFormData({ ...formData, endDate: date.toString() })
-                  }
-                  customInput={<CustomTextField label="End Date" fullWidth />}
-                />
-              </Grid>
-            )}
+            <Grid item xs={12} lg={6}>
+              <AppReactDatepicker
+                id="max-date"
+                selected={new Date(formData.endDate)}
+                minDate={new Date(formData.startDate)}
+                onChange={(date: Date) =>
+                  setFormData({ ...formData, endDate: date.toString() })
+                }
+                customInput={<CustomTextField label="End Date" fullWidth />}
+              />
+            </Grid>
 
             {popupType !== "Exit Intent" && (
               <Grid item xs={12} sm={6}>
@@ -391,21 +292,6 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
                 }
               />
             </Grid>
-            {!allPages && (
-              <Grid item xs={12} lg={12} className="mb-[20px]">
-                <CustomAutocomplete
-                  id="autocomplete-grouped"
-                  multiple // Enable multiple selections
-                  options={pageList}
-                  value={selectedPages}
-                  getOptionLabel={(option) => option.pageName || ""}
-                  renderInput={(params) => (
-                    <CustomTextField {...params} label="Select Page*" />
-                  )}
-                  onChange={handleChange}
-                />
-              </Grid>
-            )}
           </Grid>
         </Box>
 
@@ -517,7 +403,7 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
               </Grid>
             )}
 
-            {/* {popupType === "Survey" && (
+            {popupType === "Survey" && (
               <>
                 <SurveyPopupType
                   open={0}
@@ -526,7 +412,7 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
                   editingRow={null}
                 />
               </>
-            )} */}
+            )}
           </Grid>
 
           <Grid container spacing={4} xs={4}>
@@ -539,16 +425,17 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
                 >
                   <input {...getImageInputProps()} />
                   <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
-                    {open == popupActions.EDIT && !isImageTouched && (
-                      <img
-                        className="object-contain w-full h-full"
-                        src={
-                          process.env.NEXT_PUBLIC_BACKEND_BASE_URL +
-                          "/" +
-                          formData?.image
-                        }
-                      />
-                    )}
+                    {open == EDIT_BLOG &&
+                      !isImageTouched && (
+                        <img
+                          className="object-contain w-full h-full"
+                          src={
+                            process.env.NEXT_PUBLIC_BACKEND_BASE_URL +
+                            "/" +
+                            editingRow?.thumbnailImageUrl
+                          }
+                        />
+                      )}
                     {image && isImageTouched && (
                       <img
                         key={image.name}
@@ -560,7 +447,7 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
 
                     {!image &&
                       !isImageTouched &&
-                      open !== popupActions.EDIT && (
+                      open !== EDIT_BLOG && (
                         <>
                           <Avatar
                             variant="rounded"
@@ -585,6 +472,7 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
                         </>
                       )}
                   </div>
+                 
                 </Box>
               </div>
             </Grid>
