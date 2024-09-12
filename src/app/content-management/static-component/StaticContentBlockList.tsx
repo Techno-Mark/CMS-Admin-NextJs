@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@mui/material/Card";
-import {TablePagination, TextFieldProps, Tooltip } from "@mui/material";
+import { TablePagination, TextFieldProps, Tooltip } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import classnames from "classnames";
@@ -21,12 +21,14 @@ import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
 // import ConfirmationDialog from "./ConfirmationDialog";
-import { postDataToOrganizationAPIs } from "@/services/apiService";
+import { post, postDataToOrganizationAPIs } from "@/services/apiService";
 import { TemplateType } from "@/types/apps/templateType";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import { staticContentBlock } from "@/services/endpoint/staticContentBlock";
 import { staticContentBlockType } from "@/types/apps/staticContentBlockType";
+import { authnetication } from "@/services/endpoint/auth";
+import { storePermissionData } from "@/utils/storageService";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -83,10 +85,45 @@ const columnHelper = createColumnHelper<StaticComponentTypeWithAction>();
 
 const StaticContentBlockList = () => {
   
+
+  const [userIdRole, setUserIdRole] = useState();
+  const [userPermissionData, setUserPermissionData] = useState();
+  const getPermissionModule = async () => {
+    setLoading(true);
+    try {
+      const result = await post(authnetication.user_permission_data, {});
+      console.log(result.data);
+      setUserIdRole(result.data.currentUserId);
+      setUserPermissionData(result.data.moduleWisePermissions)
+      console.log(userIdRole);
+
+      await storePermissionData(result.data);
+      setLoading(false);
+    } catch (error: any) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+  function hasPermission(module: string, action: string) {
+    if (userIdRole == 1) {
+      return true;
+    }
+    // @ts-ignore
+    return userPermissionData?.[module]?.includes(action) ?? false;
+  };
+
+  const hasCheckModule = (menuKey: string): boolean => !!(userPermissionData && userPermissionData[menuKey]);
+  const router = useRouter();
+  if (!hasCheckModule('Static Component')) {
+    router.push('/401-not-authorized'); 
+    return null; 
+  }
+
+  
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const router = useRouter();
+
 
   const [data, setData] = useState<TemplateType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -106,6 +143,7 @@ const StaticContentBlockList = () => {
         search: globalFilter,
         active: activeFilter,
       });
+      getPermissionModule()
       setData(result.data.sections);
       setTotalRows(result.data.totalSections);
     } catch (error: any) {
@@ -146,7 +184,7 @@ const StaticContentBlockList = () => {
           </Typography>
         ),
       }),
-     
+
       columnHelper.accessor("sectionSlug", {
         header: "Section Slug",
         cell: ({ row }) => (
@@ -168,24 +206,39 @@ const StaticContentBlockList = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
-            <Tooltip title={'Save And Edit'}>
-              <IconButton
-                onClick={() =>
-                  router.push(
-                    `/content-management/static-component/edit/${row.original.sectionId}`
-                  )
-                }
-              >
-                <i className="tabler-edit text-[22px] text-textSecondary" />
-              </IconButton>
-            </Tooltip>
-       
+            {userPermissionData && (
+              hasPermission('Static Component', 'Edit') ? (
+                <Tooltip title={'Save And Edit'}>
+                  <IconButton
+                    onClick={() =>
+                      router.push(
+                        `/content-management/static-component/edit/${row.original.sectionId}`
+                      )
+                    }
+                  >
+                    <i className="tabler-edit text-[22px] text-textSecondary" />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                <Tooltip title={'View'}>
+                  <IconButton
+                    onClick={() =>
+                      router.push(
+                        `/content-management/static-component/edit/${row.original.sectionId}`
+                      )
+                    }
+                  >
+                    <i className="tabler-eye text-[22px] text-textSecondary" />
+                  </IconButton>
+                </Tooltip>
+
+              ))}
           </div>
         ),
         enableSorting: false,
       }),
     ],
-    [router, page, pageSize]
+    [router, page, pageSize,userPermissionData]
   );
 
   const table = useReactTable({
@@ -234,7 +287,7 @@ const StaticContentBlockList = () => {
               placeholder="Search"
               className="is-full sm:is-auto"
             />
-           
+
           </div>
         </div>
         <Card className="flex flex-col h-full">
@@ -315,7 +368,7 @@ const StaticContentBlockList = () => {
             onRowsPerPageChange={handleRowsPerPageChange}
           />
         </Card>
-     
+
       </div>
     </>
   );

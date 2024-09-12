@@ -19,12 +19,14 @@ import {
 import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
-import { postDataToOrganizationAPIs } from "@/services/apiService";
+import { post, postDataToOrganizationAPIs } from "@/services/apiService";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import { truncateText } from "@/utils/common";
 import { contactUsType } from "@/types/apps/contactUsType";
 import { contactUs } from "@/services/endpoint/contactUs";
+import { storePermissionData } from "@/utils/storageService";
+import { authnetication } from "@/services/endpoint/auth";
 // import ConfirmationDialog from "./ConfirmationDialog";
 
 declare module "@tanstack/table-core" {
@@ -81,6 +83,34 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<ContactUsTypeWithAction>();
 
 const ContactUsListTable = () => {
+  const [userIdRole, setUserIdRole] = useState();
+  const [userPermissionData, setUserPermissionData] = useState();
+  const getPermissionModule = async () => {
+    setLoading(true);
+    try {
+      const result = await post(authnetication.user_permission_data, {});
+      console.log(result.data);
+      setUserIdRole(result.data.currentUserId);
+      setUserPermissionData(result.data.moduleWisePermissions)
+      console.log(userIdRole);
+
+      await storePermissionData(result.data);
+      setLoading(false);
+    } catch (error: any) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+  function hasPermission(module: string, action: string) {
+    if (userIdRole == 1) {
+      return true;
+    }
+    // @ts-ignore
+    return userPermissionData?.[module]?.includes(action) ?? false;
+  };
+
+
+
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 

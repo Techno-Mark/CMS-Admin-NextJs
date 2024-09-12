@@ -36,6 +36,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     fetchData();
   }, [params.id]);
   const { hasPermission } = usePermission()
+  
   return (
     <>
       <LoadingBackdrop isLoading={loading} />

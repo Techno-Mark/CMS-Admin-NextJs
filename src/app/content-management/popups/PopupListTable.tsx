@@ -33,6 +33,8 @@ import CustomChip from "@/@core/components/mui/Chip";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import { post } from "@/services/apiService";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
+import { authnetication } from "@/services/endpoint/auth";
+import { storePermissionData } from "@/utils/storageService";
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value);
@@ -80,6 +82,34 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<any>();
 
 const PopupListTable = () => {
+
+  const [userIdRole, setUserIdRole] = useState();
+  const [userPermissionData, setUserPermissionData] = useState();
+  const getPermissionModule = async () => {
+    setLoading(true);
+    try {
+      const result = await post(authnetication.user_permission_data, {});
+      console.log(result.data);
+      setUserIdRole(result.data.currentUserId);
+      setUserPermissionData(result.data.moduleWisePermissions)
+      console.log(userIdRole);
+
+      await storePermissionData(result.data);
+      setLoading(false);
+    } catch (error: any) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+  function hasPermission(module: string, action: string) {
+    if (userIdRole == 1) {
+      return true;
+    }
+    // @ts-ignore
+    return userPermissionData?.[module]?.includes(action) ?? false;
+  };
+
+
   const [rowSelection, setRowSelection] = useState({});
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -104,6 +134,7 @@ const PopupListTable = () => {
         search: globalFilter,
         active: activeFilter,
       });
+      getPermissionModule()
       setData(
         result.data.popups.map((item: any) => ({
           popupId: item.popupId,
@@ -174,32 +205,46 @@ const PopupListTable = () => {
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
-              <Tooltip title={'Edit'}>
-              <IconButton
-                onClick={() => {
-                  router.push(redirectToEditPage(row.original.popupId));
-                }}
-              >
-                <i className="tabler-edit text-[22px] text-textSecondary" />
-              </IconButton>
-              </Tooltip>
-              <Tooltip title={'Delete'}>
-              <IconButton
-                onClick={() => {
-                  setIsDeleting(true);
-                  setDeletingId(row.original.popupId);
-                }}
-              >
-                <i className="tabler-trash text-[22px] text-textSecondary" />
-              </IconButton>
-              </Tooltip>
+              {userPermissionData && (
+                hasPermission('Popup', 'Edit') ? (
+                  <Tooltip title={'Edit'}>
+                    <IconButton
+                      onClick={() => {
+                        router.push(redirectToEditPage(row.original.popupId));
+                      }}
+                    >
+                      <i className="tabler-edit text-[22px] text-textSecondary" />
+                    </IconButton>
+                  </Tooltip>
+                ) : <Tooltip title={'View'}>
+                  <IconButton
+                    onClick={() => {
+                      router.push(redirectToEditPage(row.original.popupId));
+                    }}
+                  >
+                    <i className="tabler-eye text-[22px] text-textSecondary" />
+                  </IconButton>
+                </Tooltip>)}
+              {userPermissionData && (
+                (hasPermission('Popup', 'Delete')) && (
+                  <Tooltip title={'Delete'}>
+                    <IconButton
+                      onClick={() => {
+                        setIsDeleting(true);
+                        setDeletingId(row.original.popupId);
+                      }}
+                    >
+                      <i className="tabler-trash text-[22px] text-textSecondary" />
+                    </IconButton>
+                  </Tooltip>
+                ))}
             </div>
           );
         },
         enableSorting: false,
       }),
     ],
-    []
+    [router, page, pageSize, userPermissionData]
   );
   const table = useReactTable({
     data,
@@ -242,7 +287,7 @@ const PopupListTable = () => {
 
   return (
     <>
-     <LoadingBackdrop isLoading={loading} />
+      <LoadingBackdrop isLoading={loading} />
       <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
         <BreadCrumbList />
         <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
@@ -282,14 +327,16 @@ const PopupListTable = () => {
               <MenuItem value="inactive">InActive</MenuItem>
             </CustomTextField>
           </div>
-          <Button
-            variant="contained"
-            startIcon={<i className="tabler-plus" />}
-            onClick={() => router.push(redirectToAddPage)}
-            className="is-full sm:is-auto"
-          >
-            Add Pop-up
-          </Button>
+          {hasPermission('Popup', 'Create') && (
+            <Button
+              variant="contained"
+              startIcon={<i className="tabler-plus" />}
+              onClick={() => router.push(redirectToAddPage)}
+              className="is-full sm:is-auto"
+            >
+              Add Pop-up
+            </Button>
+          )}
         </div>
       </div>
       <Card>

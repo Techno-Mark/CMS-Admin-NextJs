@@ -22,7 +22,7 @@ import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
 // import ConfirmationDialog from "./ConfirmationDialog";
-import { postDataToOrganizationAPIs } from "@/services/apiService";
+import { post, postDataToOrganizationAPIs } from "@/services/apiService";
 import CustomChip from "@/@core/components/mui/Chip";
 import { TemplateType } from "@/types/apps/templateType";
 import BreadCrumbList from "@/components/BreadCrumbList";
@@ -32,6 +32,8 @@ import { blogsType } from "@/types/apps/blogsType";
 import { blogPost } from "@/services/endpoint/blogpost";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { usePermission } from "@/utils/permissions";
+import { authnetication } from "@/services/endpoint/auth";
+import { storePermissionData } from "@/utils/storageService";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -87,10 +89,45 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<BlogTypeWithAction>();
 
 const BlogListTable = () => {
+  // const { hasPermission } = usePermission()
+  const [userIdRole, setUserIdRole] = useState();
+  const [userPermissionData, setUserPermissionData] = useState();
+  const getPermissionModule = async () => {
+    setLoading(true);
+    try {
+      const result = await post(authnetication.user_permission_data, {});
+      console.log(result.data);
+      setUserIdRole(result.data.currentUserId);
+      setUserPermissionData(result.data.moduleWisePermissions)
+      console.log(userIdRole);
+
+      await storePermissionData(result.data);
+      setLoading(false);
+    } catch (error: any) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+  function hasPermission(module: string, action: string) {
+    if (userIdRole == 1) {
+      return true;
+    }
+    // @ts-ignore
+    return userPermissionData?.[module]?.includes(action) ?? false;
+  };
+
+  const hasCheckModule = (menuKey: string): boolean => !!(userPermissionData && userPermissionData[menuKey]);
+  const router = useRouter();
+  if (!hasCheckModule('Blog')) {
+    router.push('/401-not-authorized'); 
+    return null; 
+  }
+
+
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const router = useRouter();
+
 
   const [data, setData] = useState<TemplateType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -102,7 +139,7 @@ const BlogListTable = () => {
   const [deletingId, setDeletingId] = useState<number>(0);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
-  const { hasPermission } = usePermission()
+
 
   const getData = async () => {
     setLoading(true);
@@ -113,6 +150,7 @@ const BlogListTable = () => {
         search: globalFilter,
         active: activeFilter,
       });
+      getPermissionModule()
       setData(result.data.blogs);
       setTotalRows(result.data.totalBlogs);
     } catch (error: any) {
@@ -159,15 +197,7 @@ const BlogListTable = () => {
           </Typography>
         ),
       }),
-      // columnHelper.accessor("blogSlug", {
-      //   header: "Slug",
-      //   cell: ({ row }) => (
-      //     <Typography color="text.primary" className="font-medium">
-      //       {truncateText(row.original.blogSlug, 25)}
-      //     </Typography>
-      //   ),
-      //   enableSorting: false,
-      // }),
+
       columnHelper.accessor("authorName", {
         header: "Author Name",
         cell: ({ row }) => (
@@ -206,50 +236,54 @@ const BlogListTable = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
-            {hasPermission('Blog', 'Edit') ? (
-              <Tooltip title={'Edit'}>
-                <IconButton
-                  onClick={() =>
-                    router.push(
-                      `/content-management/blogs/edit/${row.original.blogId}` // Edit URL
-                    )
-                  }
-                >
-                  <i className="tabler-edit text-[22px] text-textSecondary" />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Tooltip title={'View'}>
-                <IconButton
-                  onClick={() =>
-                    router.push(
-                      `/content-management/blogs/view/${row.original.blogId}` // View URL
-                    )
-                  }
-                >
-                  <i className="tabler-eye text-[22px] text-textSecondary" />
-                </IconButton>
-              </Tooltip>
-            )}
+            {userPermissionData && (
+              hasPermission('Blog', 'Edit') ? (
+                <Tooltip title={'Edit'}>
+                  <IconButton
+                    onClick={() =>
+                      router.push(
+                        `/content-management/blogs/edit/${row.original.blogId}` // Edit URL
+                      )
+                    }
+                  >
+                    <i className="tabler-edit text-[22px] text-textSecondary" />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                <Tooltip title={'View'}>
+                  <IconButton
+                    onClick={() =>
+                      router.push(
+                        `/content-management/blogs/view/${row.original.blogId}` // View URL
+                      )
+                    }
+                  >
+                    <i className="tabler-eye text-[22px] text-textSecondary" />
+                  </IconButton>
+                </Tooltip>
 
-            {hasPermission('Blog', 'Delete') && (
-              <Tooltip title={'Delete'}>
-                <IconButton
-                  onClick={() => {
-                    setIsDeleting(true);
-                    setDeletingId(row.original.blogId);
-                  }}
-                >
-                  <i className="tabler-trash text-[22px] text-textSecondary" />
-                </IconButton>
-              </Tooltip>
+              ))}
+            {userPermissionData && (
+              (hasPermission('Blog', 'Delete')) && (
+
+                <Tooltip title={'Delete'}>
+                  <IconButton
+                    onClick={() => {
+                      setIsDeleting(true);
+                      setDeletingId(row.original.blogId);
+                    }}
+                  >
+                    <i className="tabler-trash text-[22px] text-textSecondary" />
+                  </IconButton>
+                </Tooltip>
+              )
             )}
           </div>
         ),
         enableSorting: false,
       }),
     ],
-    [router, page, pageSize]
+    [router, page, pageSize, userPermissionData]
   );
 
   const table = useReactTable({
@@ -291,7 +325,7 @@ const BlogListTable = () => {
     <>
       <div>
 
-     
+
         <LoadingBackdrop isLoading={loading} />
         <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
           <BreadCrumbList />

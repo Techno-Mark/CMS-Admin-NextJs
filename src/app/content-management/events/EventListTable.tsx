@@ -21,7 +21,7 @@ import {
 import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
-import { postDataToOrganizationAPIs } from "@/services/apiService";
+import { post, postDataToOrganizationAPIs } from "@/services/apiService";
 import CustomChip from "@/@core/components/mui/Chip";
 import { TemplateType } from "@/types/apps/templateType";
 import BreadCrumbList from "@/components/BreadCrumbList";
@@ -31,6 +31,8 @@ import { eventsType } from "@/types/apps/eventType";
 import { event } from "@/services/endpoint/event";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { usePermission } from "@/utils/permissions";
+import { authnetication } from "@/services/endpoint/auth";
+import { storePermissionData } from "@/utils/storageService";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -86,7 +88,33 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<EventTypeWithAction>();
 
 const BlogListTable = () => {
-  const { hasPermission } = usePermission()
+
+  const [userIdRole, setUserIdRole] = useState();
+  const [userPermissionData, setUserPermissionData] = useState();
+  const getPermissionModule = async () => {
+    setLoading(true);
+    try {
+      const result = await post(authnetication.user_permission_data, {});
+      console.log(result.data);
+      setUserIdRole(result.data.currentUserId);
+      setUserPermissionData(result.data.moduleWisePermissions)
+      console.log(userIdRole);
+
+      await storePermissionData(result.data);
+      setLoading(false);
+    } catch (error: any) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+  function hasPermission(module: string, action: string) {
+    if (userIdRole == 1) {
+      return true;
+    }
+    // @ts-ignore
+    return userPermissionData?.[module]?.includes(action) ?? false;
+  };
+  // const { hasPermission } = usePermission()
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -111,6 +139,7 @@ const BlogListTable = () => {
         search: globalFilter,
         active: activeFilter,
       });
+      getPermissionModule()
       setData(result.data.events);
       setTotalRows(result.data.totalEvents);
     } catch (error: any) {
@@ -215,52 +244,55 @@ const BlogListTable = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
-            {hasPermission('Event', 'Create') ? (<>
+            {userPermissionData && (
+              hasPermission('Event', 'Edit') ? (
+                <>
 
-              <Tooltip title={'Edit'}>
-                <IconButton
-                  onClick={() =>
-                    router.push(
-                      `/content-management/events/edit/${row.original.eventId}`
-                    )
-                  }
-                >
-                  <i className="tabler-edit text-[22px] text-textSecondary" />
-                </IconButton>
-              </Tooltip>
-            </>) : (
-              <Tooltip title={'View'}>
-                <IconButton
-                  onClick={() =>
-                    router.push(
-                      `/content-management/events/edit/${row.original.eventId}`
-                    )
-                  }
-                >
-                  <i className="tabler-eye text-[22px] text-textSecondary" />
-                </IconButton>
-              </Tooltip>
-            )}
+                  <Tooltip title={'Edit'}>
+                    <IconButton
+                      onClick={() =>
+                        router.push(
+                          `/content-management/events/edit/${row.original.eventId}`
+                        )
+                      }
+                    >
+                      <i className="tabler-edit text-[22px] text-textSecondary" />
+                    </IconButton>
+                  </Tooltip>
+                </>) : (
+                <Tooltip title={'View'}>
+                  <IconButton
+                    onClick={() =>
+                      router.push(
+                        `/content-management/events/edit/${row.original.eventId}`
+                      )
+                    }
+                  >
+                    <i className="tabler-eye text-[22px] text-textSecondary" />
+                  </IconButton>
+                </Tooltip>
+              ))}
 
-            {hasPermission('Event', 'Delete') && (
-              <Tooltip title={'Delete'}>
-                <IconButton
-                  onClick={() => {
-                    setIsDeleting(true);
-                    setDeletingId(row.original.eventId);
-                  }}
-                >
-                  <i className="tabler-trash text-[22px] text-textSecondary" />
-                </IconButton>
-              </Tooltip>
+            {userPermissionData && (
+              hasPermission('Event', 'Delete') && (
+                <Tooltip title={'Delete'}>
+                  <IconButton
+                    onClick={() => {
+                      setIsDeleting(true);
+                      setDeletingId(row.original.eventId);
+                    }}
+                  >
+                    <i className="tabler-trash text-[22px] text-textSecondary" />
+                  </IconButton>
+                </Tooltip>
 
-            )}
+              ))}
           </div>
         ),
         enableSorting: false,
       }),
     ],
-    [router, page, pageSize]
+    [router, page, pageSize,userPermissionData]
   );
 
   const table = useReactTable({

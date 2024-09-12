@@ -7,6 +7,7 @@ import { post } from "@/services/apiService";
 import { PopupTypes } from "../../popupTypes";
 import { popups } from "@/services/endpoint/popup";
 import NewPopupForm from "../../NewPopupForm";
+import { usePermission } from "@/utils/permissions";
 
 const page = ({ params }: { params: { id: string } }) => {
   const [editingRow, setEditingRow] = useState<PopupTypes | null>(null);
@@ -28,7 +29,7 @@ const page = ({ params }: { params: { id: string } }) => {
 
     fetchData();
   }, [params.id]);
-
+  const { hasPermission } = usePermission()
   return (
     <>
       {editingRow && (
@@ -36,6 +37,7 @@ const page = ({ params }: { params: { id: string } }) => {
           open={1}
           editingRow={editingRow}
           handleClose={() => router.push("/content-management/popups")}
+          permissionUser={hasPermission('Popup', 'Edit')}
         />
       )}
     </>

@@ -22,7 +22,7 @@ import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import CustomTextField from "@core/components/mui/TextField";
 import tableStyles from "@core/styles/table.module.css";
 // import ConfirmationDialog from "./ConfirmationDialog";
-import { postDataToOrganizationAPIs } from "@/services/apiService";
+import { post, postDataToOrganizationAPIs } from "@/services/apiService";
 import CustomChip from "@/@core/components/mui/Chip";
 import { TemplateType } from "@/types/apps/templateType";
 import BreadCrumbList from "@/components/BreadCrumbList";
@@ -32,6 +32,8 @@ import ConfirmationDialog from "./ConfirmationDialog";
 import { menuType } from "@/types/apps/menusType";
 import { menu } from "@/services/endpoint/menu";
 import { usePermission } from "@/utils/permissions";
+import { authnetication } from "@/services/endpoint/auth";
+import { storePermissionData } from "@/utils/storageService";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -87,7 +89,35 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<BlogTypeWithAction>();
 
 const MenuListTable = () => {
-  const { hasPermission } = usePermission()
+  // const { hasPermission } = usePermission()
+  const [userIdRole, setUserIdRole] = useState();
+  const [userPermissionData, setUserPermissionData] = useState();
+  const getPermissionModule = async () => {
+    setLoading(true);
+    try {
+      const result = await post(authnetication.user_permission_data, {});
+      console.log(result.data);
+      setUserIdRole(result.data.currentUserId);
+      setUserPermissionData(result.data.moduleWisePermissions)
+      console.log(userIdRole);
+
+      await storePermissionData(result.data);
+      setLoading(false);
+    } catch (error: any) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+  function hasPermission(module: string, action: string) {
+    if (userIdRole == 1) {
+      return true;
+    }
+    // @ts-ignore
+    return userPermissionData?.[module]?.includes(action) ?? false;
+  };
+
+
+
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -112,6 +142,7 @@ const MenuListTable = () => {
         search: globalFilter,
         active: activeFilter,
       });
+      getPermissionModule()
       setData(result.data.menus);
       setTotalRows(result.data.totalMenus);
     } catch (error: any) {
@@ -195,29 +226,56 @@ const MenuListTable = () => {
         cell: ({ row }) => (
           <div className="flex items-center">
 
-            {/* {hasPermission('Menu', 'Edit')&& ( */}
-              <>
-                <Tooltip title={'Edit'}>
-                  <IconButton
-                    onClick={() =>
-                      router.push(
-                        `/content-management/menus/edit/${row.original.menuId}`
-                      )
-                    }
-                  >
-                    <i className="tabler-edit text-[22px] text-textSecondary" />
-                  </IconButton>
-                </Tooltip>
+            {userPermissionData && (
+              hasPermission('Menu', 'Edit') ? (
+                <>
+                  <Tooltip title={'Edit'}>
+                    <IconButton
+                      onClick={() =>
+                        router.push(
+                          `/content-management/menus/edit/${row.original.menuId}`
+                        )
+                      }
+                    >
+                      <i className="tabler-edit text-[22px] text-textSecondary" />
+                    </IconButton>
+                  </Tooltip>
 
-                <Tooltip title={'Sort'}>
-                  <IconButton
-                    onClick={() => router.push(`/content-management/menus/menu-item/${row.original.menuId}`)}
-                  >
-                    <i className="tabler-arrows-sort text-[22px] text-textSecondary" />
-                  </IconButton>
-                </Tooltip>
-              </>
-            {/* )} */}
+                  <Tooltip title={'Sort'}>
+                    <IconButton
+                      onClick={() => router.push(`/content-management/menus/menu-item/${row.original.menuId}`)}
+                    >
+                      <i className="tabler-arrows-sort text-[22px] text-textSecondary" />
+                    </IconButton>
+                  </Tooltip>
+                </>) : (
+
+                <>
+                  <Tooltip title={'View Edit'}>
+                    <IconButton
+                      onClick={() =>
+                        router.push(
+                          `/content-management/menus/edit/${row.original.menuId}`
+                        )
+                      }
+                    >
+                      <i className="tabler-eye text-[22px] text-textSecondary" />
+                    </IconButton>
+                  </Tooltip>
+
+                  <Tooltip title={'View Sort'}>
+                    <IconButton
+                      onClick={() => router.push(`/content-management/menus/menu-item/${row.original.menuId}`)}
+                    >
+                      <i className="tabler-arrows-sort text-[22px] text-textSecondary" />
+                    </IconButton>
+                  </Tooltip>
+
+                  
+                </>
+
+
+              ))}
 
 
             {hasPermission('Menu', 'Delete') &&
@@ -237,7 +295,7 @@ const MenuListTable = () => {
         enableSorting: false,
       }),
     ],
-    [router, page, pageSize]
+    [router, page, pageSize, userPermissionData]
   );
 
   const table = useReactTable({

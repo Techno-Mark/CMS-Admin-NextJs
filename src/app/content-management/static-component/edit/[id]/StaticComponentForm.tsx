@@ -77,15 +77,15 @@ function StaticComponentForm({
 
   //Effects
   useEffect(() => {
-    if(editingRow?.sectionValue?.data){
-        setTemplateValues(editingRow.sectionValue);
+    if (editingRow?.sectionValue?.data) {
+      setTemplateValues(editingRow.sectionValue);
     }
     setLoading(false);
   }, []);
 
   // handle submit
   const handleSubmit = async (active: boolean) => {
-    
+
     if (true) {
       try {
         setLoading(true);
@@ -115,7 +115,7 @@ function StaticComponentForm({
       }
     }
   };
-  
+
   //component data part
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement>,
@@ -278,7 +278,7 @@ function StaticComponentForm({
                                             size="small"
                                             onClick={() =>
                                               handleAddDuplicateForm(
-                                               "data",
+                                                "data",
                                                 sectionField.fekey,
                                                 multipleSectionIndex + 1,
                                                 sectionField
@@ -337,7 +337,7 @@ function StaticComponentForm({
                                             onChange={(e: any) =>
                                               handleInputChange(
                                                 e,
-                                               "data",
+                                                "data",
                                                 sectionField.fekey,
                                                 multipleSectionIndex,
                                                 subField.fekey
@@ -348,15 +348,15 @@ function StaticComponentForm({
                                             inputProps={
                                               subField.validation
                                                 ? JSON.parse(
-                                                    subField.validation
-                                                  )
+                                                  subField.validation
+                                                )
                                                 : {}
                                             }
                                             value={
                                               templateValue?.data?.[
-                                                sectionField.fekey
+                                              sectionField.fekey
                                               ]?.[multipleSectionIndex]?.[
-                                                subField.fekey
+                                              subField.fekey
                                               ] || ""
                                             }
                                           />
@@ -397,7 +397,7 @@ function StaticComponentForm({
                         margin="normal"
                         value={
                           templateValue?.data?.[
-                            sectionField.fekey
+                          sectionField.fekey
                           ] || ""
                         }
                       />
@@ -455,14 +455,14 @@ function StaticComponentForm({
                   Cancel
                 </Button>
                 {permissionUser &&
-                <Button
-                  variant="contained"
-                  type="submit"
-                  onClick={() => handleSubmit(true)}
-                >
-                  Save & Update
-                </Button>
-}
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    onClick={() => handleSubmit(true)}
+                  >
+                    Save & Update
+                  </Button>
+                }
               </Box>
             </Grid>
           </Grid>

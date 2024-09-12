@@ -64,7 +64,7 @@ const initialErrorData = {
   image: "",
 };
 
-function NewPopupForm({ open, handleClose, editingRow }: any) {
+function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
   const router = useRouter();
 
   const [popupType, setPopupType] = useState("Event");
@@ -243,7 +243,7 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
             <BreadCrumbList />
           </Grid>
           <Grid item xs={12} sm={1}>
-            <IconButton color="info" onClick={() => {}}>
+            <IconButton color="info" onClick={() => { }}>
               <i className="tabler-external-link text-textSecondary"></i>
             </IconButton>
           </Grid>
@@ -441,61 +441,61 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
             {(popupType === "Event" ||
               popupType === "General" ||
               popupType === "Exit Intent") && (
-              <Grid item xs={12} sm={12}>
-                <CustomTextField
-                  // disabled={true}
-                  error={!!formErrors.heading}
-                  helperText={formErrors.heading}
-                  label="Heading*"
-                  fullWidth
-                  placeholder="Heading"
-                  value={formData.heading}
-                  onChange={(e) => {
-                    setFormData({ ...formData, heading: e.target.value });
-                  }}
-                />
-              </Grid>
-            )}
+                <Grid item xs={12} sm={12}>
+                  <CustomTextField
+                    // disabled={true}
+                    error={!!formErrors.heading}
+                    helperText={formErrors.heading}
+                    label="Heading*"
+                    fullWidth
+                    placeholder="Heading"
+                    value={formData.heading}
+                    onChange={(e) => {
+                      setFormData({ ...formData, heading: e.target.value });
+                    }}
+                  />
+                </Grid>
+              )}
             {(popupType === "Event" ||
               popupType === "General" ||
               popupType === "Exit Intent") && (
-              <Grid item xs={12} sm={12}>
-                <CustomTextField
-                  // disabled={true}
-                  error={!!formErrors.supportingLine}
-                  helperText={formErrors.supportingLine}
-                  label="Supporting Line*"
-                  fullWidth
-                  placeholder="Supporting Line"
-                  value={formData.supportingLine}
-                  onChange={(e) => {
-                    setFormData({
-                      ...formData,
-                      supportingLine: e.target.value,
-                    });
-                  }}
-                />
-              </Grid>
-            )}
+                <Grid item xs={12} sm={12}>
+                  <CustomTextField
+                    // disabled={true}
+                    error={!!formErrors.supportingLine}
+                    helperText={formErrors.supportingLine}
+                    label="Supporting Line*"
+                    fullWidth
+                    placeholder="Supporting Line"
+                    value={formData.supportingLine}
+                    onChange={(e) => {
+                      setFormData({
+                        ...formData,
+                        supportingLine: e.target.value,
+                      });
+                    }}
+                  />
+                </Grid>
+              )}
             {(popupType === "Event" ||
               popupType === "General" ||
               popupType === "Exit Intent" ||
               popupType === "Survey") && (
-              <Grid item xs={12} sm={6}>
-                <CustomTextField
-                  // disabled={true}
-                  error={!!formErrors.btnText}
-                  helperText={formErrors.btnText}
-                  label="Button Text*"
-                  fullWidth
-                  placeholder=""
-                  value={formData.btnText}
-                  onChange={(e) => {
-                    setFormData({ ...formData, btnText: e.target.value });
-                  }}
-                />
-              </Grid>
-            )}
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    // disabled={true}
+                    error={!!formErrors.btnText}
+                    helperText={formErrors.btnText}
+                    label="Button Text*"
+                    fullWidth
+                    placeholder=""
+                    value={formData.btnText}
+                    onChange={(e) => {
+                      setFormData({ ...formData, btnText: e.target.value });
+                    }}
+                  />
+                </Grid>
+              )}
             {popupType === "Event" && (
               <Grid item xs={12} sm={6}>
                 <CustomTextField
@@ -611,13 +611,15 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
                 >
                   Cancel
                 </Button>
-                <Button
-                  variant="contained"
-                  type="submit"
-                  onClick={() => handleSubmit(true)}
-                >
-                  Save & Update
-                </Button>
+                {permissionUser &&
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    onClick={() => handleSubmit(true)}
+                  >
+                    Save & Update
+                  </Button>
+                }
               </Box>
             </Grid>
           </Grid>

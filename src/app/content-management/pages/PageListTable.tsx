@@ -38,6 +38,8 @@ import BreadCrumbList from "@/components/BreadCrumbList";
 import { post } from "@/services/apiService";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
 import { usePermission } from "@/utils/permissions";
+import { authnetication } from "@/services/endpoint/auth";
+import { storePermissionData } from "@/utils/storageService";
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value);
@@ -83,16 +85,36 @@ const DebouncedInput = ({
 // Column Definitions
 const columnHelper = createColumnHelper<any>();
 
-type Props = {
-  editPer: Boolean;
-  createPer: Boolean;
-  deletePer: Boolean
-};
-
-const PageListTable = (
-  { editPer, createPer, deletePer }: Props
-) => {
+const PageListTable = () => {
   // const { hasPermission } = usePermission()
+  const [userIdRole, setUserIdRole] = useState();
+  const [userPermissionData, setUserPermissionData] = useState();
+  const getPermissionModule = async () => {
+    setLoading(true);
+    try {
+      const result = await post(authnetication.user_permission_data, {});
+      console.log(result.data);
+      setUserIdRole(result.data.currentUserId);
+      setUserPermissionData(result.data.moduleWisePermissions)
+      console.log(userIdRole);
+
+      await storePermissionData(result.data);
+      setLoading(false);
+    } catch (error: any) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+  function hasPermission(module: string, action: string) {
+    if (userIdRole == 1) {
+      return true;
+    }
+    // @ts-ignore
+    return userPermissionData?.[module]?.includes(action) ?? false;
+  };
+
+
+
   const [rowSelection, setRowSelection] = useState({});
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -117,6 +139,7 @@ const PageListTable = (
         search: globalFilter,
         active: activeFilter,
       });
+      getPermissionModule()
       setData(
         result.data.pages.map((item: any) => ({
           id: item.pageId,
@@ -134,7 +157,7 @@ const PageListTable = (
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     getData();
     const handleStorageUpdate = async () => {
@@ -191,52 +214,50 @@ const PageListTable = (
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
-              {editPer ? (
-
-                <Tooltip title={"Edit"}>
-                  <IconButton
-                    onClick={() => {
-                      router.push(redirectToEditPage(row.original.id));
-                    }}
-                  >
-                    <i className="tabler-edit text-[22px] text-textSecondary" />
-                  </IconButton>
-                </Tooltip>
-
-              )
-                :
-                (
-                  <Tooltip title={'View'}>
+              {userPermissionData && (
+                hasPermission('Page', 'Edit') ? (
+                  <Tooltip title={"Edit"}>
                     <IconButton
-                      onClick={() =>
-                        router.push(redirectToEditPage(row.original.id))
-                      }
+                      onClick={() => {
+                        router.push(redirectToEditPage(row.original.id));
+                      }}
                     >
-                      <i className="tabler-eye text-[22px] text-textSecondary" />
+                      <i className="tabler-edit text-[22px] text-textSecondary" />
                     </IconButton>
                   </Tooltip>
+                ): (
+                    <Tooltip title={'View'}>
+                      <IconButton
+                        onClick={() =>
+                          router.push(redirectToEditPage(row.original.id))
+                        }
+                      >
+                        <i className="tabler-eye text-[22px] text-textSecondary" />
+                      </IconButton>
+                    </Tooltip>
 
-                )
+                  ))
               }
-              {deletePer && (
-              <Tooltip title={"Delete"}>
-                <IconButton
-                  onClick={() => {
-                    setIsDeleting(true);
-                    setDeletingId(row.original.id);
-                  }}
-                >
-                  <i className="tabler-trash text-[22px] text-textSecondary" />
-                </IconButton>
-              </Tooltip>
-              )}
+              {userPermissionData && (
+                hasPermission('Page', 'Delete') && (
+                <Tooltip title={"Delete"}>
+                  <IconButton
+                    onClick={() => {
+                      setIsDeleting(true);
+                      setDeletingId(row.original.id);
+                    }}
+                  >
+                    <i className="tabler-trash text-[22px] text-textSecondary" />
+                  </IconButton>
+                </Tooltip>
+      ))}
             </div>
           );
         },
         enableSorting: false,
       }),
     ],
-    []
+    [router, page, pageSize, userPermissionData]
   );
   const table = useReactTable({
     data,
@@ -319,16 +340,16 @@ const PageListTable = (
               <MenuItem value="inactive">Draft</MenuItem>
             </CustomTextField>
           </div>
-          {/* {hasPermission('Page', 'Create') && ( */}
-            <Button
-              variant="contained"
-              startIcon={<i className="tabler-plus" />}
-              onClick={() => router.push(redirectToAddPage)}
-              className="is-full sm:is-auto"
-            >
-              Add Pages
-            </Button>
-          {/* )} */}
+          {hasPermission('Page', 'Create') && (
+          <Button
+            variant="contained"
+            startIcon={<i className="tabler-plus" />}
+            onClick={() => router.push(redirectToAddPage)}
+            className="is-full sm:is-auto"
+          >
+            Add Pages
+          </Button>
+          )} 
         </div>
       </div>
       <Card>

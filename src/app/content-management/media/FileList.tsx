@@ -94,23 +94,23 @@ const columnHelper = createColumnHelper<BlogTypeWithAction>();
 const FileListTable = () => {
   // const { hasPermission } = usePermission()
 
-  const [userIdRole,setUserIdRole] = useState();
-  const [userPermissionData,setUserPermissionData] = useState();
+  const [userIdRole, setUserIdRole] = useState();
+  const [userPermissionData, setUserPermissionData] = useState();
   const getPermissionModule = async () => {
     setLoading(true);
-      try {
-        const result = await post(authnetication.user_permission_data, {});
-        console.log(result.data);
-        setUserIdRole(result.data.currentUserId);
-        setUserPermissionData(result.data.moduleWisePermissions)
-        console.log(userIdRole);
-        
-        await storePermissionData(result.data);
-        setLoading(false);
-      } catch (error: any) {
-        console.error(error);
-        setLoading(false);
-      }
+    try {
+      const result = await post(authnetication.user_permission_data, {});
+      console.log(result.data);
+      setUserIdRole(result.data.currentUserId);
+      setUserPermissionData(result.data.moduleWisePermissions)
+      console.log(userIdRole);
+
+      await storePermissionData(result.data);
+      setLoading(false);
+    } catch (error: any) {
+      console.error(error);
+      setLoading(false);
+    }
   };
   function hasPermission(module: string, action: string) {
     if (userIdRole == 1) {
@@ -272,30 +272,30 @@ const FileListTable = () => {
             </Tooltip>
             {/* @ts-ignore */}
 
-       
+
 
             {userPermissionData && (
-  ( hasPermission('Media', 'Delete')) && (
-    <Tooltip title="Delete">
-      <IconButton
-        onClick={() => {
-          setIsDeleting(true);
-          // @ts-ignore
-          setDeletingId(row.original.mediaId); // no need to ignore TypeScript error here
-        }}
-      >
-        <i className="tabler-trash text-[22px] text-textSecondary" />
-      </IconButton>
-    </Tooltip>
-  )
-) }
+              (hasPermission('Media', 'Delete')) && (
+                <Tooltip title="Delete">
+                  <IconButton
+                    onClick={() => {
+                      setIsDeleting(true);
+                      // @ts-ignore
+                      setDeletingId(row.original.mediaId); // no need to ignore TypeScript error here
+                    }}
+                  >
+                    <i className="tabler-trash text-[22px] text-textSecondary" />
+                  </IconButton>
+                </Tooltip>
+              )
+            )}
 
           </div>
         ),
         enableSorting: false,
       }),
     ],
-    [router, page, pageSize,userPermissionData]
+    [router, page, pageSize, userPermissionData]
   );
 
   const table = useReactTable({
@@ -344,10 +344,10 @@ const FileListTable = () => {
               placeholder="Search"
               className="is-full sm:is-auto"
             />
-        
-{/* @ts-ignore */}
 
-            { hasPermission('Media', 'Create') && (
+            {/* @ts-ignore */}
+
+            {hasPermission('Media', 'Create') && (
               <Button
                 variant="contained"
                 startIcon={<i className="tabler-plus" />}
