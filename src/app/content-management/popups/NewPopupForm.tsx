@@ -151,6 +151,7 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
     try {
       setLoading(true);
       const [pagesResponse] = await Promise.all([post(`${pages.active}`, {})]);
+      let pagesData = pagesResponse?.data?.pages;
       setPageList(pagesResponse?.data?.pages);
 
       //Update edit form
@@ -166,13 +167,10 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
         setSelectedPages(editingRow?.data?.selectedPages);
 
         //set all pages option
-        const preSelectedOptions = pageList.filter((option) =>
+        const preSelectedOptions = pagesData.filter((option: any) =>
           editingRow?.data?.selectedPages?.includes(option.pageId)
         );
-        const pages = pageList.filter((option)=>
-          !editingRow.data?.selectedPages?.includes(option.pageId)
-        );
-        setPageList(pages);
+
         setSelectedPages(preSelectedOptions);
 
         setFormData(data);
@@ -234,8 +232,6 @@ function NewPopupForm({ open, handleClose, editingRow }: any) {
   const handleChange = (event: any, newValue: any[]) => {
     setSelectedPages(newValue);
   };
-
-  console.log("selected options111", selectedPages);
 
   return (
     <>
