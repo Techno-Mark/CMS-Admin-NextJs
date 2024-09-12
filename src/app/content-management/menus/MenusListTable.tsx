@@ -33,7 +33,7 @@ import { menuType } from "@/types/apps/menusType";
 import { menu } from "@/services/endpoint/menu";
 import { usePermission } from "@/utils/permissions";
 import { authnetication } from "@/services/endpoint/auth";
-import { storePermissionData } from "@/utils/storageService";
+import { getDecryptedPermissionData, storePermissionData } from "@/utils/storageService";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -95,14 +95,19 @@ const MenuListTable = () => {
   const getPermissionModule = async () => {
     setLoading(true);
     try {
-      const result = await post(authnetication.user_permission_data, {});
-      console.log(result.data);
-      setUserIdRole(result.data.currentUserId);
-      setUserPermissionData(result.data.moduleWisePermissions)
-      console.log(userIdRole);
-
-      await storePermissionData(result.data);
-      setLoading(false);
+      const data = await getDecryptedPermissionData();
+      if (data) {
+        setUserIdRole(data.currentUserId);
+        setUserPermissionData(data.moduleWisePermissions)
+        await storePermissionData(data);
+      }
+      if (!data) {
+        const result = await post(authnetication.user_permission_data, {});
+        setUserIdRole(result.data.currentUserId);
+        setUserPermissionData(result.data.moduleWisePermissions)
+        await storePermissionData(result.data);
+        setLoading(false);
+      }
     } catch (error: any) {
       console.error(error);
       setLoading(false);

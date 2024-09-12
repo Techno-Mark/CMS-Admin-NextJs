@@ -35,6 +35,7 @@ type RenderExpandIconProps = {
 
 type Props = {
   scrollMenu: (container: any, isPerfectScrollbar: boolean) => void
+  permissionData:any
 }
 
 const RenderExpandIcon = ({ open, transitionDuration }: RenderExpandIconProps) => (
@@ -43,7 +44,9 @@ const RenderExpandIcon = ({ open, transitionDuration }: RenderExpandIconProps) =
   </StyledVerticalNavExpandIcon>
 )
 
-const VerticalMenu = ({ scrollMenu }: Props) => {
+const VerticalMenu = ({ scrollMenu,permissionData }: Props) => {
+  console.log(permissionData);
+  
   // Hooks
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
@@ -56,41 +59,41 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const { data: session } = useSession()
 
   // State to hold decrypted permission data
-  const [permissionData, setPermissionData] = useState<Record<string, string[]>>({})
+  // const [permissionData, setPermissionData] = useState<Record<string, string[]>>({})
   const [loading, setLoading] = useState(true) // Add loading state
 
   // Fetch decrypted data once on component mount
-  const fetchDecryptedData = async () => {
-    try {
-      const data = await getDecryptedPermissionData()
-      if (data) {
-        setPermissionData(data.moduleWisePermissions)
-      }
-    } catch (error) {
-      console.error('Error fetching decrypted data:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // const fetchDecryptedData = async () => {
+  //   try {
+  //     const data = await getDecryptedPermissionData()
+  //     if (data) {
+  //       setPermissionData(data.moduleWisePermissions)
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching decrypted data:', error)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
-  useEffect(() => {
-    setTimeout(() => {
+  // useEffect(() => {
+    // setTimeout(() => {
 
-      fetchDecryptedData() // Retrieve and decrypt the permission data on initial load
-    }, 3000);
-  }, [])
+      // fetchDecryptedData() // Retrieve and decrypt the permission data on initial load
+    // }, 3000);
+  // }, [])
 
   const hasPermission = (menuKey: string) => permissionData && permissionData[menuKey]
 
-  if (loading) {
-    return <div className=' ml-3'>
-      <Stack spacing={2}>
-        {Array.from({ length: 5 }).map((_, index) => (
-          <Skeleton key={index} variant="rounded" width={240} height={30} />
-        ))}
-      </Stack>
-    </div>
-  }
+  // if (loading) {
+  //   return <div className=' ml-3'>
+  //     <Stack spacing={2}>
+  //       {Array.from({ length: 5 }).map((_, index) => (
+  //         <Skeleton key={index} variant="rounded" width={240} height={30} />
+  //       ))}
+  //     </Stack>
+  //   </div>
+  // }
   return (
     <ScrollWrapper
       {...(isBreakpointReached

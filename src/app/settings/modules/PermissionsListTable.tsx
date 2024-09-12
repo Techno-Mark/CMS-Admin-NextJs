@@ -37,7 +37,7 @@ import BreadCrumbList from "@components/BreadCrumbList";
 import { PermissionsType } from "@/types/apps/permissionsType";
  
  
-import {  MenuItem } from "@mui/material";
+import {  Chip, MenuItem } from "@mui/material";
 import OpenDialogOnElementClick from "@/components/Dialogs/OpenDialogOnElementClick";
 import PermissionDialog from "./PermissionDialog";
 import { ModulesType } from "@/types/apps/modulesType";
@@ -162,47 +162,39 @@ const PermissionsListTable = ({
           </Typography>
         ),
       }),
-      // columnHelper.accessor("active", {
-      //   header: "Status",
-      //   cell: ({ row }) => (
-      //     <div className="flex items-center gap-3">
-      //       <Chip
-      //         variant="tonal"
-      //         className="capitalize"
-      //         label={row.original.active ? "Active" : "Inactive"}
-      //         color={row.original.active ? "success" : "error"}
-      //         size="small"
-      //       />
-      //     </div>
-      //   ),
-      // }),
-      // columnHelper.accessor("permissionId", {
-      //   header: "Action",
-      //   cell: ({ row }) => {
-      //     return (
-      //       <div className="flex items-center">
-      //         {/* <IconButton
-      //           onClick={() => {
-      //             setOpen(true);
-      //             setAddOpen(true);
-      //             setEditValue(row.original.permissionId);
-      //           }}
-      //         >
-      //           <i className="tabler-edit text-[22px] text-textSecondary" />
-      //         </IconButton> */}
-      //         <IconButton
-      //           onClick={() => {
-      //             setIsDeleting(true);
-      //             setDeletingId(row.original.permissionId);
-      //           }}
-      //         >
-      //           <i className="tabler-trash text-[22px] text-textSecondary" />
-      //         </IconButton>
-      //       </div>
-      //     );
-      //   },
-      //   enableSorting: false,
-      // }),
+      columnHelper.accessor("active", {
+        header: "Status",
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3">
+            <Chip
+              variant="tonal"
+              className="capitalize"
+              label={row.original.active ? "Active" : "Inactive"}
+              color={row.original.active ? "success" : "error"}
+              size="small"
+            />
+          </div>
+        ),
+      }),
+      columnHelper.accessor("moduleId", {
+        header: "Action",
+        cell: ({ row }) => {
+          return (
+            <div className="flex items-center">
+             
+              <IconButton
+                onClick={() => {
+                  setIsDeleting(true);
+                  setDeletingId(row.original.moduleId);
+                }}
+              >
+                <i className="tabler-trash text-[22px] text-textSecondary" />
+              </IconButton>
+            </div>
+          );
+        },
+        enableSorting: false,
+      }),
     ],
     []
   );
@@ -325,7 +317,7 @@ const PermissionsListTable = ({
         </div>
       </div>
       <Card>
-        <div className="overflow-x-auto h-[380px]">
+        <div className="">
           <table className={tableStyles.table}>
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (

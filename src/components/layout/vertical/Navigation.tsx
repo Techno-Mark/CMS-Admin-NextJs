@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 // MUI Imports
 import { styled, useColorScheme, useTheme } from '@mui/material/styles'
@@ -20,6 +20,9 @@ import { useSettings } from '@core/hooks/useSettings'
 
 // Style Imports
 import navigationCustomStyles from '@core/styles/vertical/navigationCustomStyles'
+import { getDecryptedPermissionData } from '@/utils/storageService'
+import { post } from '@/services/apiService'
+import { authnetication } from '@/services/endpoint/auth'
 
 type Props = {
   mode: Mode
@@ -45,6 +48,29 @@ const StyledBoxForShadow = styled('div')(({ theme }) => ({
 }))
 
 const Navigation = (props: Props) => {
+
+  const [permissionData, setPermissionData] = useState<Record<string, string[]>>({})
+  const fetchDecryptedData = async () => {
+    try {
+      const data = await getDecryptedPermissionData()
+      if (data) {
+        
+        
+        setPermissionData(data.moduleWisePermissions)
+      }
+
+      if(!data){
+        const result = await post(authnetication.user_permission_data, {});
+        setPermissionData(result.data.moduleWisePermissions)
+
+      }
+    } catch (error) {
+      console.error('Error fetching decrypted data:', error)
+    } 
+  }
+  useEffect(()=>{
+    fetchDecryptedData()
+  },[])
   // Props
   const { mode, systemMode } = props
 
@@ -121,7 +147,7 @@ const Navigation = (props: Props) => {
         )}
       </NavHeader>
       <StyledBoxForShadow ref={shadowRef} />
-      <VerticalMenu scrollMenu={scrollMenu} />
+      <VerticalMenu scrollMenu={scrollMenu} permissionData={permissionData} />
     </VerticalNav>
   )
 }

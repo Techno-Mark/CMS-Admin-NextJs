@@ -33,9 +33,6 @@ const initialData = {
 };
 
 const MenuForm = ({ open, handleClose, editingRow, permissionUser }: Props) => {
-console.log(permissionUser);
-
-
   const [loading, setLoading] = useState<boolean>(true);
 
   const [formData, setFormData] = useState<typeof initialData>(initialData);

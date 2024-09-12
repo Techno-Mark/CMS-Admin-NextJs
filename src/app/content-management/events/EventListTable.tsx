@@ -26,13 +26,11 @@ import CustomChip from "@/@core/components/mui/Chip";
 import { TemplateType } from "@/types/apps/templateType";
 import BreadCrumbList from "@/components/BreadCrumbList";
 import LoadingBackdrop from "@/components/LoadingBackdrop";
-import { truncateText } from "@/utils/common";
 import { eventsType } from "@/types/apps/eventType";
 import { event } from "@/services/endpoint/event";
 import ConfirmationDialog from "./ConfirmationDialog";
-import { usePermission } from "@/utils/permissions";
 import { authnetication } from "@/services/endpoint/auth";
-import { storePermissionData } from "@/utils/storageService";
+import { getDecryptedPermissionData, storePermissionData } from "@/utils/storageService";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -94,14 +92,19 @@ const BlogListTable = () => {
   const getPermissionModule = async () => {
     setLoading(true);
     try {
-      const result = await post(authnetication.user_permission_data, {});
-      console.log(result.data);
-      setUserIdRole(result.data.currentUserId);
-      setUserPermissionData(result.data.moduleWisePermissions)
-      console.log(userIdRole);
-
-      await storePermissionData(result.data);
-      setLoading(false);
+      const data = await getDecryptedPermissionData();
+      if (data) {
+        setUserIdRole(data.currentUserId);
+        setUserPermissionData(data.moduleWisePermissions)
+        await storePermissionData(data);
+      }
+      if (!data) {
+        const result = await post(authnetication.user_permission_data, {});
+        setUserIdRole(result.data.currentUserId);
+        setUserPermissionData(result.data.moduleWisePermissions)
+        await storePermissionData(result.data);
+        setLoading(false);
+      }
     } catch (error: any) {
       console.error(error);
       setLoading(false);

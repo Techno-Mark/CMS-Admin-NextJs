@@ -101,7 +101,6 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
       },
     });
 
-  //Effects
   useEffect(() => {
     getRequiredData();
   }, []);
@@ -165,8 +164,6 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
         setIsParamanent(editingRow?.data.isParamanent);
         setAllPages(editingRow?.data?.allPages);
         setSelectedPages(editingRow?.data?.selectedPages);
-
-        //set all pages option
         const preSelectedOptions = pagesData.filter((option: any) =>
           editingRow?.data?.selectedPages?.includes(option.pageId)
         );
@@ -198,7 +195,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
         selectedPages: selectedPages,
         isParamanent: isParamanent,
       };
-      //selected pages
+    
       //@ts-ignore
       data.selectedPages = selectedPages.map((item) => item.pageId);
 

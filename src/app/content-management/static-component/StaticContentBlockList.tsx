@@ -28,7 +28,7 @@ import LoadingBackdrop from "@/components/LoadingBackdrop";
 import { staticContentBlock } from "@/services/endpoint/staticContentBlock";
 import { staticContentBlockType } from "@/types/apps/staticContentBlockType";
 import { authnetication } from "@/services/endpoint/auth";
-import { storePermissionData } from "@/utils/storageService";
+import { getDecryptedPermissionData, storePermissionData } from "@/utils/storageService";
 import { useSession } from "next-auth/react";
 
 declare module "@tanstack/table-core" {
@@ -90,22 +90,39 @@ const StaticContentBlockList = () => {
   const getPermissionModule = async () => {
     setLoading(true);
     try {
-      const result = await post(authnetication.user_permission_data, {});
-      setUserIdRole(result.data.currentUserId);
-      setUserPermissionData(result.data.moduleWisePermissions)
-      console.log(result.data.currentUserId);
-      // if (userIdRole !== 1) {
-      //   if (hasCheckModule('Static Component')) {
-      //     router.push('/401-not-authorized');
-      //     return null;
-      //   }
-      // }
-      await storePermissionData(result.data);
-      setLoading(false);
+      const data = await getDecryptedPermissionData();
+      if (data) {
+        setUserIdRole(data.currentUserId);
+        setUserPermissionData(data.moduleWisePermissions)
+        await storePermissionData(data);
+      }
+      if (!data) {
+        const result = await post(authnetication.user_permission_data, {});
+        setUserIdRole(result.data.currentUserId);
+        setUserPermissionData(result.data.moduleWisePermissions)
+        await storePermissionData(result.data);
+        setLoading(false);
+      }
     } catch (error: any) {
       console.error(error);
       setLoading(false);
     }
+    // try {
+    //   const result = await post(authnetication.user_permission_data, {});
+    //   setUserIdRole(result.data.currentUserId);
+    //   setUserPermissionData(result.data.moduleWisePermissions)
+    //   // if (userIdRole !== 1) {
+    //   //   if (hasCheckModule('Static Component')) {
+    //   //     router.push('/401-not-authorized');
+    //   //     return null;
+    //   //   }
+    //   // }
+    //   await storePermissionData(result.data);
+    //   setLoading(false);
+    // } catch (error: any) {
+    //   console.error(error);
+    //   setLoading(false);
+    // }
   };
   function hasPermission(module: string, action: string) {
     if (userIdRole == 1) {
