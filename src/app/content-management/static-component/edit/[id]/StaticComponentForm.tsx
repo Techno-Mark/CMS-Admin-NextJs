@@ -203,6 +203,7 @@ function StaticComponentForm({
   }
 
   const commonComponentData = () => {
+    if(!formData) return
     return (
       <Grid item xs={12} sm={12}>
         <Card variant="outlined" style={{ marginBottom: "10px" }}>
@@ -265,9 +266,9 @@ function StaticComponentForm({
                                           {multipleSectionIndex + 1}{" "}
                                         </b>{" "}
                                         Entry of (
-                                        {formData.name +
+                                        {formData?.sectionName +
                                           " -> " +
-                                          sectionField.fieldLabel}
+                                          sectionField?.fieldLabel}
                                         )
                                       </Typography>
                                     </Grid>

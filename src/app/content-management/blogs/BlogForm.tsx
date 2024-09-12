@@ -291,10 +291,11 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
       errors.authorName = "author name must be at most 100 characters long";
       valid = false;
     }
-    if (!formData.description) {
+    if (!formData.description || formData.description.length < 15) {
       errors.description = "Please enter a description";
       valid = false;
     }
+
     if (!formData.tags.length) {
       errors.tags = "Please select or create new tags";
       valid = false;
@@ -601,12 +602,17 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
               />
             </Grid>
             <Grid item xs={12} sm={12}>
-              <p className="text-[#4e4b5a]">Description *</p>
+              <p className={`${!!formErrors.description ? 'text-red-600': ' text-[#4e4b5a]'}`}>Description *</p>
 
               <MyCKEditor
                 onChange={handleEditorChangeCKEditor}
                 initialValue={editingRow?.description}
               />
+              {
+                !!formErrors.description &&
+                <p className="text-red-600">{formErrors.description}</p>
+                
+              }
               {/* <div>
                 <div dangerouslySetInnerHTML={{ __html: formData.description }} />
               </div> */}
