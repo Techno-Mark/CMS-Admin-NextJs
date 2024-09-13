@@ -1,4 +1,5 @@
 // MUI Imports
+import React from "react"
 import Dialog from "@mui/material/Dialog"
 import DialogContent from "@mui/material/DialogContent"
 import DialogActions from "@mui/material/DialogActions"
@@ -6,7 +7,6 @@ import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
 import { toast } from "react-toastify"
 import { postDataToOrganizationAPIs } from "@/services/apiService"
-import { blogPost } from "@/services/endpoint/blogpost"
 import { media } from "@/services/endpoint/media"
 
 type ConfirmationDialogProps = {

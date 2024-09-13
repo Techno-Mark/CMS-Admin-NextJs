@@ -1,13 +1,11 @@
 "use client"
 
-import LoadingBackdrop from "@/components/LoadingBackdrop"
 import {
   Button,
   Box,
   Card,
   Grid,
   Avatar,
-  IconButton,
   CardActions,
   Typography,
   ButtonGroup,
@@ -15,25 +13,17 @@ import {
   CardContent
 } from "@mui/material"
 import CustomTextField from "@/@core/components/mui/TextField"
-import React, { ChangeEvent, useEffect, useState } from "react"
-import CustomAutocomplete from "@/@core/components/mui/Autocomplete"
-import { useRouter } from "next/navigation"
+import React, { useEffect, useState } from "react"
+
 import { useDropzone } from "react-dropzone"
 import {
   post,
-  postContentBlock,
   postDataToOrganizationAPIs
 } from "@/services/apiService"
 import { template } from "@/services/endpoint/template"
-import { blogPost } from "@/services/endpoint/blogpost"
 import { category } from "@/services/endpoint/category"
 import { tag } from "@/services/endpoint/tag"
-import { toast } from "react-toastify"
-import BreadCrumbList from "@/components/BreadCrumbList"
-import { blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType"
-import AppReactDatepicker from "@/libs/styles/AppReactDatepicker"
-import { Heading } from "lucide-react"
-import { formatDate } from "date-fns"
+import { blogDetailType } from "@/types/apps/blogsType"
 
 type blogFormPropsTypes = {
   open: number;
@@ -42,12 +32,12 @@ type blogFormPropsTypes = {
   handleSubmit:Function
 };
 
-const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
+// const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
 
-const sectionActions = {
-  ADD: -1,
-  EDIT: 1
-}
+// const sectionActions = {
+//   ADD: -1,
+//   EDIT: 1
+// }
 
 const initialFormData = {
   id: -1,
@@ -71,10 +61,6 @@ function SurveyPopupType({
   editingRow,
   handleSubmit
 }: blogFormPropsTypes) {
-  const router = useRouter()
-
-  const [popupType, setPopupType] = useState("Event")
-
   // state management hook
   const [image, setImage] = useState<File | null>(null)
   const [formData, setFormData] =
@@ -83,10 +69,10 @@ function SurveyPopupType({
     useState<typeof initialErrorData>(initialErrorData)
 
   // template list hooks & other list apis data
-  const [templateList, setTemplateList] = useState<
+  const [setTemplateList] = useState<
     [{ templateName: string; templateId: number }] | []
   >([])
-  const [loading, setLoading] = useState<boolean>(true)
+  const [setLoading] = useState<boolean>(true)
 
   // Custom Hooks
   const { getRootProps: getImageRootProps, getInputProps: getImageInputProps } =
@@ -105,8 +91,8 @@ function SurveyPopupType({
   useEffect(() => {
     async function getTemplate() {
       await getRequiredData()
-      if (editingRow && open == EDIT_BLOG) {
-      }
+      // if (editingRow && open == EDIT_BLOG) {
+      // }
     }
     getTemplate()
   }, [])
@@ -115,7 +101,7 @@ function SurveyPopupType({
   const getRequiredData = async () => {
     try {
       setLoading(true)
-      const [templateResponse, categoryResponse, tagResponse] =
+      const [templateResponse] =
         await Promise.all([
           post(`${template.active}`, {}),
           postDataToOrganizationAPIs(`${category.active}`, {}),
@@ -131,13 +117,13 @@ function SurveyPopupType({
   }
 
   // validation before submit
-  const validateForm = () => {
-    const valid = true
-    const errors = { ...initialErrorData }
+  // const validateForm = () => {
+  //   const valid = true
+  //   const errors = { ...initialErrorData }
 
-    setFormErrors(errors)
-    return valid
-  }
+  //   setFormErrors(errors)
+  //   return valid
+  // }
 
   return (
     <>

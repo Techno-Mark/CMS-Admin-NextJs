@@ -20,7 +20,6 @@ import { PagesType } from "./pagesType"
 import { pages } from "@/services/endpoint/pages"
 import { toast } from "react-toastify"
 import BreadCrumbList from "@/components/BreadCrumbList"
-import { title } from "process"
 
 const initialFormData = {
   pageId: "",
@@ -79,7 +78,7 @@ type Props = {
   permissionUser: Boolean
 };
 function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUser }: Props) {
-  const [isSlugManuallyEdited, setIsSlugManuallyEdited] =
+  const [setIsSlugManuallyEdited] =
     useState<boolean>(false)
 
   const [formData, setFormData] =
@@ -167,60 +166,61 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
   }
 
   // validate form and submit
-  const validateField = (value: string, validation: any, field?: any) => {
-    if (!value && field?.isRequired) {
-      return `${field?.fieldLabel} is required`
-    }
-    if (field?.fieldType == "email") {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(value)) {
-        return `Invalid email format`
-      }
-    }
+  // const validateField = (value: string, validation: any, field?: any) => {
+  //   if (!value && field?.isRequired) {
+  //     return `${field?.fieldLabel} is required`
+  //   }
+  //   if (field?.fieldType == "email") {
+  //     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  //     if (!emailRegex.test(value)) {
+  //       return `Invalid email format`
+  //     }
+  //   }
 
-    if (field?.fieldType === "file") {
-      const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i
-      const extendedUrlRegex = /^(https?|ftp):\/\/[^\s/$.?#].*[^\s]*\.[^\s]*$/i
-      if (!urlRegex.test(value) && !extendedUrlRegex.test(value)) {
-        return `Invalid URL format`
-      }
-    }
+  //   if (field?.fieldType === "file") {
+  //     const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i
+  //     const extendedUrlRegex = /^(https?|ftp):\/\/[^\s/$.?#].*[^\s]*\.[^\s]*$/i
+  //     if (!urlRegex.test(value) && !extendedUrlRegex.test(value)) {
+  //       return `Invalid URL format`
+  //     }
+  //   }
 
-    if (validation.maxLength && value.length > validation.maxLength) {
-      return `Maximum length is ${validation.maxLength}`
-    }
-    if (validation.minLength && value.length < validation.minLength) {
-      return `Minimum length is ${validation.minLength}`
-    }
-    if (validation.min !== undefined && validation.max !== undefined) {
-      if (parseFloat(value) > parseFloat(validation.max)) {
-        return `Maximum value is ${validation.max}`
-      }
-      if (parseFloat(value) < parseFloat(validation.min)) {
-        return `Minimum value is ${validation.min}`
-      }
-    } else {
-      if (
-        validation.min !== undefined &&
-        parseFloat(value) < parseFloat(validation.min)
-      ) {
-        return `Minimum value is ${validation.min}`
-      }
-      if (
-        validation.max !== undefined &&
-        parseFloat(value) > parseFloat(validation.max)
-      ) {
-        return `Maximum value is ${validation.max}`
-      }
-    }
-    if (validation.pattern) {
-      const patternRegex = new RegExp(validation.pattern)
-      if (!patternRegex.test(value)) {
-        return `Value does not match the required pattern`
-      }
-    }
-    return ""
-  }
+  //   if (validation.maxLength && value.length > validation.maxLength) {
+  //     return `Maximum length is ${validation.maxLength}`
+  //   }
+  //   if (validation.minLength && value.length < validation.minLength) {
+  //     return `Minimum length is ${validation.minLength}`
+  //   }
+  //   if (validation.min !== undefined && validation.max !== undefined) {
+  //     if (parseFloat(value) > parseFloat(validation.max)) {
+  //       return `Maximum value is ${validation.max}`
+  //     }
+  //     if (parseFloat(value) < parseFloat(validation.min)) {
+  //       return `Minimum value is ${validation.min}`
+  //     }
+  //   } else {
+  //     if (
+  //       validation.min !== undefined &&
+  //       parseFloat(value) < parseFloat(validation.min)
+  //     ) {
+  //       return `Minimum value is ${validation.min}`
+  //     }
+  //     if (
+  //       validation.max !== undefined &&
+  //       parseFloat(value) > parseFloat(validation.max)
+  //     ) {
+  //       return `Maximum value is ${validation.max}`
+  //     }
+  //   }
+  //   if (validation.pattern) {
+  //     const patternRegex = new RegExp(validation.pattern)
+  //     if (!patternRegex.test(value)) {
+  //       return `Value does not match the required pattern`
+  //     }
+  //   }
+  //   return ""
+  // }
+
   const validateForm = () => {
     let valid = true
     const errors = { ...initialErrorData }

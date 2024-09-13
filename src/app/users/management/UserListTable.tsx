@@ -25,7 +25,7 @@ import {
   getSortedRowModel,
   useReactTable
 } from "@tanstack/react-table"
-import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils"
+import { rankItem } from "@tanstack/match-sorter-utils"
 import tableStyles from "@core/styles/table.module.css"
 import { useRouter } from "next/navigation"
 import { getUsersList } from "@/services/endpoint/users/management"
@@ -36,12 +36,12 @@ import { userType } from "@/types/apps/userType"
 import ConfirmationDialog from "./ConfirmationDialog"
 
 declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
+  // interface FilterFns {
+  //   fuzzy: FilterFn<unknown>;
+  // }
+  // interface FilterMeta {
+  //   itemRank: RankingInfo;
+  // }
 }
 
 type EventTypeWithAction = userType & {
@@ -96,7 +96,7 @@ const UserListTable = () => {
 
   const [data, setData] = useState<userType[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
   const [totalRows, setTotalRows] = useState<number>(0)
@@ -130,7 +130,7 @@ const UserListTable = () => {
 
   useEffect(() => {
     const handleStorageUpdate = async () => {
-      const storedOrgName = localStorage.getItem('selectedOrgId')
+      // const storedOrgName = localStorage.getItem('selectedOrgId')
       const getData = async () => {
         setLoading(true)
         try {

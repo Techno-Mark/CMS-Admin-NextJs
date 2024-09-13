@@ -1,5 +1,5 @@
 // React Imports
-import { useEffect, useState, useMemo } from "react"
+import React, { useEffect, useState, useMemo } from "react"
 // MUI Imports
 import Card from "@mui/material/Card"
 import Typography from "@mui/material/Typography"
@@ -15,18 +15,15 @@ import {
   getCoreRowModel,
   useReactTable,
   getFilteredRowModel,
-
   getPaginationRowModel,
   getSortedRowModel
 } from "@tanstack/react-table"
 import type { ColumnDef, FilterFn } from "@tanstack/react-table"
-import type { RankingInfo } from "@tanstack/match-sorter-utils"
 // Component Imports
 import CustomTextField from "@core/components/mui/TextField"
 // Style Imports
 import tableStyles from "@core/styles/table.module.css"
 import ConfirmationDialog from "./ConfirmationDialog"
-import { useRouter } from "next/navigation"
 import BreadCrumbList from "@components/BreadCrumbList"
 // Type Imports
 import { RolesType } from "@/types/apps/rolesType"
@@ -38,12 +35,12 @@ import { getRoleList } from "@/services/endpoint/users/roles"
 import LoadingBackdrop from "@/components/LoadingBackdrop"
 
 declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
+  // interface FilterFns {
+  //   fuzzy: FilterFn<unknown>;
+  // }
+  // interface FilterMeta {
+  //   itemRank: RankingInfo;
+  // }
 }
 
 type RolesTypeWithAction = RolesType & {
@@ -125,7 +122,7 @@ const RolesListTable = ({
   const [rowSelection, setRowSelection] = useState({})
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
   const [totalRows, setTotalRows] = useState<number>(0)
@@ -162,10 +159,10 @@ const RolesListTable = ({
     function handleStorageUpdate() {
       getData()
     }
-    window.addEventListener('localStorageUpdate', handleStorageUpdate)
+    window.addEventListener("localStorageUpdate", handleStorageUpdate)
 
     return () => {
-      window.removeEventListener('localStorageUpdate', handleStorageUpdate)
+      window.removeEventListener("localStorageUpdate", handleStorageUpdate)
     }
   }, [page, pageSize, globalFilter, activeFilter])
 
@@ -214,7 +211,7 @@ const RolesListTable = ({
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
-              <Tooltip title={'Edit'}>
+              <Tooltip title={"Edit"}>
                 <IconButton
                   onClick={() => {
                     setEditId(row.original.roleId)
@@ -224,7 +221,7 @@ const RolesListTable = ({
                   <i className="tabler-edit text-[22px] text-textSecondary" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title={'Delete'}>
+              <Tooltip title={"Delete"}>
                 <IconButton
                   onClick={() => {
                     setIsDeleting(true)
@@ -280,12 +277,12 @@ const RolesListTable = ({
     if (deletingId === 0 || !openDialog) {
       getData()
     }
-    if (localStorage !== undefined) orgId = localStorage.getItem("selectedOrgId")
+    if (localStorage !== undefined) { orgId = localStorage.getItem("selectedOrgId") }
   }, [deletingId, openDialog])
 
   return (
     <>
-    <LoadingBackdrop isLoading={loading} />
+      <LoadingBackdrop isLoading={loading} />
       <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
         <BreadCrumbList />
         <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">

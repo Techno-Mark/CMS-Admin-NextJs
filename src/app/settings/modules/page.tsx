@@ -15,6 +15,10 @@ const page = () => {
   const [totalCount, setTotalCount] = useState<number>(0)
   const [permissionsData, setPermissionsData] = useState([])
 
+  useEffect(() => {
+    getList(initialBody)
+  }, [])
+
   const getList = async (body: any) => {
     try {
       const result = await post(modules.list, body)
@@ -24,10 +28,6 @@ const page = () => {
       console.error(error)
     }
   }
-
-  useEffect(() => {
-    getList(initialBody)
-  }, [])
 
   return (
     <>

@@ -22,7 +22,6 @@ import BreadCrumbList from "@/components/BreadCrumbList"
 import { popups } from "@/services/endpoint/popup"
 
 import { PopupTypes } from "./popupTypes"
-import dynamic from "next/dynamic"
 
 import EditorBasic from "@/components/EditorToolbar"
 
@@ -60,10 +59,10 @@ const validFileTypes = [
   "video/ogg"
 ]
 
-const sectionActions = {
-  ADD: -1,
-  EDIT: 1
-}
+// const sectionActions = {
+//   ADD: -1,
+//   EDIT: 1
+// }
 
 const initialFormData = {
   popupId: "",
@@ -235,18 +234,18 @@ function PopupForm({ open, handleClose, setEditingRow, editingRow }: Props) {
       }
     }
   }
-  const handleEditorChange = (content: string) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      description: content
-    }))
-    if (content?.length) {
-      setFormErrors((prevFormErrors) => ({
-        ...prevFormErrors,
-        description: ""
-      }))
-    }
-  }
+  // const handleEditorChange = (content: string) => {
+  //   setFormData((prevFormData) => ({
+  //     ...prevFormData,
+  //     description: content
+  //   }))
+  //   if (content?.length) {
+  //     setFormErrors((prevFormErrors) => ({
+  //       ...prevFormErrors,
+  //       description: ""
+  //     }))
+  //   }
+  // }
   const handleContentChange = (content: any) => {
     setFormData((prevData) => ({
       ...prevData,

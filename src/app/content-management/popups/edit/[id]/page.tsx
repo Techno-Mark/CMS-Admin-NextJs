@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect, useState } from "react"
-import PagesForm from "../../PagesForm"
 import { useRouter } from "next/navigation"
 import { post } from "@/services/apiService"
 import { PopupTypes } from "../../popupTypes"

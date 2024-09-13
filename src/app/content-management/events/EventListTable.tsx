@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
+import React, { useEffect, useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Card from "@mui/material/Card"
 import { MenuItem, TablePagination, TextFieldProps, Tooltip } from "@mui/material"
@@ -8,7 +8,7 @@ import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 import classnames from "classnames"
-import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils"
+import { rankItem } from "@tanstack/match-sorter-utils"
 import {
   createColumnHelper,
   flexRender,
@@ -26,21 +26,19 @@ import CustomChip from "@/@core/components/mui/Chip"
 import { TemplateType } from "@/types/apps/templateType"
 import BreadCrumbList from "@/components/BreadCrumbList"
 import LoadingBackdrop from "@/components/LoadingBackdrop"
-import { truncateText } from "@/utils/common"
 import { eventsType } from "@/types/apps/eventType"
 import { event } from "@/services/endpoint/event"
 import ConfirmationDialog from "./ConfirmationDialog"
-import { usePermission } from "@/utils/permissions"
 import { authnetication } from "@/services/endpoint/auth"
 import { storePermissionData } from "@/utils/storageService"
 
 declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
+  // interface FilterFns {
+  //   fuzzy: FilterFn<unknown>;
+  // }
+  // interface FilterMeta {
+  //   itemRank: RankingInfo;
+  // }
 }
 
 type EventTypeWithAction = eventsType & {
@@ -121,7 +119,7 @@ const BlogListTable = () => {
 
   const [data, setData] = useState<TemplateType[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
   const [totalRows, setTotalRows] = useState<number>(0)

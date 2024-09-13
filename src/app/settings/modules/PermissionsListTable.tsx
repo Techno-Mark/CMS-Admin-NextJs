@@ -4,8 +4,6 @@ import { useEffect, useState, useMemo } from "react"
 import Card from "@mui/material/Card"
 import Button, { ButtonProps } from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
-import IconButton from "@mui/material/IconButton"
-import TablePagination from "@mui/material/TablePagination"
 import type { TextFieldProps } from "@mui/material/TextField"
 // Third-party Imports
 import classnames from "classnames"
@@ -23,31 +21,27 @@ import {
   getSortedRowModel
 } from "@tanstack/react-table"
 import type { ColumnDef, FilterFn } from "@tanstack/react-table"
-import type { RankingInfo } from "@tanstack/match-sorter-utils"
 // Component Imports
-import TablePaginationComponent from "@components/TablePaginationComponent"
 import CustomTextField from "@core/components/mui/TextField"
 // Style Imports
 import tableStyles from "@core/styles/table.module.css"
 import ConfirmationDialog from "./ConfirmationDialog"
 
-import { useRouter } from "next/navigation"
 import BreadCrumbList from "@components/BreadCrumbList"
 // Type Imports
 import { PermissionsType } from "@/types/apps/permissionsType"
 
-import { MenuItem } from "@mui/material"
 import OpenDialogOnElementClick from "@/components/Dialogs/OpenDialogOnElementClick"
 import PermissionDialog from "./PermissionDialog"
 import { ModulesType } from "@/types/apps/modulesType"
 
 declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
+  // interface FilterFns {
+  //   fuzzy: FilterFn<unknown>;
+  // }
+  // interface FilterMeta {
+  //   itemRank: RankingInfo;
+  // }
 }
 
 type PermissionsTypeWithAction = ModulesType & {
@@ -124,7 +118,6 @@ const PermissionsListTable = ({
     search: string;
   };
 }) => {
-  const router = useRouter()
   // States
   const [open, setOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
@@ -132,7 +125,7 @@ const PermissionsListTable = ({
   const [deletingId, setDeletingId] = useState<number>(0)
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
   const [editValue, setEditValue] = useState<number>(0)
-  const [activeFilter, setActiveFilter] = useState<boolean | null>(null)
+  const [activeFilter] = useState<boolean | null>(null)
 
   // vars
   const buttonProps: ButtonProps = {

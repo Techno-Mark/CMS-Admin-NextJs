@@ -9,7 +9,6 @@ import { postDataToOrganizationAPIs } from "@/services/apiService"
 import { menu } from "@/services/endpoint/menu"
 import { toast } from "react-toastify"
 import ConfirmationDialog from "./ConfirmationDialog"
-import Image from "next/image"
 
 const MenuItem = ({
   menuData,
@@ -114,7 +113,7 @@ const MenuItem = ({
     setEditData({ index, parentId })
   }
 
-  const handleDelete = () => {}
+  // const handleDelete = () => {}
 
   const handleSubmit = async () => {
     try {

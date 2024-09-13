@@ -1,5 +1,4 @@
 import CustomTextField from "@/@core/components/mui/TextField"
-import TablePaginationComponent from "@/components/TablePaginationComponent"
 import {
   Button,
   Card,
@@ -37,7 +36,6 @@ import CustomChip from "@/@core/components/mui/Chip"
 import BreadCrumbList from "@/components/BreadCrumbList"
 import { post } from "@/services/apiService"
 import LoadingBackdrop from "@/components/LoadingBackdrop"
-import { usePermission } from "@/utils/permissions"
 import { authnetication } from "@/services/endpoint/auth"
 import { storePermissionData } from "@/utils/storageService"
 
@@ -116,7 +114,7 @@ const PageListTable = () => {
   const [rowSelection, setRowSelection] = useState({})
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
   const [totalRows, setTotalRows] = useState<number>(0)

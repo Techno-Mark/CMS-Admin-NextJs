@@ -239,8 +239,8 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
                   <td></td>
                   {Array.isArray(defaultData) &&
                     defaultData.length > 0 &&
-                    defaultData[0]?.permissions?.map((perm: any) => (
-                      <td className="!text-end pie-0 !pr-4">
+                    defaultData[0]?.permissions?.map((perm: any, index:any) => (
+                      <td key={index} className="!text-end pie-0 !pr-4">
                         <FormGroup className="flex-row justify-end flex-nowrap gap-6">
                           <FormControlLabel
                             key={perm.id}
@@ -264,8 +264,8 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
                             {module.moduleName}
                           </Typography>
                         </td>
-                        {module.permissions.map((perm: any) => (
-                          <td className="!text-end pie-0 !pr-4">
+                        {module.permissions.map((perm: any, index:any) => (
+                          <td key={index} className="!text-end pie-0 !pr-4">
                             <FormGroup className="flex-row justify-end flex-nowrap gap-6">
                               <FormControlLabel
                                 key={perm.id}

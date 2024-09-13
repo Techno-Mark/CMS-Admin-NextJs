@@ -1,6 +1,5 @@
 // Next Imports
 import type { Metadata } from 'next'
-import { useRouter } from 'next/router'
 
 // Server Action Imports
 import { getServerMode } from '@core/utils/serverHelpers'

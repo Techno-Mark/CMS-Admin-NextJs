@@ -6,14 +6,12 @@ import {
   Box,
   Card,
   Grid,
-  MenuItem,
   Typography,
   Avatar,
   IconButton
 } from "@mui/material"
 import CustomTextField from "@/@core/components/mui/TextField"
-import React, { ChangeEvent, useEffect, useState } from "react"
-import CustomAutocomplete from "@/@core/components/mui/Autocomplete"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useDropzone } from "react-dropzone"
 import {
@@ -85,15 +83,15 @@ function PopupForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
   // Error Handler Hooks
   const [formErrors, setFormErrors] =
     useState<typeof initialErrorData>(initialErrorData)
-  const [isSlugManuallyEdited, setIsSlugManuallyEdited] =
+  const [isSlugManuallyEdited] =
     useState<boolean>(false)
 
   // template list hooks & other list apis data
-  const [templateList, setTemplateList] = useState<
+  const [setTemplateList] = useState<
     [{ templateName: string; templateId: number }] | []
   >([])
-  const [tagsList, setTagsList] = useState<[string] | []>([])
-  const [categoryList, setCategoryList] = useState<[string] | []>([])
+  const [setTagsList] = useState<[string] | []>([])
+  const [setCategoryList] = useState<[string] | []>([])
   const [loading, setLoading] = useState<boolean>(true)
 
   // Custom Hooks

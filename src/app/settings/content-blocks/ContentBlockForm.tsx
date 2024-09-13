@@ -26,7 +26,6 @@ import { toast } from "react-toastify"
 import { section } from "@/services/endpoint/section"
 import LoadingBackdrop from "@/components/LoadingBackdrop"
 import BreadCrumbList from "@/components/BreadCrumbList"
-import { SyntheticEvent } from "react-draft-wysiwyg"
 
 const tooltipContent = {
   pattern: "[A-Za-z]{3,10}",
@@ -101,7 +100,7 @@ const ContentBlockForm = ({ open }: Props) => {
   }>(initialErrorData)
   const [loading, setLoading] = useState<boolean>(true)
   const query = usePathname().split("/")
-  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false)
+  const [setIsSlugManuallyEdited] = useState<boolean>(false)
   const [expanded, setExpanded] = useState(true)
   const [editAllow, setEditAllow] = useState(false)
   const [initialIsCommon, setInitialIsCommon] = useState(false)

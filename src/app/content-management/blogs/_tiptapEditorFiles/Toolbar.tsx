@@ -18,7 +18,6 @@ import {
   Quote,
   Undo,
   Redo,
-  Code,
   Code2,
   Minus
 } from "lucide-react"

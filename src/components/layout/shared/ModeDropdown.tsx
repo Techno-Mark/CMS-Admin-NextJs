@@ -1,21 +1,21 @@
-import { useRef, useState, useEffect } from 'react'
-import Badge from '@mui/material/Badge'
-import Avatar from '@mui/material/Avatar'
-import Popper from '@mui/material/Popper'
-import Fade from '@mui/material/Fade'
-import Paper from '@mui/material/Paper'
-import ClickAwayListener from '@mui/material/ClickAwayListener'
-import MenuList from '@mui/material/MenuList'
-import MenuItem from '@mui/material/MenuItem'
-import Typography from '@mui/material/Typography'
+import React, { useRef, useState, useEffect } from "react"
+import Badge from "@mui/material/Badge"
+import Avatar from "@mui/material/Avatar"
+import Popper from "@mui/material/Popper"
+import Fade from "@mui/material/Fade"
+import Paper from "@mui/material/Paper"
+import ClickAwayListener from "@mui/material/ClickAwayListener"
+import MenuList from "@mui/material/MenuList"
+import MenuItem from "@mui/material/MenuItem"
+import Typography from "@mui/material/Typography"
 
 // Hook Imports
-import { useSettings } from '@core/hooks/useSettings'
+import { useSettings } from "@core/hooks/useSettings"
 
 // API Imports
 import { organization } from "@/services/endpoint/organization"
 import { post } from "@/services/apiService"
-import { setLocalStorageItem } from '@/utils/localStorageHelper'
+import { setLocalStorageItem } from "@/utils/localStorageHelper"
 
 interface Organization {
   id: string;
@@ -28,8 +28,13 @@ const ModeDropdown = () => {
   const [selectedOrgId, setSelectedOrgId] = useState<any | null>(null)
   const anchorRef1 = useRef<HTMLDivElement>(null)
   const { settings } = useSettings()
-  const selectedOrgName = organizations.find((org) => org.id === selectedOrgId)?.name || 'Select Organization'
-  const avatarText = selectedOrgName.split(' ').map((n) => n[0]).join('')
+  const selectedOrgName =
+    organizations.find((org) => org.id === selectedOrgId)?.name ||
+    "Select Organization"
+  const avatarText = selectedOrgName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
 
   useEffect(() => {
     const fetchOrganizations = async () => {
@@ -38,24 +43,26 @@ const ModeDropdown = () => {
         const orgs = response.data.organizations as Organization[]
         setOrganizations(orgs)
 
-        const storedOrgId = localStorage.getItem('selectedOrgId')
+        const storedOrgId = localStorage.getItem("selectedOrgId")
 
         if (storedOrgId) {
           const parsedOrgId = parseInt(storedOrgId, 10)
-          const matchingOrg = orgs.find(org => parseInt(org.id) === parsedOrgId)
+          const matchingOrg = orgs.find(
+            (org) => parseInt(org.id) === parsedOrgId
+          )
 
           if (matchingOrg) {
             setSelectedOrgId(parsedOrgId)
           } else if (orgs.length > 0) {
             setSelectedOrgId(orgs[0].id)
-            setLocalStorageItem('selectedOrgId', orgs[0].id)
+            setLocalStorageItem("selectedOrgId", orgs[0].id)
           }
         } else if (orgs.length > 0) {
           setSelectedOrgId(orgs[0].id)
-          setLocalStorageItem('selectedOrgId', orgs[0].id)
+          setLocalStorageItem("selectedOrgId", orgs[0].id)
         }
       } catch (error) {
-        console.error('Error fetching organizations:', error)
+        console.error("Error fetching organizations:", error)
       }
     }
 
@@ -74,7 +81,7 @@ const ModeDropdown = () => {
     event.preventDefault()
     setSelectedOrgId(orgId)
     // localStorage.setItem('selectedOrgId', orgId);
-    setLocalStorageItem('selectedOrgId', orgId)
+    setLocalStorageItem("selectedOrgId", orgId)
     // window.location.reload();
     handleClose()
   }
@@ -84,17 +91,22 @@ const ModeDropdown = () => {
       <Badge
         ref={anchorRef1}
         overlap="circular"
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         className="mis-2 flex items-center justify-center cursor-pointer"
         onClick={handleToggle1}
       >
-        <Avatar alt={selectedOrgName} className="cursor-pointer bs-[38px] is-[38px]">
+        <Avatar
+          alt={selectedOrgName}
+          className="cursor-pointer bs-[38px] is-[38px]"
+        >
           {avatarText}
         </Avatar>
         <Typography className="font-medium ml-2 mr-1" color="text.primary">
           {selectedOrgName}
         </Typography>
-        <i className={`tabler-chevron-down ${open ? 'transform rotate-180' : ''}`} />
+        <i
+          className={`tabler-chevron-down ${open ? "transform rotate-180" : ""}`}
+        />
       </Badge>
       <Popper
         open={open}
@@ -108,10 +120,15 @@ const ModeDropdown = () => {
           <Fade
             {...TransitionProps}
             style={{
-              transformOrigin: placement === 'bottom-start' ? 'left top' : 'right top'
+              transformOrigin:
+                placement === "bottom-start" ? "left top" : "right top"
             }}
           >
-            <Paper className={settings.skin === 'bordered' ? 'border shadow-none' : 'shadow-lg'}>
+            <Paper
+              className={
+                settings.skin === "bordered" ? "border shadow-none" : "shadow-lg"
+              }
+            >
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList onKeyDown={handleClose}>
                   {organizations.map((org) => (

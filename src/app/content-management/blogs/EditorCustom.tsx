@@ -65,9 +65,7 @@ import {
   TableColumnResize,
   TableProperties,
   TableToolbar,
-  TextPartLanguage,
   TextTransformation,
-  Title,
   TodoList,
   Underline,
   Undo

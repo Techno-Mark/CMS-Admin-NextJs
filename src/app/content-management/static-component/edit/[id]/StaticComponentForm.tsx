@@ -29,39 +29,39 @@ type staticContentBlockFormPropsTypes = {
   permissionUser: Boolean
 };
 
-const initialFormData = {
-  id: -1,
-  templateId: -1,
-  title: "",
-  subTitle: "",
-  slug: "",
-  authorName: "",
-  categories: [] as string[],
-  tags: [] as string[],
-  description: "",
-  status: 0,
-  metaTitle: "",
-  metaDescription: "",
-  metaKeywords: ""
-}
+// const initialFormData = {
+//   id: -1,
+//   templateId: -1,
+//   title: "",
+//   subTitle: "",
+//   slug: "",
+//   authorName: "",
+//   categories: [] as string[],
+//   tags: [] as string[],
+//   description: "",
+//   status: 0,
+//   metaTitle: "",
+//   metaDescription: "",
+//   metaKeywords: ""
+// }
 
-const initialErrorData = {
-  templateId: "",
-  title: "",
-  subTitle: "",
-  slug: "",
-  authorName: "",
-  bannerImageError: "",
-  thumbnailImageError: "",
-  authorImageUrl: "",
-  categories: "",
-  tags: "",
-  description: "",
-  status: "",
-  metaTitle: "",
-  metaDescription: "",
-  metaKeywords: ""
-}
+// const initialErrorData = {
+//   templateId: "",
+//   title: "",
+//   subTitle: "",
+//   slug: "",
+//   authorName: "",
+//   bannerImageError: "",
+//   thumbnailImageError: "",
+//   authorImageUrl: "",
+//   categories: "",
+//   tags: "",
+//   description: "",
+//   status: "",
+//   metaTitle: "",
+//   metaDescription: "",
+//   metaKeywords: ""
+// }
 
 function StaticComponentForm({
   sectionSchema: formData,

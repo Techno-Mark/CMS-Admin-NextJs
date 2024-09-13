@@ -1,14 +1,14 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
+import React, { useEffect, useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Card from "@mui/material/Card"
-import { Avatar, Badge, Chip, Divider, FormControl, InputLabel, MenuItem, Select, Switch, TablePagination, TextFieldProps, Tooltip } from "@mui/material"
+import { MenuItem, TablePagination, TextFieldProps, Tooltip } from "@mui/material"
 import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 import classnames from "classnames"
-import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils"
+import { rankItem } from "@tanstack/match-sorter-utils"
 import {
   createColumnHelper,
   flexRender,
@@ -31,12 +31,12 @@ import LoadingBackdrop from "@/components/LoadingBackdrop"
 import { truncateText } from "@/utils/common"
 
 declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
+  // interface FilterFns {
+  //   fuzzy: FilterFn<unknown>;
+  // }
+  // interface FilterMeta {
+  //   itemRank: RankingInfo;
+  // }
 }
 
 type TemplateTypeWithAction = TemplateType & {
@@ -91,7 +91,7 @@ const TemplateListTable = () => {
 
   const [data, setData] = useState<TemplateType[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
   const [totalRows, setTotalRows] = useState<number>(0)

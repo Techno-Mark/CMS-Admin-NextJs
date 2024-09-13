@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
+import React, { useEffect, useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Card from "@mui/material/Card"
 import { MenuItem, TablePagination, TextFieldProps, Tooltip } from "@mui/material"
@@ -8,7 +8,7 @@ import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 import classnames from "classnames"
-import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils"
+import { rankItem } from "@tanstack/match-sorter-utils"
 import {
   createColumnHelper,
   flexRender,
@@ -31,17 +31,16 @@ import { truncateText } from "@/utils/common"
 import { blogsType } from "@/types/apps/blogsType"
 import { blogPost } from "@/services/endpoint/blogpost"
 import ConfirmationDialog from "./ConfirmationDialog"
-import { usePermission } from "@/utils/permissions"
 import { authnetication } from "@/services/endpoint/auth"
 import { storePermissionData } from "@/utils/storageService"
 
 declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
+  // interface FilterFns {
+  //   fuzzy: FilterFn<unknown>;
+  // }
+  // interface FilterMeta {
+  //   itemRank: RankingInfo;
+  // }
 }
 
 type BlogTypeWithAction = blogsType & {

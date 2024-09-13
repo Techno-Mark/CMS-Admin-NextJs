@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
+import React, { useEffect, useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Card from "@mui/material/Card"
 import { TablePagination, TextFieldProps, Tooltip } from "@mui/material"
 import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 import classnames from "classnames"
-import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils"
+import { rankItem } from "@tanstack/match-sorter-utils"
 import {
   createColumnHelper,
   flexRender,
@@ -31,12 +31,12 @@ import { authnetication } from "@/services/endpoint/auth"
 import { storePermissionData } from "@/utils/storageService"
 
 declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
+  // interface FilterFns {
+  //   fuzzy: FilterFn<unknown>;
+  // }
+  // interface FilterMeta {
+  //   itemRank: RankingInfo;
+  // }
 }
 
 type StaticComponentTypeWithAction = staticContentBlockType & {
@@ -122,11 +122,11 @@ const StaticContentBlockList = () => {
 
   const [data, setData] = useState<TemplateType[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
   const [totalRows, setTotalRows] = useState<number>(0)
-  const [activeFilter, setActiveFilter] = useState<boolean | null>(null)
+  const [activeFilter] = useState<boolean | null>(null)
 
   const getData = async () => {
     setLoading(true)

@@ -4,8 +4,6 @@ import { useEffect, useState, useMemo } from "react"
 import Card from "@mui/material/Card"
 import Button, { ButtonProps } from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
-import IconButton from "@mui/material/IconButton"
-import TablePagination from "@mui/material/TablePagination"
 import type { TextFieldProps } from "@mui/material/TextField"
 // Third-party Imports
 import classnames from "classnames"
@@ -23,34 +21,26 @@ import {
   getSortedRowModel
 } from "@tanstack/react-table"
 import type { ColumnDef, FilterFn } from "@tanstack/react-table"
-import type { RankingInfo } from "@tanstack/match-sorter-utils"
 // Component Imports
-import TablePaginationComponent from "@components/TablePaginationComponent"
 import CustomTextField from "@core/components/mui/TextField"
 // Style Imports
 import tableStyles from "@core/styles/table.module.css"
 import ConfirmationDialog from "./ConfirmationDialog"
 
-import { useRouter } from "next/navigation"
 import BreadCrumbList from "@components/BreadCrumbList"
 // Type Imports
 import { PermissionsType } from "@/types/apps/permissionsType"
-import {
-  redirectToAddPage,
-  redirectToEditPage
-} from "@/services/endpoint/users/roles"
-import { formatDate } from "@/utils/formatDate"
-import { Chip, MenuItem } from "@mui/material"
+import { MenuItem } from "@mui/material"
 import OpenDialogOnElementClick from "@/components/Dialogs/OpenDialogOnElementClick"
 import PermissionDialog from "./PermissionDialog"
 
 declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
+  // interface FilterFns {
+  //   fuzzy: FilterFn<unknown>;
+  // }
+  // interface FilterMeta {
+  //   itemRank: RankingInfo;
+  // }
 }
 
 type PermissionsTypeWithAction = PermissionsType & {
@@ -129,7 +119,6 @@ const PermissionsListTable = ({
     search: string;
   };
 }) => {
-  const router = useRouter()
   // States
   const [open, setOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)

@@ -45,7 +45,7 @@ const page = () => {
 
   useEffect(() => {
     const handleStorageUpdate = async () => {
-      const storedOrgName = localStorage.getItem('selectedOrgId')
+      // const storedOrgName = localStorage.getItem('selectedOrgId')
       const getList = async (body: any) => {
         try {
           const result = await post(getRoleList, body)

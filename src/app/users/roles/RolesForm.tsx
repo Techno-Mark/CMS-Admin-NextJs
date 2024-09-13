@@ -1,5 +1,5 @@
 // React Imports
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 // MUI Imports
 import Button from "@mui/material/Button"
 // Component Imports
@@ -8,11 +8,10 @@ import BreadCrumbList from "@components/BreadCrumbList"
 import CustomTextField from "@core/components/mui/TextField"
 
 import { toast } from "react-toastify"
-import { post, get } from "@/services/apiService"
+import { post } from "@/services/apiService"
 import { usePathname, useRouter } from "next/navigation"
 import { ADD_ROLE, EDIT_ROLE, RolesType } from "@/types/apps/rolesType"
 import { createRole, updateRole } from "@/services/endpoint/users/roles"
-import { getSectionById } from "@/services/endpoint/content-block"
 
 type Props = {
   open: ADD_ROLE | EDIT_ROLE;
@@ -122,8 +121,8 @@ const RolesForm = ({ open }: Props) => {
 
   const getSectionDataById = async (slug: string | number) => {
     try {
-      const result = await get(getSectionById(slug))
-      const { data } = result
+      // const result = await get(getSectionById(slug))
+      // const { data } = result
 
       setFormData({
         ...formData,

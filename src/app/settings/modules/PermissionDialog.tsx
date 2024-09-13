@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react"
 // MUI Imports
 import Dialog from "@mui/material/Dialog"
 import DialogTitle from "@mui/material/DialogTitle"
@@ -5,18 +6,13 @@ import DialogContent from "@mui/material/DialogContent"
 import DialogActions from "@mui/material/DialogActions"
 import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
-import FormControlLabel from "@mui/material/FormControlLabel"
-import Switch from "@mui/material/Switch"
 
 // Component Imports
 import CustomTextField from "@core/components/mui/TextField"
 import DialogCloseButton from "../../../components/Dialogs/DialogCloseButton"
-import { useEffect, useState } from "react"
 import { get, post } from "@/services/apiService"
 import {
-  createPermission,
-  getPermissionById,
-  updatePermission
+  getPermissionById
 } from "@/services/endpoint/users/permissions"
 import { toast } from "react-toastify"
 import { modules } from "@/services/endpoint/modules"
