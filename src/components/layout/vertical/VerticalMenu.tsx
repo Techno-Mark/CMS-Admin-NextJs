@@ -169,7 +169,7 @@ const VerticalMenu = ({ scrollMenu,permissionData }: Props) => {
           </MenuItem>)}
         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Static Component')) && (
-          <MenuItem href={`/content-management/static-component`} icon={<i className='tabler-file-upload'></i>}>
+          <MenuItem href={`/content-management/static-component`} icon={<i className='tabler-file-stack'></i>}>
             Static Component
           </MenuItem>)}
         {/* @ts-ignore */}
