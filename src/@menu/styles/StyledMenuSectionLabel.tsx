@@ -19,11 +19,9 @@ const StyledMenuSectionLabel = styled.span<StyledMenuSectionLabelProps>`
       white-space: nowrap;
     `};
   ${({ isCollapsed, isHovered }) =>
-    !isCollapsed || (isCollapsed && isHovered)
-      ? `
+    !isCollapsed || (isCollapsed && isHovered) ? `
 flex-grow: 1;
-`
-      : ''}
+` : ''}
   ${({ rootStyles }) => rootStyles};
 `
 

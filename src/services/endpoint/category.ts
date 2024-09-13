@@ -1,4 +1,4 @@
-const commonPrefix = "organization/category";
+const commonPrefix = "organization/category"
 
 export const category = {
   list: `${commonPrefix}/list`,
@@ -6,5 +6,5 @@ export const category = {
   active: `${commonPrefix}/active`,
   update: `${commonPrefix}/update`,
   getById: `${commonPrefix}/getById`,
-  delete: `${commonPrefix}/delete`,
-};
+  delete: `${commonPrefix}/delete`
+}

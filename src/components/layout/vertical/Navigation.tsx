@@ -105,8 +105,8 @@ const Navigation = (props: Props) => {
       // when semiDark is enabled and the mode or systemMode is light
       {...(isSemiDark &&
         !isDark && {
-          'data-mui-color-scheme': 'dark'
-        })}
+        'data-mui-color-scheme': 'dark'
+      })}
     >
       {/* Nav Header including Logo & nav toggle icons  */}
       <NavHeader>

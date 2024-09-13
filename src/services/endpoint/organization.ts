@@ -4,5 +4,5 @@ export const organization = {
   update: `master-organization/update`,
   getById: `master-organization/getById`,
   delete: `master-organization/delete`,
-  active: `master-organization/active`,
-};
+  active: `master-organization/active`
+}

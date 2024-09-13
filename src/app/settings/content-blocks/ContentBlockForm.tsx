@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"
 import {
   Button,
   Box,
@@ -16,26 +16,26 @@ import {
   Typography,
   Accordion,
   AccordionDetails,
-  AccordionSummary,
-} from "@mui/material";
-import CustomTextField from "@/@core/components/mui/TextField";
-import CustomAutocomplete from "@/@core/components/mui/Autocomplete";
-import { get, post } from "@/services/apiService";
-import { usePathname, useRouter } from "next/navigation";
-import { toast } from "react-toastify";
-import { section } from "@/services/endpoint/section";
-import LoadingBackdrop from "@/components/LoadingBackdrop";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import { SyntheticEvent } from "react-draft-wysiwyg";
+  AccordionSummary
+} from "@mui/material"
+import CustomTextField from "@/@core/components/mui/TextField"
+import CustomAutocomplete from "@/@core/components/mui/Autocomplete"
+import { get, post } from "@/services/apiService"
+import { usePathname, useRouter } from "next/navigation"
+import { toast } from "react-toastify"
+import { section } from "@/services/endpoint/section"
+import LoadingBackdrop from "@/components/LoadingBackdrop"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import { SyntheticEvent } from "react-draft-wysiwyg"
 
 const tooltipContent = {
-  "pattern": "[A-Za-z]{3,10}",
-  "maxLength": 10,
-  "minLength": 3,
+  pattern: "[A-Za-z]{3,10}",
+  maxLength: 10,
+  minLength: 3
   // "min": "01",
   // "max": "100",
   // "accept": ".jpg, .jpeg, .png",
-};
+}
 
 const fieldTypeOptions = [
   // { label: 'email', value: 'email' },
@@ -46,31 +46,31 @@ const fieldTypeOptions = [
   // { label: 'number', value: 'number' },
   // { label: 'textarea', value: 'textarea' },
   { label: 'Multiple', value: 'multiple' }
-];
+]
 
 const fieldTypeOptionsForMultiple = [
   // { label: 'email', value: 'email' },
   // { label: 'file', value: 'file' },
-  { label: 'text', value: 'text' },
+  { label: 'text', value: 'text' }
   // { label: 'url', value: 'url' },
   // { label: 'date', value: 'date' },
   // { label: 'number', value: 'number' },
   // { label: 'textarea', value: 'textarea' }
-];
+]
 
 const sectionActions = {
   ADD: -1,
-  EDIT: 1,
-};
+  EDIT: 1
+}
 
 const initialData = {
   id: 0,
   name: "",
   slug: "",
-  jsonContent: [{ fieldType: "", fieldLabel: "", fekey:"", isRequired: false, validation: "{}" }],
+  jsonContent: [{ fieldType: "", fieldLabel: "", fekey: "", isRequired: false, validation: "{}" }],
   status: false,
-  isCommon:false
-};
+  isCommon: false
+}
 
 type Props = {
   open: number;
@@ -79,8 +79,8 @@ type Props = {
 const initialErrorData = {
   name: "",
   slug: "",
-  jsonContent: [],
-};
+  jsonContent: []
+}
 
 type FormDataType = {
   id: number;
@@ -92,157 +92,155 @@ type FormDataType = {
 };
 
 const ContentBlockForm = ({ open }: Props) => {
-  const router = useRouter();
-  const [formData, setFormData] = useState<FormDataType>(initialData);
+  const router = useRouter()
+  const [formData, setFormData] = useState<FormDataType>(initialData)
   const [formErrors, setFormErrors] = useState<{
     name: string;
     slug: string;
     jsonContent: string[];
-  }>(initialErrorData);
-  const [loading, setLoading] = useState<boolean>(true);
-  const query = usePathname().split("/");
-  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false);
+  }>(initialErrorData)
+  const [loading, setLoading] = useState<boolean>(true)
+  const query = usePathname().split("/")
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false)
   const [expanded, setExpanded] = useState(true)
-  const [editAllow, setEditAllow] = useState(false);
-  const [initialIsCommon, setInitialIsCommon] = useState(false);
+  const [editAllow, setEditAllow] = useState(false)
+  const [initialIsCommon, setInitialIsCommon] = useState(false)
   useEffect(() => {
     if (formData.jsonContent.length === 0) {
-      handleAddRow();
+      handleAddRow()
     }
-  }, []);
+  }, [])
 
   const handleAddRow = () => {
-    const newField = { fieldType: "", fieldLabel: "", isRequired: false, validation: "{}" };
-    setFormData({ ...formData, jsonContent: [...formData.jsonContent, newField] });
-  };
+    const newField = { fieldType: "", fieldLabel: "", isRequired: false, validation: "{}" }
+    setFormData({ ...formData, jsonContent: [...formData.jsonContent, newField] })
+  }
   const handleRemoveRow = (index: number) => {
     if (formData.jsonContent.length > 1) {
-      const updatedFields = formData.jsonContent.filter((_, idx) => idx !== index);
-      setFormData({ ...formData, jsonContent: updatedFields });
+      const updatedFields = formData.jsonContent.filter((_, idx) => idx !== index)
+      setFormData({ ...formData, jsonContent: updatedFields })
     }
-  };
+  }
 
   const handleChangeField = (index: number, field: string, value: any, subIndex?: number) => {
-  
-    const updatedFields = [...formData.jsonContent];
+    const updatedFields = [...formData.jsonContent]
     if (subIndex !== undefined) {
-      updatedFields[index].multipleData[subIndex][field] = value;
+      updatedFields[index].multipleData[subIndex][field] = value
     } else {
-      updatedFields[index][field] = value;
+      updatedFields[index][field] = value
 
       if (field === "validation") {
         try {
-          JSON.parse(value);
+          JSON.parse(value)
           setFormErrors({
             ...formErrors,
             jsonContent: {
               ...formErrors.jsonContent,
-              [index]: "",
-            },
-          });
+              [index]: ""
+            }
+          })
         } catch (error) {
           setFormErrors({
             ...formErrors,
             jsonContent: {
               ...formErrors.jsonContent,
-              [index]: "Validation should be a valid JSON object.",
-            },
-          });
+              [index]: "Validation should be a valid JSON object."
+            }
+          })
         }
       }
 
       if (field === "fieldType" && value === "multiple") {
-        updatedFields[index].multipleData = [{ fieldType: "", fieldLabel: "",fekey:"", isRequired: false, validation: "{}" }];
+        updatedFields[index].multipleData = [{ fieldType: "", fieldLabel: "", fekey: "", isRequired: false, validation: "{}" }]
       }
     }
 
-    setFormData({ ...formData, jsonContent: updatedFields });
-  };
+    setFormData({ ...formData, jsonContent: updatedFields })
+  }
   const handleAddSubRow = (parentIndex: number) => {
-    const newSubField = { fieldType: "", fieldLabel: "",fekey:"", isRequired: false, validation: "{}" };
-    const updatedFields = [...formData.jsonContent];
-    updatedFields[parentIndex].multipleData.push(newSubField);
-    setFormData({ ...formData, jsonContent: updatedFields });
-  };
-
-  const handleRemoveSubRow = (parentIndex: number, subIndex: number) => {
-    const updatedFields = [...formData.jsonContent];
-    if (updatedFields[parentIndex].multipleData.length > 1) {
-      updatedFields[parentIndex].multipleData = updatedFields[parentIndex].multipleData.filter((_: any, idx: any) => idx !== subIndex);
-      setFormData({ ...formData, jsonContent: updatedFields });
-    }
-  };
-  const validateFormData = (data: FormDataType) => {
-    let isValid = true;
-    let errors = {
-      name: '',
-      slug: '',
-      jsonContent: data.jsonContent.map(() => ''),
-    };
-
-    const slugRegex = /^[a-zA-Z0-9]+$/;
-
-    if (data.name.trim().length === 0) {
-      errors.name = 'Full Name is required';
-      isValid = false;
-    }
-
-     if (data.slug.trim().length === 0) {
-    errors.slug = 'Section Slug is required';
-    isValid = false;
-  } else if (!slugRegex.test(data.slug)) {
-    errors.slug = 'Section Slug must be alphanumeric with no spaces or special characters.';
-    isValid = false;
+    const newSubField = { fieldType: "", fieldLabel: "", fekey: "", isRequired: false, validation: "{}" }
+    const updatedFields = [...formData.jsonContent]
+    updatedFields[parentIndex].multipleData.push(newSubField)
+    setFormData({ ...formData, jsonContent: updatedFields })
   }
 
+  const handleRemoveSubRow = (parentIndex: number, subIndex: number) => {
+    const updatedFields = [...formData.jsonContent]
+    if (updatedFields[parentIndex].multipleData.length > 1) {
+      updatedFields[parentIndex].multipleData = updatedFields[parentIndex].multipleData.filter((_: any, idx: any) => idx !== subIndex)
+      setFormData({ ...formData, jsonContent: updatedFields })
+    }
+  }
+  const validateFormData = (data: FormDataType) => {
+    let isValid = true
+    const errors = {
+      name: '',
+      slug: '',
+      jsonContent: data.jsonContent.map(() => '')
+    }
 
-    setFormErrors({ ...formErrors, ...errors });
-    setLoading(false);
-    return isValid;
-  };
+    const slugRegex = /^[a-zA-Z0-9]+$/
+
+    if (data.name.trim().length === 0) {
+      errors.name = 'Full Name is required'
+      isValid = false
+    }
+
+    if (data.slug.trim().length === 0) {
+      errors.slug = 'Section Slug is required'
+      isValid = false
+    } else if (!slugRegex.test(data.slug)) {
+      errors.slug = 'Section Slug must be alphanumeric with no spaces or special characters.'
+      isValid = false
+    }
+
+    setFormErrors({ ...formErrors, ...errors })
+    setLoading(false)
+    return isValid
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (validateFormData(formData)) {
       try {
-        setLoading(true);
-        const endpoint = open === sectionActions.EDIT ? section.update : section.create;
-        
-        let sectionName = formData.name;
-        sectionName = sectionName?.split("_")?.join(" ");
+        setLoading(true)
+        const endpoint = open === sectionActions.EDIT ? section.update : section.create
+
+        let sectionName = formData.name
+        sectionName = sectionName?.split("_")?.join(" ")
 
         const payload = {
           sectionId: open === sectionActions.EDIT ? formData.id : undefined,
-          sectionName: sectionName,
+          sectionName,
           sectionSlug: formData.slug,
           sectionTemplate: formData.jsonContent,
           active: formData.status,
-          isCommon:formData.isCommon
-        };
+          isCommon: formData.isCommon
+        }
 
-        const response = await post(endpoint, payload);
+        const response = await post(endpoint, payload)
 
-        toast.success(response.message);
-        handleReset();
-        setLoading(false);
+        toast.success(response.message)
+        handleReset()
+        setLoading(false)
       } catch (error: any) {
-        console.error('Error fetching data:', error.message);
-        setLoading(false);
+        console.error('Error fetching data:', error.message)
+        setLoading(false)
       }
     }
-  };
+  }
 
   const handleReset = () => {
-    setFormData(initialData);
-    setFormErrors(initialErrorData);
-    router.back();
-  };
+    setFormData(initialData)
+    setFormErrors(initialErrorData)
+    router.back()
+  }
 
   const getSectionDataById = async (slug: string | number) => {
     try {
-      const result = await get(`${section.getById}/${slug}`);
-      const { data } = result;
+      const result = await get(`${section.getById}/${slug}`)
+      const { data } = result
       setEditAllow(data.disableSection)
       setFormData({
         ...formData,
@@ -253,54 +251,52 @@ const ContentBlockForm = ({ open }: Props) => {
         status: data.active,
         isCommon: data.isCommon
 
-      });
-      setIsSlugManuallyEdited(false);
-      setInitialIsCommon(data.isCommon);
-      setLoading(false);
+      })
+      setIsSlugManuallyEdited(false)
+      setInitialIsCommon(data.isCommon)
+      setLoading(false)
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
   useEffect(() => {
     if (open === sectionActions.EDIT) {
-      getSectionDataById(query[query.length - 1]);
-
+      getSectionDataById(query[query.length - 1])
     } else {
       setEditAllow(false)
-      setFormData(initialData);
-      setFormErrors(initialErrorData);
-      setLoading(false);
+      setFormData(initialData)
+      setFormErrors(initialErrorData)
+      setLoading(false)
     }
-  }, []);
+  }, [])
 
   const handleSectionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value;
-    setFormErrors({ ...formErrors, name: "" });
+    const newName = e.target.value
+    setFormErrors({ ...formErrors, name: "" })
     setFormData((prevData) => ({
       ...prevData,
-      name: newName,
+      name: newName
       // slug: !isSlugManuallyEdited && open === sectionActions.ADD ? newName.replace(/[^\w\s]|_/g, "").replace(/\s+/g, "-").toLowerCase() : prevData.slug,
-    }));
-  };
+    }))
+  }
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSlug = e.target.value;
-    const slugRegex = /^[a-zA-Z0-9]+$/;
-  
+    const newSlug = e.target.value
+    const slugRegex = /^[a-zA-Z0-9]+$/
+
     if (!slugRegex.test(newSlug)) {
-      setFormErrors({ ...formErrors, slug: "Slug must be alphanumeric with no spaces, dashes, or underscores." });
+      setFormErrors({ ...formErrors, slug: "Slug must be alphanumeric with no spaces, dashes, or underscores." })
     } else {
-      setFormErrors({ ...formErrors, slug: "" });
+      setFormErrors({ ...formErrors, slug: "" })
     }
-  
+
     setFormData((prevData) => ({
       ...prevData,
-      slug: newSlug,
-    }));
-    setIsSlugManuallyEdited(true);
-  };
-  
+      slug: newSlug
+    }))
+    setIsSlugManuallyEdited(true)
+  }
 
   // const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   const newSlug = e.target.value;
@@ -332,7 +328,7 @@ const ContentBlockForm = ({ open }: Props) => {
                     placeholder=""
                     value={formData.name}
                     onChange={handleSectionNameChange}
-                    disabled={open ==sectionActions.EDIT ? true : false}
+                    disabled={open == sectionActions.EDIT}
                   />
                 </Grid>
                 <Grid item xs={12} sm={4}>
@@ -345,7 +341,7 @@ const ContentBlockForm = ({ open }: Props) => {
                     placeholder=""
                     value={formData.slug}
                     onChange={handleSlugChange}
-                    disabled={editAllow ? true : false}
+                    disabled={!!editAllow}
                   />
                 </Grid>
                 <Grid item xs={4} sm={1}>
@@ -358,7 +354,7 @@ const ContentBlockForm = ({ open }: Props) => {
                     onChange={(e) =>
                       setFormData({ ...formData, status: e.target.checked })
                     }
-                    disabled={editAllow ? true : false}
+                    disabled={!!editAllow}
                   />
                 </Grid>
                 <Grid item xs={6} sm={2}>
@@ -371,7 +367,7 @@ const ContentBlockForm = ({ open }: Props) => {
                     onChange={(e) =>
                       setFormData({ ...formData, isCommon: e.target.checked })
                     }
-                    disabled={open == sectionActions.EDIT && !!initialIsCommon? true : false}
+                    disabled={!!(open == sectionActions.EDIT && !!initialIsCommon)}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -391,7 +387,7 @@ const ContentBlockForm = ({ open }: Props) => {
                               </IconButton>
                             </Tooltip>
                           </TableCell>
-                          {!editAllow &&<TableCell>Actions </TableCell> }
+                          {!editAllow && <TableCell>Actions </TableCell> }
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -407,7 +403,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                   renderInput={(params) => <CustomTextField {...params} placeholder="" />}
                                   value={fieldTypeOptions.find((option) => option.value === field.fieldType) || null}
                                   onChange={(e, newValue) => handleChangeField(index, "fieldType", newValue ? newValue.value : "")}
-                                  disabled={open ==sectionActions.EDIT ? true : false}
+                                  disabled={open == sectionActions.EDIT}
                                 />
                               </TableCell>
                               <TableCell>
@@ -425,7 +421,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                   fullWidth
                                   value={field.fekey}
                                   onChange={(e) => handleChangeField(index, "fekey", e.target.value)}
-                                  disabled={open == sectionActions.EDIT ? true : false}
+                                  disabled={open == sectionActions.EDIT}
                                 />
                               </TableCell>
 
@@ -519,7 +515,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                                   renderInput={(params) => <CustomTextField {...params} placeholder="" />}
                                                   value={fieldTypeOptionsForMultiple.find((option) => option.value === subField.fieldType) || null}
                                                   onChange={(e, newValue) => handleChangeField(index, "fieldType", newValue ? newValue.value : "", subIndex)}
-                                                  disabled={open ==sectionActions.EDIT ? true : false}
+                                                  disabled={open == sectionActions.EDIT}
                                                 />
                                               </TableCell>
                                               <TableCell>
@@ -536,7 +532,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                                   fullWidth
                                                   value={subField.fekey}
                                                   onChange={(e) => handleChangeField(index, "fekey", e.target.value, subIndex)}
-                                                  disabled={open == sectionActions.EDIT ? true : false}
+                                                  disabled={open == sectionActions.EDIT}
                                                 />
                                               </TableCell>
                                               <TableCell>
@@ -560,7 +556,6 @@ const ContentBlockForm = ({ open }: Props) => {
                                               {/* </>)} */}
                                               {!editAllow &&
                                                 <TableCell>
-
 
                                                   <IconButton
                                                     size="small"
@@ -626,7 +621,7 @@ const ContentBlockForm = ({ open }: Props) => {
         </div>
       </Card>
     </>
-  );
-};
+  )
+}
 
-export default ContentBlockForm;
+export default ContentBlockForm

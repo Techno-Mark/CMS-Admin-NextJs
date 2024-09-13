@@ -1,13 +1,13 @@
-"use client";
+"use client"
 
-import PopupListTable from "./PopupListTable";
+import PopupListTable from "./PopupListTable"
 
 const page = () => {
   return (
     <>
       <PopupListTable />
     </>
-  );
-};
+  )
+}
 
-export default page;
+export default page

@@ -1,4 +1,3 @@
-
 export type TemplateType = {
     uniqueSectionName: any;
     srNo?: number;

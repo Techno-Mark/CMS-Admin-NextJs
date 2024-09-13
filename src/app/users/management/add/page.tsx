@@ -1,12 +1,12 @@
-"use client";
+"use client"
 
-import { useRouter } from "next/navigation";
-import UserForm from "../UserForm";
+import { useRouter } from "next/navigation"
+import UserForm from "../UserForm"
 
-const ADD_USER = -1;
+const ADD_USER = -1
 
 const Page = () => {
-  const router = useRouter();
+  const router = useRouter()
 
   return (
     <UserForm
@@ -14,7 +14,7 @@ const Page = () => {
       handleClose={() => router.push("/users/management")}
       editingRow={null}
     />
-  );
-};
+  )
+}
 
-export default Page;
+export default Page

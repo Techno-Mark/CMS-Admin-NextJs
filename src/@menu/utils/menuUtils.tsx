@@ -109,9 +109,7 @@ export const renderMenuIcon = (params: RenderMenuIconParams) => {
     (!renderExpandedMenuItemIcon.level || renderExpandedMenuItemIcon.level >= level)
   ) {
     const iconToRender =
-      typeof renderExpandedMenuItemIcon.icon === 'function'
-        ? renderExpandedMenuItemIcon.icon({ level, active, disabled })
-        : renderExpandedMenuItemIcon.icon
+      typeof renderExpandedMenuItemIcon.icon === 'function' ? renderExpandedMenuItemIcon.icon({ level, active, disabled }) : renderExpandedMenuItemIcon.icon
 
     if (iconToRender) {
       return (

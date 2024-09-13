@@ -1,12 +1,12 @@
 // MUI Imports
-import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import { post } from "@/services/apiService";
-import { organization } from "@/services/endpoint/organization";
-import { toast } from "react-toastify";
+import Dialog from "@mui/material/Dialog"
+import DialogContent from "@mui/material/DialogContent"
+import DialogActions from "@mui/material/DialogActions"
+import Typography from "@mui/material/Typography"
+import Button from "@mui/material/Button"
+import { post } from "@/services/apiService"
+import { organization } from "@/services/endpoint/organization"
+import { toast } from "react-toastify"
 
 type ConfirmationDialogProps = {
   deletingId: number;
@@ -19,28 +19,27 @@ const ConfirmationDialog = ({
   deletingId,
   open,
   setOpen,
-  setDeletingId,
+  setDeletingId
 }: ConfirmationDialogProps) => {
   const deleteOrganizationBlock = async () => {
     // await post(organization.delete, { id: deletingId });
 
     // toast.success("Organization deleted successfully!");
     try {
-      const result = await post(organization.delete, { id: deletingId });
+      const result = await post(organization.delete, { id: deletingId })
 
       if (result.status === "success") {
-        toast.success(result.message);
+        toast.success(result.message)
       } else {
-        toast.error(result.message);
+        toast.error(result.message)
       }
     } catch (error) {
-      console.error(error);
+      console.error(error)
     } finally {
-      setDeletingId(0);
-      setOpen(false);
+      setDeletingId(0)
+      setOpen(false)
     }
-
-  };
+  }
 
   return (
     <Dialog fullWidth maxWidth="xs" open={open} onClose={() => setOpen(false)}>
@@ -58,14 +57,14 @@ const ConfirmationDialog = ({
           variant="tonal"
           color="secondary"
           onClick={() => {
-            setOpen(false);
+            setOpen(false)
           }}
         >
           No
         </Button>
       </DialogActions>
     </Dialog>
-  );
-};
+  )
+}
 
-export default ConfirmationDialog;
+export default ConfirmationDialog

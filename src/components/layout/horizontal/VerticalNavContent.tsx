@@ -33,9 +33,7 @@ const VerticalNavContent = ({ children }: ChildrenType) => {
         />
       </NavHeader>
       <ScrollWrapper
-        {...(isBreakpointReached
-          ? { className: 'bs-full overflow-y-auto overflow-x-hidden' }
-          : { options: { wheelPropagation: false, suppressScrollX: true } })}
+        {...(isBreakpointReached ? { className: 'bs-full overflow-y-auto overflow-x-hidden' } : { options: { wheelPropagation: false, suppressScrollX: true } })}
       >
         {mapHorizontalToVerticalMenu(children)}
       </ScrollWrapper>

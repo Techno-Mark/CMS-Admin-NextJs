@@ -1,5 +1,5 @@
-import ContactUsListTable from "./ContactUsListTable";
+import ContactUsListTable from "./ContactUsListTable"
 
 export default function Page() {
-  return <ContactUsListTable />;
+  return <ContactUsListTable />
 }

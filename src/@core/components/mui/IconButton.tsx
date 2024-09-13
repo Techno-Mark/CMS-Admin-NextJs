@@ -1,7 +1,7 @@
 // CustomIconButton.tsx
-import React from "react";
-import IconButton from "@mui/material/IconButton";
-import { styled } from "@mui/system";
+import React from "react"
+import IconButton from "@mui/material/IconButton"
+import { styled } from "@mui/system"
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   // Add your custom styles here
@@ -9,12 +9,12 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
   padding: theme.spacing(1),
   borderRadius: theme.shape.borderRadius,
   "&:hover": {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: theme.palette.action.hover
   },
   "&.Mui-selected": {
-    color: theme.palette.primary.main,
-  },
-}));
+    color: theme.palette.primary.main
+  }
+}))
 
 interface CustomIconButtonProps {
   color?: "default" | "inherit" | "primary" | "secondary";
@@ -31,7 +31,7 @@ const CustomIconButton: React.FC<CustomIconButtonProps> = ({
   size = "medium",
   onClick,
   selected = false,
-  children,
+  children
 }) => {
   return (
     <StyledIconButton
@@ -42,7 +42,7 @@ const CustomIconButton: React.FC<CustomIconButtonProps> = ({
     >
       {children}
     </StyledIconButton>
-  );
-};
+  )
+}
 
-export default CustomIconButton;
+export default CustomIconButton

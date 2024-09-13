@@ -18,7 +18,6 @@ import ClickAwayListener from '@mui/material/ClickAwayListener'
 import MenuList from '@mui/material/MenuList'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
-import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
 
 // Hook Imports
@@ -35,7 +34,7 @@ const BadgeContentSpan = styled('span')({
   borderRadius: '50%',
   cursor: 'pointer',
   backgroundColor: 'var(--mui-palette-success-main)',
-  boxShadow: '0 0 0 2px var(--mui-palette-background-paper)',
+  boxShadow: '0 0 0 2px var(--mui-palette-background-paper)'
 })
 
 const UserDropdown = () => {
@@ -73,28 +72,27 @@ const UserDropdown = () => {
   }
 
   const handleUserLogout = async () => {
-    localStorage.removeItem("encryptedPermissionData");
+    localStorage.removeItem("encryptedPermissionData")
     await signOut({ callbackUrl: '/login' })
   }
 
   const getPermissionModule = async () => {
-    const data = await getDecryptedPermissionData();
+    const data = await getDecryptedPermissionData()
     if (data) {
-      storePermissionData(data);
+      storePermissionData(data)
     }
     if (!data) {
       try {
-        const result = await post(authnetication.user_permission_data, {});
-        await storePermissionData(result.data);
+        const result = await post(authnetication.user_permission_data, {})
+        await storePermissionData(result.data)
       } catch (error: any) {
-        console.error(error);
-
+        console.error(error)
       }
     }
-  };
+  }
   useEffect(() => {
-    getPermissionModule();
-  }, []);
+    getPermissionModule()
+  }, [])
 
   return (
     <>
@@ -133,7 +131,7 @@ const UserDropdown = () => {
           <Fade
             {...TransitionProps}
             style={{
-              transformOrigin: placement === 'bottom-end' ? 'right top' : 'left top',
+              transformOrigin: placement === 'bottom-end' ? 'right top' : 'left top'
             }}
           >
             <Paper className={settings.skin === 'bordered' ? 'border shadow-none' : 'shadow-lg'}>

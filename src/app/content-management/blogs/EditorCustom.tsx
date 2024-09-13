@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
+import { useState, useEffect, useRef } from "react"
+import { CKEditor } from "@ckeditor/ckeditor5-react"
 
 import {
   ClassicEditor,
@@ -70,23 +70,23 @@ import {
   Title,
   TodoList,
   Underline,
-  Undo,
-} from "ckeditor5";
+  Undo
+} from "ckeditor5"
 
-import "ckeditor5/ckeditor5.css";
+import "ckeditor5/ckeditor5.css"
 
 export default function MyCKEditor({ onChange, initialValue }: any) {
-  const [data, setData] = useState(initialValue);
+  const [data, setData] = useState(initialValue)
 
-  const editorContainerRef = useRef(null);
-  const editorRef = useRef(null);
-  const [isLayoutReady, setIsLayoutReady] = useState(false);
+  const editorContainerRef = useRef(null)
+  const editorRef = useRef(null)
+  const [isLayoutReady, setIsLayoutReady] = useState(false)
 
   useEffect(() => {
-    setIsLayoutReady(true);
+    setIsLayoutReady(true)
 
-    return () => setIsLayoutReady(false);
-  }, []);
+    return () => setIsLayoutReady(false)
+  }, [])
 
   const editorConfig:any = {
     toolbar: {
@@ -135,9 +135,9 @@ export default function MyCKEditor({ onChange, initialValue }: any) {
         "outdent",
         "indent",
         "|",
-        "accessibilityHelp",
+        "accessibilityHelp"
       ],
-      shouldNotGroupWhenFull: false,
+      shouldNotGroupWhenFull: false
     },
     plugins: [
       AccessibilityHelp,
@@ -206,68 +206,68 @@ export default function MyCKEditor({ onChange, initialValue }: any) {
       // Title,
       TodoList,
       Underline,
-      Undo,
+      Undo
     ],
     fontFamily: {
-      supportAllValues: true,
+      supportAllValues: true
     },
     fontSize: {
       options: [10, 12, 14, "default", 18, 20, 22],
-      supportAllValues: true,
+      supportAllValues: true
     },
     heading: {
       options: [
         {
           model: "paragraph",
           title: "Paragraph",
-          class: "ck-heading_paragraph",
+          class: "ck-heading_paragraph"
         },
         {
           model: "heading1",
           view: "h1",
           title: "Heading 1",
-          class: "ck-heading_heading1",
+          class: "ck-heading_heading1"
         },
         {
           model: "heading2",
           view: "h2",
           title: "Heading 2",
-          class: "ck-heading_heading2",
+          class: "ck-heading_heading2"
         },
         {
           model: "heading3",
           view: "h3",
           title: "Heading 3",
-          class: "ck-heading_heading3",
+          class: "ck-heading_heading3"
         },
         {
           model: "heading4",
           view: "h4",
           title: "Heading 4",
-          class: "ck-heading_heading4",
+          class: "ck-heading_heading4"
         },
         {
           model: "heading5",
           view: "h5",
           title: "Heading 5",
-          class: "ck-heading_heading5",
+          class: "ck-heading_heading5"
         },
         {
           model: "heading6",
           view: "h6",
           title: "Heading 6",
-          class: "ck-heading_heading6",
-        },
-      ],
+          class: "ck-heading_heading6"
+        }
+      ]
     },
     htmlSupport: {
       allow: [
         {
           name: /^.*$/,
           attributes: true,
-          classes: true,
-        },
-      ],
+          classes: true
+        }
+      ]
     },
     image: {
       toolbar: [
@@ -278,8 +278,8 @@ export default function MyCKEditor({ onChange, initialValue }: any) {
         "imageStyle:wrapText",
         "imageStyle:breakText",
         "|",
-        "resizeImage",
-      ],
+        "resizeImage"
+      ]
     },
 
     link: {
@@ -290,17 +290,17 @@ export default function MyCKEditor({ onChange, initialValue }: any) {
           mode: "manual",
           label: "Downloadable",
           attributes: {
-            download: "file",
-          },
-        },
-      },
+            download: "file"
+          }
+        }
+      }
     },
     list: {
       properties: {
         styles: true,
         startIndex: true,
-        reversed: true,
-      },
+        reversed: true
+      }
     },
     placeholder: "Type or paste your content here!",
     style: {
@@ -308,49 +308,49 @@ export default function MyCKEditor({ onChange, initialValue }: any) {
         {
           name: "Article category",
           element: "h3",
-          classes: ["category"],
+          classes: ["category"]
         },
         {
           name: "Title",
           element: "h2",
-          classes: ["document-title"],
+          classes: ["document-title"]
         },
         {
           name: "Subtitle",
           element: "h3",
-          classes: ["document-subtitle"],
+          classes: ["document-subtitle"]
         },
         {
           name: "Info box",
           element: "p",
-          classes: ["info-box"],
+          classes: ["info-box"]
         },
         {
           name: "Side quote",
           element: "blockquote",
-          classes: ["side-quote"],
+          classes: ["side-quote"]
         },
         {
           name: "Marker",
           element: "span",
-          classes: ["marker"],
+          classes: ["marker"]
         },
         {
           name: "Spoiler",
           element: "span",
-          classes: ["spoiler"],
+          classes: ["spoiler"]
         },
         {
           name: "Code (dark)",
           element: "pre",
-          classes: ["fancy-code", "fancy-code-dark"],
+          classes: ["fancy-code", "fancy-code-dark"]
         },
         {
           name: "Code (bright)",
           element: "pre",
-          classes: ["fancy-code", "fancy-code-bright"],
-        },
-      ],
+          classes: ["fancy-code", "fancy-code-bright"]
+        }
+      ]
     },
     table: {
       contentToolbar: [
@@ -358,10 +358,10 @@ export default function MyCKEditor({ onChange, initialValue }: any) {
         "tableRow",
         "mergeTableCells",
         "tableProperties",
-        "tableCellProperties",
-      ],
-    },
-  };
+        "tableCellProperties"
+      ]
+    }
+  }
 
   return (
     <div>
@@ -378,9 +378,9 @@ export default function MyCKEditor({ onChange, initialValue }: any) {
                   config={editorConfig}
                   data={data}
                   onChange={(event, editor) => {
-                    const data = editor.getData();
-                    setData(data);
-                    onChange(data);
+                    const data = editor.getData()
+                    setData(data)
+                    onChange(data)
                   }}
                 />
               )}
@@ -389,5 +389,5 @@ export default function MyCKEditor({ onChange, initialValue }: any) {
         </div>
       </div>
     </div>
-  );
+  )
 }

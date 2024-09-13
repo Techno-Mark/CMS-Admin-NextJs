@@ -35,5 +35,5 @@ export type blogDetailType = {
   updatedAt: Date;
 };
 
-export const ADD_BLOG = -1;
-export const EDIT_BLOG = 1;
+export const ADD_BLOG = -1
+export const EDIT_BLOG = 1

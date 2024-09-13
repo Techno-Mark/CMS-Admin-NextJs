@@ -1,9 +1,9 @@
 // MUI Imports
-import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog"
+import DialogContent from "@mui/material/DialogContent"
+import DialogActions from "@mui/material/DialogActions"
+import Typography from "@mui/material/Typography"
+import Button from "@mui/material/Button"
 
 type ConfirmationDialogProps = {
   deleteData: any;
@@ -16,23 +16,23 @@ const ConfirmationDialog = ({
   deleteData,
   menuItems,
   setMenuItems,
-  setOpen,
+  setOpen
 }: ConfirmationDialogProps) => {
   const deleteTemplate = async () => {
     try {
-      if (!menuItems) return;
+      if (!menuItems) return
 
       if (deleteData.parentId == -1) {
-        menuItems.splice(deleteData.index, 1);
+        menuItems.splice(deleteData.index, 1)
       } else {
-        menuItems[deleteData.parentId].children.splice(deleteData.index, 1);
+        menuItems[deleteData.parentId].children.splice(deleteData.index, 1)
       }
     } catch (error) {
-      console.error(error);
+      console.error(error)
     } finally {
-      setOpen(false);
+      setOpen(false)
     }
-  };
+  }
 
   return (
     <Dialog fullWidth maxWidth="xs" open={true} onClose={() => setOpen(false)}>
@@ -50,14 +50,14 @@ const ConfirmationDialog = ({
           variant="tonal"
           color="secondary"
           onClick={() => {
-            setOpen(false);
+            setOpen(false)
           }}
         >
           No
         </Button>
       </DialogActions>
     </Dialog>
-  );
-};
+  )
+}
 
-export default ConfirmationDialog;
+export default ConfirmationDialog

@@ -1,8 +1,8 @@
-import React from "react";
-import EventListTable from "./EventListTable";
+import React from "react"
+import EventListTable from "./EventListTable"
 
 const page = () => {
-  return <EventListTable />;
-};
+  return <EventListTable />
+}
 
-export default page;
+export default page

@@ -4,13 +4,12 @@ export const pages = {
   update: `organization/page/update`,
   getById: `organization/page/getById`,
   delete: `organization/page/delete`,
-  fileUpoad:  `upload`,
-  active: `organization/page/active`,
-};
-
+  fileUpoad: `upload`,
+  active: `organization/page/active`
+}
 
 export const redirectToEditPage = (id: number | string) => {
-  return `/content-management/pages/edit/${id}`;
-};
+  return `/content-management/pages/edit/${id}`
+}
 
-export const redirectToAddPage = "/content-management/pages/add";
+export const redirectToAddPage = "/content-management/pages/add"

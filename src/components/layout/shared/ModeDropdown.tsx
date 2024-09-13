@@ -1,21 +1,21 @@
-import { useRef, useState, useEffect } from 'react';
-import Badge from '@mui/material/Badge';
-import Avatar from '@mui/material/Avatar';
-import Popper from '@mui/material/Popper';
-import Fade from '@mui/material/Fade';
-import Paper from '@mui/material/Paper';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
-import MenuList from '@mui/material/MenuList';
-import MenuItem from '@mui/material/MenuItem';
-import Typography from '@mui/material/Typography';
+import { useRef, useState, useEffect } from 'react'
+import Badge from '@mui/material/Badge'
+import Avatar from '@mui/material/Avatar'
+import Popper from '@mui/material/Popper'
+import Fade from '@mui/material/Fade'
+import Paper from '@mui/material/Paper'
+import ClickAwayListener from '@mui/material/ClickAwayListener'
+import MenuList from '@mui/material/MenuList'
+import MenuItem from '@mui/material/MenuItem'
+import Typography from '@mui/material/Typography'
 
 // Hook Imports
-import { useSettings } from '@core/hooks/useSettings';
+import { useSettings } from '@core/hooks/useSettings'
 
 // API Imports
-import { organization } from "@/services/endpoint/organization";
-import { post } from "@/services/apiService";
-import { setLocalStorageItem } from '@/utils/localStorageHelper';
+import { organization } from "@/services/endpoint/organization"
+import { post } from "@/services/apiService"
+import { setLocalStorageItem } from '@/utils/localStorageHelper'
 
 interface Organization {
   id: string;
@@ -23,61 +23,61 @@ interface Organization {
 }
 
 const ModeDropdown = () => {
-  const [open, setOpen] = useState(false);
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [selectedOrgId, setSelectedOrgId] = useState<any | null>(null);
-  const anchorRef1 = useRef<HTMLDivElement>(null);
-  const { settings } = useSettings();
-  const selectedOrgName = organizations.find((org) => org.id === selectedOrgId)?.name || 'Select Organization';
-  const avatarText = selectedOrgName.split(' ').map((n) => n[0]).join('');
+  const [open, setOpen] = useState(false)
+  const [organizations, setOrganizations] = useState<Organization[]>([])
+  const [selectedOrgId, setSelectedOrgId] = useState<any | null>(null)
+  const anchorRef1 = useRef<HTMLDivElement>(null)
+  const { settings } = useSettings()
+  const selectedOrgName = organizations.find((org) => org.id === selectedOrgId)?.name || 'Select Organization'
+  const avatarText = selectedOrgName.split(' ').map((n) => n[0]).join('')
 
   useEffect(() => {
     const fetchOrganizations = async () => {
       try {
-        const response = await post(organization.active, {});
-        const orgs = response.data.organizations as Organization[];
-        setOrganizations(orgs);
-  
-        const storedOrgId = localStorage.getItem('selectedOrgId');
-  
+        const response = await post(organization.active, {})
+        const orgs = response.data.organizations as Organization[]
+        setOrganizations(orgs)
+
+        const storedOrgId = localStorage.getItem('selectedOrgId')
+
         if (storedOrgId) {
-          const parsedOrgId = parseInt(storedOrgId, 10);
-          const matchingOrg = orgs.find(org => parseInt(org.id) === parsedOrgId);
-  
+          const parsedOrgId = parseInt(storedOrgId, 10)
+          const matchingOrg = orgs.find(org => parseInt(org.id) === parsedOrgId)
+
           if (matchingOrg) {
-            setSelectedOrgId(parsedOrgId);
+            setSelectedOrgId(parsedOrgId)
           } else if (orgs.length > 0) {
-            setSelectedOrgId(orgs[0].id);
-            setLocalStorageItem('selectedOrgId', orgs[0].id);
+            setSelectedOrgId(orgs[0].id)
+            setLocalStorageItem('selectedOrgId', orgs[0].id)
           }
         } else if (orgs.length > 0) {
-          setSelectedOrgId(orgs[0].id);
-          setLocalStorageItem('selectedOrgId', orgs[0].id);
+          setSelectedOrgId(orgs[0].id)
+          setLocalStorageItem('selectedOrgId', orgs[0].id)
         }
       } catch (error) {
-        console.error('Error fetching organizations:', error);
+        console.error('Error fetching organizations:', error)
       }
-    };
-  
-    fetchOrganizations();
-  }, []);
+    }
+
+    fetchOrganizations()
+  }, [])
 
   const handleClose = () => {
-    setOpen(false);
-  };
+    setOpen(false)
+  }
 
   const handleToggle1 = () => {
-    setOpen((prevOpen) => !prevOpen);
-  };
+    setOpen((prevOpen) => !prevOpen)
+  }
 
   const handleModeSwitch = (orgId: string, event: React.MouseEvent) => {
-    event.preventDefault();
-    setSelectedOrgId(orgId);
+    event.preventDefault()
+    setSelectedOrgId(orgId)
     // localStorage.setItem('selectedOrgId', orgId);
-    setLocalStorageItem('selectedOrgId', orgId);
+    setLocalStorageItem('selectedOrgId', orgId)
     // window.location.reload();
-    handleClose();
-  };
+    handleClose()
+  }
 
   return (
     <>
@@ -108,7 +108,7 @@ const ModeDropdown = () => {
           <Fade
             {...TransitionProps}
             style={{
-              transformOrigin: placement === 'bottom-start' ? 'left top' : 'right top',
+              transformOrigin: placement === 'bottom-start' ? 'left top' : 'right top'
             }}
           >
             <Paper className={settings.skin === 'bordered' ? 'border shadow-none' : 'shadow-lg'}>
@@ -138,7 +138,7 @@ const ModeDropdown = () => {
         )}
       </Popper>
     </>
-  );
-};
+  )
+}
 
-export default ModeDropdown;
+export default ModeDropdown

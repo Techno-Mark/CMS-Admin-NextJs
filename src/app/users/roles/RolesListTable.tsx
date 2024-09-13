@@ -1,46 +1,41 @@
 // React Imports
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react"
 // MUI Imports
-import Card from "@mui/material/Card";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import TablePagination from "@mui/material/TablePagination";
-import type { TextFieldProps } from "@mui/material/TextField";
+import Card from "@mui/material/Card"
+import Typography from "@mui/material/Typography"
+import IconButton from "@mui/material/IconButton"
+import TablePagination from "@mui/material/TablePagination"
+import type { TextFieldProps } from "@mui/material/TextField"
 // Third-party Imports
-import classnames from "classnames";
-import { rankItem } from "@tanstack/match-sorter-utils";
+import classnames from "classnames"
+import { rankItem } from "@tanstack/match-sorter-utils"
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
   getFilteredRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  
-  getFacetedMinMaxValues,
+
   getPaginationRowModel,
-  getSortedRowModel,
-} from "@tanstack/react-table";
-import type { ColumnDef, FilterFn } from "@tanstack/react-table";
-import type { RankingInfo } from "@tanstack/match-sorter-utils";
+  getSortedRowModel
+} from "@tanstack/react-table"
+import type { ColumnDef, FilterFn } from "@tanstack/react-table"
+import type { RankingInfo } from "@tanstack/match-sorter-utils"
 // Component Imports
-import TablePaginationComponent from "@components/TablePaginationComponent";
-import CustomTextField from "@core/components/mui/TextField";
+import CustomTextField from "@core/components/mui/TextField"
 // Style Imports
-import tableStyles from "@core/styles/table.module.css";
-import ConfirmationDialog from "./ConfirmationDialog";
-import { useRouter } from "next/navigation";
-import BreadCrumbList from "@components/BreadCrumbList";
+import tableStyles from "@core/styles/table.module.css"
+import ConfirmationDialog from "./ConfirmationDialog"
+import { useRouter } from "next/navigation"
+import BreadCrumbList from "@components/BreadCrumbList"
 // Type Imports
-import { RolesType } from "@/types/apps/rolesType";
-import RoleCards from "./RolesCard";
-import { Chip, MenuItem, Tooltip } from "@mui/material";
-import RoleDialog from "./RoleDialog";
-import { post } from "@/services/apiService";
-import { getSectionList } from "@/services/endpoint/content-block";
-import { getRoleList } from "@/services/endpoint/users/roles";
-import LoadingBackdrop from "@/components/LoadingBackdrop";
+import { RolesType } from "@/types/apps/rolesType"
+import RoleCards from "./RolesCard"
+import { Chip, MenuItem, Tooltip } from "@mui/material"
+import RoleDialog from "./RoleDialog"
+import { post } from "@/services/apiService"
+import { getRoleList } from "@/services/endpoint/users/roles"
+import LoadingBackdrop from "@/components/LoadingBackdrop"
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -57,16 +52,16 @@ type RolesTypeWithAction = RolesType & {
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   // Rank the item
-  const itemRank = rankItem(row.getValue(columnId), value);
+  const itemRank = rankItem(row.getValue(columnId), value)
 
   // Store the itemRank info
   addMeta({
-    itemRank,
-  });
+    itemRank
+  })
 
   // Return if the item should be filtered in/out
-  return itemRank.passed;
-};
+  return itemRank.passed
+}
 
 const DebouncedInput = ({
   value: initialValue,
@@ -79,19 +74,19 @@ const DebouncedInput = ({
   debounce?: number;
 } & Omit<TextFieldProps, "onChange">) => {
   // States
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState(initialValue)
 
   useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
+    setValue(initialValue)
+  }, [initialValue])
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      onChange(value);
-    }, debounce);
+      onChange(value)
+    }, debounce)
 
-    return () => clearTimeout(timeout);
-  }, [value]);
+    return () => clearTimeout(timeout)
+  }, [value])
 
   return (
     <CustomTextField
@@ -99,17 +94,17 @@ const DebouncedInput = ({
       value={value}
       onChange={(e) => setValue(e.target.value)}
     />
-  );
-};
+  )
+}
 
 // Column Definitions
-const columnHelper = createColumnHelper<RolesTypeWithAction>();
+const columnHelper = createColumnHelper<RolesTypeWithAction>()
 
 const RolesListTable = ({
   totalCount,
   tableData,
   getList,
-  initialBody,
+  initialBody
 }: {
   totalCount: number;
   tableData?: RolesType[];
@@ -127,54 +122,52 @@ const RolesListTable = ({
     organizationId: number | string;
   };
 }) => {
-  const [rowSelection, setRowSelection] = useState({});
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(10);
-  const [totalRows, setTotalRows] = useState<number>(0);
+  const [rowSelection, setRowSelection] = useState({})
+  const [data, setData] = useState<any[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [page, setPage] = useState<number>(0)
+  const [pageSize, setPageSize] = useState<number>(10)
+  const [totalRows, setTotalRows] = useState<number>(0)
 
-  const router = useRouter();
   // States
-  const [globalFilter, setGlobalFilter] = useState("");
-  const [deletingId, setDeletingId] = useState<number>(0);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
-  const [editId, setEditId] = useState<number>(0);
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
+  const [globalFilter, setGlobalFilter] = useState("")
+  const [deletingId, setDeletingId] = useState<number>(0)
+  const [isDeleting, setIsDeleting] = useState<boolean>(false)
+  const [editId, setEditId] = useState<number>(0)
+  const [openDialog, setOpenDialog] = useState<boolean>(false)
+  const [activeFilter, setActiveFilter] = useState<boolean | null>(null)
 
-  let orgId = null;
+  let orgId = null
 
   const getData = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
       const result = await post(getRoleList, {
         page: page + 1,
         limit: pageSize,
         search: globalFilter,
-        active: activeFilter,
-      });
-      setData(result.data.roles);
-      setTotalRows(result.data.totalRoles);
+        active: activeFilter
+      })
+      setData(result.data.roles)
+      setTotalRows(result.data.totalRoles)
     } catch (error: any) {
-      setError(error.message);
+      setError(error.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
   useEffect(() => {
-    getData();
-    function handleStorageUpdate(){
-      getData();
+    getData()
+    function handleStorageUpdate() {
+      getData()
     }
-    window.addEventListener('localStorageUpdate', handleStorageUpdate);
+    window.addEventListener('localStorageUpdate', handleStorageUpdate)
 
     return () => {
-      window.removeEventListener('localStorageUpdate', handleStorageUpdate);
-    };
-  }, [page, pageSize, globalFilter, activeFilter]);
-
+      window.removeEventListener('localStorageUpdate', handleStorageUpdate)
+    }
+  }, [page, pageSize, globalFilter, activeFilter])
 
   const columns = useMemo<ColumnDef<RolesTypeWithAction, any>[]>(
     () => [
@@ -184,7 +177,7 @@ const RolesListTable = ({
           <Typography color="text.primary" className="font-medium">
             {row.index + 1}
           </Typography>
-        ),
+        )
       }),
       columnHelper.accessor("roleName", {
         header: "Role Name",
@@ -192,7 +185,7 @@ const RolesListTable = ({
           <Typography color="text.primary" className="font-medium">
             {row.original.roleName}
           </Typography>
-        ),
+        )
       }),
       columnHelper.accessor("createdAt", {
         header: "Created At",
@@ -200,7 +193,7 @@ const RolesListTable = ({
           <Typography color="text.primary" className="font-medium">
             {row.original.createdAt}
           </Typography>
-        ),
+        )
       }),
       columnHelper.accessor("active", {
         header: "Status",
@@ -214,7 +207,7 @@ const RolesListTable = ({
               size="small"
             />
           </div>
-        ),
+        )
       }),
       columnHelper.accessor("roleId", {
         header: "Action",
@@ -224,8 +217,8 @@ const RolesListTable = ({
               <Tooltip title={'Edit'}>
                 <IconButton
                   onClick={() => {
-                    setEditId(row.original.roleId);
-                    setOpenDialog(true);
+                    setEditId(row.original.roleId)
+                    setOpenDialog(true)
                   }}
                 >
                   <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -234,21 +227,21 @@ const RolesListTable = ({
               <Tooltip title={'Delete'}>
                 <IconButton
                   onClick={() => {
-                    setIsDeleting(true);
-                    setDeletingId(row.original.roleId);
+                    setIsDeleting(true)
+                    setDeletingId(row.original.roleId)
                   }}
                 >
                   <i className="tabler-trash text-[22px] text-textSecondary" />
                 </IconButton>
               </Tooltip>
             </div>
-          );
+          )
         },
-        enableSorting: false,
-      }),
+        enableSorting: false
+      })
     ],
     []
-  );
+  )
 
   const table = useReactTable({
     data,
@@ -257,7 +250,7 @@ const RolesListTable = ({
     state: {
       rowSelection,
       globalFilter,
-      pagination: { pageIndex: page, pageSize },
+      pagination: { pageIndex: page, pageSize }
     },
     globalFilterFn: fuzzyFilter,
     onRowSelectionChange: setRowSelection,
@@ -267,30 +260,29 @@ const RolesListTable = ({
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     manualPagination: true,
-    pageCount: Math.ceil(totalRows / pageSize),
-  });
+    pageCount: Math.ceil(totalRows / pageSize)
+  })
 
   const handlePageChange = (event: unknown, newPage: number) => {
     if (newPage !== page) {
-      setPage(newPage);
+      setPage(newPage)
     }
-  };
+  }
 
   const handleRowsPerPageChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setPageSize(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+    setPageSize(parseInt(event.target.value, 10))
+    setPage(0)
+  }
 
   useEffect(() => {
     if (deletingId === 0 || !openDialog) {
       getData()
     }
-    if(localStorage !== undefined) orgId = localStorage.getItem("selectedOrgId");
-  
-  }, [deletingId, openDialog]);
- 
+    if (localStorage !== undefined) orgId = localStorage.getItem("selectedOrgId")
+  }, [deletingId, openDialog])
+
   return (
     <>
     <LoadingBackdrop isLoading={loading} />
@@ -311,21 +303,13 @@ const RolesListTable = ({
               defaultValue="all"
               id="custom-select"
               value={
-                activeFilter === null
-                  ? "all"
-                  : activeFilter === true
-                    ? "active"
-                    : "inactive"
+                activeFilter === null ? "all" : activeFilter === true ? "active" : "inactive"
               }
               onChange={(e) => {
-                const value = e.target.value;
+                const value = e.target.value
                 setActiveFilter(
-                  value === "active"
-                    ? true
-                    : value === "inactive"
-                      ? false
-                      : null
-                );
+                  value === "active" ? true : value === "inactive" ? false : null
+                )
               }}
             >
               <MenuItem value="all">All</MenuItem>
@@ -351,7 +335,7 @@ const RolesListTable = ({
                             className={classnames({
                               "flex items-center": header.column.getIsSorted(),
                               "cursor-pointer select-none":
-                                header.column.getCanSort(),
+                                header.column.getCanSort()
                             })}
                             onClick={header.column.getToggleSortingHandler()}
                           >
@@ -363,7 +347,7 @@ const RolesListTable = ({
                               asc: <i className="tabler-chevron-up text-xl" />,
                               desc: (
                                 <i className="tabler-chevron-down text-xl" />
-                              ),
+                              )
                             }[header.column.getIsSorted() as "asc" | "desc"] ??
                               null}
                           </div>
@@ -395,7 +379,7 @@ const RolesListTable = ({
                       <tr
                         key={row.id}
                         className={classnames({
-                          selected: row.getIsSelected(),
+                          selected: row.getIsSelected()
                         })}
                       >
                         {row.getVisibleCells().map((cell) => (
@@ -407,7 +391,7 @@ const RolesListTable = ({
                           </td>
                         ))}
                       </tr>
-                    );
+                    )
                   })}
               </tbody>
             )}
@@ -429,7 +413,7 @@ const RolesListTable = ({
         setOpen={(arg1: boolean) => setIsDeleting(arg1)}
         deletePayload={{
           roleId: deletingId,
-          organizationId: orgId,
+          organizationId: orgId
         }}
       />
 
@@ -440,7 +424,7 @@ const RolesListTable = ({
         editId={editId}
       />
     </>
-  );
-};
+  )
+}
 
-export default RolesListTable;
+export default RolesListTable

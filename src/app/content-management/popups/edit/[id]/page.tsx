@@ -1,34 +1,33 @@
-"use client";
-import React from "react";
-import PagesForm from "../../PagesForm";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { post } from "@/services/apiService";
-import { PopupTypes } from "../../popupTypes";
-import { popups } from "@/services/endpoint/popup";
-import NewPopupForm from "../../NewPopupForm";
-import { usePermission } from "@/utils/permissions";
+"use client"
+import React, { useEffect, useState } from "react"
+import PagesForm from "../../PagesForm"
+import { useRouter } from "next/navigation"
+import { post } from "@/services/apiService"
+import { PopupTypes } from "../../popupTypes"
+import { popups } from "@/services/endpoint/popup"
+import NewPopupForm from "../../NewPopupForm"
+import { usePermission } from "@/utils/permissions"
 
 const page = ({ params }: { params: { id: string } }) => {
-  const [editingRow, setEditingRow] = useState<PopupTypes | null>(null);
-  const router = useRouter();
+  const [editingRow, setEditingRow] = useState<PopupTypes | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await post(popups.getById, { id: params.id });
+        const response = await post(popups.getById, { id: params.id })
         if (response.statusCode !== 200) {
-          throw new Error("Failed to fetch data");
+          throw new Error("Failed to fetch data")
         }
-        const data = await response;
-        setEditingRow(data.data);
+        const data = await response
+        setEditingRow(data.data)
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching data:", error)
       }
-    };
+    }
 
-    fetchData();
-  }, [params.id]);
+    fetchData()
+  }, [params.id])
   const { hasPermission } = usePermission()
   return (
     <>
@@ -41,7 +40,7 @@ const page = ({ params }: { params: { id: string } }) => {
         />
       )}
     </>
-  );
-};
+  )
+}
 
-export default page;
+export default page

@@ -62,19 +62,17 @@ const checkbox: Theme['components'] = {
     },
     styleOverrides: {
       root: ({ theme, ownerState }) => ({
-        ...(ownerState.size === 'small'
-          ? {
-              padding: theme.spacing(1),
-              '& svg': {
-                fontSize: '1.25rem'
-              }
-            }
-          : {
-              padding: theme.spacing(1.5),
-              '& svg': {
-                fontSize: '1.5rem'
-              }
-            }),
+        ...(ownerState.size === 'small' ? {
+          padding: theme.spacing(1),
+          '& svg': {
+            fontSize: '1.25rem'
+          }
+        } : {
+          padding: theme.spacing(1.5),
+          '& svg': {
+            fontSize: '1.5rem'
+          }
+        }),
         '&:not(.Mui-checked):not(.Mui-disabled):not(.MuiCheckbox-indeterminate) svg, &:not(.Mui-checked):not(.Mui-disabled):not(.MuiCheckbox-indeterminate) i':
           {
             color: 'var(--mui-palette-text-disabled)'

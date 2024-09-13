@@ -1,4 +1,4 @@
-import CustomTextField from "@/@core/components/mui/TextField";
+import CustomTextField from "@/@core/components/mui/TextField"
 import {
   Button,
   Card,
@@ -7,9 +7,9 @@ import {
   TablePagination,
   TextFieldProps,
   Tooltip,
-  Typography,
-} from "@mui/material";
-import { rankItem } from "@tanstack/match-sorter-utils";
+  Typography
+} from "@mui/material"
+import { rankItem } from "@tanstack/match-sorter-utils"
 import {
   ColumnDef,
   FilterFn,
@@ -19,31 +19,30 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import classNames from "classnames";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useMemo, useState } from "react";
-import ConfirmationDialog from "./ConfirmationDialog";
+  useReactTable
+} from "@tanstack/react-table"
+import classNames from "classnames"
+import { useRouter } from "next/navigation"
+import React, { useEffect, useMemo, useState } from "react"
+import ConfirmationDialog from "./ConfirmationDialog"
 
-
-import tableStyles from "@core/styles/table.module.css";
-import { popups, redirectToAddPage, redirectToEditPage } from "@/services/endpoint/popup";
-import CustomChip from "@/@core/components/mui/Chip";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import { post } from "@/services/apiService";
-import LoadingBackdrop from "@/components/LoadingBackdrop";
-import { authnetication } from "@/services/endpoint/auth";
-import { storePermissionData } from "@/utils/storageService";
+import tableStyles from "@core/styles/table.module.css"
+import { popups, redirectToAddPage, redirectToEditPage } from "@/services/endpoint/popup"
+import CustomChip from "@/@core/components/mui/Chip"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import { post } from "@/services/apiService"
+import LoadingBackdrop from "@/components/LoadingBackdrop"
+import { authnetication } from "@/services/endpoint/auth"
+import { storePermissionData } from "@/utils/storageService"
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-  const itemRank = rankItem(row.getValue(columnId), value);
+  const itemRank = rankItem(row.getValue(columnId), value)
   addMeta({
-    itemRank,
-  });
+    itemRank
+  })
 
-  return itemRank.passed;
-};
+  return itemRank.passed
+}
 
 const DebouncedInput = ({
   value: initialValue,
@@ -55,19 +54,18 @@ const DebouncedInput = ({
   onChange: (value: string | number) => void;
   debounce?: number;
 } & Omit<TextFieldProps, "onChange">) => {
-
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState(initialValue)
 
   useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
+    setValue(initialValue)
+  }, [initialValue])
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      onChange(value);
-    }, debounce);
-    return () => clearTimeout(timeout);
-  }, [value]);
+      onChange(value)
+    }, debounce)
+    return () => clearTimeout(timeout)
+  }, [value])
 
   return (
     <CustomTextField
@@ -75,93 +73,91 @@ const DebouncedInput = ({
       value={value}
       onChange={(e) => setValue(e.target.value)}
     />
-  );
-};
+  )
+}
 
 // Column Definitions
-const columnHelper = createColumnHelper<any>();
+const columnHelper = createColumnHelper<any>()
 
 const PopupListTable = () => {
-
-  const [userIdRole, setUserIdRole] = useState();
-  const [userPermissionData, setUserPermissionData] = useState();
+  const [userIdRole, setUserIdRole] = useState()
+  const [userPermissionData, setUserPermissionData] = useState()
   const getPermissionModule = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const result = await post(authnetication.user_permission_data, {});
-      console.log(result.data);
-      setUserIdRole(result.data.currentUserId);
+      const result = await post(authnetication.user_permission_data, {})
+      console.log(result.data)
+      setUserIdRole(result.data.currentUserId)
       setUserPermissionData(result.data.moduleWisePermissions)
-      console.log(userIdRole);
+      console.log(userIdRole)
 
-      await storePermissionData(result.data);
-      setLoading(false);
+      await storePermissionData(result.data)
+      setLoading(false)
     } catch (error: any) {
-      console.error(error);
-      setLoading(false);
+      console.error(error)
+      setLoading(false)
     }
-  };
+  }
   function hasPermission(module: string, action: string) {
     if (userIdRole == 1) {
-      return true;
+      return true
     }
     // @ts-ignore
-    return userPermissionData?.[module]?.includes(action) ?? false;
-  };
+    return userPermissionData?.[module]?.includes(action) ?? false
+  }
 
+  const [rowSelection, setRowSelection] = useState({})
+  const [data, setData] = useState<any[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [page, setPage] = useState<number>(0)
+  const [pageSize, setPageSize] = useState<number>(10)
+  const [totalRows, setTotalRows] = useState<number>(0)
 
-  const [rowSelection, setRowSelection] = useState({});
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(10);
-  const [totalRows, setTotalRows] = useState<number>(0);
-
-  const router = useRouter();
+  const router = useRouter()
   // States
-  const [globalFilter, setGlobalFilter] = useState("");
-  const [deletingId, setDeletingId] = useState<number>(-1);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
-  const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
+  const [globalFilter, setGlobalFilter] = useState("")
+  const [deletingId, setDeletingId] = useState<number>(-1)
+  const [isDeleting, setIsDeleting] = useState<boolean>(false)
+  const [activeFilter, setActiveFilter] = useState<boolean | null>(null)
 
   const getData = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
       const result = await post(popups.list, {
         page: page + 1,
         limit: pageSize,
         search: globalFilter,
-        active: activeFilter,
-      });
+        active: activeFilter
+      })
       getPermissionModule()
       setData(
         result.data.popups.map((item: any) => ({
           popupId: item.popupId,
           popupTitle: item.popupTitle,
           createdAt: item.createdAt,
-          active: item.active,
+          active: item.active
         }))
-      );
-      setTotalRows(result.data.totalPopups);
+      )
+      setTotalRows(result.data.totalPopups)
     } catch (error: any) {
-      setError(error.message);
+      setError(error.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
   useEffect(() => {
-    getData();
+    getData()
     const handleStorageUpdate = async () => {
-      getData();
-    };
+      getData()
+    }
 
-    window.addEventListener("localStorageUpdate", handleStorageUpdate);
+    window.addEventListener("localStorageUpdate", handleStorageUpdate)
 
     return () => {
-      window.removeEventListener("localStorageUpdate", handleStorageUpdate);
-    };
-  }, [page, pageSize, globalFilter, activeFilter]);
+      window.removeEventListener("localStorageUpdate", handleStorageUpdate)
+    }
+  }, [page, pageSize, globalFilter, activeFilter])
 
   const columns = useMemo<ColumnDef<any, any>[]>(
     () => [
@@ -171,7 +167,7 @@ const PopupListTable = () => {
           <Typography color="text.primary" className="font-medium">
             {row.index + 1}
           </Typography>
-        ),
+        )
       }),
       columnHelper.accessor("popupTitle", {
         header: "Popup Title",
@@ -179,7 +175,7 @@ const PopupListTable = () => {
           <Typography color="text.primary" className="font-medium">
             {row.original.popupTitle}
           </Typography>
-        ),
+        )
       }),
       columnHelper.accessor("createdAt", {
         header: "Created At",
@@ -187,7 +183,7 @@ const PopupListTable = () => {
           <Typography color="text.primary" className="font-medium">
             {row.original.createdAt}
           </Typography>
-        ),
+        )
       }),
       columnHelper.accessor("status", {
         header: "Status",
@@ -210,7 +206,7 @@ const PopupListTable = () => {
                   <Tooltip title={'Edit'}>
                     <IconButton
                       onClick={() => {
-                        router.push(redirectToEditPage(row.original.popupId));
+                        router.push(redirectToEditPage(row.original.popupId))
                       }}
                     >
                       <i className="tabler-edit text-[22px] text-textSecondary" />
@@ -219,7 +215,7 @@ const PopupListTable = () => {
                 ) : <Tooltip title={'View'}>
                   <IconButton
                     onClick={() => {
-                      router.push(redirectToEditPage(row.original.popupId));
+                      router.push(redirectToEditPage(row.original.popupId))
                     }}
                   >
                     <i className="tabler-eye text-[22px] text-textSecondary" />
@@ -230,8 +226,8 @@ const PopupListTable = () => {
                   <Tooltip title={'Delete'}>
                     <IconButton
                       onClick={() => {
-                        setIsDeleting(true);
-                        setDeletingId(row.original.popupId);
+                        setIsDeleting(true)
+                        setDeletingId(row.original.popupId)
                       }}
                     >
                       <i className="tabler-trash text-[22px] text-textSecondary" />
@@ -239,13 +235,13 @@ const PopupListTable = () => {
                   </Tooltip>
                 ))}
             </div>
-          );
+          )
         },
-        enableSorting: false,
-      }),
+        enableSorting: false
+      })
     ],
     [router, page, pageSize, userPermissionData]
-  );
+  )
   const table = useReactTable({
     data,
     columns,
@@ -253,7 +249,7 @@ const PopupListTable = () => {
     state: {
       rowSelection,
       globalFilter,
-      pagination: { pageIndex: page, pageSize },
+      pagination: { pageIndex: page, pageSize }
     },
     globalFilterFn: fuzzyFilter,
     onRowSelectionChange: setRowSelection,
@@ -263,27 +259,27 @@ const PopupListTable = () => {
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     manualPagination: true,
-    pageCount: Math.ceil(totalRows / pageSize),
-  });
+    pageCount: Math.ceil(totalRows / pageSize)
+  })
 
   const handlePageChange = (event: unknown, newPage: number) => {
     if (newPage !== page) {
-      setPage(newPage);
+      setPage(newPage)
     }
-  };
+  }
 
   const handleRowsPerPageChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setPageSize(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+    setPageSize(parseInt(event.target.value, 10))
+    setPage(0)
+  }
 
   useEffect(() => {
     if (deletingId === 0) {
-      getData();
+      getData()
     }
-  }, [deletingId]);
+  }, [deletingId])
 
   return (
     <>
@@ -305,21 +301,13 @@ const PopupListTable = () => {
               defaultValue="all"
               id="custom-select"
               value={
-                activeFilter === null
-                  ? "all"
-                  : activeFilter === true
-                    ? "active"
-                    : "inactive"
+                activeFilter === null ? "all" : activeFilter === true ? "active" : "inactive"
               }
               onChange={(e) => {
-                const value = e.target.value;
+                const value = e.target.value
                 setActiveFilter(
-                  value === "active"
-                    ? true
-                    : value === "inactive"
-                      ? false
-                      : null
-                );
+                  value === "active" ? true : value === "inactive" ? false : null
+                )
               }}
             >
               <MenuItem value="all">All</MenuItem>
@@ -353,7 +341,7 @@ const PopupListTable = () => {
                             className={classNames({
                               "flex items-center": header.column.getIsSorted(),
                               "cursor-pointer select-none":
-                                header.column.getCanSort(),
+                                header.column.getCanSort()
                             })}
                             onClick={header.column.getToggleSortingHandler()}
                           >
@@ -365,7 +353,7 @@ const PopupListTable = () => {
                               asc: <i className="tabler-chevron-up text-xl" />,
                               desc: (
                                 <i className="tabler-chevron-down text-xl" />
-                              ),
+                              )
                             }[header.column.getIsSorted() as "asc" | "desc"] ??
                               null}
                           </div>
@@ -397,7 +385,7 @@ const PopupListTable = () => {
                       <tr
                         key={row.id}
                         className={classNames({
-                          selected: row.getIsSelected(),
+                          selected: row.getIsSelected()
                         })}
                       >
                         {row.getVisibleCells().map((cell) => (
@@ -409,7 +397,7 @@ const PopupListTable = () => {
                           </td>
                         ))}
                       </tr>
-                    );
+                    )
                   })}
               </tbody>
             )}
@@ -431,7 +419,7 @@ const PopupListTable = () => {
         setOpen={(arg1: boolean) => setIsDeleting(arg1)}
       />
     </>
-  );
-};
+  )
+}
 
-export default PopupListTable;
+export default PopupListTable

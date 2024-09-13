@@ -1,12 +1,10 @@
 'use client'
 
 // Next Imports
-import Link from 'next/link'
+import Image from 'next/image'
 
 // MUI Imports
-import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
-import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 
 // Third-party Imports
@@ -14,9 +12,6 @@ import classnames from 'classnames'
 
 // Type Imports
 import type { SystemMode } from '@core/types'
-
-// Hook Imports
-import { useImageVariant } from '@core/hooks/useImageVariant'
 
 // Styled Components
 const MaskImg = styled('img')({
@@ -30,7 +25,6 @@ const MaskImg = styled('img')({
 
 const NotAuthorized = ({ mode }: { mode: SystemMode }) => {
   // Vars
-  const darkImg = '/images/pages/misc-mask-dark.png'
   const lightImg = '/images/pages/misc-mask-light.png'
 
   // Hooks
@@ -48,22 +42,17 @@ const NotAuthorized = ({ mode }: { mode: SystemMode }) => {
           <Typography variant='h4'>You are not authorized! 🔐</Typography>
           <Typography>You don&#39;t have permission to access this page!</Typography>
         </div>
-        {/* <Button href='/' component={Link} variant='contained'>
-          Back To Home
-        </Button> */}
-        <img
+        <Image
           alt='error-401-illustration'
           src='/images/illustrations/characters/3.png'
           className='object-cover bs-[400px] md:bs-[450px] lg:bs-[500px] mbs-10 md:mbs-14 lg:mbs-20'
         />
       </div>
-      {/* {!hidden && ( */}
         <MaskImg
           alt='mask'
           src={miscBackground}
           className={classnames({ 'scale-x-[-1]': theme.direction === 'rtl' })}
         />
-      {/* )} */}
     </div>
   )
 }

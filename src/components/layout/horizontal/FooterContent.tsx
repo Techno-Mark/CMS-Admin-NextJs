@@ -1,7 +1,6 @@
 'use client'
 
 // Next Imports
-import Link from 'next/link'
 
 // Third-party Imports
 import classnames from 'classnames'

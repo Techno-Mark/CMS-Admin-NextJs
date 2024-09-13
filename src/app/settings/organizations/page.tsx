@@ -1,11 +1,11 @@
-import OrganizationsListTable from "./OrganizationsListTable";
+import OrganizationsListTable from "./OrganizationsListTable"
 
 const page = () => {
   return (
     <>
       <OrganizationsListTable />
     </>
-  );
-};
+  )
+}
 
-export default page;
+export default page

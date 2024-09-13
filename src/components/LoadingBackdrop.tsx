@@ -14,6 +14,6 @@ const LoadingBackdrop = ({ isLoading }: LoadingBackdropProps) => (
   >
     <CircularProgress />
   </Backdrop>
-);
+)
 
-export default LoadingBackdrop;
+export default LoadingBackdrop

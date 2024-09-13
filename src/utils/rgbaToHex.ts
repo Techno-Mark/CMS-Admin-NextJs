@@ -18,11 +18,9 @@ export const rgbaToHex = (colorStr: string, forceRemoveAlpha: boolean = false) =
     const blueHex = blue.toString(16).padStart(2, '0')
 
     // Convert alpha to a hexadecimal format (assuming it's already a decimal value in the range [0, 1])
-    const alphaHex = forceRemoveAlpha
-      ? ''
-      : Math.round(alpha * 255)
-          .toString(16)
-          .padStart(2, '0')
+    const alphaHex = forceRemoveAlpha ? '' : Math.round(alpha * 255)
+      .toString(16)
+      .padStart(2, '0')
 
     // Combine the hexadecimal values to form the final hex color string
     const hexColor = `#${redHex}${greenHex}${blueHex}${alphaHex}`

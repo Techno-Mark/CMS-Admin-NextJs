@@ -1,4 +1,4 @@
-const commonPrefix = "organization/blog-post";
+const commonPrefix = "organization/blog-post"
 
 export const blogPost = {
   list: `${commonPrefix}/list`,
@@ -7,6 +7,6 @@ export const blogPost = {
   getById: `${commonPrefix}/getById`,
   delete: `${commonPrefix}/delete`,
 
-  generatePreview: `organization/preview/generate-hash`,
+  generatePreview: `organization/preview/generate-hash`
 
-};
+}

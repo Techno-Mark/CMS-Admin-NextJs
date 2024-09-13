@@ -1,11 +1,10 @@
-"use client";
+"use client"
 
 // React Imports
-import { useState } from "react";
-import type { ComponentType } from "react";
+import type { ComponentType } from "react"
 
 type OpenDialogOnElementClickProps = {
-  element: ComponentType<any>; 
+  element: ComponentType<any>;
   dialog: ComponentType<any>;
   elementProps?: any;
   dialogProps?: any;
@@ -21,17 +20,17 @@ const OpenDialogOnElementClick = (props: OpenDialogOnElementClickProps) => {
     elementProps,
     dialogProps,
     openDialog,
-    setOpenDialog,
-  } = props;
+    setOpenDialog
+  } = props
 
   // Extract onClick from elementProps
-  const { onClick: elementOnClick, ...restElementProps } = elementProps;
+  const { onClick: elementOnClick, ...restElementProps } = elementProps
 
   // Handle onClick event
   const handleOnClick = (e: MouseEvent) => {
-    elementOnClick && elementOnClick(e);
-    setOpenDialog(true);
-  };
+    elementOnClick && elementOnClick(e)
+    setOpenDialog(true)
+  }
 
   return (
     <>
@@ -40,7 +39,7 @@ const OpenDialogOnElementClick = (props: OpenDialogOnElementClickProps) => {
       {/* Receive dialog component as prop and we will pass open and setOpen props to that component */}
       <Dialog open={openDialog} setOpen={setOpenDialog} {...dialogProps} />
     </>
-  );
-};
+  )
+}
 
-export default OpenDialogOnElementClick;
+export default OpenDialogOnElementClick

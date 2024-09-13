@@ -1,29 +1,27 @@
-"use client";
+"use client"
 
-import React, { useState } from "react";
-import Tiptap from "./TipTap";
-import { v4 as uuidv4 } from "uuid";
+import React, { useState } from "react"
+import Tiptap from "./TipTap"
+import { v4 as uuidv4 } from "uuid"
 
 const Todo = () => {
-  const [content, setContent] = useState<string>("");
+  const [content, setContent] = useState<string>("")
   const handleContentChange = (reason: any) => {
-    setContent(reason);
-  };
+    setContent(reason)
+  }
   const handleSubmit = (e: any) => {
-    e.preventDefault();
+    e.preventDefault()
     const data = {
       id: uuidv4(),
-      content: content,
+      content
     };
-    (data);
-    const existingDataString = localStorage.getItem("myData");
-    const existingData = existingDataString
-      ? JSON.parse(existingDataString)
-      : [];
-    const updatedData = [...existingData, data];
-    localStorage.setItem("myData", JSON.stringify(updatedData));
-    setContent("");
-  };
+    (data)
+    const existingDataString = localStorage.getItem("myData")
+    const existingData = existingDataString ? JSON.parse(existingDataString) : []
+    const updatedData = [...existingData, data]
+    localStorage.setItem("myData", JSON.stringify(updatedData))
+    setContent("")
+  }
   return (
     <form
       onSubmit={handleSubmit}
@@ -34,7 +32,7 @@ const Todo = () => {
         onChange={(newContent: string) => handleContentChange(newContent)}
       />
     </form>
-  );
-};
+  )
+}
 
-export default Todo;
+export default Todo

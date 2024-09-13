@@ -1,12 +1,12 @@
 // MUI Imports
-import Drawer from "@mui/material/Drawer";
-import Typography from "@mui/material/Typography";
+import Drawer from "@mui/material/Drawer"
+import Typography from "@mui/material/Typography"
 
-import IconButton from "@mui/material/IconButton";
+import IconButton from "@mui/material/IconButton"
 
-import CustomTextField from "@/@core/components/mui/TextField";
-import { ChangeEvent, Children, useEffect, useState } from "react";
-import { Button } from "@mui/material";
+import CustomTextField from "@/@core/components/mui/TextField"
+import { ChangeEvent, Children, useEffect, useState } from "react"
+import { Button } from "@mui/material"
 
 type KanbanDrawerProps = {
   drawerOpen: boolean;
@@ -20,14 +20,14 @@ type KanbanDrawerProps = {
 const initialFormData = {
   name: "",
   link: "",
-  logo: "",
-};
+  logo: ""
+}
 
 const initialErrorData = {
   name: "",
   link: "",
-  logo: "",
-};
+  logo: ""
+}
 
 const KanbanDrawer = (props: KanbanDrawerProps) => {
   // Props
@@ -37,119 +37,119 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
     menuItems,
     setMenuItems,
     dataRequired,
-    open,
-  } = props;
-  const [loading, setLoading] = useState(true);
+    open
+  } = props
+  const [loading, setLoading] = useState(true)
   const [formErrors, setFormErrors] =
-    useState<typeof initialErrorData>(initialErrorData);
+    useState<typeof initialErrorData>(initialErrorData)
   const [formData, setFormData] =
-    useState<typeof initialErrorData>(initialFormData);
+    useState<typeof initialErrorData>(initialFormData)
 
   // Close Drawer
   const handleClose = () => {
-    setFormData(initialFormData);
-    setFormErrors(initialErrorData);
-    setDrawerOpen(false);
-  };
+    setFormData(initialFormData)
+    setFormErrors(initialErrorData)
+    setDrawerOpen(false)
+  }
 
   // Update Task
   const updateTask = (data: FormData) => {
-    handleClose();
-  };
+    handleClose()
+  }
 
-  //validation before submit
+  // validation before submit
   const validateForm = () => {
-    let valid = true;
-    let errors = { ...initialErrorData };
+    let valid = true
+    const errors = { ...initialErrorData }
 
     if (!formData.name) {
-      errors.name = "menu name is required";
-      valid = false;
+      errors.name = "menu name is required"
+      valid = false
     } else if (formData.name.length < 3) {
-      errors.name = "name must be at least 3 characters long";
-      valid = false;
+      errors.name = "name must be at least 3 characters long"
+      valid = false
     } else if (formData.name.length > 255) {
-      errors.name = "name must be at most 255 characters long";
-      valid = false;
+      errors.name = "name must be at most 255 characters long"
+      valid = false
     }
     if (!formData.link) {
-      errors.link = "link is required";
-      valid = false;
+      errors.link = "link is required"
+      valid = false
     } else if (formData.link.length > 1000) {
-      errors.link = "link must be at most 1000 characters long";
-      valid = false;
+      errors.link = "link must be at most 1000 characters long"
+      valid = false
     }
     if (!formData.logo) {
-      errors.logo = "logo link  is required";
-      valid = false;
+      errors.logo = "logo link  is required"
+      valid = false
     } else if (formData.logo.length > 1000) {
-      errors.logo = "logo link must be at most 1000 characters long";
-      valid = false;
+      errors.logo = "logo link must be at most 1000 characters long"
+      valid = false
     }
 
-    setFormErrors(errors);
-    return valid;
-  };
+    setFormErrors(errors)
+    return valid
+  }
 
   // Handle Sunmit
   const handleSubmit = (d: any) => {
     if (validateForm()) {
-      let newItem = {
+      const newItem = {
         name: formData.name,
         link: formData.link,
         children: [],
-        logo: formData.logo,
-      };
+        logo: formData.logo
+      }
       if (open == -1) {
-        if(!menuItems){
-          setMenuItems([newItem]);
-        }else{
+        if (!menuItems) {
+          setMenuItems([newItem])
+        } else {
           const newMenus = [
             ...menuItems,
             newItem
-          ];
-          setMenuItems(newMenus);
+          ]
+          setMenuItems(newMenus)
         }
       } else if (open == 1) {
-        const { index, parentId } = dataRequired;
+        const { index, parentId } = dataRequired
         if (parentId == -1) {
-          menuItems[index].name = formData.name;
-          menuItems[index].link = formData.link;
-          menuItems[index].logo = formData.logo;
+          menuItems[index].name = formData.name
+          menuItems[index].link = formData.link
+          menuItems[index].logo = formData.logo
         } else {
-          menuItems[parentId].children[index].name = formData.name;
-          menuItems[parentId].children[index].link = formData.link;
-          menuItems[parentId].children[index].logo = formData.logo;
+          menuItems[parentId].children[index].name = formData.name
+          menuItems[parentId].children[index].link = formData.link
+          menuItems[parentId].children[index].logo = formData.logo
         }
       }
-      handleClose();
+      handleClose()
     }
-  };
+  }
 
   useEffect(() => {
     if (open == 1) {
-      const { index, parentId } = dataRequired;
-      let name,
-        link,
-        logo = "";
+      const { index, parentId } = dataRequired
+      let name
+      let link
+      let logo = ""
 
       if (parentId == -1) {
-        name = menuItems[index].name;
-        link = menuItems[index].link;
-        logo = menuItems[index].logo;
+        name = menuItems[index].name
+        link = menuItems[index].link
+        logo = menuItems[index].logo
       } else {
-        name = menuItems[parentId].children[index].name;
-        link = menuItems[parentId].children[index].link;
-        logo = menuItems[parentId].children[index].logo;
+        name = menuItems[parentId].children[index].name
+        link = menuItems[parentId].children[index].link
+        logo = menuItems[parentId].children[index].logo
       }
       setFormData({
-        name: name,
-        link: link,
-        logo: logo,
-      });
+        name,
+        link,
+        logo
+      })
     }
-    setLoading(false);
-  }, []);
+    setLoading(false)
+  }, [])
 
   return (
     <div>
@@ -180,9 +180,9 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
               placeholder=""
               value={formData.name}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setFormData({ ...formData, name: e.target.value });
+                setFormData({ ...formData, name: e.target.value })
                 if (e.target?.value?.length) {
-                  setFormErrors({ ...formErrors, name: "" });
+                  setFormErrors({ ...formErrors, name: "" })
                 }
               }}
             />
@@ -194,9 +194,9 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
               placeholder=""
               value={formData.link}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setFormData({ ...formData, link: e.target.value });
+                setFormData({ ...formData, link: e.target.value })
                 if (e.target?.value?.length) {
-                  setFormErrors({ ...formErrors, link: "" });
+                  setFormErrors({ ...formErrors, link: "" })
                 }
               }}
             />
@@ -208,9 +208,9 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
               placeholder=""
               value={formData.logo}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setFormData({ ...formData, logo: e.target.value });
+                setFormData({ ...formData, logo: e.target.value })
                 if (e.target?.value?.length) {
-                  setFormErrors({ ...formErrors, logo: "" });
+                  setFormErrors({ ...formErrors, logo: "" })
                 }
               }}
             />
@@ -225,7 +225,7 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
         </div>
       </Drawer>
     </div>
-  );
-};
+  )
+}
 
-export default KanbanDrawer;
+export default KanbanDrawer

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Typography,
@@ -8,18 +8,18 @@ import {
   Checkbox,
   FormControlLabel,
   Card,
-  IconButton,
-} from '@mui/material';
-import { toast } from 'react-toastify';
-import { post } from '@/services/apiService';
-import CustomTextField from '@/@core/components/mui/TextField';
-import { TemplateType } from '@/types/apps/templateType';
-import { template } from '@/services/endpoint/template';
-import CustomAutocomplete from '@core/components/mui/Autocomplete';
-import { section } from '@/services/endpoint/section';
-import BreadCrumbList from '@/components/BreadCrumbList';
-import LoadingBackdrop from '@/components/LoadingBackdrop';
-import { v4 as uuidv4 } from 'uuid';
+  IconButton
+} from '@mui/material'
+import { toast } from 'react-toastify'
+import { post } from '@/services/apiService'
+import CustomTextField from '@/@core/components/mui/TextField'
+import { TemplateType } from '@/types/apps/templateType'
+import { template } from '@/services/endpoint/template'
+import CustomAutocomplete from '@core/components/mui/Autocomplete'
+import { section } from '@/services/endpoint/section'
+import BreadCrumbList from '@/components/BreadCrumbList'
+import LoadingBackdrop from '@/components/LoadingBackdrop'
+import { v4 as uuidv4 } from 'uuid'
 // import DeleteIcon from '@mui/icons-material/Delete';
 
 type SectionType = {
@@ -31,8 +31,8 @@ type SectionType = {
 
 const sectionActions = {
   ADD: -1,
-  EDIT: 1,
-};
+  EDIT: 1
+}
 
 type Props = {
   open: -1 | 0 | 1;
@@ -50,161 +50,157 @@ const initialData: TemplateType = {
   sectionIds: [],
   templateSection: [],
   createdAt: '',
-  uniqueSectionName:""
-};
+  uniqueSectionName: ""
+}
 
 const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditingRow }) => {
-  const [formData, setFormData] = useState<TemplateType>(initialData);
+  const [formData, setFormData] = useState<TemplateType>(initialData)
   const [formErrors, setFormErrors] = useState({
     templateName: '',
     templateDescription: '',
     active: '',
-    templateSlug: '',
-  });
-  const [activeData, setActiveData] = useState<SectionType[]>([]);
-  const [selectedSections, setSelectedSections] = useState<SectionType[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [isSectionsValid, setIsSectionsValid] = useState(true); // State for validation
+    templateSlug: ''
+  })
+  const [activeData, setActiveData] = useState<SectionType[]>([])
+  const [selectedSections, setSelectedSections] = useState<SectionType[]>([])
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [isSectionsValid, setIsSectionsValid] = useState(true) // State for validation
 
   useEffect(() => {
     const getActiveSection = async () => {
-      setLoading(true);
+      setLoading(true)
       try {
-        const result = await post(section.active, {});
-        setActiveData(result.data.sections);
-        setLoading(false);
+        const result = await post(section.active, {})
+        setActiveData(result.data.sections)
+        setLoading(false)
       } catch (error: any) {
-        setError(error.message);
-        setLoading(false);
+        setError(error.message)
+        setLoading(false)
       }
-    };
-    getActiveSection();
-  }, []);
+    }
+    getActiveSection()
+  }, [])
 
   useEffect(() => {
-    setLoading(true);
+    setLoading(true)
     if (editingRow) {
-      setFormData(editingRow);
-      
+      setFormData(editingRow)
+
       const sections = editingRow.templateSection.map((section: any) => ({
-        
-        
+
         sectionId: section.sectionId,
         sectionName: section.sectionName,
         uniqueSectionName: section.uniqueSectionName,
-        isCommon: section.isCommon,
-      }));
-      setSelectedSections(sections);
-      setLoading(false);
+        isCommon: section.isCommon
+      }))
+      setSelectedSections(sections)
+      setLoading(false)
     } else {
-      setFormData(initialData);
-      setLoading(false);
+      setFormData(initialData)
+      setLoading(false)
     }
-  }, [editingRow]);
+  }, [editingRow])
 
   const validateFormData = (data: TemplateType) => {
-    let isValid = true;
-    let errors = { templateName: '', templateDescription: '', active: '', templateSlug: '' };
+    let isValid = true
+    const errors = { templateName: '', templateDescription: '', active: '', templateSlug: '' }
 
     if (data.templateName.trim().length < 5) {
-      errors.templateName = 'Template Name should allow a minimum of 5 characters';
-      isValid = false;
-
+      errors.templateName = 'Template Name should allow a minimum of 5 characters'
+      isValid = false
     }
     if (data.templateName.trim().length > 50) {
-      errors.templateName = 'Template Name should allow a maximum of 50 character';
-      isValid = false;
-
+      errors.templateName = 'Template Name should allow a maximum of 50 character'
+      isValid = false
     }
     if (data.templateSlug.trim().length === 0) {
-      errors.templateSlug = 'This field is required';
-      isValid = false;
+      errors.templateSlug = 'This field is required'
+      isValid = false
     }
     if (data.templateDescription.trim().length === 0) {
-      errors.templateDescription = 'This field is required';
-      isValid = false;
+      errors.templateDescription = 'This field is required'
+      isValid = false
     }
 
-    setFormErrors(errors);
-    setLoading(false);
-    return isValid;
-  };
-
+    setFormErrors(errors)
+    setLoading(false)
+    return isValid
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
     if (validateFormData(formData)) {
       if (selectedSections.length === 0) {
-        setIsSectionsValid(false);
-        setLoading(false);
-        return;
+        setIsSectionsValid(false)
+        setLoading(false)
+        return
       }
 
-      setIsSectionsValid(true);
+      setIsSectionsValid(true)
       try {
-        const endpoint = editingRow ? template.update : template.create;
-        //need to update uniqueSectionName for common component
+        const endpoint = editingRow ? template.update : template.create
+        // need to update uniqueSectionName for common component
         const payload = {
           templateId: editingRow ? formData.templateId : undefined,
           templateName: formData.templateName,
           templateDescription: formData.templateDescription,
           active: formData.active,
           templateSlug: formData.templateSlug,
-          sectionIds: selectedSections.map(section =>{ 
+          sectionIds: selectedSections.map(section => {
             let uniqueSectionName = ''
-            if(section.isCommon){
-              uniqueSectionName = section.sectionName;
-            }else{
-              uniqueSectionName =  section?.uniqueSectionName ? section.uniqueSectionName : `${section.sectionName}_${uuidv4()}`;
+            if (section.isCommon) {
+              uniqueSectionName = section.sectionName
+            } else {
+              uniqueSectionName = section?.uniqueSectionName ? section.uniqueSectionName : `${section.sectionName}_${uuidv4()}`
             }
-              return ({
+            return ({
               sectionId: section.sectionId,
-              isCommon: section.isCommon ? true : false,
-              uniqueSectionName:  uniqueSectionName
+              isCommon: !!section.isCommon,
+              uniqueSectionName
             })
-        }),
-        };
-  
-        const response = await post(endpoint, payload);
-        toast.success(response.message);
-        handleClose();
-        setFormData(response.data);
-        setEditingRow(null);
-        setLoading(false);
+          })
+        }
+
+        const response = await post(endpoint, payload)
+        toast.success(response.message)
+        handleClose()
+        setFormData(response.data)
+        setEditingRow(null)
+        setLoading(false)
       } catch (error: any) {
-        console.error('Error fetching data:', error.message);
-        setLoading(false);
+        console.error('Error fetching data:', error.message)
+        setLoading(false)
       }
     }
-  };
+  }
 
   const handleAddSection = (event: any, newValue: SectionType[]) => {
-    setSelectedSections([...selectedSections, ...newValue]);
-  };
+    setSelectedSections([...selectedSections, ...newValue])
+  }
 
   const handleRemoveSection = (index: number) => {
-    const updatedSections = [...selectedSections];
-    updatedSections.splice(index, 1);
-    setSelectedSections(updatedSections);
-  };
+    const updatedSections = [...selectedSections]
+    updatedSections.splice(index, 1)
+    setSelectedSections(updatedSections)
+  }
 
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>, index: number) => {
-    event.dataTransfer.setData('text/plain', index.toString());
-  };
+    event.dataTransfer.setData('text/plain', index.toString())
+  }
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>, index: number) => {
-    const draggedIndex = Number(event.dataTransfer.getData('text/plain'));
-    const updatedSections = [...selectedSections];
-    const [draggedSection] = updatedSections.splice(draggedIndex, 1);
-    updatedSections.splice(index, 0, draggedSection);
-    setSelectedSections(updatedSections);
-  };
+    const draggedIndex = Number(event.dataTransfer.getData('text/plain'))
+    const updatedSections = [...selectedSections]
+    const [draggedSection] = updatedSections.splice(draggedIndex, 1)
+    updatedSections.splice(index, 0, draggedSection)
+    setSelectedSections(updatedSections)
+  }
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-  };
+    event.preventDefault()
+  }
 
   // const handleSectionIsCommonChange = (sectionId: number) => {
   //   setSelectedSections(prevSections =>
@@ -218,28 +214,28 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
       prevSections.map((section, i) =>
         i === index ? { ...section, isCommon: !section.isCommon } : section
       )
-    );
-  };
-  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false);
+    )
+  }
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false)
   const handleSectionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value;
-    setFormErrors({ ...formErrors, templateName: "" });
+    const newName = e.target.value
+    setFormErrors({ ...formErrors, templateName: "" })
     setFormData((prevData) => ({
       ...prevData,
       templateName: newName,
-      templateSlug: !isSlugManuallyEdited && open === sectionActions.ADD ? newName.replace(/[^\w\s]|_/g, "").replace(/\s+/g, "-").toLowerCase() : prevData.templateSlug,
-    }));
-  };
+      templateSlug: !isSlugManuallyEdited && open === sectionActions.ADD ? newName.replace(/[^\w\s]|_/g, "").replace(/\s+/g, "-").toLowerCase() : prevData.templateSlug
+    }))
+  }
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSlug = e.target.value.toLowerCase();
-    setFormErrors({ ...formErrors, templateSlug: "" });
+    const newSlug = e.target.value.toLowerCase()
+    setFormErrors({ ...formErrors, templateSlug: "" })
     setFormData((prevData) => ({
       ...prevData,
-      templateSlug: newSlug,
-    }));
-    setIsSlugManuallyEdited(true);
-  };
+      templateSlug: newSlug
+    }))
+    setIsSlugManuallyEdited(true)
+  }
 
   return (
     <>
@@ -314,8 +310,8 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                     label="Template Description *"
                     id="validation-error-helper-text"
                     onChange={(e) => {
-                      setFormErrors(prevErrors => ({ ...prevErrors, templateDescription: '' }));
-                      setFormData(prevData => ({ ...prevData, templateDescription: e.target.value }));
+                      setFormErrors(prevErrors => ({ ...prevErrors, templateDescription: '' }))
+                      setFormData(prevData => ({ ...prevData, templateDescription: e.target.value }))
                     }}
                   />
                 </Grid>
@@ -357,7 +353,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                             cursor: 'move',
                             display: 'flex',
                             justifyContent: 'space-between',
-                            alignItems: 'center',
+                            alignItems: 'center'
                           }}
                         >
                           <Typography>
@@ -400,7 +396,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
           </form>
         </div>
       </Card>
-      <Grid item xs={12} style={{ position: 'sticky', bottom: 0, zIndex: 10, }} >
+      <Grid item xs={12} style={{ position: 'sticky', bottom: 0, zIndex: 10 }} >
         <Box
           p={7}
           display="flex"
@@ -417,8 +413,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
         </Box>
       </Grid>
     </>
-  );
-};
+  )
+}
 
-export default TemplateForm;
-
+export default TemplateForm

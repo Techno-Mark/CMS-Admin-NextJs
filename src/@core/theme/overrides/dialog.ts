@@ -1,7 +1,7 @@
-//MUI Imports
+// MUI Imports
 import type { Theme } from '@mui/material/styles'
 
-//Type Imports
+// Type Imports
 import type { Skin } from '@core/types'
 
 const dialog = (skin: Skin): Theme['components'] => ({
@@ -9,13 +9,11 @@ const dialog = (skin: Skin): Theme['components'] => ({
     styleOverrides: {
       paper: ({ theme }) => ({
         borderRadius: 'var(--mui-shape-customBorderRadius-lg)',
-        ...(skin !== 'bordered'
-          ? {
-              boxShadow: 'var(--mui-customShadows-lg)'
-            }
-          : {
-              boxShadow: 'none'
-            }),
+        ...(skin !== 'bordered' ? {
+          boxShadow: 'var(--mui-customShadows-lg)'
+        } : {
+          boxShadow: 'none'
+        }),
         [theme.breakpoints.down('sm')]: {
           margin: theme.spacing(6)
         }

@@ -1,12 +1,12 @@
-"use client";
+"use client"
 
 // MUI Imports
-import Card from "@mui/material/Card";
-import Button from "@mui/material/Button";
-import type { CardProps } from "@mui/material/Card";
+import Card from "@mui/material/Card"
+import Button from "@mui/material/Button"
+import type { CardProps } from "@mui/material/Card"
 
-import OpenDialogOnElementClick from "@/components/Dialogs/OpenDialogOnElementClick";
-import RoleDialog from "./RoleDialog";
+import OpenDialogOnElementClick from "@/components/Dialogs/OpenDialogOnElementClick"
+import RoleDialog from "./RoleDialog"
 
 const RoleCards = ({ openDialog, setOpenDialog }: any) => {
   const CardProps: CardProps = {
@@ -18,10 +18,10 @@ const RoleCards = ({ openDialog, setOpenDialog }: any) => {
         className="is-full sm:is-auto"
       >
         Add Role
-        
+
       </Button>
-    ),
-  };
+    )
+  }
 
   return (
     <OpenDialogOnElementClick
@@ -31,7 +31,7 @@ const RoleCards = ({ openDialog, setOpenDialog }: any) => {
       openDialog={openDialog}
       setOpenDialog={setOpenDialog}
     />
-  );
-};
+  )
+}
 
-export default RoleCards;
+export default RoleCards

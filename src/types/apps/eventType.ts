@@ -27,5 +27,5 @@ export type eventDetailType = {
   active: boolean;
 };
 
-export const ADD_EVENT = -1;
-export const EDIT_EVENT = 1;
+export const ADD_EVENT = -1
+export const EDIT_EVENT = 1

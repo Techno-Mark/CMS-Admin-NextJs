@@ -1,14 +1,14 @@
-"use client";
+"use client"
 
-import { useEffect, useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import Card from "@mui/material/Card";
-import { Box, MenuItem, TablePagination, TextFieldProps, Tooltip } from "@mui/material";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import classnames from "classnames";
-import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
+import { useEffect, useState, useMemo } from "react"
+import { useRouter } from "next/navigation"
+import Card from "@mui/material/Card"
+import { Box, MenuItem, TablePagination, TextFieldProps, Tooltip } from "@mui/material"
+import Button from "@mui/material/Button"
+import Typography from "@mui/material/Typography"
+import IconButton from "@mui/material/IconButton"
+import classnames from "classnames"
+import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils"
 import {
   createColumnHelper,
   flexRender,
@@ -16,25 +16,25 @@ import {
   useReactTable,
   getFilteredRowModel,
   getPaginationRowModel,
-  getSortedRowModel,
-} from "@tanstack/react-table";
-import type { ColumnDef, FilterFn } from "@tanstack/react-table";
-import CustomTextField from "@core/components/mui/TextField";
-import tableStyles from "@core/styles/table.module.css";
+  getSortedRowModel
+} from "@tanstack/react-table"
+import type { ColumnDef, FilterFn } from "@tanstack/react-table"
+import CustomTextField from "@core/components/mui/TextField"
+import tableStyles from "@core/styles/table.module.css"
 
-import { post, postDataToOrganizationAPIs } from "@/services/apiService";
+import { post, postDataToOrganizationAPIs } from "@/services/apiService"
 
-import { TemplateType } from "@/types/apps/templateType";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import LoadingBackdrop from "@/components/LoadingBackdrop";
+import { TemplateType } from "@/types/apps/templateType"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import LoadingBackdrop from "@/components/LoadingBackdrop"
 
-import { media } from "@/services/endpoint/media";
-import { filesType } from "@/types/apps/FilesTypes";
-import { toast } from "react-toastify";
-import ConfirmationDialog from "./ConfirmationDialog";
-import { usePermission } from "@/utils/permissions";
-import { getDecryptedPermissionData, storePermissionData } from "@/utils/storageService";
-import { authnetication } from "@/services/endpoint/auth";
+import { media } from "@/services/endpoint/media"
+import { filesType } from "@/types/apps/FilesTypes"
+import { toast } from "react-toastify"
+import ConfirmationDialog from "./ConfirmationDialog"
+import { usePermission } from "@/utils/permissions"
+import { getDecryptedPermissionData, storePermissionData } from "@/utils/storageService"
+import { authnetication } from "@/services/endpoint/auth"
 // import defaultFileIcon from "../../../../public/images/files.png";
 
 declare module "@tanstack/table-core" {
@@ -51,10 +51,10 @@ type BlogTypeWithAction = filesType & {
 };
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-  const itemRank = rankItem(row.getValue(columnId), value);
-  addMeta({ itemRank });
-  return itemRank.passed;
-};
+  const itemRank = rankItem(row.getValue(columnId), value)
+  addMeta({ itemRank })
+  return itemRank.passed
+}
 
 const DebouncedInput = ({
   value: initialValue,
@@ -66,18 +66,18 @@ const DebouncedInput = ({
   onChange: (value: string | number) => void;
   debounce?: number;
 } & Omit<TextFieldProps, "onChange">) => {
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState(initialValue)
 
   useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
+    setValue(initialValue)
+  }, [initialValue])
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      onChange(value);
-    }, debounce);
-    return () => clearTimeout(timeout);
-  }, [value, onChange, debounce]);
+      onChange(value)
+    }, debounce)
+    return () => clearTimeout(timeout)
+  }, [value, onChange, debounce])
 
   return (
     <CustomTextField
@@ -85,110 +85,108 @@ const DebouncedInput = ({
       value={value}
       onChange={(e) => setValue(e.target.value)}
     />
-  );
-};
+  )
+}
 
-const columnHelper = createColumnHelper<BlogTypeWithAction>();
-
+const columnHelper = createColumnHelper<BlogTypeWithAction>()
 
 const FileListTable = () => {
   // const { hasPermission } = usePermission()
 
-  const [userIdRole, setUserIdRole] = useState();
-  const [userPermissionData, setUserPermissionData] = useState();
+  const [userIdRole, setUserIdRole] = useState()
+  const [userPermissionData, setUserPermissionData] = useState()
   const getPermissionModule = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const result = await post(authnetication.user_permission_data, {});
-      console.log(result.data);
-      setUserIdRole(result.data.currentUserId);
+      const result = await post(authnetication.user_permission_data, {})
+      console.log(result.data)
+      setUserIdRole(result.data.currentUserId)
       setUserPermissionData(result.data.moduleWisePermissions)
-      console.log(userIdRole);
+      console.log(userIdRole)
 
-      await storePermissionData(result.data);
-      setLoading(false);
+      await storePermissionData(result.data)
+      setLoading(false)
     } catch (error: any) {
-      console.error(error);
-      setLoading(false);
+      console.error(error)
+      setLoading(false)
     }
-  };
+  }
   function hasPermission(module: string, action: string) {
     if (userIdRole == 1) {
-      return true;
+      return true
     }
     // @ts-ignore
-    return userPermissionData?.[module]?.includes(action) ?? false;
-  };
+    return userPermissionData?.[module]?.includes(action) ?? false
+  }
 
-  const [rowSelection, setRowSelection] = useState({});
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [rowSelection, setRowSelection] = useState({})
+  const [globalFilter, setGlobalFilter] = useState("")
 
-  const router = useRouter();
+  const router = useRouter()
 
-  const [data, setData] = useState<TemplateType[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(10);
-  const [totalRows, setTotalRows] = useState<number>(0);
-  const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
-  const [deletingId, setDeletingId] = useState<number>(0);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [data, setData] = useState<TemplateType[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [page, setPage] = useState<number>(0)
+  const [pageSize, setPageSize] = useState<number>(10)
+  const [totalRows, setTotalRows] = useState<number>(0)
+  const [activeFilter, setActiveFilter] = useState<boolean | null>(null)
+  const [deletingId, setDeletingId] = useState<number>(0)
+  const [isDeleting, setIsDeleting] = useState<boolean>(false)
 
   useEffect(() => {
     const getData = async () => {
-      setLoading(true);
+      setLoading(true)
       try {
         const result = await postDataToOrganizationAPIs(media.list, {
           page: page + 1,
           limit: pageSize,
           search: globalFilter,
-          active: activeFilter,
-        });
+          active: activeFilter
+        })
         getPermissionModule()
-        setData(result.data.mediaLists);
-        setTotalRows(result.data.totalMediaFiles);
+        setData(result.data.mediaLists)
+        setTotalRows(result.data.totalMediaFiles)
       } catch (error: any) {
-        setError(error.message);
+        setError(error.message)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    getData();
-  }, [page, pageSize, globalFilter, deletingId, activeFilter,]);
-  const validImageTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
-  const defaultFileIcon = "public/images/files.png";
-
+    }
+    getData()
+  }, [page, pageSize, globalFilter, deletingId, activeFilter])
+  const validImageTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
+  const defaultFileIcon = "public/images/files.png"
 
   useEffect(() => {
     const handleStorageUpdate = async () => {
-      const storedOrgName = localStorage.getItem('selectedOrgId');
+      const storedOrgName = localStorage.getItem('selectedOrgId')
       const getData = async () => {
-        setLoading(true);
+        setLoading(true)
         try {
           const result = await postDataToOrganizationAPIs(media.list, {
             page: page + 1,
             limit: pageSize,
             search: globalFilter,
-            active: activeFilter,
-          });
-          setData(result.data.blogs);
-          setTotalRows(result.data.totalBlogs);
+            active: activeFilter
+          })
+          setData(result.data.blogs)
+          setTotalRows(result.data.totalBlogs)
         } catch (error: any) {
-          setError(error.message);
+          setError(error.message)
         } finally {
-          setLoading(false);
+          setLoading(false)
         }
-      };
-      getData();
-    };
+      }
+      getData()
+    }
 
-    window.addEventListener('localStorageUpdate', handleStorageUpdate);
+    window.addEventListener('localStorageUpdate', handleStorageUpdate)
 
     return () => {
-      window.removeEventListener('localStorageUpdate', handleStorageUpdate);
-    };
-  }, []);
+      window.removeEventListener('localStorageUpdate', handleStorageUpdate)
+    }
+  }, [])
 
   const columns = useMemo<ColumnDef<BlogTypeWithAction, any>[]>(
     () => [
@@ -199,18 +197,18 @@ const FileListTable = () => {
             {row.index + 1 + page * pageSize}
           </Typography>
         ),
-        enableSorting: false,
+        enableSorting: false
       }),
       columnHelper.accessor("filePath", {
         header: "File Name",
         cell: ({ row }) => {
-          const { filePath, mediaType, fileName } = row.original;
+          const { filePath, mediaType, fileName } = row.original
 
           // Construct the full URL for the file
-          const fileUrl = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${filePath}`;
+          const fileUrl = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${filePath}`
 
           // Determine if the file is an image
-          const isImage = validImageTypes.includes(mediaType);
+          const isImage = validImageTypes.includes(mediaType)
 
           return (
             <Box display="flex" alignItems="center">
@@ -229,8 +227,8 @@ const FileListTable = () => {
                 {fileName}
               </Typography>
             </Box>
-          );
-        },
+          )
+        }
       }),
 
       columnHelper.accessor("mediaId", {
@@ -241,10 +239,9 @@ const FileListTable = () => {
 
               <IconButton
                 onClick={() => {
+                  const url = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${row.original.filePath}`
 
-                  const url = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${row.original.filePath}`;
-
-                  window.open(url, '_blank');
+                  window.open(url, '_blank')
                 }}
               >
                 <i className="tabler-eye text-[22px] " />
@@ -254,17 +251,16 @@ const FileListTable = () => {
 
               <IconButton
                 onClick={() => {
-                  const url = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${row.original.filePath}`;
+                  const url = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${row.original.filePath}`
 
                   navigator.clipboard.writeText(url)
                     .then(() => {
-
-                      toast.success(`URL copied to clipboard!`);
+                      toast.success(`URL copied to clipboard!`)
                     })
                     .catch(err => {
-                      console.error('Failed to copy URL:', err);
-                      toast.error('Failed to copy URL:');
-                    });
+                      console.error('Failed to copy URL:', err)
+                      toast.error('Failed to copy URL:')
+                    })
                 }}
               >
                 <i className="tabler-copy text-[22px]" />
@@ -272,16 +268,14 @@ const FileListTable = () => {
             </Tooltip>
             {/* @ts-ignore */}
 
-
-
             {userPermissionData && (
               (hasPermission('Media', 'Delete')) && (
                 <Tooltip title="Delete">
                   <IconButton
                     onClick={() => {
-                      setIsDeleting(true);
+                      setIsDeleting(true)
                       // @ts-ignore
-                      setDeletingId(row.original.mediaId); // no need to ignore TypeScript error here
+                      setDeletingId(row.original.mediaId) // no need to ignore TypeScript error here
                     }}
                   >
                     <i className="tabler-trash text-[22px] text-textSecondary" />
@@ -292,11 +286,11 @@ const FileListTable = () => {
 
           </div>
         ),
-        enableSorting: false,
-      }),
+        enableSorting: false
+      })
     ],
     [router, page, pageSize, userPermissionData]
-  );
+  )
 
   const table = useReactTable({
     data,
@@ -305,7 +299,7 @@ const FileListTable = () => {
     state: {
       rowSelection,
       globalFilter,
-      pagination: { pageIndex: page, pageSize },
+      pagination: { pageIndex: page, pageSize }
     },
     globalFilterFn: fuzzyFilter,
     onRowSelectionChange: setRowSelection,
@@ -315,21 +309,21 @@ const FileListTable = () => {
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     manualPagination: true,
-    pageCount: Math.ceil(totalRows / pageSize),
-  });
+    pageCount: Math.ceil(totalRows / pageSize)
+  })
 
   const handlePageChange = (event: unknown, newPage: number) => {
     if (newPage !== page) {
-      setPage(newPage);
+      setPage(newPage)
     }
-  };
+  }
 
   const handleRowsPerPageChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setPageSize(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+    setPageSize(parseInt(event.target.value, 10))
+    setPage(0)
+  }
 
   return (
     <>
@@ -373,7 +367,7 @@ const FileListTable = () => {
                             className={classnames({
                               "flex items-center": header.column.getIsSorted(),
                               "cursor-pointer select-none":
-                                header.column.getCanSort(),
+                                header.column.getCanSort()
                             })}
                             onClick={header.column.getToggleSortingHandler()}
                           >
@@ -385,7 +379,7 @@ const FileListTable = () => {
                               asc: <i className="tabler-chevron-up text-xl" />,
                               desc: (
                                 <i className="tabler-chevron-down text-xl" />
-                              ),
+                              )
                             }[header.column.getIsSorted() as "asc" | "desc"] ??
                               null}
                           </div>
@@ -412,7 +406,7 @@ const FileListTable = () => {
                     <tr
                       key={row.id}
                       className={classnames({
-                        selected: row.getIsSelected(),
+                        selected: row.getIsSelected()
                       })}
                     >
                       {row.getVisibleCells().map((cell) => (
@@ -446,7 +440,7 @@ const FileListTable = () => {
         />
       </div>
     </>
-  );
-};
+  )
+}
 
-export default FileListTable;
+export default FileListTable

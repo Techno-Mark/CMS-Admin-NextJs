@@ -11,7 +11,6 @@ import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Me
 
 // Component Imports
 import { Menu, MenuItem, SubMenu } from '@menu/vertical-menu'
-import CustomChip from '@core/components/mui/Chip'
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
@@ -75,9 +74,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
   useEffect(() => {
     setTimeout(() => {
-
       fetchDecryptedData() // Retrieve and decrypt the permission data on initial load
-    }, 3000);
+    }, 3000)
   }, [])
 
   const hasPermission = (menuKey: string) => permissionData && permissionData[menuKey]
@@ -93,15 +91,13 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   }
   return (
     <ScrollWrapper
-      {...(isBreakpointReached
-        ? {
-          className: 'bs-full overflow-y-auto overflow-x-hidden',
-          onScroll: container => scrollMenu(container, false)
-        }
-        : {
-          options: { wheelPropagation: false, suppressScrollX: true },
-          onScrollY: container => scrollMenu(container, true)
-        })}
+      {...(isBreakpointReached ? {
+        className: 'bs-full overflow-y-auto overflow-x-hidden',
+        onScroll: container => scrollMenu(container, false)
+      } : {
+        options: { wheelPropagation: false, suppressScrollX: true },
+        onScrollY: container => scrollMenu(container, true)
+      })}
     >
       <Menu
         popoutMenuOffset={{ mainAxis: 23 }}
@@ -129,14 +125,12 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           </MenuItem>
         )}
 
-
         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Page')) && (
           <MenuItem href='/content-management/pages' icon={<i className='tabler-brand-pagekit' />}>
             Pages
           </MenuItem>
         )}
-
 
         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Menu')) && (
@@ -151,7 +145,6 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             Popup
           </MenuItem>
         )}
-
 
         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Event')) && (

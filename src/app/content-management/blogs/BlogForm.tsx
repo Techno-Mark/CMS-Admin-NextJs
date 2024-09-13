@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import LoadingBackdrop from "@/components/LoadingBackdrop";
+import LoadingBackdrop from "@/components/LoadingBackdrop"
 import {
   Button,
   Box,
@@ -10,34 +10,34 @@ import {
   Typography,
   Avatar,
   IconButton,
-  Tooltip,
-} from "@mui/material";
-import CustomTextField from "@/@core/components/mui/TextField";
-import React, { ChangeEvent, useEffect, useState } from "react";
-import CustomAutocomplete from "@/@core/components/mui/Autocomplete";
-import { useRouter } from "next/navigation";
-import { useDropzone } from "react-dropzone";
+  Tooltip
+} from "@mui/material"
+import CustomTextField from "@/@core/components/mui/TextField"
+import React, { ChangeEvent, useEffect, useState } from "react"
+import CustomAutocomplete from "@/@core/components/mui/Autocomplete"
+import { useRouter } from "next/navigation"
+import { useDropzone } from "react-dropzone"
 import {
   post,
   postContentBlock,
-  postDataToOrganizationAPIs,
-} from "@/services/apiService";
-import { template } from "@/services/endpoint/template";
-import { blogPost } from "@/services/endpoint/blogpost";
-import { category } from "@/services/endpoint/category";
-import { tag } from "@/services/endpoint/tag";
-import { toast } from "react-toastify";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import { ADD_BLOG, blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
+  postDataToOrganizationAPIs
+} from "@/services/apiService"
+import { template } from "@/services/endpoint/template"
+import { blogPost } from "@/services/endpoint/blogpost"
+import { category } from "@/services/endpoint/category"
+import { tag } from "@/services/endpoint/tag"
+import { toast } from "react-toastify"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import { ADD_BLOG, blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType"
 // import EditorBasic from "@/components/EditorToolbar";
 // import EditorCustom from "./EditorCustom";
-import dynamic from "next/dynamic";
+import dynamic from "next/dynamic"
 // import MyCKEditor from "./EditorCustom";
 
 // Dynamically import CKEditor to prevent SSR issues
 const MyCKEditor = dynamic(() => import("./EditorCustom"), {
-  ssr: false,
-});
+  ssr: false
+})
 
 type blogFormPropsTypes = {
   open: number;
@@ -46,12 +46,12 @@ type blogFormPropsTypes = {
   permissionUser:Boolean
 };
 
-const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
+const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
 
 const sectionActions = {
   ADD: -1,
-  EDIT: 1,
-};
+  EDIT: 1
+}
 
 const initialFormData = {
   id: -1,
@@ -66,8 +66,8 @@ const initialFormData = {
   status: 0,
   metaTitle: "",
   metaDescription: "",
-  metaKeywords: "",
-};
+  metaKeywords: ""
+}
 
 const initialErrorData = {
   templateId: "",
@@ -84,94 +84,94 @@ const initialErrorData = {
   status: "",
   metaTitle: "",
   metaDescription: "",
-  metaKeywords: "",
-};
+  metaKeywords: ""
+}
 
-function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormPropsTypes) {
-  const router = useRouter();
+function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPropsTypes) {
+  const router = useRouter()
 
-  //state management hook
-  const [bannerImage, setBannerImage] = useState<File | null>(null);
-  const [thumbnailImage, setThumbnailImage] = useState<File | null>(null);
-  const [authorImageUrl, setAuthorImageUrl] = useState<File | null>(null);
+  // state management hook
+  const [bannerImage, setBannerImage] = useState<File | null>(null)
+  const [thumbnailImage, setThumbnailImage] = useState<File | null>(null)
+  const [authorImageUrl, setAuthorImageUrl] = useState<File | null>(null)
   const [isImageBannerTouched, setIsImageBannerTouched] = useState({
     bannerImage: false,
     thumbnailImage: false,
-    authorImageUrl: false,
-  });
+    authorImageUrl: false
+  })
   const [formData, setFormData] =
-    useState<typeof initialFormData>(initialFormData); // form data hooks
+    useState<typeof initialFormData>(initialFormData) // form data hooks
 
-  //Error Handler Hooks
+  // Error Handler Hooks
   const [formErrors, setFormErrors] =
-    useState<typeof initialErrorData>(initialErrorData);
+    useState<typeof initialErrorData>(initialErrorData)
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] =
-    useState<boolean>(false);
+    useState<boolean>(false)
 
-  //template list hooks & other list apis data
+  // template list hooks & other list apis data
   const [templateList, setTemplateList] = useState<
     [{ templateName: string; templateId: number }] | []
-  >([]);
-  const [tagsList, setTagsList] = useState<[string] | []>([]);
-  const [categoryList, setCategoryList] = useState<[string] | []>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  >([])
+  const [tagsList, setTagsList] = useState<[string] | []>([])
+  const [categoryList, setCategoryList] = useState<[string] | []>([])
+  const [loading, setLoading] = useState<boolean>(true)
 
-  //Custom Hooks
+  // Custom Hooks
   const {
     getRootProps: getBannerRootProps,
-    getInputProps: getBannerInputProps,
+    getInputProps: getBannerInputProps
   } = useDropzone({
     multiple: false,
     accept: {
-      "image/*": [".png", ".jpg", ".jpeg", ".gif"],
+      "image/*": [".png", ".jpg", ".jpeg", ".gif"]
     },
     onDrop: (acceptedFiles: File[]) => {
-      setFormErrors({ ...formErrors, bannerImageError: "" });
-      setBannerImage(acceptedFiles[0]);
-      setIsImageBannerTouched({ ...isImageBannerTouched, bannerImage: true });
-    },
-  });
+      setFormErrors({ ...formErrors, bannerImageError: "" })
+      setBannerImage(acceptedFiles[0])
+      setIsImageBannerTouched({ ...isImageBannerTouched, bannerImage: true })
+    }
+  })
 
   const {
     getRootProps: getThumbnailRootProps,
-    getInputProps: getThumbnailInputProps,
+    getInputProps: getThumbnailInputProps
   } = useDropzone({
     multiple: false,
     accept: {
-      "image/*": [".png", ".jpg", ".jpeg", ".gif"],
+      "image/*": [".png", ".jpg", ".jpeg", ".gif"]
     },
     onDrop: (acceptedFiles: File[]) => {
-      setFormErrors({ ...formErrors, thumbnailImageError: "" });
-      setThumbnailImage(acceptedFiles[0]);
+      setFormErrors({ ...formErrors, thumbnailImageError: "" })
+      setThumbnailImage(acceptedFiles[0])
       setIsImageBannerTouched({
         ...isImageBannerTouched,
-        thumbnailImage: true,
-      });
-    },
-  });
-  //Author Image
+        thumbnailImage: true
+      })
+    }
+  })
+  // Author Image
   const {
     getRootProps: getAuthorRootProps,
-    getInputProps: getAuthorInputProps,
+    getInputProps: getAuthorInputProps
   } = useDropzone({
     multiple: false,
     accept: {
-      "image/*": [".png", ".jpg", ".jpeg", ".gif"],
+      "image/*": [".png", ".jpg", ".jpeg", ".gif"]
     },
     onDrop: (acceptedFiles: File[]) => {
-      setFormErrors({ ...formErrors, authorImageUrl: "" });
-      setAuthorImageUrl(acceptedFiles[0]);
+      setFormErrors({ ...formErrors, authorImageUrl: "" })
+      setAuthorImageUrl(acceptedFiles[0])
       setIsImageBannerTouched({
         ...isImageBannerTouched,
-        authorImageUrl: true,
-      });
-    },
-  });
+        authorImageUrl: true
+      })
+    }
+  })
 
-  //Effects
+  // Effects
   useEffect(() => {
     async function getBlogPostRelatedData() {
-      await getRequiredData();
+      await getRequiredData()
       if (editingRow && open == EDIT_BLOG) {
         const formData = {
           templateId: editingRow.templateId,
@@ -185,262 +185,260 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
           metaKeywords: editingRow.metaKeywords,
           title: editingRow.title,
           subTitle: editingRow.subTitle,
-          slug: editingRow.slug,
-        };
-        setFormData({ ...formData, status: 0 });
+          slug: editingRow.slug
+        }
+        setFormData({ ...formData, status: 0 })
       } else {
-        setFormData({ ...initialFormData });
-        setFormErrors({ ...initialErrorData });
+        setFormData({ ...initialFormData })
+        setFormErrors({ ...initialErrorData })
       }
     }
-    getBlogPostRelatedData();
-  }, []);
+    getBlogPostRelatedData()
+  }, [])
 
   // Methods
-  //handle title  change
+  // handle title  change
   const handleBlogTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value;
+    const newName = e.target.value
     setFormData((prevData) => ({
       ...prevData,
       title: newName,
       slug:
-        !isSlugManuallyEdited && open === sectionActions.ADD
-          ? newName
-            .replace(/[^\w\s]|_/g, "")
-            .replace(/\s+/g, "-")
-            .toLowerCase()
-          : prevData.slug,
-    }));
+        !isSlugManuallyEdited && open === sectionActions.ADD ? newName
+          .replace(/[^\w\s]|_/g, "")
+          .replace(/\s+/g, "-")
+          .toLowerCase() : prevData.slug
+    }))
     if (newName?.length) {
-      setFormErrors({ ...formErrors, title: "" });
+      setFormErrors({ ...formErrors, title: "" })
     }
-  };
+  }
 
   // Get Active Template List
   const getRequiredData = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
       const [templateResponse, categoryResponse, tagResponse] =
         await Promise.all([
           post(`${template.active}`, {}),
           postDataToOrganizationAPIs(`${category.active}`, {}),
-          postDataToOrganizationAPIs(`${tag.active}`, {}),
-        ]);
-      setTemplateList(templateResponse?.data?.templates);
-      setCategoryList(categoryResponse?.data?.categories);
-      setTagsList(tagResponse?.data?.tags);
-      setLoading(false);
+          postDataToOrganizationAPIs(`${tag.active}`, {})
+        ])
+      setTemplateList(templateResponse?.data?.templates)
+      setCategoryList(categoryResponse?.data?.categories)
+      setTagsList(tagResponse?.data?.tags)
+      setLoading(false)
     } catch (error) {
-      setLoading(false);
-      console.error(error);
+      setLoading(false)
+      console.error(error)
     }
-  };
+  }
 
-  //validation before submit
+  // validation before submit
   const validateForm = () => {
-    let valid = true;
-    let errors = { ...initialErrorData };
+    let valid = true
+    const errors = { ...initialErrorData }
 
     if (formData.templateId <= 0) {
-      errors.templateId = "Please select a template";
-      valid = false;
+      errors.templateId = "Please select a template"
+      valid = false
     }
     if (!formData.title) {
-      errors.title = "Please enter a blog title";
-      valid = false;
+      errors.title = "Please enter a blog title"
+      valid = false
     } else if (formData.title.length < 5) {
-      errors.title = "title must be at least 5 characters long";
-      valid = false;
+      errors.title = "title must be at least 5 characters long"
+      valid = false
     } else if (formData.title.length > 255) {
-      errors.title = "title must be at most 255 characters long";
-      valid = false;
+      errors.title = "title must be at most 255 characters long"
+      valid = false
     }
 
     if (!formData.subTitle) {
-      errors.subTitle = "Please enter a sub title";
-      valid = false;
+      errors.subTitle = "Please enter a sub title"
+      valid = false
     } else if (formData.subTitle.length < 5) {
-      errors.subTitle = "sub title must be at least 5 characters long";
-      valid = false;
+      errors.subTitle = "sub title must be at least 5 characters long"
+      valid = false
     } else if (formData.subTitle.length > 1000) {
-      errors.subTitle = "sub title must be at most 1000 characters long";
-      valid = false;
+      errors.subTitle = "sub title must be at most 1000 characters long"
+      valid = false
     }
 
     if (!formData.slug) {
-      errors.slug = "Please add a slug";
-      valid = false;
+      errors.slug = "Please add a slug"
+      valid = false
     } else if (formData.slug.length < 5) {
-      errors.slug = "slug must be at least 5 characters long";
-      valid = false;
+      errors.slug = "slug must be at least 5 characters long"
+      valid = false
     } else if (formData.slug.length > 255) {
-      errors.slug = "slug must be at most 255 characters long";
-      valid = false;
+      errors.slug = "slug must be at most 255 characters long"
+      valid = false
     } else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(formData.slug)) {
       errors.slug =
-        "slug must be a valid slug (only lowercase letters, numbers, and hyphens are allowed).";
-      valid = false;
+        "slug must be a valid slug (only lowercase letters, numbers, and hyphens are allowed)."
+      valid = false
     }
     if (!formData.authorName) {
-      errors.authorName = "Please enter an author name";
-      valid = false;
+      errors.authorName = "Please enter an author name"
+      valid = false
     } else if (formData.authorName.length < 3) {
-      errors.authorName = "author name must be at least 3 characters long";
-      valid = false;
+      errors.authorName = "author name must be at least 3 characters long"
+      valid = false
     } else if (formData.authorName.length > 100) {
-      errors.authorName = "author name must be at most 100 characters long";
-      valid = false;
+      errors.authorName = "author name must be at most 100 characters long"
+      valid = false
     }
     if (!formData.description || formData.description.length < 15) {
-      errors.description = "Please enter a description";
-      valid = false;
+      errors.description = "Please enter a description"
+      valid = false
     }
 
     if (!formData.tags.length) {
-      errors.tags = "Please select or create new tags";
-      valid = false;
+      errors.tags = "Please select or create new tags"
+      valid = false
     }
     if (!formData.categories.length) {
-      errors.categories = "Please select or create new categories";
-      valid = false;
+      errors.categories = "Please select or create new categories"
+      valid = false
     }
     if (!formData.metaTitle) {
-      errors.metaTitle = "Please enter a meta title";
-      valid = false;
+      errors.metaTitle = "Please enter a meta title"
+      valid = false
     } else if (formData.metaTitle.length > 160) {
-      errors.metaTitle = "meta title must be less than 160 character";
-      valid = false;
+      errors.metaTitle = "meta title must be less than 160 character"
+      valid = false
     }
     if (!formData.metaDescription) {
-      errors.metaDescription = "Please enter a meta description";
-      valid = false;
+      errors.metaDescription = "Please enter a meta description"
+      valid = false
     } else if (formData.metaDescription.length > 160) {
       errors.metaDescription =
-        "meta description must be less than 160 character";
-      valid = false;
+        "meta description must be less than 160 character"
+      valid = false
     }
     if (!formData.metaKeywords) {
-      errors.metaKeywords = "Please enter meta keywords";
-      valid = false;
+      errors.metaKeywords = "Please enter meta keywords"
+      valid = false
     } else if (formData.metaKeywords.length > 160) {
-      errors.metaKeywords = "meta keywords must be less than 160 character";
-      valid = false;
+      errors.metaKeywords = "meta keywords must be less than 160 character"
+      valid = false
     }
 
     // Validate Banner Image
     if (open == ADD_BLOG && !bannerImage) {
-      errors.bannerImageError = "Banner Image is required";
-      valid = false;
+      errors.bannerImageError = "Banner Image is required"
+      valid = false
     }
     if (bannerImage && !validImageType.includes(bannerImage.type)) {
-      errors.bannerImageError = `Invalid file type for Banner Image. Allowed types ${validImageType.join(",")}`;
-      valid = false;
+      errors.bannerImageError = `Invalid file type for Banner Image. Allowed types ${validImageType.join(",")}`
+      valid = false
     }
 
     // Validate Thumbnail Image
     if (open == ADD_BLOG && !thumbnailImage) {
-      errors.thumbnailImageError = "Thumbnail Image is required";
-      valid = false;
+      errors.thumbnailImageError = "Thumbnail Image is required"
+      valid = false
     }
     if (thumbnailImage && !validImageType.includes(thumbnailImage.type)) {
-      errors.thumbnailImageError = `Invalid file type for Thumbnail Image. Allowed types ${validImageType.join(",")}`;
-      valid = false;
+      errors.thumbnailImageError = `Invalid file type for Thumbnail Image. Allowed types ${validImageType.join(",")}`
+      valid = false
     }
 
-    //validate author image
+    // validate author image
     // if (open == ADD_BLOG && !thumbnailImage) {
     //   errors.thumbnailImageError = "Thumbnail Image is required";
     //   valid = false;
     // }
     if (authorImageUrl && !validImageType.includes(authorImageUrl.type)) {
-      errors.authorImageUrl = `Invalid file type for Author Image. Allowed types ${validImageType.join(",")}`;
-      valid = false;
+      errors.authorImageUrl = `Invalid file type for Author Image. Allowed types ${validImageType.join(",")}`
+      valid = false
     }
-    setFormErrors(errors);
-    return valid;
-  };
+    setFormErrors(errors)
+    return valid
+  }
 
   // handle submit
   const handleSubmit = async (active: boolean) => {
     if (validateForm()) {
       try {
-        setLoading(true);
+        setLoading(true)
 
-        const formDataToSend = new FormData();
-        formDataToSend.set("templateId", String(formData.templateId));
-        formDataToSend.set("title", formData.title);
-        formDataToSend.set("subTitle", formData.subTitle);
-        formDataToSend.set("slug", formData.slug);
-        formDataToSend.set("authorName", formData.authorName);
-        formDataToSend.set("description", formData.description);
-        formDataToSend.set("metaTitle", formData.metaTitle);
-        formDataToSend.set("metaDescription", formData.metaDescription);
-        formDataToSend.set("metaKeywords", formData.metaKeywords);
-        formDataToSend.set("active", String(active));
-        formDataToSend.set("tags", formData.tags.join(","));
-        formDataToSend.set("categories", formData.categories.join(","));
+        const formDataToSend = new FormData()
+        formDataToSend.set("templateId", String(formData.templateId))
+        formDataToSend.set("title", formData.title)
+        formDataToSend.set("subTitle", formData.subTitle)
+        formDataToSend.set("slug", formData.slug)
+        formDataToSend.set("authorName", formData.authorName)
+        formDataToSend.set("description", formData.description)
+        formDataToSend.set("metaTitle", formData.metaTitle)
+        formDataToSend.set("metaDescription", formData.metaDescription)
+        formDataToSend.set("metaKeywords", formData.metaKeywords)
+        formDataToSend.set("active", String(active))
+        formDataToSend.set("tags", formData.tags.join(","))
+        formDataToSend.set("categories", formData.categories.join(","))
         if (bannerImage) {
-          formDataToSend.append("bannerImage", bannerImage as Blob);
+          formDataToSend.append("bannerImage", bannerImage as Blob)
         }
         if (thumbnailImage) {
-          formDataToSend.append("thumbnailImage", thumbnailImage as Blob);
+          formDataToSend.append("thumbnailImage", thumbnailImage as Blob)
         }
         if (authorImageUrl) {
-          formDataToSend.append("authorImageUrl", authorImageUrl as Blob);
+          formDataToSend.append("authorImageUrl", authorImageUrl as Blob)
         }
 
-        let result = null;
+        let result = null
         if (open == EDIT_BLOG) {
-          formDataToSend.set("blogId", String(editingRow?.blogId));
-          result = await postContentBlock(blogPost.update, formDataToSend);
+          formDataToSend.set("blogId", String(editingRow?.blogId))
+          result = await postContentBlock(blogPost.update, formDataToSend)
         } else {
-          result = await postContentBlock(blogPost.create, formDataToSend);
+          result = await postContentBlock(blogPost.create, formDataToSend)
         }
 
-        setLoading(false);
+        setLoading(false)
 
         if (result.status === "success") {
-          toast.success(result.message);
-          router.back();
+          toast.success(result.message)
+          router.back()
         } else {
-          toast.error(result.message);
+          toast.error(result.message)
         }
       } catch (error) {
-        console.error(error);
-        setLoading(false);
+        console.error(error)
+        setLoading(false)
       }
     }
-  };
+  }
 
   const convertImageToBase64 = (file: any) => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
+      const reader = new FileReader()
 
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file)
 
       reader.onload = () => {
-        resolve(reader.result);
-      };
+        resolve(reader.result)
+      }
 
       reader.onerror = (error) => {
-        reject(error);
-      };
-    });
-  };
+        reject(error)
+      }
+    })
+  }
 
   // handle Preview Generate
   const handlePreviewGenerateAndRedirect = async () => {
     if (validateForm()) {
       try {
-        const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
-        setLoading(true);
-        let todayDate: string | Date = new Date();
+        const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL
+        setLoading(true)
+        let todayDate: string | Date = new Date()
         todayDate =
           todayDate.getDay() +
           "/" +
           todayDate.getMonth() +
           "/" +
-          todayDate.getFullYear();
+          todayDate.getFullYear()
 
         const previewData = {
           title: formData.title,
@@ -457,35 +455,35 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
           metaDescription: formData.metaDescription,
           metaKeywords: formData.metaKeywords,
           createdAt: editingRow?.createdAt,
-          updatedAt: todayDate,
-        };
+          updatedAt: todayDate
+        }
 
-        //authorImageUrl
+        // authorImageUrl
         if (
           !isImageBannerTouched.authorImageUrl &&
           editingRow?.authorImageUrl
         ) {
           previewData.authorImageUrl = (BACKEND_URL +
             "/" +
-            editingRow?.authorImageUrl) as string;
+            editingRow?.authorImageUrl) as string
         } else if (authorImageUrl) {
           previewData.authorImageUrl = (await convertImageToBase64(
             authorImageUrl
-          )) as string;
+          )) as string
         }
 
-        //bannerImage
+        // bannerImage
         if (!isImageBannerTouched.bannerImage && editingRow?.bannerImageUrl) {
           previewData.bannerImageUrl = (BACKEND_URL +
             "/" +
-            editingRow?.bannerImageUrl) as string;
+            editingRow?.bannerImageUrl) as string
         } else if (bannerImage) {
           previewData.bannerImageUrl = (await convertImageToBase64(
             bannerImage
-          )) as string;
+          )) as string
         }
 
-        //thumbnailImage
+        // thumbnailImage
         // if (
         //   !isImageBannerTouched.thumbnailImage &&
         //   editingRow?.thumbnailImageUrl
@@ -499,32 +497,32 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
         //   )) as string;
         // }
 
-        let result = await postDataToOrganizationAPIs(
+        const result = await postDataToOrganizationAPIs(
           blogPost.generatePreview,
           { data: previewData }
-        );
-        setLoading(false);
+        )
+        setLoading(false)
 
         if (result.statusCode === 200) {
-          let redirectURL = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/blogs/${formData.slug}?preview=true&id=${result.data.hash}`;
-          window.open(redirectURL, "_blank");
+          const redirectURL = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/blogs/${formData.slug}?preview=true&id=${result.data.hash}`
+          window.open(redirectURL, "_blank")
         } else {
-          toast.error(result.message);
+          toast.error(result.message)
         }
       } catch (error) {
-        console.error(error);
-        setLoading(false);
+        console.error(error)
+        setLoading(false)
       }
     }
-  };
+  }
 
   const handleEditorChangeCKEditor = (data: any) => {
     // setEditorData(data)
     setFormData((prevData) => ({
       ...prevData,
-      description: data,
-    }));
-  };
+      description: data
+    }))
+  }
 
   return (
     <>
@@ -572,9 +570,9 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                 fullWidth
                 value={formData.subTitle}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  setFormData({ ...formData, subTitle: e.target.value });
+                  setFormData({ ...formData, subTitle: e.target.value })
                   if (e.target?.value?.length) {
-                    setFormErrors({ ...formErrors, subTitle: "" });
+                    setFormErrors({ ...formErrors, subTitle: "" })
                   }
                 }}
               />
@@ -584,7 +582,7 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                 // disabled={open === sectionActions.EDIT}
                 // error={!!formErrors.slug}
                 InputProps={{
-                  startAdornment: "/blog/",
+                  startAdornment: "/blog/"
                 }}
                 error={!!formErrors.slug}
                 helperText={formErrors.slug}
@@ -593,16 +591,16 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                 placeholder=""
                 value={formData.slug}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  setFormData({ ...formData, slug: e.target.value });
-                  setIsSlugManuallyEdited(true);
+                  setFormData({ ...formData, slug: e.target.value })
+                  setIsSlugManuallyEdited(true)
                   if (e.target?.value?.length) {
-                    setFormErrors({ ...formErrors, slug: "" });
+                    setFormErrors({ ...formErrors, slug: "" })
                   }
                 }}
               />
             </Grid>
             <Grid item xs={12} sm={12}>
-              <p className={`${!!formErrors.description ? 'text-red-600': ' text-[#4e4b5a]'}`}>Description *</p>
+              <p className={`${formErrors.description ? 'text-red-600' : ' text-[#4e4b5a]'}`}>Description *</p>
 
               <MyCKEditor
                 onChange={handleEditorChangeCKEditor}
@@ -611,7 +609,7 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
               {
                 !!formErrors.description &&
                 <p className="text-red-600">{formErrors.description}</p>
-                
+
               }
               {/* <div>
                 <div dangerouslySetInnerHTML={{ __html: formData.description }} />
@@ -629,9 +627,9 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                 placeholder=""
                 value={formData.metaTitle}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  setFormData({ ...formData, metaTitle: e.target.value });
+                  setFormData({ ...formData, metaTitle: e.target.value })
                   if (e.target?.value?.length) {
-                    setFormErrors({ ...formErrors, metaTitle: "" });
+                    setFormErrors({ ...formErrors, metaTitle: "" })
                   }
                 }}
               />
@@ -660,10 +658,10 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   setFormData({
                     ...formData,
-                    metaDescription: e.target.value,
-                  });
+                    metaDescription: e.target.value
+                  })
                   if (e.target?.value?.length) {
-                    setFormErrors({ ...formErrors, metaDescription: "" });
+                    setFormErrors({ ...formErrors, metaDescription: "" })
                   }
                 }}
               />
@@ -693,10 +691,10 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   setFormData({
                     ...formData,
-                    metaKeywords: e.target.value,
-                  });
+                    metaKeywords: e.target.value
+                  })
                   if (e.target?.value?.length) {
-                    setFormErrors({ ...formErrors, metaKeywords: "" });
+                    setFormErrors({ ...formErrors, metaKeywords: "" })
                   }
                 }}
               />
@@ -767,7 +765,7 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                             through your machine
                           </Typography>
                         </>
-                      )}
+                    )}
                   </div>
                   {!!formErrors.bannerImageError && (
                     <p className="text-[#ff5054]">
@@ -796,7 +794,7 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                             editingRow?.thumbnailImageUrl
                           }
                         />
-                      )}
+                    )}
                     {thumbnailImage && isImageBannerTouched.thumbnailImage && (
                       <img
                         key={thumbnailImage.name}
@@ -831,7 +829,7 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                             through your machine
                           </Typography>
                         </>
-                      )}
+                    )}
                   </div>
                   {!!formErrors.thumbnailImageError && (
                     <p className="text-[#ff5054]">
@@ -861,7 +859,7 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                             editingRow?.authorImageUrl
                           }
                         />
-                      )}
+                    )}
                     {authorImageUrl && isImageBannerTouched.authorImageUrl && (
                       <img
                         key={authorImageUrl.name}
@@ -896,7 +894,7 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                             through your machine
                           </Typography>
                         </>
-                      )}
+                    )}
                   </div>
                   {!!formErrors.authorImageUrl && (
                     <p className="text-[#ff5054]">
@@ -919,10 +917,10 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     setFormData({
                       ...formData,
-                      authorName: e.target.value,
-                    });
+                      authorName: e.target.value
+                    })
                     if (e.target?.value?.length) {
-                      setFormErrors({ ...formErrors, authorName: "" });
+                      setFormErrors({ ...formErrors, authorName: "" })
                     }
                   }}
                 />
@@ -941,9 +939,9 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                   <CustomTextField {...params} label="Tags" />
                 )}
                 onChange={(e: any, newVal: string[]) => {
-                  setFormData({ ...formData, tags: [...newVal] });
+                  setFormData({ ...formData, tags: [...newVal] })
                   if (newVal.length) {
-                    setFormErrors({ ...formErrors, tags: "" });
+                    setFormErrors({ ...formErrors, tags: "" })
                   }
                 }}
               />
@@ -964,9 +962,9 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                   <CustomTextField {...params} label="Categories" />
                 )}
                 onChange={(e: any, newVal: string[]) => {
-                  setFormData({ ...formData, categories: [...newVal] });
+                  setFormData({ ...formData, categories: [...newVal] })
                   if (newVal.length) {
-                    setFormErrors({ ...formErrors, categories: "" });
+                    setFormErrors({ ...formErrors, categories: "" })
                   }
                 }}
               />
@@ -988,15 +986,15 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                   if (Number(e.target.value) <= 0) {
                     setFormErrors({
                       ...formErrors,
-                      templateId: "please select template",
-                    });
+                      templateId: "please select template"
+                    })
                   } else {
-                    setFormErrors({ ...formErrors, templateId: "" });
+                    setFormErrors({ ...formErrors, templateId: "" })
                   }
                   setFormData({
                     ...formData,
-                    templateId: Number(e.target.value),
-                  });
+                    templateId: Number(e.target.value)
+                  })
                 }}
               >
                 <MenuItem value={-1}>
@@ -1012,7 +1010,7 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                       >
                         {template.templateName}
                       </MenuItem>
-                    );
+                    )
                   })}
               </CustomTextField>
             </Grid>
@@ -1037,7 +1035,7 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
                   color="error"
                   type="reset"
                   onClick={() => {
-                    handleClose();
+                    handleClose()
                   }}
                 >
                   Cancel
@@ -1066,7 +1064,7 @@ function BlogForm({ open, editingRow, handleClose,permissionUser }: blogFormProp
         </Box>
       </Card>
     </>
-  );
+  )
 }
 
-export default BlogForm;
+export default BlogForm
