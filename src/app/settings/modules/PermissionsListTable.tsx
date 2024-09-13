@@ -162,39 +162,39 @@ const PermissionsListTable = ({
           </Typography>
         ),
       }),
-      columnHelper.accessor("active", {
-        header: "Status",
-        cell: ({ row }) => (
-          <div className="flex items-center gap-3">
-            <Chip
-              variant="tonal"
-              className="capitalize"
-              label={row.original.active ? "Active" : "Inactive"}
-              color={row.original.active ? "success" : "error"}
-              size="small"
-            />
-          </div>
-        ),
-      }),
-      columnHelper.accessor("moduleId", {
-        header: "Action",
-        cell: ({ row }) => {
-          return (
-            <div className="flex items-center">
+      // columnHelper.accessor("active", {
+      //   header: "Status",
+      //   cell: ({ row }) => (
+      //     <div className="flex items-center gap-3">
+      //       <Chip
+      //         variant="tonal"
+      //         className="capitalize"
+      //         label={row.original.active ? "Active" : "Inactive"}
+      //         color={row.original.active ? "success" : "error"}
+      //         size="small"
+      //       />
+      //     </div>
+      //   ),
+      // }),
+      // columnHelper.accessor("moduleId", {
+      //   header: "Action",
+      //   cell: ({ row }) => {
+      //     return (
+      //       <div className="flex items-center">
              
-              <IconButton
-                onClick={() => {
-                  setIsDeleting(true);
-                  setDeletingId(row.original.moduleId);
-                }}
-              >
-                <i className="tabler-trash text-[22px] text-textSecondary" />
-              </IconButton>
-            </div>
-          );
-        },
-        enableSorting: false,
-      }),
+      //         <IconButton
+      //           onClick={() => {
+      //             setIsDeleting(true);
+      //             setDeletingId(row.original.moduleId);
+      //           }}
+      //         >
+      //           <i className="tabler-trash text-[22px] text-textSecondary" />
+      //         </IconButton>
+      //       </div>
+      //     );
+      //   },
+      //   enableSorting: false,
+      // }),
     ],
     []
   );
@@ -308,12 +308,12 @@ const PermissionsListTable = ({
               <MenuItem value="inactive">Inactive</MenuItem>
             </CustomTextField>
           </div> */}
-          <OpenDialogOnElementClick
+          {/* <OpenDialogOnElementClick
             element={Button}
             elementProps={buttonProps}
             dialog={PermissionDialog}
             dialogProps={{ editValue }}
-          />
+          /> */}
         </div>
       </div>
       <Card>

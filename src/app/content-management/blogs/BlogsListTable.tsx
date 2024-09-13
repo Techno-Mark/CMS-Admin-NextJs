@@ -89,6 +89,7 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<BlogTypeWithAction>();
 
 const BlogListTable = () => {
+  
   // const { fetchDecryptedData } = usePermission()
   const [userIdRole, setUserIdRole] = useState();
   const [userPermissionData, setUserPermissionData] = useState();
@@ -96,6 +97,8 @@ const BlogListTable = () => {
     setLoading(true);
     try {
       const data = await getDecryptedPermissionData();
+      console.log(data);
+      
       if (data) {
         setUserIdRole(data.currentUserId);
         setUserPermissionData(data.moduleWisePermissions)

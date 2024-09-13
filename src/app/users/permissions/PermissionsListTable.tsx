@@ -292,7 +292,7 @@ const PermissionsListTable = ({
             placeholder="Search"
             className="is-full sm:is-auto"
           />
-          <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
+          {/* <div className="flex flex-col sm:flex-row is-full sm:is-auto items-start sm:items-center gap-4">
             <Typography>Status:</Typography>
             <CustomTextField
               select
@@ -321,13 +321,13 @@ const PermissionsListTable = ({
               <MenuItem value="active">Active</MenuItem>
               <MenuItem value="inactive">Inactive</MenuItem>
             </CustomTextField>
-          </div>
-          <OpenDialogOnElementClick
+          </div> */}
+          {/* <OpenDialogOnElementClick
             element={Button}
             elementProps={buttonProps}
             dialog={PermissionDialog}
             dialogProps={{ editValue }}
-          />
+          /> */}
         </div>
       </div>
       <Card>
