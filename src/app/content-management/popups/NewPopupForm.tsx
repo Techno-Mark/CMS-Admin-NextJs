@@ -34,7 +34,8 @@ const popupActions = {
 const initialFormData = {
   id: -1,
   active: false,
-  eventDate: new Date().toString(),
+  eventStartDate: new Date().toString(),
+  eventEndDate: new Date().toString(),
   startDate: new Date().toString(),
   endDate: new Date().toString(),
   frequency: 0,
@@ -46,11 +47,15 @@ const initialFormData = {
   btnText: "",
   btnLink: "",
   image: "",
+  headerLeftIcon:"",
+  headerRightIcon:"",
+  location: "",
 };
 
 const initialErrorData = {
   id: -1,
-  eventDate: "",
+  eventStartDate: "",
+  eventEndDate: "",
   startDate: "",
   endDate: "",
   frequency: "",
@@ -62,6 +67,9 @@ const initialErrorData = {
   btnText: "",
   btnLink: "",
   image: "",
+  headerLeftIcon:"",
+  headerRightIcon:"",
+  location: "",
 };
 
 function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
@@ -139,6 +147,21 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
 
     if (!image && open == popupActions.ADD) {
       errors.image = "image is required";
+      isValid = false;
+    }
+
+    if (!formData.headerLeftIcon) {
+      errors.headerLeftIcon = "header left icon is required";
+      isValid = false;
+    }
+
+    if (!formData.headerRightIcon) {
+      errors.headerRightIcon = "header right icon is required";
+      isValid = false;
+    }
+
+    if (!formData.location) {
+      errors.location = "location is required";
       isValid = false;
     }
 
@@ -243,7 +266,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
             <BreadCrumbList />
           </Grid>
           <Grid item xs={12} sm={1}>
-            <IconButton color="info" onClick={() => { }}>
+            <IconButton color="info" onClick={() => {}}>
               <i className="tabler-external-link text-textSecondary"></i>
             </IconButton>
           </Grid>
@@ -411,13 +434,31 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
               <Grid item xs={12} lg={6}>
                 <AppReactDatepicker
                   id="min-date"
-                  selected={new Date(formData.eventDate)}
+                  selected={new Date(formData.eventStartDate)}
                   minDate={new Date()}
                   onChange={(date: Date) => {
-                    setFormData({ ...formData, eventDate: date.toString() });
+                    setFormData({
+                      ...formData,
+                      eventStartDate: date.toString(),
+                    });
                   }}
                   customInput={
                     <CustomTextField label="Event Date*" fullWidth />
+                  }
+                />
+              </Grid>
+            )}
+            {popupType === "Event" && (
+              <Grid item xs={12} lg={6}>
+                <AppReactDatepicker
+                  id="min-date"
+                  selected={new Date(formData.eventEndDate)}
+                  minDate={new Date()}
+                  onChange={(date: Date) => {
+                    setFormData({ ...formData, eventEndDate: date.toString() });
+                  }}
+                  customInput={
+                    <CustomTextField label="Event End Date*" fullWidth />
                   }
                 />
               </Grid>
@@ -441,61 +482,65 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
             {(popupType === "Event" ||
               popupType === "General" ||
               popupType === "Exit Intent") && (
-                <Grid item xs={12} sm={12}>
-                  <CustomTextField
-                    // disabled={true}
-                    error={!!formErrors.heading}
-                    helperText={formErrors.heading}
-                    label="Heading*"
-                    fullWidth
-                    placeholder="Heading"
-                    value={formData.heading}
-                    onChange={(e) => {
-                      setFormData({ ...formData, heading: e.target.value });
-                    }}
-                  />
-                </Grid>
-              )}
+              <Grid item xs={12} sm={12}>
+                <CustomTextField
+                  // disabled={true}
+                  minRows={2}
+                  multiline
+                  error={!!formErrors.heading}
+                  helperText={formErrors.heading}
+                  label="Heading*"
+                  fullWidth
+                  placeholder="Heading"
+                  value={formData.heading}
+                  onChange={(e) => {
+                    setFormData({ ...formData, heading: e.target.value });
+                  }}
+                />
+              </Grid>
+            )}
             {(popupType === "Event" ||
               popupType === "General" ||
               popupType === "Exit Intent") && (
-                <Grid item xs={12} sm={12}>
-                  <CustomTextField
-                    // disabled={true}
-                    error={!!formErrors.supportingLine}
-                    helperText={formErrors.supportingLine}
-                    label="Supporting Line*"
-                    fullWidth
-                    placeholder="Supporting Line"
-                    value={formData.supportingLine}
-                    onChange={(e) => {
-                      setFormData({
-                        ...formData,
-                        supportingLine: e.target.value,
-                      });
-                    }}
-                  />
-                </Grid>
-              )}
+              <Grid item xs={12} sm={12}>
+                <CustomTextField
+                  // disabled={true}
+                  minRows={2}
+                  multiline
+                  error={!!formErrors.supportingLine}
+                  helperText={formErrors.supportingLine}
+                  label="Supporting Line*"
+                  fullWidth
+                  placeholder="Supporting Line"
+                  value={formData.supportingLine}
+                  onChange={(e) => {
+                    setFormData({
+                      ...formData,
+                      supportingLine: e.target.value,
+                    });
+                  }}
+                />
+              </Grid>
+            )}
             {(popupType === "Event" ||
               popupType === "General" ||
               popupType === "Exit Intent" ||
               popupType === "Survey") && (
-                <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    // disabled={true}
-                    error={!!formErrors.btnText}
-                    helperText={formErrors.btnText}
-                    label="Button Text*"
-                    fullWidth
-                    placeholder=""
-                    value={formData.btnText}
-                    onChange={(e) => {
-                      setFormData({ ...formData, btnText: e.target.value });
-                    }}
-                  />
-                </Grid>
-              )}
+              <Grid item xs={12} sm={6}>
+                <CustomTextField
+                  // disabled={true}
+                  error={!!formErrors.btnText}
+                  helperText={formErrors.btnText}
+                  label="Button Text*"
+                  fullWidth
+                  placeholder=""
+                  value={formData.btnText}
+                  onChange={(e) => {
+                    setFormData({ ...formData, btnText: e.target.value });
+                  }}
+                />
+              </Grid>
+            )}
             {popupType === "Event" && (
               <Grid item xs={12} sm={6}>
                 <CustomTextField
@@ -508,6 +553,22 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   value={formData.btnLink}
                   onChange={(e) => {
                     setFormData({ ...formData, btnLink: e.target.value });
+                  }}
+                />
+              </Grid>
+            )}
+            {popupType === "Event" && (
+              <Grid item xs={12} sm={6}>
+                <CustomTextField
+                  // disabled={true}
+                  error={!!formErrors.location}
+                  helperText={formErrors.location}
+                  label="Location*"
+                  fullWidth
+                  placeholder=""
+                  value={formData.location}
+                  onChange={(e) => {
+                    setFormData({ ...formData, location: e.target.value });
                   }}
                 />
               </Grid>
@@ -527,7 +588,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
 
           <Grid container spacing={4} xs={4}>
             <Grid item xs={12} sm={12} className="mt-[-20px]">
-              <p className="text-[#4e4b5a] my-2"> Image* </p>
+              <p className={`${formErrors.image ? 'text-red-500' : 'text-[#4e4b5a]'} my-2`}> Image* </p>
               <div className="flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md">
                 <Box
                   {...getImageRootProps({ className: "dropzone" })}
@@ -583,6 +644,37 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   </div>
                 </Box>
               </div>
+              {!!formErrors.image && 
+              <p className="text-red-500">{formErrors.image}</p>
+              }
+            </Grid>
+            <Grid item xs={12}>
+              <CustomTextField
+                // disabled={true}
+                error={!!formErrors.headerLeftIcon}
+                helperText={formErrors.headerLeftIcon}
+                label="Header Left Icon*"
+                fullWidth
+                placeholder="enter url of icon image"
+                value={formData.headerLeftIcon}
+                onChange={(e) => {
+                  setFormData({ ...formData, headerLeftIcon: e.target.value });
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <CustomTextField
+                // disabled={true}
+                error={!!formErrors.headerRightIcon}
+                helperText={formErrors.headerRightIcon}
+                label="Header Right Icon*"
+                fullWidth
+                placeholder="enter url of icon image"
+                value={formData.headerRightIcon}
+                onChange={(e) => {
+                  setFormData({ ...formData, headerRightIcon: e.target.value });
+                }}
+              />
             </Grid>
           </Grid>
         </Box>
@@ -611,7 +703,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                 >
                   Cancel
                 </Button>
-                {permissionUser &&
+                {permissionUser && (
                   <Button
                     variant="contained"
                     type="submit"
@@ -619,7 +711,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   >
                     Save & Update
                   </Button>
-                }
+                )}
               </Box>
             </Grid>
           </Grid>
