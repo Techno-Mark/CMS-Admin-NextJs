@@ -47,8 +47,6 @@ const initialFormData = {
   btnText: "",
   btnLink: "",
   image: "",
-  headerLeftIcon:"",
-  headerRightIcon:"",
   location: "",
 };
 
@@ -67,8 +65,6 @@ const initialErrorData = {
   btnText: "",
   btnLink: "",
   image: "",
-  headerLeftIcon:"",
-  headerRightIcon:"",
   location: "",
 };
 
@@ -149,16 +145,6 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
       isValid = false;
     }
 
-    if (!formData.headerLeftIcon) {
-      errors.headerLeftIcon = "header left icon is required";
-      isValid = false;
-    }
-
-    if (!formData.headerRightIcon) {
-      errors.headerRightIcon = "header right icon is required";
-      isValid = false;
-    }
-
     if (!formData.location) {
       errors.location = "location is required";
       isValid = false;
@@ -218,7 +204,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
         selectedPages: selectedPages,
         isParamanent: isParamanent,
       };
-    
+
       //@ts-ignore
       data.selectedPages = selectedPages.map((item) => item.pageId);
 
@@ -585,7 +571,12 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
 
           <Grid container spacing={4} xs={4}>
             <Grid item xs={12} sm={12} className="mt-[-20px]">
-              <p className={`${formErrors.image ? 'text-red-500' : 'text-[#4e4b5a]'} my-2`}> Image* </p>
+              <p
+                className={`${formErrors.image ? "text-red-500" : "text-[#4e4b5a]"} my-2`}
+              >
+                {" "}
+                Image*{" "}
+              </p>
               <div className="flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md">
                 <Box
                   {...getImageRootProps({ className: "dropzone" })}
@@ -641,37 +632,9 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   </div>
                 </Box>
               </div>
-              {!!formErrors.image && 
-              <p className="text-red-500">{formErrors.image}</p>
-              }
-            </Grid>
-            <Grid item xs={12}>
-              <CustomTextField
-                // disabled={true}
-                error={!!formErrors.headerLeftIcon}
-                helperText={formErrors.headerLeftIcon}
-                label="Header Left Icon*"
-                fullWidth
-                placeholder="enter url of icon image"
-                value={formData.headerLeftIcon}
-                onChange={(e) => {
-                  setFormData({ ...formData, headerLeftIcon: e.target.value });
-                }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <CustomTextField
-                // disabled={true}
-                error={!!formErrors.headerRightIcon}
-                helperText={formErrors.headerRightIcon}
-                label="Header Right Icon*"
-                fullWidth
-                placeholder="enter url of icon image"
-                value={formData.headerRightIcon}
-                onChange={(e) => {
-                  setFormData({ ...formData, headerRightIcon: e.target.value });
-                }}
-              />
+              {!!formErrors.image && (
+                <p className="text-red-500">{formErrors.image}</p>
+              )}
             </Grid>
           </Grid>
         </Box>
