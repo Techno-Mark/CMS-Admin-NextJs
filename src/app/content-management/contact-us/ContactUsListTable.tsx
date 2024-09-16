@@ -19,7 +19,7 @@ import {
 import type { ColumnDef, FilterFn } from "@tanstack/react-table"
 import CustomTextField from "@core/components/mui/TextField"
 import tableStyles from "@core/styles/table.module.css"
-import { post, postDataToOrganizationAPIs } from "@/services/apiService"
+import { postDataToOrganizationAPIs } from "@/services/apiService"
 import BreadCrumbList from "@/components/BreadCrumbList"
 import LoadingBackdrop from "@/components/LoadingBackdrop"
 import { truncateText } from "@/utils/common"
@@ -83,8 +83,8 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<ContactUsTypeWithAction>()
 
 const ContactUsListTable = () => {
-  const [userIdRole, setUserIdRole] = useState()
-  const [setUserPermissionData] = useState()
+  // const [userIdRole, setUserIdRole] = useState()
+  // const [setUserPermissionData] = useState()
   // const getPermissionModule = async () => {
   //   setLoading(true)
   //   try {

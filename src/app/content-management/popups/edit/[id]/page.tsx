@@ -8,8 +8,8 @@ import NewPopupForm from "../../NewPopupForm"
 import { usePermission } from "@/utils/permissions"
 
 const page = ({ params }: { params: { id: string } }) => {
-  const [editingRow, setEditingRow] = useState<PopupTypes | null>(null)
   const router = useRouter()
+  const [editingRow, setEditingRow] = useState<PopupTypes | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {

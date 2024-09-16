@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react"
+import React, { useState, useEffect } from "react"
 import { post } from "@/services/apiService"
 import { getPermissionsList } from "@/services/endpoint/users/permissions"
 import PermissionsListTable from "./PermissionsListTable"
@@ -15,10 +15,6 @@ const page = () => {
   const [totalCount, setTotalCount] = useState<number>(0)
   const [permissionsData, setPermissionsData] = useState([])
 
-  useEffect(() => {
-    getList(initialBody)
-  }, [])
-
   const getList = async (body: any) => {
     try {
       const result = await post(getPermissionsList, body)
@@ -28,6 +24,9 @@ const page = () => {
       console.error(error)
     }
   }
+  useEffect(() => {
+    getList(initialBody)
+  }, [])
 
   return (
     <>

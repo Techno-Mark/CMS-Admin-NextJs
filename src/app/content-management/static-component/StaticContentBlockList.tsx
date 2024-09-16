@@ -86,6 +86,17 @@ const columnHelper = createColumnHelper<StaticComponentTypeWithAction>()
 const StaticContentBlockList = () => {
   const [userIdRole, setUserIdRole] = useState()
   const [userPermissionData, setUserPermissionData] = useState()
+  const [rowSelection, setRowSelection] = useState({})
+  const [globalFilter, setGlobalFilter] = useState("")
+
+  const [data, setData] = useState<TemplateType[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [page, setPage] = useState<number>(0)
+  const [pageSize, setPageSize] = useState<number>(10)
+  const [totalRows, setTotalRows] = useState<number>(0)
+  const [activeFilter] = useState<boolean | null>(null)
+
   const getPermissionModule = async () => {
     setLoading(true)
     try {
@@ -116,17 +127,6 @@ const StaticContentBlockList = () => {
     router.push('/401-not-authorized')
     return null
   }
-
-  const [rowSelection, setRowSelection] = useState({})
-  const [globalFilter, setGlobalFilter] = useState("")
-
-  const [data, setData] = useState<TemplateType[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [setError] = useState<string | null>(null)
-  const [page, setPage] = useState<number>(0)
-  const [pageSize, setPageSize] = useState<number>(10)
-  const [totalRows, setTotalRows] = useState<number>(0)
-  const [activeFilter] = useState<boolean | null>(null)
 
   const getData = async () => {
     setLoading(true)

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { post } from "@/services/apiService"
 import { getRoleList } from "@/services/endpoint/users/roles"
 import RolesListTable from "./RolesListTable"
