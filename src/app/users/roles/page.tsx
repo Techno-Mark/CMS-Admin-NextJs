@@ -5,7 +5,7 @@ import { post } from "@/services/apiService"
 import { getRoleList } from "@/services/endpoint/users/roles"
 import RolesListTable from "./RolesListTable"
 
-const page = () => {
+const Page = () => {
   const [totalCount, setTotalCount] = useState<number>(0)
   const [rolesData, setRolesData] = useState([])
   const [initialBody, setInitialBody] = useState({
@@ -78,4 +78,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

@@ -7,7 +7,7 @@ import { popups } from "@/services/endpoint/popup"
 import NewPopupForm from "../../NewPopupForm"
 import { usePermission } from "@/utils/permissions"
 
-const page = ({ params }: { params: { id: string } }) => {
+const Page = ({ params }: { params: { id: string } }) => {
   const router = useRouter()
   const [editingRow, setEditingRow] = useState<PopupTypes | null>(null)
 
@@ -42,4 +42,4 @@ const page = ({ params }: { params: { id: string } }) => {
   )
 }
 
-export default page
+export default Page

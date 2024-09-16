@@ -6,7 +6,6 @@ import type { ElementType } from 'react'
 import Paper from '@mui/material/Paper'
 import Autocomplete from '@mui/material/Autocomplete'
 import type { AutocompleteProps } from '@mui/material/Autocomplete'
-import { any } from 'valibot'
 
 const CustomAutocomplete = forwardRef(
   <

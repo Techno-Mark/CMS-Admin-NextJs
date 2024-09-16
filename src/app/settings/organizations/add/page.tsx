@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import OrganizationsForm from '../OrganizationsForm'
 
-const page = ({ params }: { params: { } }) => {
+const Page = ({ params }: { params: { } }) => {
   const router = useRouter()
 
   return (
@@ -16,4 +16,4 @@ const page = ({ params }: { params: { } }) => {
   )
 }
 
-export default page
+export default Page

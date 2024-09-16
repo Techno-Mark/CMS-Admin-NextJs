@@ -263,4 +263,6 @@ const CustomTextField = forwardRef((props: TextFieldProps, ref) => {
   )
 })
 
+CustomTextField.displayName = "CustomTextField"
+
 export default CustomTextField

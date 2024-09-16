@@ -84,7 +84,7 @@ function StaticComponentForm({
 
   // handle submit
   const handleSubmit = async (active: boolean) => {
-    if (true) {
+    
       try {
         setLoading(true)
 
@@ -111,7 +111,7 @@ function StaticComponentForm({
         console.error(error)
         setLoading(false)
       }
-    }
+    
   }
 
   // component data part
