@@ -1,0 +1,37 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": ["plugin:react/recommended", "standard"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["react"],
+  "settings": {
+  "react": {
+    "version": "18.2.0"
+  }
+},
+  "rules": {
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "never",
+        "named": "never",
+        "asyncArrow": "always"
+      }
+    ],
+    "multiline-ternary": ["error", "never"],
+    "react/no-unknown-property": [
+      2,
+      {
+        "ignore": ["onError", "download"]
+      }
+    ]
+  }
+}
