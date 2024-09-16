@@ -20,7 +20,6 @@ import {
   getSortedRowModel
 } from "@tanstack/react-table"
 import type { ColumnDef, FilterFn } from "@tanstack/react-table"
-import type { RankingInfo } from "@tanstack/match-sorter-utils"
 // Type Imports
 import type { UsersType } from "@/types/apps/userTypes"
 // Component Imports
@@ -39,15 +38,6 @@ import { MenuItem, Tooltip } from "@mui/material"
 import CustomChip from "@/@core/components/mui/Chip"
 import { post } from "@/services/apiService"
 import LoadingBackdrop from "@/components/LoadingBackdrop"
-
-declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
-}
 
 type UsersTypeWithAction = UsersType & {
   action?: string;
@@ -108,7 +98,7 @@ const UserListTable = () => {
   const [rowSelection, setRowSelection] = useState({})
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
   const [totalRows, setTotalRows] = useState<number>(0)

@@ -63,7 +63,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
   })
   const [activeData, setActiveData] = useState<SectionType[]>([])
   const [selectedSections, setSelectedSections] = useState<SectionType[]>([])
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [isSectionsValid, setIsSectionsValid] = useState(true) // State for validation
 

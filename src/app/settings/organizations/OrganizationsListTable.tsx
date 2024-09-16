@@ -3,15 +3,7 @@
 import { useEffect, useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import {
-  Avatar,
-  Badge,
-  Chip,
-  Divider,
-  FormControl,
-  InputLabel,
   MenuItem,
-  Select,
-  Switch,
   TablePagination,
   TextFieldProps,
   Tooltip,
@@ -21,7 +13,7 @@ import {
   IconButton
 } from "@mui/material"
 import classnames from "classnames"
-import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils"
+import { rankItem } from "@tanstack/match-sorter-utils"
 import {
   createColumnHelper,
   flexRender,
@@ -41,15 +33,6 @@ import { organization } from "@/services/endpoint/organization"
 import CustomChip from "@/@core/components/mui/Chip"
 import BreadCrumbList from "@/components/BreadCrumbList"
 import LoadingBackdrop from "@/components/LoadingBackdrop"
-
-declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
-}
 
 type OrganizationsTypeWithAction = OrganizationsType & {
   action?: string;
@@ -104,7 +87,7 @@ const OrganizationsListTable = () => {
   const [data, setData] = useState<OrganizationsType[]>([])
   const [loading, setLoading] = useState<boolean>(true)
 
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
   const [totalRows, setTotalRows] = useState<number>(0)

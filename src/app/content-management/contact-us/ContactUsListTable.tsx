@@ -6,7 +6,7 @@ import Card from "@mui/material/Card"
 import { TablePagination, TextFieldProps, Tooltip } from "@mui/material"
 import Typography from "@mui/material/Typography"
 import classnames from "classnames"
-import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils"
+import { rankItem } from "@tanstack/match-sorter-utils"
 import {
   createColumnHelper,
   flexRender,
@@ -25,18 +25,7 @@ import LoadingBackdrop from "@/components/LoadingBackdrop"
 import { truncateText } from "@/utils/common"
 import { contactUsType } from "@/types/apps/contactUsType"
 import { contactUs } from "@/services/endpoint/contactUs"
-import { getDecryptedPermissionData, storePermissionData } from "@/utils/storageService"
-import { authnetication } from "@/services/endpoint/auth"
 // import ConfirmationDialog from "./ConfirmationDialog";
-
-declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
-}
 
 type ContactUsTypeWithAction = contactUsType & {
   action?: string;
@@ -83,37 +72,6 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<ContactUsTypeWithAction>()
 
 const ContactUsListTable = () => {
-  const [userIdRole, setUserIdRole] = useState()
-  const [userPermissionData, setUserPermissionData] = useState()
-  const getPermissionModule = async () => {
-    setLoading(true)
-    try {
-      const data = await getDecryptedPermissionData()
-      if (data) {
-        setUserIdRole(data.currentUserId)
-        setUserPermissionData(data.moduleWisePermissions)
-        await storePermissionData(data)
-      }
-      if (!data) {
-        const result = await post(authnetication.user_permission_data, {})
-        setUserIdRole(result.data.currentUserId)
-        setUserPermissionData(result.data.moduleWisePermissions)
-        await storePermissionData(result.data)
-        setLoading(false)
-      }
-    } catch (error: any) {
-      console.error(error)
-      setLoading(false)
-    }
-  }
-  function hasPermission(module: string, action: string) {
-    if (userIdRole == 1) {
-      return true
-    }
-    // @ts-ignore
-    return userPermissionData?.[module]?.includes(action) ?? false
-  }
-
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState("")
 
@@ -121,13 +79,12 @@ const ContactUsListTable = () => {
 
   const [data, setData] = useState<ContactUsTypeWithAction[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
   const [totalRows, setTotalRows] = useState<number>(0)
-  const [activeFilter, setActiveFilter] = useState<boolean | null>(null)
-  const [deletingId, setDeletingId] = useState<number>(0)
-  const [isDeleting, setIsDeleting] = useState<boolean>(false)
+  const [activeFilter] = useState<boolean | null>(null)
+  const [deletingId] = useState<number>(0)
 
   const getData = async () => {
     setLoading(true)

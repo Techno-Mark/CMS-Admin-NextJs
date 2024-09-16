@@ -11,7 +11,6 @@ import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Me
 
 // Component Imports
 import { Menu, MenuItem, SubMenu } from '@menu/vertical-menu'
-import CustomChip from '@core/components/mui/Chip'
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
@@ -24,9 +23,6 @@ import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNav
 import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 import { useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
-import { getDecryptedPermissionData } from '@/utils/storageService'
-import { Skeleton, Stack } from '@mui/material'
 
 type RenderExpandIconProps = {
   open?: boolean
@@ -60,7 +56,7 @@ const VerticalMenu = ({ scrollMenu, permissionData }: Props) => {
 
   // State to hold decrypted permission data
   // const [permissionData, setPermissionData] = useState<Record<string, string[]>>({})
-  const [loading, setLoading] = useState(true) // Add loading state
+  // const [loading, setLoading] = useState(true) // Add loading state
 
   // Fetch decrypted data once on component mount
   // const fetchDecryptedData = async () => {

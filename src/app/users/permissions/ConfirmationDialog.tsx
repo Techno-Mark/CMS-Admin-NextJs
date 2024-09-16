@@ -11,6 +11,7 @@ import { deletePermission } from "@/services/endpoint/users/permissions"
 type ConfirmationDialogProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
+  // eslint-disable-next-line no-undef
   setDeletingId: React.Dispatch<React.SetStateAction<number>>;
 
   deletePayload: object;

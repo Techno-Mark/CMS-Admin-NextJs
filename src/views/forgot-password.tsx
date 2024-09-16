@@ -2,7 +2,6 @@
 
 // Next Imports
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
 
 // MUI Imports
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -25,7 +24,6 @@ import CustomTextField from '@core/components/mui/TextField'
 import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
 import { useState } from 'react'
-import { withoutAuthPost } from '@/services/apiService'
 import { authnetication } from '@/services/endpoint/auth'
 import { toast } from 'react-toastify'
 const API_URL = process.env.NEXT_PUBLIC_API_URL
@@ -92,7 +90,6 @@ const ForgotPassword = ({ mode }: { mode: SystemMode }) => {
   const lightIllustration = '/images/illustrations/auth/v2-forgot-password-light.png'
 
   // Hooks
-  const { lang: locale } = useParams()
   const { settings } = useSettings()
   const theme = useTheme()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
@@ -105,6 +102,7 @@ const ForgotPassword = ({ mode }: { mode: SystemMode }) => {
   const [status, setStatus] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // eslint-disable-next-line no-undef
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)

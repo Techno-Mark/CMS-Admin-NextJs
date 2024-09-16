@@ -5,7 +5,7 @@ import { post } from "@/services/apiService"
 import { getRoleList } from "@/services/endpoint/users/roles"
 import RolesListTable from "./RolesListTable"
 
-const page = () => {
+const Page = () => {
   const [totalCount, setTotalCount] = useState<number>(0)
   const [rolesData, setRolesData] = useState([])
   const [initialBody, setInitialBody] = useState({
@@ -45,7 +45,6 @@ const page = () => {
 
   useEffect(() => {
     const handleStorageUpdate = async () => {
-      const storedOrgName = localStorage.getItem('selectedOrgId')
       const getList = async (body: any) => {
         try {
           const result = await post(getRoleList, body)
@@ -78,4 +77,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

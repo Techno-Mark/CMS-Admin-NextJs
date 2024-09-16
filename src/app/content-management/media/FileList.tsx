@@ -3,12 +3,12 @@
 import { useEffect, useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Card from "@mui/material/Card"
-import { Box, MenuItem, TablePagination, TextFieldProps, Tooltip } from "@mui/material"
+import { Box, TablePagination, TextFieldProps, Tooltip } from "@mui/material"
 import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 import classnames from "classnames"
-import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils"
+import { rankItem } from "@tanstack/match-sorter-utils"
 import {
   createColumnHelper,
   flexRender,
@@ -32,19 +32,9 @@ import { media } from "@/services/endpoint/media"
 import { filesType } from "@/types/apps/FilesTypes"
 import { toast } from "react-toastify"
 import ConfirmationDialog from "./ConfirmationDialog"
-import { usePermission } from "@/utils/permissions"
 import { getDecryptedPermissionData, storePermissionData } from "@/utils/storageService"
 import { authnetication } from "@/services/endpoint/auth"
 // import defaultFileIcon from "../../../../public/images/files.png";
-
-declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
-}
 
 type BlogTypeWithAction = filesType & {
   action?: string;
@@ -131,11 +121,11 @@ const FileListTable = () => {
 
   const [data, setData] = useState<TemplateType[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
   const [totalRows, setTotalRows] = useState<number>(0)
-  const [activeFilter, setActiveFilter] = useState<boolean | null>(null)
+  const [activeFilter] = useState<boolean | null>(null)
   const [deletingId, setDeletingId] = useState<number>(0)
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
 
@@ -160,12 +150,9 @@ const FileListTable = () => {
     }
     getData()
   }, [page, pageSize, globalFilter, deletingId, activeFilter])
-  const validImageTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
-  const defaultFileIcon = "public/images/files.png"
 
   useEffect(() => {
     const handleStorageUpdate = async () => {
-      const storedOrgName = localStorage.getItem('selectedOrgId')
       const getData = async () => {
         setLoading(true)
         try {
@@ -211,9 +198,6 @@ const FileListTable = () => {
 
           // Construct the full URL for the file
           const fileUrl = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/${filePath}`
-
-          // Determine if the file is an image
-          const isImage = validImageTypes.includes(mediaType)
 
           return (
             <Box display="flex" alignItems="center">

@@ -31,18 +31,8 @@ import { truncateText } from "@/utils/common"
 import { blogsType } from "@/types/apps/blogsType"
 import { blogPost } from "@/services/endpoint/blogpost"
 import ConfirmationDialog from "./ConfirmationDialog"
-import { usePermission } from "@/utils/permissions"
 import { authnetication } from "@/services/endpoint/auth"
 import { getDecryptedPermissionData, storePermissionData } from "@/utils/storageService"
-
-declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
-}
 
 type BlogTypeWithAction = blogsType & {
   action?: string;
@@ -135,7 +125,7 @@ const BlogListTable = () => {
 
   const [data, setData] = useState<TemplateType[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
   const [totalRows, setTotalRows] = useState<number>(0)

@@ -122,8 +122,7 @@ const RolesForm = ({ open }: Props) => {
 
   const getSectionDataById = async (slug: string | number) => {
     try {
-      const result = await get(getSectionById(slug))
-      const { data } = result
+      await get(getSectionById(slug))
 
       setFormData({
         ...formData,

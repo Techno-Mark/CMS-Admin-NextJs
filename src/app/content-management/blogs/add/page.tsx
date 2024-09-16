@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation"
 import BlogForm from "@/app/content-management/blogs/BlogForm"
 import { ADD_BLOG } from "@/types/apps/blogsType"
-import { useEffect, useState } from "react"
 import { usePermission } from "@/utils/permissions"
 
 const Page = () => {

@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect, useState } from "react"
-import PagesForm from "../../PagesForm"
 import { useRouter } from "next/navigation"
 import { post } from "@/services/apiService"
 import { PopupTypes } from "../../popupTypes"
@@ -8,7 +7,7 @@ import { popups } from "@/services/endpoint/popup"
 import NewPopupForm from "../../NewPopupForm"
 import { usePermission } from "@/utils/permissions"
 
-const page = ({ params }: { params: { id: string } }) => {
+const Page = ({ params }: { params: { id: string } }) => {
   const [editingRow, setEditingRow] = useState<PopupTypes | null>(null)
   const router = useRouter()
 
@@ -43,4 +42,4 @@ const page = ({ params }: { params: { id: string } }) => {
   )
 }
 
-export default page
+export default Page

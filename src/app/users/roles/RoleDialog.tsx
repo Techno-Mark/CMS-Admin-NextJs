@@ -240,7 +240,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
                   {Array.isArray(defaultData) &&
                     defaultData.length > 0 &&
                     defaultData[0]?.permissions?.map((perm: any) => (
-                      <td className="!text-end pie-0 !pr-4">
+                      <td className="!text-end pie-0 !pr-4" key={perm.id}>
                         <FormGroup className="flex-row justify-end flex-nowrap gap-6">
                           <FormControlLabel
                             key={perm.id}
@@ -265,7 +265,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
                           </Typography>
                         </td>
                         {module.permissions.map((perm: any) => (
-                          <td className="!text-end pie-0 !pr-4">
+                          <td className="!text-end pie-0 !pr-4" key={perm?.id}>
                             <FormGroup className="flex-row justify-end flex-nowrap gap-6">
                               <FormControlLabel
                                 key={perm.id}

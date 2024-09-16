@@ -1,12 +1,7 @@
 'use client'
 
-// Next Imports
-import Link from 'next/link'
-
 // MUI Imports
-import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
-import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 
 // Third-party Imports
@@ -14,9 +9,6 @@ import classnames from 'classnames'
 
 // Type Imports
 import type { SystemMode } from '@core/types'
-
-// Hook Imports
-import { useImageVariant } from '@core/hooks/useImageVariant'
 
 // Styled Components
 const MaskImg = styled('img')({
@@ -30,7 +22,6 @@ const MaskImg = styled('img')({
 
 const NotAuthorized = ({ mode }: { mode: SystemMode }) => {
   // Vars
-  const darkImg = '/images/pages/misc-mask-dark.png'
   const lightImg = '/images/pages/misc-mask-light.png'
 
   // Hooks

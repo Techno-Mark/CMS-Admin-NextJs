@@ -10,9 +10,6 @@ import ModeDropdown from '@components/layout/shared/ModeDropdown'
 
 // Util Imports
 import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
-import { useEffect, useState } from 'react'
-import { post } from '@/services/apiService'
-import { organization } from '@/services/endpoint/organization'
 
 const NavbarContent = () => {
   return (

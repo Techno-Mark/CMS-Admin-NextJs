@@ -5,7 +5,6 @@ import { post } from "@/services/apiService"
 import { organization } from "@/services/endpoint/organization"
 import { createUser, updateUser } from "@/services/endpoint/users/management"
 import { getRoleList } from "@/services/endpoint/users/roles"
-import { userDetailType } from "@/types/apps/userType"
 import {
   Box,
   Button,
@@ -85,7 +84,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
 
       return response.data.roles.map(
         (r: any) =>
-          new Object({
+          ({
             id: r.roleId,
             name: r.roleName
           })
@@ -254,7 +253,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
             active: formData.active,
             organizations: company.map(
               (c) =>
-                new Object({
+                ({
                   roleId: c.roleId,
                   organizationId: c.organizationId
                 })
@@ -265,7 +264,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
             active: formData.active,
             organizations: company.map(
               (c) =>
-                new Object({
+                ({
                   roleId: c.roleId,
                   organizationId: c.organizationId
                 })

@@ -70,6 +70,7 @@ const ModeDropdown = () => {
     setOpen((prevOpen) => !prevOpen)
   }
 
+  // eslint-disable-next-line
   const handleModeSwitch = (orgId: string, event: React.MouseEvent) => {
     event.preventDefault()
     setSelectedOrgId(orgId)

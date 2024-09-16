@@ -5,10 +5,8 @@ import {
   Box,
   Typography,
   Grid,
-  TextField,
   Switch,
   Button,
-  Divider,
   Card
 } from "@mui/material"
 import { OrganizationsType } from "@/types/apps/organizationsType"

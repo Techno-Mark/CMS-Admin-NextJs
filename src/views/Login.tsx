@@ -5,7 +5,7 @@ import { useState } from "react"
 
 // Next Imports
 import Link from "next/link"
-import { useParams, useRouter, useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 // MUI Imports
 import useMediaQuery from "@mui/material/useMediaQuery"
@@ -13,11 +13,7 @@ import { styled, useTheme } from "@mui/material/styles"
 import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 import InputAdornment from "@mui/material/InputAdornment"
-import Checkbox from "@mui/material/Checkbox"
 import Button from "@mui/material/Button"
-import FormControlLabel from "@mui/material/FormControlLabel"
-import Divider from "@mui/material/Divider"
-import Alert from "@mui/material/Alert"
 
 // Third-party Imports
 

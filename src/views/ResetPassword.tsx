@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 // Next Imports
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 // MUI Imports
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -14,7 +14,6 @@ import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import Button from '@mui/material/Button'
-import { FormHelperText } from '@mui/material'
 
 // Third-party Imports
 import * as yup from 'yup'

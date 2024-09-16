@@ -1,9 +1,6 @@
 // Next Imports
 import type { Metadata } from 'next'
 
-// Component Imports
-import Login from '@views/Login'
-
 // Server Action Imports
 import { getServerMode } from '@core/utils/serverHelpers'
 import { authOptions } from '@/libs/auth'

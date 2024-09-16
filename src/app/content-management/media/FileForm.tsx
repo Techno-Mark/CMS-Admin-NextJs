@@ -12,13 +12,12 @@ import {
   ListItem,
   List
 } from "@mui/material"
-import CustomTextField from "@/@core/components/mui/TextField"
 import React, { useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { toast } from "react-toastify"
 import BreadCrumbList from "@/components/BreadCrumbList"
 import { useRouter } from "next/navigation"
-import { ADD_BLOG, blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType"
+import { ADD_BLOG, blogDetailType } from "@/types/apps/blogsType"
 import { postContentBlock } from "@/services/apiService"
 import { media } from "@/services/endpoint/media"
 
@@ -32,12 +31,6 @@ type blogFormPropsTypes = {
 const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/svg", "image/svg+xml", "video/mp4", "video/webm"]
 
 const MAX_FILES = 10
-
-const initialFormData = {
-  id: -1,
-  templateId: -1,
-  title: ""
-}
 
 const initialErrorData = {
   templateId: "",
@@ -54,7 +47,6 @@ type FileProp = {
 function FileForm({ open, editingRow, handleClose, permissionUser }: blogFormPropsTypes) {
   const router = useRouter()
 
-  const [formData, setFormData] = useState<typeof initialFormData>(initialFormData)
   const [formErrors, setFormErrors] = useState<typeof initialErrorData>(initialErrorData)
   const [loading, setLoading] = useState<boolean>(false)
   const [files, setFiles] = useState<File[]>([])

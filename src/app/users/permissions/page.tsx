@@ -11,7 +11,7 @@ const initialBody = {
   active: null
 }
 
-const page = () => {
+const Page = () => {
   const [totalCount, setTotalCount] = useState<number>(0)
   const [permissionsData, setPermissionsData] = useState([])
 
@@ -42,4 +42,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

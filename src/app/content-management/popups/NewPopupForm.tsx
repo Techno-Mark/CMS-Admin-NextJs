@@ -69,7 +69,6 @@ const initialErrorData = {
 }
 
 function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
-  const router = useRouter()
 
   const [popupType, setPopupType] = useState("Event")
   const [allPages, setAllPages] = useState(false)

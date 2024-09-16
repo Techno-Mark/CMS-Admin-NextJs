@@ -8,7 +8,7 @@ import { PagesType } from "../../pagesType"
 import LoadingBackdrop from "@/components/LoadingBackdrop"
 import { usePermission } from "@/utils/permissions"
 
-const page = ({ params }: { params: { id: string } }) => {
+const Page = ({ params }: { params: { id: string } }) => {
   const [editingRow, setEditingRow] = useState<PagesType | null>(null)
   const router = useRouter()
   const [loading, setLoading] = useState<boolean>(true)
@@ -44,4 +44,4 @@ const page = ({ params }: { params: { id: string } }) => {
   )
 }
 
-export default page
+export default Page

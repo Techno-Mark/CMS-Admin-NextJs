@@ -11,6 +11,7 @@ import { deleteRole } from "@/services/endpoint/users/roles"
 type ConfirmationDialogProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
+  // eslint-disable-next-line
   setDeletingId: React.Dispatch<React.SetStateAction<number>>;
   deletePayload: object;
 

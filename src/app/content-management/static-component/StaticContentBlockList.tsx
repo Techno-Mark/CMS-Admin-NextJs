@@ -7,7 +7,7 @@ import { TablePagination, TextFieldProps, Tooltip } from "@mui/material"
 import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 import classnames from "classnames"
-import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils"
+import { rankItem } from "@tanstack/match-sorter-utils"
 import {
   createColumnHelper,
   flexRender,
@@ -29,16 +29,6 @@ import { staticContentBlock } from "@/services/endpoint/staticContentBlock"
 import { staticContentBlockType } from "@/types/apps/staticContentBlockType"
 import { authnetication } from "@/services/endpoint/auth"
 import { getDecryptedPermissionData, storePermissionData } from "@/utils/storageService"
-import { useSession } from "next-auth/react"
-
-declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
-}
 
 type StaticComponentTypeWithAction = staticContentBlockType & {
   action?: string;
@@ -132,7 +122,6 @@ const StaticContentBlockList = () => {
     return userPermissionData?.[module]?.includes(action) ?? false
   }
 
-  const hasCheckModule = (menuKey: string): boolean => !!(userPermissionData && userPermissionData[menuKey])
   const router = useRouter()
 
   const [rowSelection, setRowSelection] = useState({})
@@ -140,11 +129,11 @@ const StaticContentBlockList = () => {
 
   const [data, setData] = useState<TemplateType[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
   const [totalRows, setTotalRows] = useState<number>(0)
-  const [activeFilter, setActiveFilter] = useState<boolean | null>(null)
+  const [activeFilter] = useState<boolean | null>(null)
 
   const getData = async () => {
     setLoading(true)

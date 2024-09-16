@@ -15,22 +15,15 @@ import {
   getCoreRowModel,
   useReactTable,
   getFilteredRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-
-  getFacetedMinMaxValues,
   getPaginationRowModel,
   getSortedRowModel
 } from "@tanstack/react-table"
 import type { ColumnDef, FilterFn } from "@tanstack/react-table"
-import type { RankingInfo } from "@tanstack/match-sorter-utils"
 // Component Imports
-import TablePaginationComponent from "@components/TablePaginationComponent"
 import CustomTextField from "@core/components/mui/TextField"
 // Style Imports
 import tableStyles from "@core/styles/table.module.css"
 import ConfirmationDialog from "./ConfirmationDialog"
-import { useRouter } from "next/navigation"
 import BreadCrumbList from "@components/BreadCrumbList"
 // Type Imports
 import { RolesType } from "@/types/apps/rolesType"
@@ -38,18 +31,8 @@ import RoleCards from "./RolesCard"
 import { Chip, MenuItem, Tooltip } from "@mui/material"
 import RoleDialog from "./RoleDialog"
 import { post } from "@/services/apiService"
-import { getSectionList } from "@/services/endpoint/content-block"
 import { getRoleList } from "@/services/endpoint/users/roles"
 import LoadingBackdrop from "@/components/LoadingBackdrop"
-
-declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
-}
 
 type RolesTypeWithAction = RolesType & {
   action?: string;
@@ -130,12 +113,11 @@ const RolesListTable = ({
   const [rowSelection, setRowSelection] = useState({})
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
   const [totalRows, setTotalRows] = useState<number>(0)
 
-  const router = useRouter()
   // States
   const [globalFilter, setGlobalFilter] = useState("")
   const [deletingId, setDeletingId] = useState<number>(0)

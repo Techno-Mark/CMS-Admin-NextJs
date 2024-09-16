@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 
 import CustomTextField from "@/@core/components/mui/TextField"
-import { ChangeEvent, Children, useEffect, useState } from "react"
+import { ChangeEvent, useEffect, useState } from "react"
 import { Button } from "@mui/material"
 
 type KanbanDrawerProps = {
@@ -39,7 +39,7 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
     dataRequired,
     open
   } = props
-  const [loading, setLoading] = useState(true)
+  const [, setLoading] = useState(true)
   const [formErrors, setFormErrors] =
     useState<typeof initialErrorData>(initialErrorData)
   const [formData, setFormData] =
@@ -50,11 +50,6 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
     setFormData(initialFormData)
     setFormErrors(initialErrorData)
     setDrawerOpen(false)
-  }
-
-  // Update Task
-  const updateTask = (data: FormData) => {
-    handleClose()
   }
 
   // validation before submit

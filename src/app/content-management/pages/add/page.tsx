@@ -6,7 +6,7 @@ import { usePermission } from "@/utils/permissions"
 
 const ADD_PAGES = -1
 
-const page = () => {
+const Page = () => {
   const router = useRouter()
 
   const { hasPermission } = usePermission()
@@ -19,4 +19,4 @@ const page = () => {
     permissionUser={hasPermission('Page', 'Create')} />
 }
 
-export default page
+export default Page

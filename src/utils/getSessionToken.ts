@@ -1,6 +1,4 @@
 import { authOptions } from "@/libs/auth"
-import { verify } from "jsonwebtoken"
-import { NextApiRequest } from "next"
 import { getServerSession } from "next-auth"
 
 // Function to get session token from cookies manually

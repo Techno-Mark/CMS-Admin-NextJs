@@ -7,6 +7,7 @@
  ! MUI CSS Variables: https://mui.com/material-ui/experimental-api/css-theme-variables/overview/
  */
 
+/* eslint-disable */
 // MUI Imports
 import type { ComponentsOverrides } from '@mui/material/styles'
 

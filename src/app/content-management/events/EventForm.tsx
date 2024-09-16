@@ -10,8 +10,6 @@ import {
   Box,
   Card,
   Grid,
-  IconButton,
-  MenuItem,
   Switch,
   Typography
 } from "@mui/material"
@@ -22,13 +20,11 @@ import LoadingBackdrop from "@/components/LoadingBackdrop"
 import AppReactDatepicker from "@/libs/styles/AppReactDatepicker"
 import dayjs from "dayjs"
 import { useDropzone } from "react-dropzone"
-import Close from "@/@menu/svg/Close"
 import EditorBasic from "@/components/EditorToolbar"
 import { toast } from "react-toastify"
 import { ADD_EVENT, EDIT_EVENT, eventDetailType } from "@/types/apps/eventType"
 // import { CKEditor } from "@ckeditor/ckeditor5-react";
 // import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import dynamic from 'next/dynamic'
 // Dynamic import for CKEditor
 // const CKEditor = dynamic<{ editor: any, data: string, onChange: (event: any, editor: any) => void }>(() =>
 //   import('@ckeditor/ckeditor5-react').then((mod: any) => mod.CKEditor), { ssr: false });
@@ -249,18 +245,7 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
       }
     }
   }
-  const handleEditorChange = (content: string) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      description: content
-    }))
-    if (content?.length) {
-      setFormErrors((prevFormErrors) => ({
-        ...prevFormErrors,
-        description: ""
-      }))
-    }
-  }
+
   const handleContentChange = (content: any) => {
     setFormData((prevData) => ({
       ...prevData,

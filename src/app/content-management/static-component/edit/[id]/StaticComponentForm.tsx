@@ -29,40 +29,6 @@ type staticContentBlockFormPropsTypes = {
   permissionUser: Boolean
 };
 
-const initialFormData = {
-  id: -1,
-  templateId: -1,
-  title: "",
-  subTitle: "",
-  slug: "",
-  authorName: "",
-  categories: [] as string[],
-  tags: [] as string[],
-  description: "",
-  status: 0,
-  metaTitle: "",
-  metaDescription: "",
-  metaKeywords: ""
-}
-
-const initialErrorData = {
-  templateId: "",
-  title: "",
-  subTitle: "",
-  slug: "",
-  authorName: "",
-  bannerImageError: "",
-  thumbnailImageError: "",
-  authorImageUrl: "",
-  categories: "",
-  tags: "",
-  description: "",
-  status: "",
-  metaTitle: "",
-  metaDescription: "",
-  metaKeywords: ""
-}
-
 function StaticComponentForm({
   sectionSchema: formData,
   editingRow,
@@ -84,33 +50,31 @@ function StaticComponentForm({
 
   // handle submit
   const handleSubmit = async (active: boolean) => {
-    if (true) {
-      try {
-        setLoading(true)
+    try {
+      setLoading(true)
 
-        const data = {
-          contentBlockId: formData?.sectionId,
-          contentBlockData: templateValue
-        }
-        let result = null
-
-        result = await postDataToOrganizationAPIs(
-          staticContentBlock.saveAndUpdate,
-          data
-        )
-
-        setLoading(false)
-
-        if (result.status === "success") {
-          toast.success(result.message)
-          router.back()
-        } else {
-          toast.error(result.message)
-        }
-      } catch (error) {
-        console.error(error)
-        setLoading(false)
+      const data = {
+        contentBlockId: formData?.sectionId,
+        contentBlockData: templateValue
       }
+      let result = null
+
+      result = await postDataToOrganizationAPIs(
+        staticContentBlock.saveAndUpdate,
+        data
+      )
+
+      setLoading(false)
+
+      if (result.status === "success") {
+        toast.success(result.message)
+        router.back()
+      } else {
+        toast.error(result.message)
+      }
+    } catch (error) {
+      console.error(error)
+      setLoading(false)
     }
   }
 

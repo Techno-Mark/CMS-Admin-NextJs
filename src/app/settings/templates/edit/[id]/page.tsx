@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { get, post } from '@/services/apiService'
+import { get } from '@/services/apiService'
 import TemplateForm from '../../TemplateForm'
 import { template } from '@/services/endpoint/template'
 import { TemplateType } from '@/types/apps/templateType'

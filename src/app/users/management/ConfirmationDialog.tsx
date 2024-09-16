@@ -11,6 +11,7 @@ import { deleteUser } from "@/services/endpoint/users/management"
 type ConfirmationDialogProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
+  // eslint-disable-next-line
   setDeletingId: React.Dispatch<React.SetStateAction<number>>;
   deletePayload: object;
 };
