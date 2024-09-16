@@ -84,34 +84,32 @@ function StaticComponentForm({
 
   // handle submit
   const handleSubmit = async (active: boolean) => {
-    
-      try {
-        setLoading(true)
+    try {
+      setLoading(true)
 
-        const data = {
-          contentBlockId: formData?.sectionId,
-          contentBlockData: templateValue
-        }
-        let result = null
-
-        result = await postDataToOrganizationAPIs(
-          staticContentBlock.saveAndUpdate,
-          data
-        )
-
-        setLoading(false)
-
-        if (result.status === "success") {
-          toast.success(result.message)
-          router.back()
-        } else {
-          toast.error(result.message)
-        }
-      } catch (error) {
-        console.error(error)
-        setLoading(false)
+      const data = {
+        contentBlockId: formData?.sectionId,
+        contentBlockData: templateValue
       }
-    
+      let result = null
+
+      result = await postDataToOrganizationAPIs(
+        staticContentBlock.saveAndUpdate,
+        data
+      )
+
+      setLoading(false)
+
+      if (result.status === "success") {
+        toast.success(result.message)
+        router.back()
+      } else {
+        toast.error(result.message)
+      }
+    } catch (error) {
+      console.error(error)
+      setLoading(false)
+    }
   }
 
   // component data part
