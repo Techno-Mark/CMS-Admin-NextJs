@@ -178,9 +178,7 @@ const SubMenu: ForwardRefRenderFunction<HTMLLIElement, SubMenuProps> = (props, r
   const alignmentAxisOffset =
     popoutMenuOffset &&
     popoutMenuOffset.alignmentAxis &&
-    (typeof popoutMenuOffset.alignmentAxis === 'function'
-      ? popoutMenuOffset.alignmentAxis({ level })
-      : popoutMenuOffset.alignmentAxis)
+    (typeof popoutMenuOffset.alignmentAxis === 'function' ? popoutMenuOffset.alignmentAxis({ level }) : popoutMenuOffset.alignmentAxis)
 
   const { refs, floatingStyles, context } = useFloating({
     strategy: 'fixed',
@@ -311,8 +309,6 @@ const SubMenu: ForwardRefRenderFunction<HTMLLIElement, SubMenuProps> = (props, r
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname])
-
-
 
   const submenuContent = (
     <SubMenuContent

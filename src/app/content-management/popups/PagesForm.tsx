@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import LoadingBackdrop from "@/components/LoadingBackdrop";
+import LoadingBackdrop from "@/components/LoadingBackdrop"
 import {
   Button,
   Box,
@@ -9,22 +9,22 @@ import {
   Typography,
   Avatar,
   IconButton,
-  Switch,
-} from "@mui/material";
-import CustomTextField from "@/@core/components/mui/TextField";
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useDropzone } from "react-dropzone";
-import { postContentBlock } from "@/services/apiService";
-import { toast } from "react-toastify";
-import BreadCrumbList from "@/components/BreadCrumbList";
+  Switch
+} from "@mui/material"
+import CustomTextField from "@/@core/components/mui/TextField"
+import React, { ChangeEvent, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useDropzone } from "react-dropzone"
+import { postContentBlock } from "@/services/apiService"
+import { toast } from "react-toastify"
+import BreadCrumbList from "@/components/BreadCrumbList"
 
-import { popups } from "@/services/endpoint/popup";
+import { popups } from "@/services/endpoint/popup"
 
-import { PopupTypes } from "./popupTypes";
-import dynamic from "next/dynamic";
+import { PopupTypes } from "./popupTypes"
+import dynamic from "next/dynamic"
 
-import EditorBasic from "@/components/EditorToolbar";
+import EditorBasic from "@/components/EditorToolbar"
 
 // import { CKEditor } from "@ckeditor/ckeditor5-react";
 // import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
@@ -57,13 +57,13 @@ const validFileTypes = [
   "image/gif",
   "video/mp4",
   "video/webm",
-  "video/ogg",
-];
+  "video/ogg"
+]
 
 const sectionActions = {
   ADD: -1,
-  EDIT: 1,
-};
+  EDIT: 1
+}
 
 const initialFormData = {
   popupId: "",
@@ -71,8 +71,8 @@ const initialFormData = {
   description: "",
   active: false,
   buttonText: "",
-  buttonRedirectLink: "",
-};
+  buttonRedirectLink: ""
+}
 
 const initialErrorData = {
   title: "",
@@ -81,181 +81,181 @@ const initialErrorData = {
   buttonRedirectLink: "",
   buttonText: "",
   description: "",
-  active: null,
-};
+  active: null
+}
 
 function PopupForm({ open, handleClose, setEditingRow, editingRow }: Props) {
-  const router = useRouter();
+  const router = useRouter()
 
   // State management hooks
-  const [popupFile, setPopupFile] = useState<File | null>(null);
+  const [popupFile, setPopupFile] = useState<File | null>(null)
   const [formData, setFormData] =
-    useState<typeof initialFormData>(initialFormData);
+    useState<typeof initialFormData>(initialFormData)
 
   // Error handler hooks
   const [formErrors, setFormErrors] =
-    useState<typeof initialErrorData>(initialErrorData);
+    useState<typeof initialErrorData>(initialErrorData)
 
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
-    setLoading(true);
+    setLoading(true)
     if (editingRow) {
-      //@ts-ignore
-      setFormData(editingRow);
+      // @ts-ignore
+      setFormData(editingRow)
 
       if (editingRow.description) {
         setFormData((prevFormData) => ({
           ...prevFormData,
-          description: editingRow.description,
-        }));
+          description: editingRow.description
+        }))
       }
 
       if (editingRow.popupFile) {
         const fileUrl =
-          process.env.NEXT_PUBLIC_BACKEND_BASE_URL + "/" + editingRow.popupFile;
+          process.env.NEXT_PUBLIC_BACKEND_BASE_URL + "/" + editingRow.popupFile
         fetch(fileUrl)
           .then(async (res) => {
-            const blob = await res.blob();
+            const blob = await res.blob()
             const file = new File([blob], editingRow.popupFile, {
-              type: blob.type,
-            });
-            setPopupFile(file);
+              type: blob.type
+            })
+            setPopupFile(file)
           })
-          .catch((err) => console.error("Failed to fetch popup file:", err));
+          .catch((err) => console.error("Failed to fetch popup file:", err))
       }
 
-      setLoading(false);
+      setLoading(false)
     } else {
-      setFormData(initialFormData);
-      setLoading(false);
+      setFormData(initialFormData)
+      setLoading(false)
     }
-  }, [editingRow]);
+  }, [editingRow])
 
   // Custom hooks
   const {
     getRootProps: getBannerRootProps,
-    getInputProps: getBannerInputProps,
+    getInputProps: getBannerInputProps
   } = useDropzone({
     multiple: false,
     accept: validFileTypes.reduce((acc: any, type) => {
-      const [category] = type.split("/");
+      const [category] = type.split("/")
       if (!acc[category]) {
-        acc[category] = [];
+        acc[category] = []
       }
-      acc[category].push(`.${type.split("/")[1]}`);
-      return acc;
+      acc[category].push(`.${type.split("/")[1]}`)
+      return acc
     }, {}),
     onDrop: (acceptedFiles: File[]) => {
-      setFormErrors({ ...formErrors, popupFileError: "" });
-      setPopupFile(acceptedFiles[0]);
-    },
-  });
+      setFormErrors({ ...formErrors, popupFileError: "" })
+      setPopupFile(acceptedFiles[0])
+    }
+  })
 
   // Validation before submit
   const validateForm = () => {
-    let valid = true;
-    let errors = { ...initialErrorData };
+    let valid = true
+    const errors = { ...initialErrorData }
 
     if (!formData.title) {
-      errors.title = "Please enter a blog title";
-      valid = false;
+      errors.title = "Please enter a blog title"
+      valid = false
     } else if (formData.title.length < 5) {
-      errors.title = "Title must be at least 5 characters long";
-      valid = false;
+      errors.title = "Title must be at least 5 characters long"
+      valid = false
     } else if (formData.title.length > 255) {
-      errors.title = "Title must be at most 255 characters long";
-      valid = false;
+      errors.title = "Title must be at most 255 characters long"
+      valid = false
     }
 
     if (!formData.buttonText) {
-      errors.buttonText = "Please enter a Button Text";
-      valid = false;
+      errors.buttonText = "Please enter a Button Text"
+      valid = false
     }
 
     if (!formData.buttonRedirectLink) {
-      errors.buttonRedirectLink = "Please enter a Button Redirect link";
-      valid = false;
+      errors.buttonRedirectLink = "Please enter a Button Redirect link"
+      valid = false
     }
 
     if (!formData.description) {
-      errors.description = "Please enter a description";
-      valid = false;
+      errors.description = "Please enter a description"
+      valid = false
     }
 
     // Validate Banner File
     if (!popupFile) {
-      errors.popupFileError = "Popup File is required";
-      valid = false;
+      errors.popupFileError = "Popup File is required"
+      valid = false
     } else if (!validFileTypes.includes(popupFile.type)) {
       errors.popupFileError = `Invalid file type for Popup File. Allowed types ${validFileTypes.join(
         ","
-      )}`;
-      valid = false;
+      )}`
+      valid = false
     }
 
-    setFormErrors(errors);
-    return valid;
-  };
+    setFormErrors(errors)
+    return valid
+  }
 
   // Handle submit
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (validateForm()) {
       try {
-        setLoading(true);
+        setLoading(true)
 
-        const formDataToSend = new FormData();
+        const formDataToSend = new FormData()
         if (formData.popupId && editingRow && editingRow.popupId) {
-          formDataToSend.set("popupId", formData.popupId);
+          formDataToSend.set("popupId", formData.popupId)
         }
-        formDataToSend.set("title", formData.title);
-        formDataToSend.set("buttonText", formData.buttonText);
-        formDataToSend.set("buttonRedirectLink", formData.buttonRedirectLink);
-        formDataToSend.set("description", formData.description);
-        formDataToSend.set("active", formData.active.toString());
+        formDataToSend.set("title", formData.title)
+        formDataToSend.set("buttonText", formData.buttonText)
+        formDataToSend.set("buttonRedirectLink", formData.buttonRedirectLink)
+        formDataToSend.set("description", formData.description)
+        formDataToSend.set("active", formData.active.toString())
         if (popupFile) {
-          formDataToSend.append("popupFile", popupFile as Blob);
+          formDataToSend.append("popupFile", popupFile as Blob)
         }
         const result = await postContentBlock(
           editingRow?.popupId ? popups.update : popups.create,
           formDataToSend
-        );
-        setLoading(false);
+        )
+        setLoading(false)
         if (result.status === "success") {
-          toast.success(result.message);
-          router.back();
+          toast.success(result.message)
+          router.back()
         } else {
-          toast.error(result.message);
+          toast.error(result.message)
         }
       } catch (error) {
-        console.error(error);
-        setLoading(false);
+        console.error(error)
+        setLoading(false)
       }
     }
-  };
+  }
   const handleEditorChange = (content: string) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
-      description: content,
-    }));
+      description: content
+    }))
     if (content?.length) {
       setFormErrors((prevFormErrors) => ({
         ...prevFormErrors,
-        description: "",
-      }));
+        description: ""
+      }))
     }
-  };
+  }
   const handleContentChange = (content: any) => {
     setFormData((prevData) => ({
       ...prevData,
-      description: content,
-    }));
+      description: content
+    }))
     // if (content.length) {
     //   setFormErrors({ ...formErrors, description: "" });
     // }
-  };
+  }
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -284,9 +284,9 @@ function PopupForm({ open, handleClose, setEditingRow, editingRow }: Props) {
                   fullWidth
                   value={formData.title}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    setFormData({ ...formData, title: e.target.value });
+                    setFormData({ ...formData, title: e.target.value })
                     if (e.target?.value?.length) {
-                      setFormErrors({ ...formErrors, title: "" });
+                      setFormErrors({ ...formErrors, title: "" })
                     }
                   }}
                 />
@@ -300,9 +300,9 @@ function PopupForm({ open, handleClose, setEditingRow, editingRow }: Props) {
                   fullWidth
                   value={formData.buttonText}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    setFormData({ ...formData, buttonText: e.target.value });
+                    setFormData({ ...formData, buttonText: e.target.value })
                     if (e.target?.value?.length) {
-                      setFormErrors({ ...formErrors, buttonText: "" });
+                      setFormErrors({ ...formErrors, buttonText: "" })
                     }
                   }}
                 />
@@ -318,10 +318,10 @@ function PopupForm({ open, handleClose, setEditingRow, editingRow }: Props) {
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     setFormData({
                       ...formData,
-                      buttonRedirectLink: e.target.value,
-                    });
+                      buttonRedirectLink: e.target.value
+                    })
                     if (e.target?.value?.length) {
-                      setFormErrors({ ...formErrors, buttonRedirectLink: "" });
+                      setFormErrors({ ...formErrors, buttonRedirectLink: "" })
                     }
                   }}
                 />
@@ -370,7 +370,7 @@ function PopupForm({ open, handleClose, setEditingRow, editingRow }: Props) {
                 /> */}
                 {/* <QuillEditor
                   value={formData.description}
-                  onChange={handleEditorChange} 
+                  onChange={handleEditorChange}
                 /> */}
                 {/* <EditorCustom /> */}
                 {/* <CustomEditor initialData={""} /> */}
@@ -463,7 +463,7 @@ function PopupForm({ open, handleClose, setEditingRow, editingRow }: Props) {
             variant="contained"
             type="submit"
             onClick={(event) => {
-              handleSubmit(event);
+              handleSubmit(event)
             }}
           >
             {open === -1 ? "Add" : "Edit"} Popup
@@ -471,7 +471,7 @@ function PopupForm({ open, handleClose, setEditingRow, editingRow }: Props) {
         </Box>
       </Grid>
     </>
-  );
+  )
 }
 
-export default PopupForm;
+export default PopupForm

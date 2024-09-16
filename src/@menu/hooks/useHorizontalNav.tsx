@@ -9,7 +9,7 @@ const useHorizontalNav = () => {
   const context = useContext(HorizontalNavContext)
 
   if (context === undefined) {
-    //TODO: set better error message
+    // TODO: set better error message
     throw new Error('HorizontalNav Component is required!')
   }
 

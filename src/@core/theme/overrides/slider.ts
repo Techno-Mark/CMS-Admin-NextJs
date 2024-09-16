@@ -151,26 +151,18 @@ const slider: Theme['components'] = {
     ],
     styleOverrides: {
       root: ({ ownerState }) => ({
-        ...(ownerState.orientation === 'horizontal'
-          ? ownerState.size !== 'small'
-            ? { blockSize: 4 }
-            : { blockSize: 4 }
-          : ownerState.size !== 'small'
-            ? { inlineSize: 4 }
-            : { inlineSize: 4 })
+        ...(ownerState.orientation === 'horizontal' ? ownerState.size !== 'small' ? { blockSize: 4 } : { blockSize: 4 } : ownerState.size !== 'small' ? { inlineSize: 4 } : { inlineSize: 4 })
       }),
       thumb: ({ ownerState }) => ({
-        ...(ownerState.size === 'small'
-          ? {
-              blockSize: 14,
-              inlineSize: 14,
-              border: '2px solid currentColor'
-            }
-          : {
-              blockSize: 22,
-              inlineSize: 22,
-              border: '4px solid currentColor'
-            }),
+        ...(ownerState.size === 'small' ? {
+          blockSize: 14,
+          inlineSize: 14,
+          border: '2px solid currentColor'
+        } : {
+          blockSize: 22,
+          inlineSize: 22,
+          border: '4px solid currentColor'
+        }),
         backgroundColor: 'var(--mui-palette-common-white)',
         ...(!ownerState.disabled && {
           boxShadow: 'var(--mui-customShadows-sm)'
@@ -179,15 +171,13 @@ const slider: Theme['components'] = {
           boxShadow: 'none'
         },
         '&:after': {
-          ...(ownerState.size === 'small'
-            ? {
-                blockSize: 28,
-                inlineSize: 28
-              }
-            : {
-                blockSize: 38,
-                inlineSize: 38
-              })
+          ...(ownerState.size === 'small' ? {
+            blockSize: 28,
+            inlineSize: 28
+          } : {
+            blockSize: 38,
+            inlineSize: 38
+          })
         }
       }),
       rail: {

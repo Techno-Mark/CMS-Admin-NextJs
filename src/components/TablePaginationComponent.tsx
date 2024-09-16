@@ -1,14 +1,14 @@
 // MUI Imports
-import CustomTextField from "@/@core/components/mui/TextField";
-import { MenuItem } from "@mui/material";
-import Pagination from "@mui/material/Pagination";
-import Typography from "@mui/material/Typography";
+import CustomTextField from "@/@core/components/mui/TextField"
+import { MenuItem } from "@mui/material"
+import Pagination from "@mui/material/Pagination"
+import Typography from "@mui/material/Typography"
 
 // Third Party Imports
-import type { useReactTable } from "@tanstack/react-table";
+import type { useReactTable } from "@tanstack/react-table"
 
 const TablePaginationComponent = ({
-  table,
+  table
 }: {
   table: ReturnType<typeof useReactTable>;
 }) => {
@@ -16,9 +16,7 @@ const TablePaginationComponent = ({
     <div className="flex justify-between items-center flex-wrap pli-6 border-bs bs-auto plb-[12.5px] gap-2">
       <Typography color="text.disabled">
         {`Showing ${
-          table.getFilteredRowModel().rows.length === 0
-            ? 0
-            : table.getState().pagination.pageIndex *
+          table.getFilteredRowModel().rows.length === 0 ? 0 : table.getState().pagination.pageIndex *
                 table.getState().pagination.pageSize +
               1
         }
@@ -49,14 +47,14 @@ const TablePaginationComponent = ({
           )}
           page={table.getState().pagination.pageIndex + 1}
           onChange={(_, page) => {
-            table.setPageIndex(page - 1);
+            table.setPageIndex(page - 1)
           }}
           showFirstButton
           showLastButton
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default TablePaginationComponent;
+export default TablePaginationComponent

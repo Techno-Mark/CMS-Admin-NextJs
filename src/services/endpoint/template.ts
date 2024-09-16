@@ -6,5 +6,5 @@ export const template = {
   delete: `template/delete`,
   active: `template/active`,
   save: `template/save`,
-  getTemplateSectionsById: `template/getTemplateSectionsById`,
-};
+  getTemplateSectionsById: `template/getTemplateSectionsById`
+}

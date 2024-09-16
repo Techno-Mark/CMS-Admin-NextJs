@@ -148,12 +148,12 @@ const pagination: Theme['components'] = {
         },
         ...(ownerState.shape === 'rounded' &&
           ownerState.size === 'small' && {
-            borderRadius: 'var(--mui-shape-customBorderRadius-sm)'
-          }),
+          borderRadius: 'var(--mui-shape-customBorderRadius-sm)'
+        }),
         ...(ownerState.shape === 'rounded' &&
           ownerState.size === 'large' && {
-            borderRadius: 'var(--mui-shape-customBorderRadius-lg)'
-          })
+          borderRadius: 'var(--mui-shape-customBorderRadius-lg)'
+        })
       }),
       ellipsis: {
         display: 'inline-flex',

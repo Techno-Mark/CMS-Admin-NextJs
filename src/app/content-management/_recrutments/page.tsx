@@ -1,4 +1,3 @@
 export default function Page() {
-    return <h3>Requirements</h3>
+  return <h3>Requirements</h3>
 }
-  

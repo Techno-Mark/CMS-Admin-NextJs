@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import LoadingBackdrop from "@/components/LoadingBackdrop";
+import LoadingBackdrop from "@/components/LoadingBackdrop"
 import {
   Button,
   Box,
@@ -12,28 +12,28 @@ import {
   Typography,
   ButtonGroup,
   Tooltip,
-  CardContent,
-} from "@mui/material";
-import CustomTextField from "@/@core/components/mui/TextField";
-import React, { ChangeEvent, useEffect, useState } from "react";
-import CustomAutocomplete from "@/@core/components/mui/Autocomplete";
-import { useRouter } from "next/navigation";
-import { useDropzone } from "react-dropzone";
+  CardContent
+} from "@mui/material"
+import CustomTextField from "@/@core/components/mui/TextField"
+import React, { ChangeEvent, useEffect, useState } from "react"
+import CustomAutocomplete from "@/@core/components/mui/Autocomplete"
+import { useRouter } from "next/navigation"
+import { useDropzone } from "react-dropzone"
 import {
   post,
   postContentBlock,
-  postDataToOrganizationAPIs,
-} from "@/services/apiService";
-import { template } from "@/services/endpoint/template";
-import { blogPost } from "@/services/endpoint/blogpost";
-import { category } from "@/services/endpoint/category";
-import { tag } from "@/services/endpoint/tag";
-import { toast } from "react-toastify";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import { blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
-import AppReactDatepicker from "@/libs/styles/AppReactDatepicker";
-import { Heading } from "lucide-react";
-import { formatDate } from "date-fns";
+  postDataToOrganizationAPIs
+} from "@/services/apiService"
+import { template } from "@/services/endpoint/template"
+import { blogPost } from "@/services/endpoint/blogpost"
+import { category } from "@/services/endpoint/category"
+import { tag } from "@/services/endpoint/tag"
+import { toast } from "react-toastify"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import { blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType"
+import AppReactDatepicker from "@/libs/styles/AppReactDatepicker"
+import { Heading } from "lucide-react"
+import { formatDate } from "date-fns"
 
 type blogFormPropsTypes = {
   open: number;
@@ -42,28 +42,28 @@ type blogFormPropsTypes = {
   handleSubmit:Function
 };
 
-const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
+const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
 
 const sectionActions = {
   ADD: -1,
-  EDIT: 1,
-};
+  EDIT: 1
+}
 
 const initialFormData = {
   id: -1,
   question: "",
   options: [] as string[],
   btnText: "",
-  image: "",
-};
+  image: ""
+}
 
 const initialErrorData = {
   id: -1,
   question: "",
   options: "",
   btnText: "",
-  image: "",
-};
+  image: ""
+}
 
 function SurveyPopupType({
   open,
@@ -71,73 +71,73 @@ function SurveyPopupType({
   editingRow,
   handleSubmit
 }: blogFormPropsTypes) {
-  const router = useRouter();
+  const router = useRouter()
 
-  const [popupType, setPopupType] = useState("Event");
+  const [popupType, setPopupType] = useState("Event")
 
-  //state management hook
-  const [image, setImage] = useState<File | null>(null);
+  // state management hook
+  const [image, setImage] = useState<File | null>(null)
   const [formData, setFormData] =
-    useState<typeof initialFormData>(initialFormData); // form data hooks
+    useState<typeof initialFormData>(initialFormData) // form data hooks
   const [formErrors, setFormErrors] =
-    useState<typeof initialErrorData>(initialErrorData);
+    useState<typeof initialErrorData>(initialErrorData)
 
-  //template list hooks & other list apis data
+  // template list hooks & other list apis data
   const [templateList, setTemplateList] = useState<
     [{ templateName: string; templateId: number }] | []
-  >([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  >([])
+  const [loading, setLoading] = useState<boolean>(true)
 
-  //Custom Hooks
+  // Custom Hooks
   const { getRootProps: getImageRootProps, getInputProps: getImageInputProps } =
     useDropzone({
       multiple: false,
       accept: {
-        "image/*": [".png", ".jpg", ".jpeg", ".gif"],
+        "image/*": [".png", ".jpg", ".jpeg", ".gif"]
       },
       onDrop: (acceptedFiles: File[]) => {
-        setFormErrors({ ...formErrors, image: "" });
-        setImage(acceptedFiles[0]);
-      },
-    });
+        setFormErrors({ ...formErrors, image: "" })
+        setImage(acceptedFiles[0])
+      }
+    })
 
-  //Effects
+  // Effects
   useEffect(() => {
     async function getTemplate() {
-      await getRequiredData();
+      await getRequiredData()
       if (editingRow && open == EDIT_BLOG) {
       }
     }
-    getTemplate();
-  }, []);
+    getTemplate()
+  }, [])
 
   // Get Active Template List
   const getRequiredData = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
       const [templateResponse, categoryResponse, tagResponse] =
         await Promise.all([
           post(`${template.active}`, {}),
           postDataToOrganizationAPIs(`${category.active}`, {}),
-          postDataToOrganizationAPIs(`${tag.active}`, {}),
-        ]);
-      setTemplateList(templateResponse?.data?.templates);
+          postDataToOrganizationAPIs(`${tag.active}`, {})
+        ])
+      setTemplateList(templateResponse?.data?.templates)
 
-      setLoading(false);
+      setLoading(false)
     } catch (error) {
-      setLoading(false);
-      console.error(error);
+      setLoading(false)
+      console.error(error)
     }
-  };
+  }
 
-  //validation before submit
+  // validation before submit
   const validateForm = () => {
-    let valid = true;
-    let errors = { ...initialErrorData };
+    const valid = true
+    const errors = { ...initialErrorData }
 
-    setFormErrors(errors);
-    return valid;
-  };
+    setFormErrors(errors)
+    return valid
+  }
 
   return (
     <>
@@ -154,7 +154,7 @@ function SurveyPopupType({
                 placeholder="Heading"
                 value={formData.question}
                 onChange={(e) => {
-                  setFormData({ ...formData, question: e.target.value });
+                  setFormData({ ...formData, question: e.target.value })
                 }}
               />
             </Grid>
@@ -170,7 +170,7 @@ function SurveyPopupType({
                           onClick={() =>
                             setFormData({
                               ...formData,
-                              options: [...formData.options, ""],
+                              options: [...formData.options, ""]
                             })
                           }
                         >
@@ -198,14 +198,14 @@ function SurveyPopupType({
                                   <Button
                                     size="small"
                                     onClick={() => {
-                                      let data = { ...formData };
+                                      const data = { ...formData }
                                       data.options.splice(
                                         multipleSectionIndex + 1,
                                         0,
                                         ""
-                                      );
+                                      )
 
-                                      setFormData(data);
+                                      setFormData(data)
                                     }}
                                   >
                                     <i className="tabler-plus" />
@@ -216,13 +216,13 @@ function SurveyPopupType({
                                   <Button
                                     size="small"
                                     onClick={() => {
-                                      let data = { ...formData };
+                                      const data = { ...formData }
                                       data.options.splice(
                                         multipleSectionIndex,
                                         1
-                                      );
+                                      )
 
-                                      setFormData(data);
+                                      setFormData(data)
                                     }}
                                   >
                                     <i className="tabler-minus" />
@@ -239,11 +239,11 @@ function SurveyPopupType({
                                 multiline
                                 type="text"
                                 onChange={(e: any) => {
-                                  let data = { ...formData };
+                                  const data = { ...formData }
                                   data.options[multipleSectionIndex] =
-                                    e.target.value;
+                                    e.target.value
 
-                                  setFormData(data);
+                                  setFormData(data)
                                 }}
                                 fullWidth
                                 margin="normal"
@@ -269,7 +269,7 @@ function SurveyPopupType({
                 placeholder=""
                 value={formData.btnText}
                 onChange={(e) => {
-                  setFormData({ ...formData, btnText: e.target.value });
+                  setFormData({ ...formData, btnText: e.target.value })
                 }}
               />
             </Grid>
@@ -341,7 +341,7 @@ function SurveyPopupType({
                   color="error"
                   type="reset"
                   onClick={() => {
-                    handleClose();
+                    handleClose()
                   }}
                 >
                   Cancel
@@ -359,7 +359,7 @@ function SurveyPopupType({
         </Box>
       </Card>
     </>
-  );
+  )
 }
 
-export default SurveyPopupType;
+export default SurveyPopupType

@@ -1,5 +1,5 @@
-const commonPrefix = "organization/contact-us";
+const commonPrefix = "organization/contact-us"
 
 export const contactUs = {
-  list: `${commonPrefix}/list`,
-};
+  list: `${commonPrefix}/list`
+}

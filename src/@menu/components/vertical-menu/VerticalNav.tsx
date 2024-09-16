@@ -199,9 +199,9 @@ const VerticalNav = (props: VerticalNavProps) => {
           ...(!isPopoutWhenCollapsedContext &&
             isCollapsedContext &&
             !breakpointReached && {
-              onMouseEnter: handleVerticalNavHover,
-              onMouseLeave: handleVerticalNavHoverOut
-            })
+            onMouseEnter: handleVerticalNavHover,
+            onMouseLeave: handleVerticalNavHoverOut
+          })
         }
       >
         {/* VerticalNav Container to apply styling like background */}

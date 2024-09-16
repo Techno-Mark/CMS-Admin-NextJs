@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"
 
 function DraggableIcon() {
   return (
@@ -13,7 +13,7 @@ function DraggableIcon() {
       <path d="M11 9.75c0-.552.448-1 1-1h.5c.552 0 1 .448 1 1v.5c0 .552-.448 1-1 1h-.5c-.552 0-1-.448-1-1v-.5Z"></path>
       <path d="M12 13c-.552 0-1 .448-1 1v.5c0 .552.448 1 1 1h.5c.552 0 1-.448 1-1v-.5c0-.552-.448-1-1-1h-.5Z"></path>
     </svg>
-  );
+  )
 }
 
-export default DraggableIcon;
+export default DraggableIcon

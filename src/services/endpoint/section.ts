@@ -4,5 +4,5 @@ export const section = {
   update: `section/update`,
   getById: `section/getById`,
   delete: `section/delete`,
-  active: `section/active`,
-};
+  active: `section/active`
+}

@@ -1,12 +1,12 @@
 // MUI Imports
-import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import { toast } from "react-toastify";
-import { postDataToOrganizationAPIs } from "@/services/apiService";
-import { blogPost } from "@/services/endpoint/blogpost";
+import Dialog from "@mui/material/Dialog"
+import DialogContent from "@mui/material/DialogContent"
+import DialogActions from "@mui/material/DialogActions"
+import Typography from "@mui/material/Typography"
+import Button from "@mui/material/Button"
+import { toast } from "react-toastify"
+import { postDataToOrganizationAPIs } from "@/services/apiService"
+import { blogPost } from "@/services/endpoint/blogpost"
 
 type ConfirmationDialogProps = {
   deletingId: number;
@@ -19,26 +19,26 @@ const ConfirmationDialog = ({
   deletingId,
   open,
   setOpen,
-  setDeletingId,
+  setDeletingId
 }: ConfirmationDialogProps) => {
   const deleteTemplate = async () => {
     try {
       const result = await postDataToOrganizationAPIs(blogPost.delete, {
-        blogId: deletingId,
-      });
+        blogId: deletingId
+      })
 
       if (result.status === "success") {
-        toast.success(result.message);
+        toast.success(result.message)
       } else {
-        toast.error(result.message);
+        toast.error(result.message)
       }
     } catch (error) {
-      console.error(error);
+      console.error(error)
     } finally {
-      setDeletingId(-1);
-      setOpen(false);
+      setDeletingId(-1)
+      setOpen(false)
     }
-  };
+  }
 
   return (
     <Dialog fullWidth maxWidth="xs" open={open} onClose={() => setOpen(false)}>
@@ -56,14 +56,14 @@ const ConfirmationDialog = ({
           variant="tonal"
           color="secondary"
           onClick={() => {
-            setOpen(false);
+            setOpen(false)
           }}
         >
           No
         </Button>
       </DialogActions>
     </Dialog>
-  );
-};
+  )
+}
 
-export default ConfirmationDialog;
+export default ConfirmationDialog

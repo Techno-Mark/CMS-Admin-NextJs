@@ -1,37 +1,51 @@
 {
-  "env": {
-    "browser": true,
-    "es2021": true
-  },
-  "extends": ["plugin:react/recommended", "standard"],
-  "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "ecmaVersion": "latest",
-    "sourceType": "module"
-  },
-  "plugins": ["react"],
-  "settings": {
-  "react": {
-    "version": "18.2.0"
-  }
-},
-  "rules": {
-    "space-before-function-paren": [
-      "error",
-      {
-        "anonymous": "never",
-        "named": "never",
-        "asyncArrow": "always"
-      }
+    "extends": [
+      "next/core-web-vitals",
+      "eslint:recommended",
+      "standard"
     ],
-    "multiline-ternary": ["error", "never"],
-    "react/no-unknown-property": [
-      2,
-      {
-        "ignore": ["onError", "download"]
-      }
-    ]
+    "plugins": [
+      "react"
+    ],
+    "rules": {
+      "react/display-name": "off",
+      "eqeqeq": "off",
+      "no-use-before-define": "off",
+      "quotes": "off",
+      "react/prop-types": 2,
+      "react-hooks/exhaustive-deps": "off",
+      "space-before-function-paren": [
+        "error",
+        {
+          "anonymous": "never",
+          "named": "never",
+          "asyncArrow": "always"
+        }
+      ],
+      "multiline-ternary": [
+        "error",
+        "never"
+      ],
+      "react/react-in-jsx-scope": "off",
+      "react/no-unknown-property": [
+        2,
+        {
+          "ignore": [
+            "jsx",
+            "amp-custom",
+            "global",
+            "on",
+            "custom-element",
+            "custom-template",
+            "option",
+            "on",
+            "items",
+            "fallback",
+            "update",
+            "item"
+          ]
+        }
+      ]
+    },
+    "root": true
   }
-}

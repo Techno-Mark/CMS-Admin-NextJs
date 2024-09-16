@@ -1,53 +1,53 @@
-"use client";
+"use client"
 
 // React Imports
-import { useState } from "react";
+import { useState } from "react"
 
 // Next Imports
-import Link from "next/link";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 
 // MUI Imports
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { styled, useTheme } from "@mui/material/styles";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import InputAdornment from "@mui/material/InputAdornment";
-import Checkbox from "@mui/material/Checkbox";
-import Button from "@mui/material/Button";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Divider from "@mui/material/Divider";
-import Alert from "@mui/material/Alert";
+import useMediaQuery from "@mui/material/useMediaQuery"
+import { styled, useTheme } from "@mui/material/styles"
+import Typography from "@mui/material/Typography"
+import IconButton from "@mui/material/IconButton"
+import InputAdornment from "@mui/material/InputAdornment"
+import Checkbox from "@mui/material/Checkbox"
+import Button from "@mui/material/Button"
+import FormControlLabel from "@mui/material/FormControlLabel"
+import Divider from "@mui/material/Divider"
+import Alert from "@mui/material/Alert"
 
 // Third-party Imports
 
-import { Controller, useForm } from "react-hook-form";
-import { valibotResolver } from "@hookform/resolvers/valibot";
-import { email, object, minLength, string, pipe, nonEmpty } from "valibot";
-import type { SubmitHandler } from "react-hook-form";
-import type { InferInput } from "valibot";
-import classnames from "classnames";
+import { Controller, useForm } from "react-hook-form"
+import { valibotResolver } from "@hookform/resolvers/valibot"
+import { email, object, minLength, string, pipe, nonEmpty } from "valibot"
+import type { SubmitHandler } from "react-hook-form"
+import type { InferInput } from "valibot"
+import classnames from "classnames"
 
 // Type Imports
-import type { SystemMode } from "@core/types";
+import type { SystemMode } from "@core/types"
 
 // Component Imports
-import Logo from "@components/layout/shared/Logo";
-import CustomTextField from "@core/components/mui/TextField";
+import Logo from "@components/layout/shared/Logo"
+import CustomTextField from "@core/components/mui/TextField"
 
 // Config Imports
-import themeConfig from "@configs/themeConfig";
+import themeConfig from "@configs/themeConfig"
 
 // Hook Imports
-import { useImageVariant } from "@core/hooks/useImageVariant";
-import { useSettings } from "@core/hooks/useSettings";
-import { signIn } from "next-auth/react";
+import { useImageVariant } from "@core/hooks/useImageVariant"
+import { useSettings } from "@core/hooks/useSettings"
+import { signIn } from "next-auth/react"
 
 // Third-party Imports
-import { toast } from "react-toastify";
-import CircularProgress from "@mui/material/CircularProgress";
-import type { CircularProgressProps } from "@mui/material/CircularProgress";
-import LoadingBackdrop from "@/components/LoadingBackdrop";
+import { toast } from "react-toastify"
+import CircularProgress from "@mui/material/CircularProgress"
+import type { CircularProgressProps } from "@mui/material/CircularProgress"
+import LoadingBackdrop from "@/components/LoadingBackdrop"
 
 // Styled Custom Components
 const LoginIllustration = styled("img")(({ theme }) => ({
@@ -57,18 +57,18 @@ const LoginIllustration = styled("img")(({ theme }) => ({
   maxInlineSize: "100%",
   margin: theme.spacing(12),
   [theme.breakpoints.down(1536)]: {
-    maxBlockSize: 550,
+    maxBlockSize: 550
   },
   [theme.breakpoints.down("lg")]: {
-    maxBlockSize: 450,
-  },
-}));
+    maxBlockSize: 450
+  }
+}))
 
 const CircularProgressDeterminate = styled(
   CircularProgress
 )<CircularProgressProps>({
-  color: "var(--mui-palette-customColors-trackBg)",
-});
+  color: "var(--mui-palette-customColors-trackBg)"
+})
 
 const CircularProgressIndeterminate = styled(
   CircularProgress
@@ -76,8 +76,8 @@ const CircularProgressIndeterminate = styled(
   left: 0,
   position: "absolute",
   animationDuration: "440ms",
-  color: theme.palette.mode === "light" ? "#ffffff" : "#30d41a",
-}));
+  color: theme.palette.mode === "light" ? "#ffffff" : "#30d41a"
+}))
 
 const MaskImg = styled("img")({
   blockSize: "auto",
@@ -85,8 +85,8 @@ const MaskImg = styled("img")({
   inlineSize: "100%",
   position: "absolute",
   insetBlockEnd: 0,
-  zIndex: -1,
-});
+  zIndex: -1
+})
 
 type ErrorType = {
   message: string[];
@@ -104,44 +104,44 @@ const schema = object({
     string(),
     nonEmpty("This field is required"),
     minLength(5, "Password must be at least 5 characters long")
-  ),
-});
+  )
+})
 
 const Login = ({ mode }: { mode: SystemMode }) => {
   // States
-  const [isPasswordShown, setIsPasswordShown] = useState(false);
-  const [errorState, setErrorState] = useState<ErrorType | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [isPasswordShown, setIsPasswordShown] = useState(false)
+  const [errorState, setErrorState] = useState<ErrorType | null>(null)
+  const [loading, setLoading] = useState(false)
 
   // Vars
-  const darkImg = "/images/pages/auth-mask-dark.png";
-  const lightImg = "/images/pages/auth-mask-light.png";
-  const darkIllustration = "/images/illustrations/auth/v2-login-dark.png";
-  const lightIllustration = "/images/illustrations/auth/v2-login-light.svg";
+  const darkImg = "/images/pages/auth-mask-dark.png"
+  const lightImg = "/images/pages/auth-mask-light.png"
+  const darkIllustration = "/images/illustrations/auth/v2-login-dark.png"
+  const lightIllustration = "/images/illustrations/auth/v2-login-light.svg"
   const borderedDarkIllustration =
-    "/images/illustrations/auth/v2-login-dark-border.png";
+    "/images/illustrations/auth/v2-login-dark-border.png"
   const borderedLightIllustration =
-    "/images/illustrations/auth/v2-login-light-border.png";
+    "/images/illustrations/auth/v2-login-light-border.png"
 
   // Hooks
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { settings } = useSettings();
-  const theme = useTheme();
-  const hidden = useMediaQuery(theme.breakpoints.down("md"));
-  const authBackground = useImageVariant(mode, lightImg, darkImg);
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const { settings } = useSettings()
+  const theme = useTheme()
+  const hidden = useMediaQuery(theme.breakpoints.down("md"))
+  const authBackground = useImageVariant(mode, lightImg, darkImg)
 
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }
   } = useForm<FormData>({
     resolver: valibotResolver(schema),
     defaultValues: {
       email: "",
-      password: "",
-    },
-  });
+      password: ""
+    }
+  })
 
   const characterIllustration = useImageVariant(
     mode,
@@ -149,42 +149,41 @@ const Login = ({ mode }: { mode: SystemMode }) => {
     darkIllustration,
     borderedLightIllustration,
     borderedDarkIllustration
-  );
+  )
 
-  const handleClickShowPassword = () => setIsPasswordShown((show) => !show);
+  const handleClickShowPassword = () => setIsPasswordShown((show) => !show)
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
-    setLoading(true);
+    setLoading(true)
     const res = await signIn("credentials", {
       email: data.email,
       password: data.password,
-      redirect: false,
-    });
+      redirect: false
+    })
 
     if (res && res.ok && res.error === null) {
-      
-      const redirectURL = searchParams.get("redirectTo") ?? "/home";
-      router.push(redirectURL);
-      toast.success("Login Successfull");
-      setLoading(false);
+      const redirectURL = searchParams.get("redirectTo") ?? "/home"
+      router.push(redirectURL)
+      toast.success("Login Successfull")
+      setLoading(false)
     } else {
-      setLoading(false);
+      setLoading(false)
       if (res?.error) {
-        let error;
+        let error
         try {
-          error = JSON.parse(res.error);
+          error = JSON.parse(res.error)
         } catch {
-          error = { message: res.error };
+          error = { message: res.error }
         }
         if (error.status === "failure") {
-          toast.error(error.message);
+          toast.error(error.message)
         } else {
-          toast.error(error.message);
-          setErrorState(error);
+          toast.error(error.message)
+          setErrorState(error)
         }
       }
     }
-  };
+  }
 
   return (
     <>
@@ -194,7 +193,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
           className={classnames(
             "flex bs-full items-center justify-center flex-1 min-bs-[100dvh] relative p-6 max-md:hidden",
             {
-              "border-ie": settings.skin === "bordered",
+              "border-ie": settings.skin === "bordered"
             }
           )}
         >
@@ -235,13 +234,13 @@ const Login = ({ mode }: { mode: SystemMode }) => {
                     label="Email"
                     placeholder="Enter your email"
                     onChange={(e) => {
-                      field.onChange(e.target.value);
-                      errorState !== null && setErrorState(null);
+                      field.onChange(e.target.value)
+                      errorState !== null && setErrorState(null)
                     }}
                     {...((errors.email || errorState !== null) && {
                       error: true,
                       helperText:
-                        errors?.email?.message || errorState?.message[0],
+                        errors?.email?.message || errorState?.message[0]
                     })}
                   />
                 )}
@@ -259,8 +258,8 @@ const Login = ({ mode }: { mode: SystemMode }) => {
                     id="login-password"
                     type={isPasswordShown ? "text" : "password"}
                     onChange={(e) => {
-                      field.onChange(e.target.value);
-                      errorState !== null && setErrorState(null);
+                      field.onChange(e.target.value)
+                      errorState !== null && setErrorState(null)
                     }}
                     InputProps={{
                       endAdornment: (
@@ -272,18 +271,16 @@ const Login = ({ mode }: { mode: SystemMode }) => {
                           >
                             <i
                               className={
-                                isPasswordShown
-                                  ? "tabler-eye"
-                                  : "tabler-eye-off"
+                                isPasswordShown ? "tabler-eye" : "tabler-eye-off"
                               }
                             />
                           </IconButton>
                         </InputAdornment>
-                      ),
+                      )
                     }}
                     {...(errors.password && {
                       error: true,
-                      helperText: errors.password.message,
+                      helperText: errors.password.message
                     })}
                   />
                 )}
@@ -332,7 +329,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

@@ -21,8 +21,7 @@ const StyledSubMenuContent = styled.div<SubMenuContentProps>`
     `}
 
   ${({ isCollapsed, level, isPopoutWhenCollapsed }) =>
-    isCollapsed && level === 0 && isPopoutWhenCollapsed
-      ? `
+    isCollapsed && level === 0 && isPopoutWhenCollapsed ? `
       display: block;
       padding-inline-start: 0px;
       inline-size: 260px;
@@ -31,8 +30,7 @@ const StyledSubMenuContent = styled.div<SubMenuContentProps>`
       transition: none !important;
       background-color: white;
       box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014, 0 9px 28px 8px #0000000d;
-     `
-      : `
+     ` : `
       position: static !important;
       transform: none !important;
       `}

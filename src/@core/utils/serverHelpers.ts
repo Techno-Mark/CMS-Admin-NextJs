@@ -22,9 +22,7 @@ export const getSettingsFromCookie = (): Settings => {
 
   const demoName = getDemoName()
 
-  const cookieName = demoName
-    ? themeConfig.settingsCookieName.replace('demo-1', demoName)
-    : themeConfig.settingsCookieName
+  const cookieName = demoName ? themeConfig.settingsCookieName.replace('demo-1', demoName) : themeConfig.settingsCookieName
 
   return JSON.parse(cookieStore.get(cookieName)?.value || '{}')
 }

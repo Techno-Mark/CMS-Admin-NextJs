@@ -12,7 +12,7 @@ const useVerticalMenu = (): VerticalMenuContextProps => {
   const context = useContext(VerticalMenuContext)
 
   if (context === undefined) {
-    //TODO: set better error message
+    // TODO: set better error message
     throw new Error('Menu Component is required!')
   }
 

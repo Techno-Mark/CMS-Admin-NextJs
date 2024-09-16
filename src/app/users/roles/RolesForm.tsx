@@ -1,22 +1,22 @@
 // React Imports
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
 // MUI Imports
-import Button from "@mui/material/Button";
+import Button from "@mui/material/Button"
 // Component Imports
-import { Card, Switch } from "@mui/material";
-import BreadCrumbList from "@components/BreadCrumbList";
-import CustomTextField from "@core/components/mui/TextField";
+import { Card, Switch } from "@mui/material"
+import BreadCrumbList from "@components/BreadCrumbList"
+import CustomTextField from "@core/components/mui/TextField"
 
-import { toast } from "react-toastify";
-import { post, get } from "@/services/apiService";
-import { usePathname, useRouter } from "next/navigation";
-import { ADD_ROLE, EDIT_ROLE, RolesType } from "@/types/apps/rolesType";
-import { createRole, updateRole } from "@/services/endpoint/users/roles";
-import { getSectionById } from "@/services/endpoint/content-block";
+import { toast } from "react-toastify"
+import { post, get } from "@/services/apiService"
+import { usePathname, useRouter } from "next/navigation"
+import { ADD_ROLE, EDIT_ROLE, RolesType } from "@/types/apps/rolesType"
+import { createRole, updateRole } from "@/services/endpoint/users/roles"
+import { getSectionById } from "@/services/endpoint/content-block"
 
 type Props = {
   open: ADD_ROLE | EDIT_ROLE;
-  
+
 };
 
 type FormDataType = {
@@ -27,11 +27,11 @@ type FormDataType = {
   active: boolean;
 };
 
-//enum
+// enum
 const sectionActions = {
   ADD: -1,
-  EDIT: 1,
-};
+  EDIT: 1
+}
 
 // Vars
 const initialData = {
@@ -39,112 +39,110 @@ const initialData = {
   roleId: 0,
   roleName: "",
   roleDescription: "",
-  active: false,
-};
+  active: false
+}
 
 const initialErrorData = {
   roleName: "",
-  roleDescription: "",
-};
+  roleDescription: ""
+}
 
 const RolesForm = ({ open }: Props) => {
-  const router = useRouter();
-  const query = usePathname().split("/");
+  const router = useRouter()
+  const query = usePathname().split("/")
   const [formData, setFormData] = useState<FormDataType | RolesType>(
     initialData
-  );
+  )
   const [formErrors, setFormErrors] = useState<{
     roleName: string;
     roleDescription: string;
-  }>(initialErrorData);
+  }>(initialErrorData)
 
-  const orgId = localStorage.getItem('selectedOrgId');
+  const orgId = localStorage.getItem('selectedOrgId')
 
   const validateFormData = (arg1: {
     roleName: string;
     roleDescription: string | null;
   }) => {
     if (arg1.roleName.trim().length === 0) {
-      setFormErrors({ ...formErrors, roleName: "This field is required" });
+      setFormErrors({ ...formErrors, roleName: "This field is required" })
     } else if (
       !arg1.roleDescription ||
       arg1.roleDescription.trim().length === 0
     ) {
       setFormErrors({
         ...formErrors,
-        roleDescription: "This field is required",
-      });
+        roleDescription: "This field is required"
+      })
     } else {
-      return true;
+      return true
     }
 
-    return false;
-  };
+    return false
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+    e.preventDefault()
     if (
       validateFormData({
         roleName: formData.roleName,
-        roleDescription: formData.roleDescription,
+        roleDescription: formData.roleDescription
       })
     ) {
       const result = await post(
         open === sectionActions.EDIT ? updateRole : createRole,
-        open === sectionActions.EDIT
-          ? {
-              organizationId: Number(orgId),
-              roleId: formData.roleId,
-              roleName: formData.roleName,
-              roleDescription: formData.roleDescription,
-              active: formData.active,
-            }
-          : {
-              organizationId: Number(orgId),
-              roleName: formData.roleName,
-              roleDescription: formData.roleDescription,
-              active: formData.active,
-            }
-      );
+        open === sectionActions.EDIT ? {
+          organizationId: Number(orgId),
+          roleId: formData.roleId,
+          roleName: formData.roleName,
+          roleDescription: formData.roleDescription,
+          active: formData.active
+        } : {
+          organizationId: Number(orgId),
+          roleName: formData.roleName,
+          roleDescription: formData.roleDescription,
+          active: formData.active
+        }
+      )
 
       if (result.status === "success") {
-        toast.success(result.message);
-        handleReset();
+        toast.success(result.message)
+        handleReset()
       } else {
-        toast.error(result.message);
+        toast.error(result.message)
       }
     }
-  };
+  }
 
   const handleReset = () => {
-    setFormData(initialData);
-    setFormErrors(initialErrorData);
-    router.back();
-  };
+    setFormData(initialData)
+    setFormErrors(initialErrorData)
+    router.back()
+  }
 
   const getSectionDataById = async (slug: string | number) => {
     try {
-      const result = await get(getSectionById(slug));
-      const { data } = result;
-     
+      const result = await get(getSectionById(slug))
+      const { data } = result
+
       setFormData({
         ...formData,
         id: 0,
         roleId: 0,
         roleName: "",
         roleDescription: "",
-        active: false,
-      });
+        active: false
+      })
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
   useEffect(() => {
     if (open === sectionActions.EDIT) {
-      getSectionDataById(query[query.length - 1]);
+      getSectionDataById(query[query.length - 1])
     }
-  }, []);
+  }, [])
 
   return (
     <>
@@ -160,11 +158,11 @@ const RolesForm = ({ open }: Props) => {
               placeholder="Enter Name"
               value={formData.roleName}
               onChange={(e) => {
-                setFormErrors({ ...formErrors, roleName: "" });
+                setFormErrors({ ...formErrors, roleName: "" })
                 setFormData({
                   ...formData,
-                  roleName: e.target.value,
-                });
+                  roleName: e.target.value
+                })
               }}
             />
             <CustomTextField
@@ -175,15 +173,15 @@ const RolesForm = ({ open }: Props) => {
               helperText={formErrors.roleDescription}
               value={formData.roleDescription}
               onChange={(e) => {
-                setFormErrors({ ...formErrors, roleDescription: "" });
-                setFormData({ ...formData, roleDescription: e.target.value });
+                setFormErrors({ ...formErrors, roleDescription: "" })
+                setFormData({ ...formData, roleDescription: e.target.value })
               }}
               label="Description *"
               placeholder="Enter here..."
               sx={{
                 "& .MuiInputBase-root.MuiFilledInput-root": {
-                  alignItems: "baseline",
-                },
+                  alignItems: "baseline"
+                }
               }}
             />
             <div>
@@ -213,7 +211,7 @@ const RolesForm = ({ open }: Props) => {
         </div>
       </Card>
     </>
-  );
-};
+  )
+}
 
-export default RolesForm;
+export default RolesForm

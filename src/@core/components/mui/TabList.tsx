@@ -14,13 +14,11 @@ export type CustomTabListProps = TabListProps & {
 const TabList = styled(MuiTabList)<CustomTabListProps>(({ color, theme, pill, orientation }) => ({
   ...(pill === 'true' && {
     minHeight: 38,
-    ...(orientation === 'vertical'
-      ? {
-          borderInlineEnd: 0
-        }
-      : {
-          borderBlockEnd: 0
-        }),
+    ...(orientation === 'vertical' ? {
+      borderInlineEnd: 0
+    } : {
+      borderBlockEnd: 0
+    }),
     '&, & .MuiTabs-scroller': {
       ...(orientation === 'vertical' && {
         boxSizing: 'content-box'
@@ -47,13 +45,11 @@ const TabList = styled(MuiTabList)<CustomTabListProps>(({ color, theme, pill, or
         border: 0,
         backgroundColor: `var(--mui-palette-${color}-lightOpacity)`,
         color: `var(--mui-palette-${color}-main)`,
-        ...(orientation === 'vertical'
-          ? {
-              paddingInlineEnd: theme.spacing(5)
-            }
-          : {
-              paddingBlockEnd: theme.spacing(2)
-            })
+        ...(orientation === 'vertical' ? {
+          paddingInlineEnd: theme.spacing(5)
+        } : {
+          paddingBlockEnd: theme.spacing(2)
+        })
       }
     }
   })

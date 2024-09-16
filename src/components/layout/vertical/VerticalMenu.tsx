@@ -44,9 +44,9 @@ const RenderExpandIcon = ({ open, transitionDuration }: RenderExpandIconProps) =
   </StyledVerticalNavExpandIcon>
 )
 
-const VerticalMenu = ({ scrollMenu,permissionData }: Props) => {
-  console.log(permissionData);
-  
+const VerticalMenu = ({ scrollMenu, permissionData }: Props) => {
+  console.log(permissionData)
+
   // Hooks
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
@@ -77,10 +77,10 @@ const VerticalMenu = ({ scrollMenu,permissionData }: Props) => {
   // }
 
   // useEffect(() => {
-    // setTimeout(() => {
+  // setTimeout(() => {
 
-      // fetchDecryptedData() // Retrieve and decrypt the permission data on initial load
-    // }, 3000);
+  // fetchDecryptedData() // Retrieve and decrypt the permission data on initial load
+  // }, 3000);
   // }, [])
 
   const hasPermission = (menuKey: string) => permissionData && permissionData[menuKey]
@@ -96,15 +96,13 @@ const VerticalMenu = ({ scrollMenu,permissionData }: Props) => {
   // }
   return (
     <ScrollWrapper
-      {...(isBreakpointReached
-        ? {
-          className: 'bs-full overflow-y-auto overflow-x-hidden',
-          onScroll: container => scrollMenu(container, false)
-        }
-        : {
-          options: { wheelPropagation: false, suppressScrollX: true },
-          onScrollY: container => scrollMenu(container, true)
-        })}
+      {...(isBreakpointReached ? {
+        className: 'bs-full overflow-y-auto overflow-x-hidden',
+        onScroll: container => scrollMenu(container, false)
+      } : {
+        options: { wheelPropagation: false, suppressScrollX: true },
+        onScrollY: container => scrollMenu(container, true)
+      })}
     >
       <Menu
         popoutMenuOffset={{ mainAxis: 23 }}
@@ -132,14 +130,12 @@ const VerticalMenu = ({ scrollMenu,permissionData }: Props) => {
           </MenuItem>
         )}
 
-
         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Page')) && (
           <MenuItem href='/content-management/pages' icon={<i className='tabler-brand-pagekit' />}>
             Pages
           </MenuItem>
         )}
-
 
         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Menu')) && (
@@ -154,7 +150,6 @@ const VerticalMenu = ({ scrollMenu,permissionData }: Props) => {
             Popup
           </MenuItem>
         )}
-
 
         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Event')) && (

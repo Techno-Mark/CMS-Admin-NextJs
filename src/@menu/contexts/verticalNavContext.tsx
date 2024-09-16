@@ -47,7 +47,7 @@ export const VerticalNavProvider = ({ children }: ChildrenType) => {
     setVerticalNavState(prevState => ({
       ...prevState,
       isHovered: value !== undefined && false,
-      isCollapsed: value !== undefined ? Boolean(value) : !Boolean(prevState?.isCollapsed),
+      isCollapsed: value !== undefined ? Boolean(value) : !prevState?.isCollapsed,
       collapsing: value === true,
       expanding: value !== true
     }))
@@ -56,14 +56,14 @@ export const VerticalNavProvider = ({ children }: ChildrenType) => {
   const hoverVerticalNav = useCallback((value?: boolean) => {
     setVerticalNavState(prevState => ({
       ...prevState,
-      isHovered: value !== undefined ? Boolean(value) : !Boolean(prevState?.isHovered)
+      isHovered: value !== undefined ? Boolean(value) : !prevState?.isHovered
     }))
   }, [])
 
   const toggleVerticalNav = useCallback((value?: boolean) => {
     setVerticalNavState(prevState => ({
       ...prevState,
-      isToggled: value !== undefined ? Boolean(value) : !Boolean(prevState?.isToggled)
+      isToggled: value !== undefined ? Boolean(value) : !prevState?.isToggled
     }))
   }, [])
 

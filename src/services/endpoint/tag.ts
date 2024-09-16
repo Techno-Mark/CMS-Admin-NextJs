@@ -1,4 +1,4 @@
-const commonPrefix = "organization/tag";
+const commonPrefix = "organization/tag"
 
 export const tag = {
   list: `${commonPrefix}/list`,
@@ -6,5 +6,5 @@ export const tag = {
   create: `${commonPrefix}/create`,
   update: `${commonPrefix}/update`,
   getById: `${commonPrefix}/getById`,
-  delete: `${commonPrefix}/delete`,
-};
+  delete: `${commonPrefix}/delete`
+}

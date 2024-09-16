@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import LoadingBackdrop from "@/components/LoadingBackdrop";
+import LoadingBackdrop from "@/components/LoadingBackdrop"
 import {
   Button,
   Box,
@@ -10,17 +10,17 @@ import {
   Typography,
   ButtonGroup,
   Tooltip,
-  CardContent,
-} from "@mui/material";
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+  CardContent
+} from "@mui/material"
+import React, { ChangeEvent, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   postDataToOrganizationAPIs
-} from "@/services/apiService";
-import { toast } from "react-toastify";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import CustomTextField from "@/@core/components/mui/TextField";
-import { staticContentBlock } from "@/services/endpoint/staticContentBlock";
+} from "@/services/apiService"
+import { toast } from "react-toastify"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import CustomTextField from "@/@core/components/mui/TextField"
+import { staticContentBlock } from "@/services/endpoint/staticContentBlock"
 
 type staticContentBlockFormPropsTypes = {
   sectionSchema: any;
@@ -42,8 +42,8 @@ const initialFormData = {
   status: 0,
   metaTitle: "",
   metaDescription: "",
-  metaKeywords: "",
-};
+  metaKeywords: ""
+}
 
 const initialErrorData = {
   templateId: "",
@@ -60,8 +60,8 @@ const initialErrorData = {
   status: "",
   metaTitle: "",
   metaDescription: "",
-  metaKeywords: "",
-};
+  metaKeywords: ""
+}
 
 function StaticComponentForm({
   sectionSchema: formData,
@@ -69,54 +69,52 @@ function StaticComponentForm({
   handleClose,
   permissionUser
 }: staticContentBlockFormPropsTypes) {
+  const router = useRouter()
+  const [loading, setLoading] = useState(true)
 
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [templateValue, setTemplateValues] = useState<any>()
 
-  const [templateValue, setTemplateValues] = useState<any>();
-
-  //Effects
+  // Effects
   useEffect(() => {
     if (editingRow?.sectionValue?.data) {
-      setTemplateValues(editingRow.sectionValue);
+      setTemplateValues(editingRow.sectionValue)
     }
-    setLoading(false);
-  }, []);
+    setLoading(false)
+  }, [])
 
   // handle submit
   const handleSubmit = async (active: boolean) => {
-
     if (true) {
       try {
-        setLoading(true);
+        setLoading(true)
 
-        let data = {
+        const data = {
           contentBlockId: formData?.sectionId,
-          contentBlockData: templateValue,
-        };
-        let result = null;
+          contentBlockData: templateValue
+        }
+        let result = null
 
         result = await postDataToOrganizationAPIs(
           staticContentBlock.saveAndUpdate,
           data
-        );
+        )
 
-        setLoading(false);
+        setLoading(false)
 
         if (result.status === "success") {
-          toast.success(result.message);
-          router.back();
+          toast.success(result.message)
+          router.back()
         } else {
-          toast.error(result.message);
+          toast.error(result.message)
         }
       } catch (error) {
-        console.error(error);
-        setLoading(false);
+        console.error(error)
+        setLoading(false)
       }
     }
-  };
+  }
 
-  //component data part
+  // component data part
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement>,
     uniqueSectionName: string,
@@ -124,39 +122,39 @@ function StaticComponentForm({
     multipleIndex = -1,
     multiFeKey = ""
   ) => {
-    const { value } = event.target;
+    const { value } = event.target
 
     uniqueSectionName = "data" // set data to section name,  fixed value
 
     if (multipleIndex !== -1) {
       setTemplateValues((prev: any) => {
-        const currentMultiple = [...(prev?.[uniqueSectionName]?.[fekey] || [])];
+        const currentMultiple = [...(prev?.[uniqueSectionName]?.[fekey] || [])]
 
         if (!currentMultiple[multipleIndex]) {
-          currentMultiple[multipleIndex] = {};
+          currentMultiple[multipleIndex] = {}
         }
 
-        currentMultiple[multipleIndex][multiFeKey] = value;
+        currentMultiple[multipleIndex][multiFeKey] = value
 
         return {
           ...prev,
           [uniqueSectionName]: {
             ...(prev?.[uniqueSectionName] || {}),
-            [fekey]: currentMultiple,
-          },
-        };
-      });
+            [fekey]: currentMultiple
+          }
+        }
+      })
     } else {
       // Handle input change for single fields
       setTemplateValues((prev: any) => ({
         ...prev,
         [uniqueSectionName]: {
           ...(prev?.[uniqueSectionName] || {}),
-          [fekey]: value,
-        },
-      }));
+          [fekey]: value
+        }
+      }))
     }
-  };
+  }
 
   function handleAddDuplicateForm(
     sectionName: any,
@@ -164,22 +162,22 @@ function StaticComponentForm({
     index: number,
     field: any
   ) {
-    let duplicateData: any = {};
+    const duplicateData: any = {}
     field.multipleData?.forEach((value: any) => {
-      duplicateData[value?.fekey] = "";
-    });
+      duplicateData[value?.fekey] = ""
+    })
 
     setTemplateValues((prev: any) => {
-      const currentMultiple = prev?.[sectionName]?.[feKey] || [];
-      currentMultiple?.splice(index, 0, duplicateData);
+      const currentMultiple = prev?.[sectionName]?.[feKey] || []
+      currentMultiple?.splice(index, 0, duplicateData)
       return {
         ...prev,
         [sectionName]: {
           ...(prev?.[sectionName] || {}),
-          [feKey]: currentMultiple,
-        },
-      };
-    });
+          [feKey]: currentMultiple
+        }
+      }
+    })
   }
 
   function handleRemoveDuplicateForm(
@@ -188,22 +186,22 @@ function StaticComponentForm({
     index: number
   ) {
     setTemplateValues((prev: any) => {
-      const currentMultiple = prev?.[sectionName]?.[feKey] || [];
+      const currentMultiple = prev?.[sectionName]?.[feKey] || []
 
-      currentMultiple?.splice(index, 1);
+      currentMultiple?.splice(index, 1)
 
       return {
         ...prev,
         [sectionName]: {
           ...(prev?.[sectionName] || {}),
-          [feKey]: currentMultiple,
-        },
-      };
-    });
+          [feKey]: currentMultiple
+        }
+      }
+    })
   }
 
   const commonComponentData = () => {
-    if(!formData) return
+    if (!formData) return
     return (
       <Grid item xs={12} sm={12}>
         <Card variant="outlined" style={{ marginBottom: "10px" }}>
@@ -325,14 +323,10 @@ function StaticComponentForm({
                                           <CustomTextField
                                             multiline
                                             label={
-                                              subField.isRequired
-                                                ? `${subField.fieldLabel} *`
-                                                : subField.fieldLabel
+                                              subField.isRequired ? `${subField.fieldLabel} *` : subField.fieldLabel
                                             }
                                             type={
-                                              subField.fieldType === "file"
-                                                ? "text"
-                                                : "text"
+                                              subField.fieldType === "file" ? "text" : "text"
                                             }
                                             name={subField.fieldType}
                                             onChange={(e: any) =>
@@ -347,17 +341,15 @@ function StaticComponentForm({
                                             fullWidth
                                             margin="normal"
                                             inputProps={
-                                              subField.validation
-                                                ? JSON.parse(
-                                                  subField.validation
-                                                )
-                                                : {}
+                                              subField.validation ? JSON.parse(
+                                                subField.validation
+                                              ) : {}
                                             }
                                             value={
                                               templateValue?.data?.[
-                                              sectionField.fekey
+                                                sectionField.fekey
                                               ]?.[multipleSectionIndex]?.[
-                                              subField.fekey
+                                                subField.fekey
                                               ] || ""
                                             }
                                           />
@@ -379,9 +371,7 @@ function StaticComponentForm({
                       <CustomTextField
                         multiline
                         label={
-                          sectionField.isRequired
-                            ? `${sectionField.fieldLabel} *`
-                            : sectionField.fieldLabel
+                          sectionField.isRequired ? `${sectionField.fieldLabel} *` : sectionField.fieldLabel
                         }
                         type={
                           sectionField.fieldType === "file" ? "text" : "text"
@@ -398,7 +388,7 @@ function StaticComponentForm({
                         margin="normal"
                         value={
                           templateValue?.data?.[
-                          sectionField.fekey
+                            sectionField.fekey
                           ] || ""
                         }
                       />
@@ -410,8 +400,8 @@ function StaticComponentForm({
           </CardContent>
         </Card>
       </Grid>
-    );
-  };
+    )
+  }
 
   return (
     <>
@@ -450,7 +440,7 @@ function StaticComponentForm({
                   color="error"
                   type="reset"
                   onClick={() => {
-                    handleClose();
+                    handleClose()
                   }}
                 >
                   Cancel
@@ -470,7 +460,7 @@ function StaticComponentForm({
         </Box>
       </Card>
     </>
-  );
+  )
 }
 
-export default StaticComponentForm;
+export default StaticComponentForm

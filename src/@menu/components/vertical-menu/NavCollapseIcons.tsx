@@ -29,7 +29,7 @@ const NavCollapseIcons = (props: NavCollapseIconsProps) => {
   // Handle Lock / Unlock Icon Buttons click
   const handleClick = (action: 'lock' | 'unlock') => {
     // Setup the verticalNav to be locked or unlocked
-    const collapse = action === 'lock' ? false : true
+    const collapse = action !== 'lock'
 
     // Tell the verticalNav to lock or unlock
     collapseVerticalNav(collapse)

@@ -17,5 +17,5 @@ export type filesDetailType = {
   updatedAt: Date;
 };
 
-export const ADD_File = -1;
-export const EDIT_File = 1;
+export const ADD_File = -1
+export const EDIT_File = 1

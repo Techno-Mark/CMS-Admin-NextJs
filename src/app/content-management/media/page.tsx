@@ -1,6 +1,5 @@
-import FileListTable from "./FileList";
+import FileListTable from "./FileList"
 
 export default function Page() {
-    return <FileListTable />;
+  return <FileListTable />
 }
-  

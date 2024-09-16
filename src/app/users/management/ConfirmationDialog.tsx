@@ -1,12 +1,12 @@
 // MUI Imports
-import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import { toast } from "react-toastify";
-import { post } from "@/services/apiService";
-import { deleteUser } from "@/services/endpoint/users/management";
+import Dialog from "@mui/material/Dialog"
+import DialogContent from "@mui/material/DialogContent"
+import DialogActions from "@mui/material/DialogActions"
+import Typography from "@mui/material/Typography"
+import Button from "@mui/material/Button"
+import { toast } from "react-toastify"
+import { post } from "@/services/apiService"
+import { deleteUser } from "@/services/endpoint/users/management"
 
 type ConfirmationDialogProps = {
   open: boolean;
@@ -19,25 +19,25 @@ const ConfirmationDialog = ({
   open,
   setOpen,
   setDeletingId,
-  
-  deletePayload,
+
+  deletePayload
 }: ConfirmationDialogProps) => {
   const handleDeletePermission = async () => {
     try {
-      const result = await post(deleteUser, deletePayload);
+      const result = await post(deleteUser, deletePayload)
 
       if (result.status === "success") {
-        toast.success(result.message);
+        toast.success(result.message)
       } else {
-        toast.error(result.message);
+        toast.error(result.message)
       }
     } catch (error) {
-      console.error(error);
+      console.error(error)
     } finally {
-      setDeletingId(0);
-      setOpen(false);
+      setDeletingId(0)
+      setOpen(false)
     }
-  };
+  }
 
   return (
     <Dialog fullWidth maxWidth="xs" open={open} onClose={() => setOpen(false)}>
@@ -56,14 +56,14 @@ const ConfirmationDialog = ({
           variant="tonal"
           color="secondary"
           onClick={() => {
-            setOpen(false);
+            setOpen(false)
           }}
         >
           Cancel
         </Button>
       </DialogActions>
     </Dialog>
-  );
-};
+  )
+}
 
-export default ConfirmationDialog;
+export default ConfirmationDialog

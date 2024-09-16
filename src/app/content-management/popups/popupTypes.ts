@@ -7,7 +7,5 @@ export type PopupTypes = {
     active: boolean,
     popupFile:string,
     popupId?:string
-    
 
-   
 }

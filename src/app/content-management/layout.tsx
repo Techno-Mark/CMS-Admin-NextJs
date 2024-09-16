@@ -25,15 +25,15 @@ import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 
 const Layout = async ({ children }: ChildrenType) => {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions)
 
-  if(!session){
-    redirect('/login');
-  } 
+  if (!session) {
+    redirect('/login')
+  }
   // Vars
   const direction = 'ltr'
   const mode = getMode()
-  const systemMode = getSystemMode();
+  const systemMode = getSystemMode()
 
   return (
     <Providers direction={direction}>

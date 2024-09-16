@@ -24,8 +24,8 @@ export const verticalLayoutClasses = {
   footerContentWrapper: "ts-vertical-layout-footer-content-wrapper",
   footerContent: "ts-vertical-layout-footer-content",
   footerContentCompact: "ts-vertical-layout-footer-content-compact",
-  footerContentWide: "ts-vertical-layout-footer-content-wide",
-};
+  footerContentWide: "ts-vertical-layout-footer-content-wide"
+}
 
 // Classes for horizontal layout
 export const horizontalLayoutClasses = {
@@ -50,15 +50,15 @@ export const horizontalLayoutClasses = {
   footerContentWrapper: "ts-horizontal-layout-footer-content-wrapper",
   footerContent: "ts-horizontal-layout-footer-content",
   footerContentCompact: "ts-horizontal-layout-footer-content-compact",
-  footerContentWide: "ts-horizontal-layout-footer-content-wide",
-};
+  footerContentWide: "ts-horizontal-layout-footer-content-wide"
+}
 
 // Classes for blank layout
 export const blankLayoutClasses = {
-  root: "ts-blank-layout",
-};
+  root: "ts-blank-layout"
+}
 
 // Common classes for Vertical and Horizontal layouts
 export const commonLayoutClasses = {
-  contentHeightFixed: "ts-layout-content-height-fixed",
-};
+  contentHeightFixed: "ts-layout-content-height-fixed"
+}

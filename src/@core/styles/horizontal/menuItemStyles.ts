@@ -16,29 +16,25 @@ const menuItemStyles = (settings: Settings, theme: Theme): MenuItemStyles => ({
     [`&.${menuClasses.open} > .${menuClasses.button}`]: {
       backgroundColor: 'var(--mui-palette-action-selected) !important'
     },
-    ...(level === 0
-      ? {
-          [`& .${menuClasses.button}.${menuClasses.active}`]: {
-            color: 'var(--mui-palette-primary-contrastText) !important',
-            background:
-              theme.direction === 'ltr'
-                ? `linear-gradient(270deg,
+    ...(level === 0 ? {
+      [`& .${menuClasses.button}.${menuClasses.active}`]: {
+        color: 'var(--mui-palette-primary-contrastText) !important',
+        background:
+              theme.direction === 'ltr' ? `linear-gradient(270deg,
                   rgb(var(--mui-palette-primary-mainChannel) / 0.7) 0%,
-                  var(--mui-palette-primary-main) 100%) !important`
-                : `linear-gradient(270deg,
+                  var(--mui-palette-primary-main) 100%) !important` : `linear-gradient(270deg,
                   var(--mui-palette-primary-main) 100%,
                   rgb(var(--mui-palette-primary-mainChannel) / 0.7) 100%) !important`
-          }
-        }
-      : {
-          [`&:not([aria-expanded]) > .${menuClasses.button}.${menuClasses.active}`]: {
-            backgroundColor: 'var(--mui-palette-primary-lightOpacity)',
-            color: 'var(--mui-palette-primary-main)'
-          },
-          [`&[aria-expanded] > .${menuClasses.button}.${menuClasses.active}`]: {
-            backgroundColor: 'var(--mui-palette-action-selected) !important'
-          }
-        }),
+      }
+    } : {
+      [`&:not([aria-expanded]) > .${menuClasses.button}.${menuClasses.active}`]: {
+        backgroundColor: 'var(--mui-palette-primary-lightOpacity)',
+        color: 'var(--mui-palette-primary-main)'
+      },
+      [`&[aria-expanded] > .${menuClasses.button}.${menuClasses.active}`]: {
+        backgroundColor: 'var(--mui-palette-action-selected) !important'
+      }
+    }),
     [`&.${menuClasses.disabled} > .${menuClasses.button}`]: {
       color: 'var(--mui-palette-text-disabled)',
       '& *': {
@@ -93,14 +89,12 @@ const menuItemStyles = (settings: Settings, theme: Theme): MenuItemStyles => ({
   subMenuContent: {
     borderRadius: 'var(--border-radius)',
     backgroundColor: 'var(--mui-palette-background-paper)',
-    ...(settings.skin === 'bordered'
-      ? {
-          boxShadow: 'none',
-          border: '1px solid var(--mui-palette-divider)'
-        }
-      : {
-          boxShadow: 'var(--mui-customShadows-lg)'
-        }),
+    ...(settings.skin === 'bordered' ? {
+      boxShadow: 'none',
+      border: '1px solid var(--mui-palette-divider)'
+    } : {
+      boxShadow: 'var(--mui-customShadows-lg)'
+    }),
     '& > ul, & > div > ul': {
       padding: theme.spacing(2),
       '& > li:not(:last-child)': {

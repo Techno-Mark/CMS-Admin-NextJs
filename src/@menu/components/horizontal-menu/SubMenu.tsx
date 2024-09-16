@@ -180,9 +180,7 @@ const SubMenu: ForwardRefRenderFunction<HTMLLIElement, SubMenuProps> = (props, r
   const alignmentAxisOffset =
     popoutMenuOffset &&
     popoutMenuOffset.alignmentAxis &&
-    (typeof popoutMenuOffset.alignmentAxis === 'function'
-      ? popoutMenuOffset.alignmentAxis({ level })
-      : popoutMenuOffset.alignmentAxis)
+    (typeof popoutMenuOffset.alignmentAxis === 'function' ? popoutMenuOffset.alignmentAxis({ level }) : popoutMenuOffset.alignmentAxis)
 
   useEffect(() => {
     dir.current = window.getComputedStyle(document.documentElement).getPropertyValue('direction')
@@ -260,7 +258,7 @@ const SubMenu: ForwardRefRenderFunction<HTMLLIElement, SubMenuProps> = (props, r
     // If the menuItemStyles prop is provided, get the styles for the specified element.
     if (menuItemStyles) {
       // Define the parameters that are passed to the style functions.
-      const params = { level, disabled, active, isSubmenu: true, open: open }
+      const params = { level, disabled, active, isSubmenu: true, open }
 
       // Get the style function for the specified element.
       const styleFunction = menuItemStyles[element]
@@ -404,7 +402,7 @@ const SubMenu: ForwardRefRenderFunction<HTMLLIElement, SubMenuProps> = (props, r
                 level,
                 disabled,
                 active,
-                open: open
+                open
               })
             ) : (
               // eslint-disable-next-line lines-around-comment

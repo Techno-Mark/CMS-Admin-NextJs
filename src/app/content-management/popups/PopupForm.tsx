@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import LoadingBackdrop from "@/components/LoadingBackdrop";
+import LoadingBackdrop from "@/components/LoadingBackdrop"
 import {
   Button,
   Box,
@@ -9,25 +9,25 @@ import {
   MenuItem,
   Typography,
   Avatar,
-  IconButton,
-} from "@mui/material";
-import CustomTextField from "@/@core/components/mui/TextField";
-import React, { ChangeEvent, useEffect, useState } from "react";
-import CustomAutocomplete from "@/@core/components/mui/Autocomplete";
-import { useRouter } from "next/navigation";
-import { useDropzone } from "react-dropzone";
+  IconButton
+} from "@mui/material"
+import CustomTextField from "@/@core/components/mui/TextField"
+import React, { ChangeEvent, useEffect, useState } from "react"
+import CustomAutocomplete from "@/@core/components/mui/Autocomplete"
+import { useRouter } from "next/navigation"
+import { useDropzone } from "react-dropzone"
 import {
   post,
   postContentBlock,
-  postDataToOrganizationAPIs,
-} from "@/services/apiService";
-import { template } from "@/services/endpoint/template";
-import { blogPost } from "@/services/endpoint/blogpost";
-import { category } from "@/services/endpoint/category";
-import { tag } from "@/services/endpoint/tag";
-import { toast } from "react-toastify";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import { blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
+  postDataToOrganizationAPIs
+} from "@/services/apiService"
+import { template } from "@/services/endpoint/template"
+import { blogPost } from "@/services/endpoint/blogpost"
+import { category } from "@/services/endpoint/category"
+import { tag } from "@/services/endpoint/tag"
+import { toast } from "react-toastify"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import { blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType"
 
 type blogFormPropsTypes = {
   open: number;
@@ -35,12 +35,12 @@ type blogFormPropsTypes = {
   editingRow: blogDetailType | null;
 };
 
-const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
+const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
 
 const sectionActions = {
   ADD: -1,
-  EDIT: 1,
-};
+  EDIT: 1
+}
 
 const initialFormData = {
   id: -1,
@@ -54,8 +54,8 @@ const initialFormData = {
   status: 0,
   metaTitle: "",
   metaDescription: "",
-  metaKeywords: "",
-};
+  metaKeywords: ""
+}
 
 const initialErrorData = {
   templateId: "",
@@ -70,256 +70,254 @@ const initialErrorData = {
   status: "",
   metaTitle: "",
   metaDescription: "",
-  metaKeywords: "",
-};
+  metaKeywords: ""
+}
 
 function PopupForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
-  const router = useRouter();
+  const router = useRouter()
 
-  //state management hook
-  const [bannerImage, setBannerImage] = useState<File | null>(null);
-  const [thumbnailImage, setThumbnailImage] = useState<File | null>(null);
+  // state management hook
+  const [bannerImage, setBannerImage] = useState<File | null>(null)
+  const [thumbnailImage, setThumbnailImage] = useState<File | null>(null)
   const [formData, setFormData] =
-    useState<typeof initialFormData>(initialFormData); // form data hooks
+    useState<typeof initialFormData>(initialFormData) // form data hooks
 
-  //Error Handler Hooks
+  // Error Handler Hooks
   const [formErrors, setFormErrors] =
-    useState<typeof initialErrorData>(initialErrorData);
+    useState<typeof initialErrorData>(initialErrorData)
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] =
-    useState<boolean>(false);
+    useState<boolean>(false)
 
-  //template list hooks & other list apis data
+  // template list hooks & other list apis data
   const [templateList, setTemplateList] = useState<
     [{ templateName: string; templateId: number }] | []
-  >([]);
-  const [tagsList, setTagsList] = useState<[string] | []>([]);
-  const [categoryList, setCategoryList] = useState<[string] | []>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  >([])
+  const [tagsList, setTagsList] = useState<[string] | []>([])
+  const [categoryList, setCategoryList] = useState<[string] | []>([])
+  const [loading, setLoading] = useState<boolean>(true)
 
-  //Custom Hooks
+  // Custom Hooks
   const {
     getRootProps: getBannerRootProps,
-    getInputProps: getBannerInputProps,
+    getInputProps: getBannerInputProps
   } = useDropzone({
     multiple: false,
     accept: {
-      "image/*": [".png", ".jpg", ".jpeg", ".gif"],
+      "image/*": [".png", ".jpg", ".jpeg", ".gif"]
     },
     onDrop: (acceptedFiles: File[]) => {
-      setFormErrors({ ...formErrors, bannerImageError: "" });
-      setBannerImage(acceptedFiles[0]);
-    },
-  });
+      setFormErrors({ ...formErrors, bannerImageError: "" })
+      setBannerImage(acceptedFiles[0])
+    }
+  })
 
   const {
     getRootProps: getThumbnailRootProps,
-    getInputProps: getThumbnailInputProps,
+    getInputProps: getThumbnailInputProps
   } = useDropzone({
     multiple: false,
     accept: {
-      "image/*": [".png", ".jpg", ".jpeg", ".gif"],
+      "image/*": [".png", ".jpg", ".jpeg", ".gif"]
     },
     onDrop: (acceptedFiles: File[]) => {
-      setFormErrors({ ...formErrors, thumbnailImageError: "" });
-      setThumbnailImage(acceptedFiles[0]);
-    },
-  });
+      setFormErrors({ ...formErrors, thumbnailImageError: "" })
+      setThumbnailImage(acceptedFiles[0])
+    }
+  })
 
-  //Effects
+  // Effects
   useEffect(() => {
     async function getTemplate() {
-      await getRequiredData();
+      await getRequiredData()
       if (editingRow && open == EDIT_BLOG) {
-        formData.templateId = editingRow.templateId;
-        formData.id = editingRow.blogId;
-        formData.authorName = editingRow.authorName;
-        formData.categories = editingRow.categories.split(",");
-        formData.tags = editingRow.tags.split(",");
-        formData.description = editingRow.description;
-        formData.metaDescription = editingRow.metaDescription;
-        formData.metaTitle = editingRow.metaTitle;
-        formData.metaKeywords = editingRow.metaKeywords;
-        formData.title = editingRow.title;
-        formData.slug = editingRow.slug;
+        formData.templateId = editingRow.templateId
+        formData.id = editingRow.blogId
+        formData.authorName = editingRow.authorName
+        formData.categories = editingRow.categories.split(",")
+        formData.tags = editingRow.tags.split(",")
+        formData.description = editingRow.description
+        formData.metaDescription = editingRow.metaDescription
+        formData.metaTitle = editingRow.metaTitle
+        formData.metaKeywords = editingRow.metaKeywords
+        formData.title = editingRow.title
+        formData.slug = editingRow.slug
       }
     }
-    getTemplate();
-  }, []);
+    getTemplate()
+  }, [])
 
   // Methods
-  //handle title  change
+  // handle title  change
   const handleBlogTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value;
+    const newName = e.target.value
     setFormData((prevData) => ({
       ...prevData,
       title: newName,
       slug:
-        !isSlugManuallyEdited && open === sectionActions.ADD
-          ? newName
-            .replace(/[^\w\s]|_/g, "")
-            .replace(/\s+/g, "-")
-            .toLowerCase()
-          : prevData.slug,
-    }));
+        !isSlugManuallyEdited && open === sectionActions.ADD ? newName
+          .replace(/[^\w\s]|_/g, "")
+          .replace(/\s+/g, "-")
+          .toLowerCase() : prevData.slug
+    }))
     if (newName?.length) {
-      setFormErrors({ ...formErrors, title: "" });
+      setFormErrors({ ...formErrors, title: "" })
     }
-  };
+  }
 
   // Get Active Template List
   const getRequiredData = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
       const [templateResponse, categoryResponse, tagResponse] =
         await Promise.all([
           post(`${template.active}`, {}),
           postDataToOrganizationAPIs(`${category.active}`, {}),
-          postDataToOrganizationAPIs(`${tag.active}`, {}),
-        ]);
-      setTemplateList(templateResponse?.data?.templates);
-      setCategoryList(categoryResponse?.data?.categories);
-      setTagsList(tagResponse?.data?.tags);
-      setLoading(false);
+          postDataToOrganizationAPIs(`${tag.active}`, {})
+        ])
+      setTemplateList(templateResponse?.data?.templates)
+      setCategoryList(categoryResponse?.data?.categories)
+      setTagsList(tagResponse?.data?.tags)
+      setLoading(false)
     } catch (error) {
-      setLoading(false);
-      console.error(error);
+      setLoading(false)
+      console.error(error)
     }
-  };
+  }
 
-  //validation before submit
+  // validation before submit
   const validateForm = () => {
-    let valid = true;
-    let errors = { ...initialErrorData };
+    let valid = true
+    const errors = { ...initialErrorData }
 
     if (formData.templateId <= 0) {
-      errors.templateId = "Please select a template";
-      valid = false;
+      errors.templateId = "Please select a template"
+      valid = false
     }
     if (!formData.title) {
-      errors.title = "Please enter a blog title";
-      valid = false;
+      errors.title = "Please enter a blog title"
+      valid = false
     } else if (formData.title.length < 5) {
-      errors.title = "title must be at least 5 characters long";
-      valid = false;
+      errors.title = "title must be at least 5 characters long"
+      valid = false
     } else if (formData.title.length > 255) {
-      errors.title = "title must be at most 255 characters long";
-      valid = false;
+      errors.title = "title must be at most 255 characters long"
+      valid = false
     }
     if (!formData.slug) {
-      errors.slug = "Please add a slug";
-      valid = false;
+      errors.slug = "Please add a slug"
+      valid = false
     } else if (formData.slug.length < 5) {
-      errors.slug = "slug must be at least 5 characters long";
-      valid = false;
+      errors.slug = "slug must be at least 5 characters long"
+      valid = false
     } else if (formData.slug.length > 255) {
-      errors.slug = "slug must be at most 255 characters long";
-      valid = false;
+      errors.slug = "slug must be at most 255 characters long"
+      valid = false
     } else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(formData.slug)) {
       errors.slug =
-        "slug must be a valid slug (only lowercase letters, numbers, and hyphens are allowed).";
-      valid = false;
+        "slug must be a valid slug (only lowercase letters, numbers, and hyphens are allowed)."
+      valid = false
     }
     if (!formData.authorName) {
-      errors.authorName = "Please enter an author name";
-      valid = false;
+      errors.authorName = "Please enter an author name"
+      valid = false
     } else if (formData.authorName.length < 3) {
-      errors.authorName = "author name must be at least 3 characters long";
-      valid = false;
+      errors.authorName = "author name must be at least 3 characters long"
+      valid = false
     } else if (formData.authorName.length > 100) {
-      errors.authorName = "author name must be at most 100 characters long";
-      valid = false;
+      errors.authorName = "author name must be at most 100 characters long"
+      valid = false
     }
     if (!formData.description) {
-      errors.description = "Please enter a description";
-      valid = false;
+      errors.description = "Please enter a description"
+      valid = false
     }
     if (!formData.tags.length) {
-      errors.tags = "Please select or create new tags";
-      valid = false;
+      errors.tags = "Please select or create new tags"
+      valid = false
     }
     if (!formData.categories.length) {
-      errors.categories = "Please select or create new categories";
-      valid = false;
+      errors.categories = "Please select or create new categories"
+      valid = false
     }
     if (!formData.metaTitle) {
-      errors.metaTitle = "Please enter a meta title";
-      valid = false;
+      errors.metaTitle = "Please enter a meta title"
+      valid = false
     } else if (formData.metaTitle.length > 160) {
-      errors.metaTitle = "meta title must be less than 160 character";
-      valid = false;
+      errors.metaTitle = "meta title must be less than 160 character"
+      valid = false
     }
     if (!formData.metaDescription) {
-      errors.metaDescription = "Please enter a meta description";
-      valid = false;
+      errors.metaDescription = "Please enter a meta description"
+      valid = false
     } else if (formData.metaDescription.length > 160) {
       errors.metaDescription =
-        "meta description must be less than 160 character";
-      valid = false;
+        "meta description must be less than 160 character"
+      valid = false
     }
     if (!formData.metaKeywords) {
-      errors.metaKeywords = "Please enter meta keywords";
-      valid = false;
+      errors.metaKeywords = "Please enter meta keywords"
+      valid = false
     } else if (formData.metaKeywords.length > 160) {
-      errors.metaKeywords = "meta keywords must be less than 160 character";
-      valid = false;
+      errors.metaKeywords = "meta keywords must be less than 160 character"
+      valid = false
     }
 
     // Validate Banner Image
     if (!bannerImage) {
-      errors.bannerImageError = "Banner Image is required";
-      valid = false;
+      errors.bannerImageError = "Banner Image is required"
+      valid = false
     } else if (!validImageType.includes(bannerImage.type)) {
-      errors.bannerImageError = `Invalid file type for Banner Image. Allowed types ${validImageType.join(",")}`;
-      valid = false;
+      errors.bannerImageError = `Invalid file type for Banner Image. Allowed types ${validImageType.join(",")}`
+      valid = false
     }
 
     // Validate Thumbnail Image
     if (!thumbnailImage) {
-      errors.thumbnailImageError = "Thumbnail Image is required";
-      valid = false;
+      errors.thumbnailImageError = "Thumbnail Image is required"
+      valid = false
     } else if (!validImageType.includes(thumbnailImage.type)) {
-      errors.thumbnailImageError = `Invalid file type for Thumbnail Image. Allowed types ${validImageType.join(",")}`;
-      valid = false;
+      errors.thumbnailImageError = `Invalid file type for Thumbnail Image. Allowed types ${validImageType.join(",")}`
+      valid = false
     }
-    setFormErrors(errors);
-    return valid;
-  };
+    setFormErrors(errors)
+    return valid
+  }
 
   // handle submit
   const handleSubmit = async (active: boolean) => {
     if (validateForm()) {
       try {
-        setLoading(true);
+        setLoading(true)
 
-        const formDataToSend = new FormData();
-        formDataToSend.set("templateId", String(formData.templateId));
-        formDataToSend.set("title", formData.title);
-        formDataToSend.set("slug", formData.slug);
-        formDataToSend.set("authorName", formData.authorName);
-        formDataToSend.set("description", formData.description);
-        formDataToSend.set("metaTitle", formData.metaTitle);
-        formDataToSend.set("metaDescription", formData.metaDescription);
-        formDataToSend.set("metaKeywords", formData.metaKeywords);
-        formDataToSend.append("bannerImage", bannerImage as Blob);
-        formDataToSend.append("thumbnailImage", thumbnailImage as Blob);
-        formDataToSend.set("active", String(active));
-        formDataToSend.set("tags", formData.tags.join(","));
-        formDataToSend.set("categories", formData.categories.join(","));
-     
-        const result = await postContentBlock(blogPost.create, formDataToSend);
-        setLoading(false);
+        const formDataToSend = new FormData()
+        formDataToSend.set("templateId", String(formData.templateId))
+        formDataToSend.set("title", formData.title)
+        formDataToSend.set("slug", formData.slug)
+        formDataToSend.set("authorName", formData.authorName)
+        formDataToSend.set("description", formData.description)
+        formDataToSend.set("metaTitle", formData.metaTitle)
+        formDataToSend.set("metaDescription", formData.metaDescription)
+        formDataToSend.set("metaKeywords", formData.metaKeywords)
+        formDataToSend.append("bannerImage", bannerImage as Blob)
+        formDataToSend.append("thumbnailImage", thumbnailImage as Blob)
+        formDataToSend.set("active", String(active))
+        formDataToSend.set("tags", formData.tags.join(","))
+        formDataToSend.set("categories", formData.categories.join(","))
+
+        const result = await postContentBlock(blogPost.create, formDataToSend)
+        setLoading(false)
         if (result.status === "success") {
-          toast.success(result.message);
-          router.back();
+          toast.success(result.message)
+          router.back()
         } else {
-          toast.error(result.message);
+          toast.error(result.message)
         }
       } catch (error) {
-        console.error(error);
-        setLoading(false);
+        console.error(error)
+        setLoading(false)
       }
     }
-  };
+  }
 
   return (
     <>
@@ -365,11 +363,9 @@ function PopupForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
               />
             </Grid>
 
-
-
             <Grid item xs={12} sm={12}>
               <p className="text-[#4e4b5a]">Description 1!@# *</p>
-             
+
               {/* <CustomEditor /> */}
 
               {/* <EditorCustom
@@ -449,7 +445,7 @@ function PopupForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
                   color="error"
                   type="reset"
                   onClick={() => {
-                    handleClose();
+                    handleClose()
                   }}
                 >
                   Cancel
@@ -477,7 +473,7 @@ function PopupForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
         </Box>
       </Card>
     </>
-  );
+  )
 }
 
-export default PopupForm;
+export default PopupForm

@@ -1,12 +1,12 @@
-"use client";
+"use client"
 
-import { useRouter } from "next/navigation";
-import { ADD_BLOG } from "@/types/apps/blogsType";
-import MenuForm from "../MenuForm";
-import { usePermission } from "@/utils/permissions";
+import { useRouter } from "next/navigation"
+import { ADD_BLOG } from "@/types/apps/blogsType"
+import MenuForm from "../MenuForm"
+import { usePermission } from "@/utils/permissions"
 
 const Page = () => {
-  const router = useRouter();
+  const router = useRouter()
   const { hasPermission } = usePermission()
   return (
     <MenuForm
@@ -15,7 +15,7 @@ const Page = () => {
       editingRow={null}
       permissionUser={hasPermission('Menu', 'Create')}
     />
-  );
-};
+  )
+}
 
-export default Page;
+export default Page

@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
+import { redirect } from "next/navigation"
 
 function page() {
-  return redirect('/content-management/menus');
+  return redirect('/content-management/menus')
 }
 
-export default page;
+export default page
