@@ -3,7 +3,12 @@
 import React, { useEffect, useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Card from "@mui/material/Card"
-import { MenuItem, TablePagination, TextFieldProps, Tooltip } from "@mui/material"
+import {
+  MenuItem,
+  TablePagination,
+  TextFieldProps,
+  Tooltip
+} from "@mui/material"
 import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
@@ -97,7 +102,7 @@ const BlogListTable = () => {
 
   const [data, setData] = useState<TemplateType[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
   const [totalRows, setTotalRows] = useState<number>(0)
@@ -121,6 +126,7 @@ const BlogListTable = () => {
       setLoading(false)
     }
   }
+  
   function hasPermission(module: string, action: string) {
     if (userIdRole == 1) {
       return true
@@ -129,7 +135,8 @@ const BlogListTable = () => {
     return userPermissionData?.[module]?.includes(action) ?? false
   }
 
-  const hasCheckModule = (menuKey: string): boolean => !!(userPermissionData && userPermissionData[menuKey])
+  const hasCheckModule = (menuKey: string): boolean =>
+    !!(userPermissionData && userPermissionData[menuKey])
   const router = useRouter()
   if (!hasCheckModule('Blog')) {
     router.push('/401-not-authorized')
@@ -154,6 +161,8 @@ const BlogListTable = () => {
       setLoading(false)
     }
   }
+
+
   useEffect(() => {
     getData()
     const handleStorageUpdate = async () => {
@@ -231,9 +240,9 @@ const BlogListTable = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
-            {userPermissionData && (
-              hasPermission('Blog', 'Edit') ? (
-                <Tooltip title={'Edit'}>
+            {userPermissionData &&
+              (hasPermission("Blog", "Edit") ? (
+                <Tooltip title={"Edit"}>
                   <IconButton
                     onClick={() =>
                       router.push(
@@ -245,7 +254,7 @@ const BlogListTable = () => {
                   </IconButton>
                 </Tooltip>
               ) : (
-                <Tooltip title={'View'}>
+                <Tooltip title={"View"}>
                   <IconButton
                     onClick={() =>
                       router.push(
@@ -256,22 +265,18 @@ const BlogListTable = () => {
                     <i className="tabler-eye text-[22px] text-textSecondary" />
                   </IconButton>
                 </Tooltip>
-
               ))}
-            {userPermissionData && (
-              (hasPermission('Blog', 'Delete')) && (
-
-                <Tooltip title={'Delete'}>
-                  <IconButton
-                    onClick={() => {
-                      setIsDeleting(true)
-                      setDeletingId(row.original.blogId)
-                    }}
-                  >
-                    <i className="tabler-trash text-[22px] text-textSecondary" />
-                  </IconButton>
-                </Tooltip>
-              )
+            {userPermissionData && hasPermission("Blog", "Delete") && (
+              <Tooltip title={"Delete"}>
+                <IconButton
+                  onClick={() => {
+                    setIsDeleting(true)
+                    setDeletingId(row.original.blogId)
+                  }}
+                >
+                  <i className="tabler-trash text-[22px] text-textSecondary" />
+                </IconButton>
+              </Tooltip>
             )}
           </div>
         ),
@@ -317,7 +322,6 @@ const BlogListTable = () => {
   return (
     <>
       <div>
-
         <LoadingBackdrop isLoading={loading} />
         <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
           <BreadCrumbList />
@@ -350,7 +354,7 @@ const BlogListTable = () => {
                 <MenuItem value="inactive">Draft</MenuItem>
               </CustomTextField>
             </div>
-            {hasPermission('Blog', 'Create') && (
+            {hasPermission("Blog", "Create") && (
               <Button
                 variant="contained"
                 startIcon={<i className="tabler-plus" />}

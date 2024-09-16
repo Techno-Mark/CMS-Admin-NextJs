@@ -109,19 +109,19 @@ function PopupForm({ open, handleClose, editingRow }: blogFormPropsTypes) {
     }
   })
 
-  const {
-    getRootProps: getThumbnailRootProps,
-    getInputProps: getThumbnailInputProps
-  } = useDropzone({
-    multiple: false,
-    accept: {
-      "image/*": [".png", ".jpg", ".jpeg", ".gif"]
-    },
-    onDrop: (acceptedFiles: File[]) => {
-      setFormErrors({ ...formErrors, thumbnailImageError: "" })
-      setThumbnailImage(acceptedFiles[0])
-    }
-  })
+  // const {
+  //   getRootProps: getThumbnailRootProps,
+  //   getInputProps: getThumbnailInputProps
+  // } = useDropzone({
+  //   multiple: false,
+  //   accept: {
+  //     "image/*": [".png", ".jpg", ".jpeg", ".gif"]
+  //   },
+  //   onDrop: (acceptedFiles: File[]) => {
+  //     setFormErrors({ ...formErrors, thumbnailImageError: "" })
+  //     setThumbnailImage(acceptedFiles[0])
+  //   }
+  // })
 
   // Effects
   useEffect(() => {

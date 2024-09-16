@@ -91,7 +91,7 @@ const StaticContentBlockList = () => {
 
   const [data, setData] = useState<TemplateType[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
   const [totalRows, setTotalRows] = useState<number>(0)
@@ -121,7 +121,8 @@ const StaticContentBlockList = () => {
     return userPermissionData?.[module]?.includes(action) ?? false
   }
 
-  const hasCheckModule = (menuKey: string): boolean => !!(userPermissionData && userPermissionData[menuKey])
+  const hasCheckModule = (menuKey: string): boolean =>
+    !!(userPermissionData && userPermissionData[menuKey])
   const router = useRouter()
   if (!hasCheckModule('Static Component')) {
     router.push('/401-not-authorized')
@@ -146,6 +147,7 @@ const StaticContentBlockList = () => {
       setLoading(false)
     }
   }
+
   useEffect(() => {
     getData()
     const handleStorageUpdate = async () => {
@@ -200,9 +202,9 @@ const StaticContentBlockList = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
-            {userPermissionData && (
-              hasPermission('Static Component', 'Edit') ? (
-                <Tooltip title={'Save And Edit'}>
+            {userPermissionData &&
+              (hasPermission("Static Component", "Edit") ? (
+                <Tooltip title={"Save And Edit"}>
                   <IconButton
                     onClick={() =>
                       router.push(
@@ -214,7 +216,7 @@ const StaticContentBlockList = () => {
                   </IconButton>
                 </Tooltip>
               ) : (
-                <Tooltip title={'View'}>
+                <Tooltip title={"View"}>
                   <IconButton
                     onClick={() =>
                       router.push(
@@ -225,7 +227,6 @@ const StaticContentBlockList = () => {
                     <i className="tabler-eye text-[22px] text-textSecondary" />
                   </IconButton>
                 </Tooltip>
-
               ))}
           </div>
         ),
@@ -281,7 +282,6 @@ const StaticContentBlockList = () => {
               placeholder="Search"
               className="is-full sm:is-auto"
             />
-
           </div>
         </div>
         <Card className="flex flex-col h-full">
@@ -362,7 +362,6 @@ const StaticContentBlockList = () => {
             onRowsPerPageChange={handleRowsPerPageChange}
           />
         </Card>
-
       </div>
     </>
   )

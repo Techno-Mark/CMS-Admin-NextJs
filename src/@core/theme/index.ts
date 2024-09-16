@@ -16,7 +16,7 @@ import shadows from './shadows'
 import customShadows from './customShadows'
 import typography from './typography'
 
-const public_sans = PublicSansFont({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700', '800', '900'] })
+const publicSans = PublicSansFont({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700', '800', '900'] })
 
 const theme = (settings: Settings, mode: SystemMode, direction: Theme['direction']): Theme => {
   return {
@@ -35,7 +35,7 @@ const theme = (settings: Settings, mode: SystemMode, direction: Theme['direction
       }
     },
     shadows: shadows(mode),
-    typography: typography(public_sans.style.fontFamily),
+    typography: typography(publicSans.style.fontFamily),
     customShadows: customShadows(mode),
     mainColorChannels: {
       light: '47 43 61',
@@ -43,7 +43,7 @@ const theme = (settings: Settings, mode: SystemMode, direction: Theme['direction
       lightShadow: '47 43 61',
       darkShadow: '19 17 32'
     }
-  } as Theme
+  } as unknown as Theme
 }
 
 export default theme

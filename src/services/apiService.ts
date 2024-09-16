@@ -49,7 +49,7 @@ const handleResponse = async (response: Response) => {
 
 export const fetchData = async (
   endpoint: string,
-  options: RequestInit = {}
+  options: Object = {}
 ) => {
   try {
     const session = await getSession()
@@ -155,7 +155,7 @@ export const postDataToOrganizationAPIs = async (
 export const withoutAuthPost = async (
   endpoint: string,
   data: any,
-  options: RequestInit = {}
+  options: Object = {}
 ) => {
   try {
     const orgId = localStorage.getItem("selectedOrgId")

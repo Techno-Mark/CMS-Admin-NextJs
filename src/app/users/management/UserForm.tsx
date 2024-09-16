@@ -84,7 +84,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
 
       return response.data.roles.map(
         (r: any) =>
-          new Object({
+          ({
             id: r.roleId,
             name: r.roleName
           })
@@ -253,7 +253,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
             active: formData.active,
             organizations: company.map(
               (c) =>
-                new Object({
+                ({
                   roleId: c.roleId,
                   organizationId: c.organizationId
                 })
@@ -264,7 +264,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
             active: formData.active,
             organizations: company.map(
               (c) =>
-                new Object({
+                ({
                   roleId: c.roleId,
                   organizationId: c.organizationId
                 })

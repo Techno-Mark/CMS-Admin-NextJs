@@ -62,7 +62,7 @@ const SubMenuContent: ForwardRefRenderFunction<HTMLDivElement, SubMenuContentPro
           const height = target.offsetHeight
 
           target.style.blockSize = '0px'
-          target.offsetHeight
+          // target.offsetHeight
 
           target.style.blockSize = `${height}px`
 
@@ -77,7 +77,7 @@ const SubMenuContent: ForwardRefRenderFunction<HTMLDivElement, SubMenuContentPro
         if (target) {
           target.style.overflow = 'hidden'
           target.style.blockSize = `${target.offsetHeight}px`
-          target.offsetHeight
+          // target.offsetHeight
           target.style.blockSize = '0px'
 
           setTimeout(() => {
