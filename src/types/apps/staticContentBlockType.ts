@@ -17,5 +17,7 @@ export type filesDetailType = {
   updatedAt: Date;
 };
 
+// eslint-disable-next-line
 export const ADD_File = -1
+// eslint-disable-next-line
 export const EDIT_File = 1
