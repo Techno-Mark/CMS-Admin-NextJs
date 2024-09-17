@@ -17,7 +17,6 @@ import {
 import CustomTextField from "@/@core/components/mui/TextField"
 import React, { useEffect, useState } from "react"
 import CustomAutocomplete from "@/@core/components/mui/Autocomplete"
-import { useRouter } from "next/navigation"
 import { useDropzone } from "react-dropzone"
 import { post, postContentBlock } from "@/services/apiService"
 import { toast } from "react-toastify"

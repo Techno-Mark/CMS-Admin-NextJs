@@ -1,51 +1,45 @@
 {
-    "extends": [
-      "next/core-web-vitals",
-      "eslint:recommended",
-      "standard"
+  "extends": ["next/core-web-vitals", "eslint:recommended", "standard"],
+  "plugins": ["react"],
+  "rules": {
+    "react/display-name": "off",
+    "eqeqeq": "off",
+    "react/react-in-jsx-scope": "off",
+    "no-use-before-define": "off",
+    "quotes": "off",
+    "react/prop-types": 2,
+    "react-hooks/exhaustive-deps": "off",
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "never",
+        "named": "never",
+        "asyncArrow": "always"
+      }
     ],
-    "plugins": [
-      "react"
-    ],
-    "rules": {
-      "react/display-name": "off",
-      "eqeqeq": "off",
-      "no-use-before-define": "off",
-      "quotes": "off",
-      "react/prop-types": 2,
-      "react-hooks/exhaustive-deps": "off",
-      "space-before-function-paren": [
-        "error",
-        {
-          "anonymous": "never",
-          "named": "never",
-          "asyncArrow": "always"
-        }
-      ],
-      "multiline-ternary": [
-        "error",
-        "never"
-      ],
-      "react/react-in-jsx-scope": "off",
-      "react/no-unknown-property": [
-        2,
-        {
-          "ignore": [
-            "jsx",
-            "amp-custom",
-            "global",
-            "on",
-            "custom-element",
-            "custom-template",
-            "option",
-            "on",
-            "items",
-            "fallback",
-            "update",
-            "item"
-          ]
-        }
-      ]
-    },
-    "root": true
-  }
+    "multiline-ternary": ["error", "never"],
+    "react/no-unknown-property": [
+      2,
+      {
+        "ignore": [
+          "jsx",
+          "amp-custom",
+          "global",
+          "on",
+          "custom-element",
+          "custom-template",
+          "option",
+          "on",
+          "items",
+          "fallback",
+          "update",
+          "item"
+        ]
+      }
+    ]
+  },
+  "globals": {
+    "React": "writable"
+  },
+  "root": true
+}

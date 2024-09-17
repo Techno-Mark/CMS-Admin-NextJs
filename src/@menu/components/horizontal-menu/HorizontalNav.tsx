@@ -36,6 +36,7 @@ export type HorizontalNavProps = HTMLAttributes<HTMLDivElement> & {
   breakpoints?: Partial<typeof defaultBreakpoints>
   customStyles?: CSSObject
   verticalNavProps?: Pick<VerticalNavProps, 'width' | 'backgroundColor' | 'backgroundImage' | 'customStyles'>
+  // eslint-disable-next-line
   verticalNavContent?: ({ children }: ChildrenType) => JSX.Element
 
   /**

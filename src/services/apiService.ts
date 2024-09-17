@@ -49,10 +49,12 @@ const handleResponse = async (response: Response) => {
 
 export const fetchData = async (
   endpoint: string,
-  options: Object = {}
+  options: any = {}
 ) => {
   try {
     const session = await getSession()
+    const user = session?.user as any
+    const token = user?.token
 
     if (!session || !session?.user) {
       throw new Error("No session or access token found")
@@ -64,7 +66,7 @@ export const fetchData = async (
       ...options,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session?.user.token}`,
+        Authorization: `Bearer ${token}`,
         ...(orgId ? { "organization-id": orgId } : {}),
         ...options.headers
       }
@@ -99,6 +101,8 @@ export const del = (endpoint: string) =>
 export const postContentBlock = async (endpoint: string, data: any) => {
   try {
     const session = await getSession()
+    const user = session?.user as any
+    const token = user?.token
 
     if (!session || !session?.user) {
       throw new Error("No session or access token found")
@@ -107,7 +111,7 @@ export const postContentBlock = async (endpoint: string, data: any) => {
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${session?.user.token}`,
+        Authorization: `Bearer ${token}`,
         "organization-id": orgId || "1"
       },
       body: data
@@ -127,6 +131,8 @@ export const postDataToOrganizationAPIs = async (
 ) => {
   try {
     const session = await getSession()
+    const user = session?.user as any
+    const token = user?.token
 
     if (!session || !session?.user) {
       throw new Error("No session or access token found")
@@ -138,7 +144,7 @@ export const postDataToOrganizationAPIs = async (
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session?.user.token}`,
+        Authorization: `Bearer ${token}`,
         "organization-id": `${orgId}`
       },
       body: JSON.stringify(data)
@@ -155,7 +161,7 @@ export const postDataToOrganizationAPIs = async (
 export const withoutAuthPost = async (
   endpoint: string,
   data: any,
-  options: Object = {}
+  options: any = {}
 ) => {
   try {
     const orgId = localStorage.getItem("selectedOrgId")

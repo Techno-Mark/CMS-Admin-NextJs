@@ -496,6 +496,7 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                           <input {...getEventInputProps()} />
                           <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
                             {open == EDIT_EVENT && !isFeatureImageTouched && (
+                              // eslint-disable-next-line
                               <img
                                 className="object-contain w-full h-full"
                                 src={

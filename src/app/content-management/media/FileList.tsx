@@ -202,6 +202,7 @@ const FileListTable = () => {
           return (
             <Box display="flex" alignItems="center">
               {mediaType === 'image' ? (
+                // eslint-disable-next-line
                 <img
                   src={fileUrl}
                   alt={filePath}

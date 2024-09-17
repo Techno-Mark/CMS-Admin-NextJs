@@ -723,6 +723,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                   <input {...getBannerInputProps()} />
                   <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
                     {open == EDIT_BLOG && !isImageBannerTouched.bannerImage && (
+                      // eslint-disable-next-line
                       <img
                         className="object-contain w-full h-full"
                         src={
@@ -733,6 +734,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                       />
                     )}
                     {bannerImage && isImageBannerTouched.bannerImage && (
+                      // eslint-disable-next-line
                       <img
                         key={bannerImage.name}
                         alt={bannerImage.name}
@@ -786,6 +788,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                   <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
                     {open == EDIT_BLOG &&
                       !isImageBannerTouched.thumbnailImage && (
+                        // eslint-disable-next-line
                         <img
                           className="object-contain w-full h-full"
                           src={
@@ -796,6 +799,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                         />
                     )}
                     {thumbnailImage && isImageBannerTouched.thumbnailImage && (
+                      // eslint-disable-next-line
                       <img
                         key={thumbnailImage.name}
                         alt={thumbnailImage.name}
@@ -851,6 +855,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                   <div className="flex items-center justify-center flex-col w-[250px] h-[170px] border border-dashed border-gray-300 rounded-md p-2">
                     {open == EDIT_BLOG &&
                       !isImageBannerTouched.authorImageUrl && (
+                        // eslint-disable-next-line
                         <img
                           className="object-contain w-full h-full"
                           src={
@@ -861,6 +866,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                         />
                     )}
                     {authorImageUrl && isImageBannerTouched.authorImageUrl && (
+                      // eslint-disable-next-line
                       <img
                         key={authorImageUrl.name}
                         alt={authorImageUrl.name}
@@ -879,9 +885,9 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                           >
                             <i className="tabler-upload" />
                           </Avatar>
-                          <Typography variant="h5" className="mbe-2.5">
+                          {/* <Typography variant="h5" className="mbe-2.5">
                             Drop files here or click to upload.
-                          </Typography>
+                          </Typography> */}
                           <Typography>
                             Drop files here or click{" "}
                             <a
