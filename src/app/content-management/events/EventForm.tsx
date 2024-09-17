@@ -507,6 +507,7 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                               />
                             )}
                             {featureImage && isFeatureImageTouched && (
+                              // eslint-disable-next-line
                               <img
                                 key={featureImage.name}
                                 alt={featureImage.name}

@@ -582,6 +582,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   <input {...getImageInputProps()} />
                   <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
                     {open == popupActions.EDIT && !isImageTouched && (
+                      // eslint-disable-next-line
                       <img
                         className="object-contain w-full h-full"
                         src={
@@ -592,6 +593,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                       />
                     )}
                     {image && isImageTouched && (
+                      // eslint-disable-next-line
                       <img
                         key={image.name}
                         alt={image.name}

@@ -51,6 +51,7 @@ const NotFound = ({ mode }: { mode: SystemMode }) => {
         <Button href='/' component={Link} variant='contained'>
           Back To Home
         </Button>
+        {/* eslint-disable-next-line  */}
         <img
           alt='error-404-illustration'
           src='/images/illustrations/characters/1.png'

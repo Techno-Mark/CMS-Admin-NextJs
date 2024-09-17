@@ -42,6 +42,7 @@ const NotAuthorized = ({ mode }: { mode: SystemMode }) => {
         {/* <Button href='/' component={Link} variant='contained'>
           Back To Home
         </Button> */}
+        {/* eslint-disable-next-line  */}
         <img
           alt='error-401-illustration'
           src='/images/illustrations/characters/3.png'

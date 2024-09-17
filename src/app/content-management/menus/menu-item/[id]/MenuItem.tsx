@@ -199,6 +199,7 @@ const MenuItem = ({
                 <div className="flex-1 flex items-center gap-x-2">
                   <DraggableIcon />
                   {childItem?.logo && childItem.logo !== "#" && (
+                    // eslint-disable-next-line
                     <img
                       src={childItem.logo}
                       alt="icon"

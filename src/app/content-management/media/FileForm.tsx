@@ -68,6 +68,7 @@ function FileForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
 
   const renderFilePreview = (file: FileProp) => {
     if (file.type.startsWith('image')) {
+      // eslint-disable-next-line
       return <img width={38} height={38} alt={file.name} src={URL.createObjectURL(file as any)} />
     } else {
       return <i className='tabler-file-description' />
