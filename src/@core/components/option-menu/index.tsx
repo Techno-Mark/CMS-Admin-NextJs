@@ -105,6 +105,7 @@ const OptionMenu = (props: OptionsMenuType) => {
                           {...(option.href && { className: 'p-0' })}
                           onClick={e => {
                             handleClose(e)
+                            // eslint-disable-next-line
                             option.menuItemProps && option.menuItemProps.onClick ? option.menuItemProps.onClick(e) : null
                           }}
                         >

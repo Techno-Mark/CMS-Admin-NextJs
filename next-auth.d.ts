@@ -1,4 +1,4 @@
-import NextAuth, { type DefaultSession } from "next-auth"
+import { type DefaultSession } from "next-auth"
 
 export type ExtendedUser = DefaultSession["user"] & {
     id: string;
@@ -8,8 +8,8 @@ export type ExtendedUser = DefaultSession["user"] & {
     CompanyId: number;
 }
 
-declare module "next-auth" {
-    interface Session {
-        user: ExtendedUser
-    }
-}
+// declare module "next-auth" {
+//     interface Session {
+//         user: ExtendedUser
+//     }
+// }

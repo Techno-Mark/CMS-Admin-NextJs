@@ -1,5 +1,5 @@
 // Next Imports
-// eslint-disable
+/* eslint-disable */
 import { Public_Sans } from 'next/font/google'
 
 // MUI Imports
