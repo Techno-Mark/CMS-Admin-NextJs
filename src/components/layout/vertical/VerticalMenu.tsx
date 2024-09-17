@@ -41,8 +41,6 @@ const RenderExpandIcon = ({ open, transitionDuration }: RenderExpandIconProps) =
 )
 
 const VerticalMenu = ({ scrollMenu, permissionData }: Props) => {
-  console.log(permissionData)
-
   // Hooks
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()

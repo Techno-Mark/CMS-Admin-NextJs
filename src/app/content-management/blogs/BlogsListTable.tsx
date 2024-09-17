@@ -86,8 +86,6 @@ const BlogListTable = () => {
     setLoading(true)
     try {
       const data = await getDecryptedPermissionData()
-      console.log(data)
-
       if (data) {
         setUserIdRole(data.currentUserId)
         setUserPermissionData(data.moduleWisePermissions)

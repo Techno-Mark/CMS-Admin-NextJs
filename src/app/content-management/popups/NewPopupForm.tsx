@@ -226,7 +226,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
         toast.error(result.message)
       }
     } catch (error) {
-      console.log(error)
+      console.error(error)
     } finally {
       setLoading(false)
     }
