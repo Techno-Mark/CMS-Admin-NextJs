@@ -107,62 +107,52 @@ const chip: Theme['components'] = {
         fontWeight: theme.typography.fontWeightMedium,
         lineHeight: theme.typography.body2.lineHeight,
 
-        ...(ownerState.size === 'small'
-          ? {
-              borderRadius: 'var(--mui-shape-customBorderRadius-sm)'
-            }
-          : {
-              borderRadius: 'var(--mui-shape-borderRadius)'
-            }),
+        ...(ownerState.size === 'small' ? {
+          borderRadius: 'var(--mui-shape-customBorderRadius-sm)'
+        } : {
+          borderRadius: 'var(--mui-shape-borderRadius)'
+        }),
 
         '& .MuiChip-deleteIcon': {
-          ...(ownerState.size === 'small'
-            ? {
-                fontSize: '1rem',
-                marginInlineEnd: theme.spacing(1),
-                marginInlineStart: theme.spacing(-2)
-              }
-            : {
-                fontSize: '1.25rem',
-                marginInlineEnd: theme.spacing(1.5),
-                marginInlineStart: theme.spacing(-2)
-              })
+          ...(ownerState.size === 'small' ? {
+            fontSize: '1rem',
+            marginInlineEnd: theme.spacing(1),
+            marginInlineStart: theme.spacing(-2)
+          } : {
+            fontSize: '1.25rem',
+            marginInlineEnd: theme.spacing(1.5),
+            marginInlineStart: theme.spacing(-2)
+          })
         },
         '& .MuiChip-avatar, & .MuiChip-icon': {
           blockSize: 20,
           inlineSize: 20,
           '& i, & svg': {
-            ...(ownerState.size === 'small'
-              ? {
-                  fontSize: 13
-                }
-              : {
-                  fontSize: 15
-                })
+            ...(ownerState.size === 'small' ? {
+              fontSize: 13
+            } : {
+              fontSize: 15
+            })
           },
-          ...(ownerState.size === 'small'
-            ? {
-                marginInlineStart: theme.spacing(1),
-                marginInlineEnd: theme.spacing(-2)
-              }
-            : {
-                marginInlineStart: theme.spacing(1.5),
-                marginInlineEnd: theme.spacing(-2)
-              })
+          ...(ownerState.size === 'small' ? {
+            marginInlineStart: theme.spacing(1),
+            marginInlineEnd: theme.spacing(-2)
+          } : {
+            marginInlineStart: theme.spacing(1.5),
+            marginInlineEnd: theme.spacing(-2)
+          })
         },
         '&.Mui-disabled': {
           opacity: 0.45
         }
       }),
       label: ({ ownerState, theme }) => ({
-        ...(ownerState.size === 'small'
-          ? {
-              paddingInline: theme.spacing(2.5),
-              paddingBlock: theme.spacing(0.5)
-            }
-          : {
-              paddingInline: theme.spacing(3)
-            })
+        ...(ownerState.size === 'small' ? {
+          paddingInline: theme.spacing(2.5),
+          paddingBlock: theme.spacing(0.5)
+        } : {
+          paddingInline: theme.spacing(3)
+        })
       }),
       iconMedium: {
         fontSize: '1.25rem'

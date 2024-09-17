@@ -1,7 +1,5 @@
 // Next Imports
 import type { Metadata } from 'next'
-import { useRouter } from 'next/router'
-
 
 // Server Action Imports
 import { getServerMode } from '@core/utils/serverHelpers'
@@ -16,20 +14,20 @@ export const metadata: Metadata = {
 }
 
 const ForgotPasswordPage = async ({ params }: { params: { token: string } }) => {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions)
 
   if (session) {
-    redirect('/home');
+    redirect('/home')
   }
-  
+
   // Vars
-  const mode = getServerMode();
+  const mode = getServerMode()
 
   // Extract the token from the URL
-  const { token } = params;
+  const { token } = params
 
   // Use the token for password reset logic or validation
-  return <ResetPassword mode={mode} token={token} />;
+  return <ResetPassword mode={mode} token={token} />
 }
 
-export default ForgotPasswordPage;
+export default ForgotPasswordPage

@@ -48,29 +48,25 @@ const StyledBoxForShadow = styled('div')(({ theme }) => ({
 }))
 
 const Navigation = (props: Props) => {
-
   const [permissionData, setPermissionData] = useState<Record<string, string[]>>({})
   const fetchDecryptedData = async () => {
     try {
       const data = await getDecryptedPermissionData()
       if (data) {
-        
-        
         setPermissionData(data.moduleWisePermissions)
       }
 
-      if(!data){
-        const result = await post(authnetication.user_permission_data, {});
+      if (!data) {
+        const result = await post(authnetication.user_permission_data, {})
         setPermissionData(result.data.moduleWisePermissions)
-
       }
     } catch (error) {
       console.error('Error fetching decrypted data:', error)
-    } 
+    }
   }
-  useEffect(()=>{
+  useEffect(() => {
     fetchDecryptedData()
-  },[])
+  }, [])
   // Props
   const { mode, systemMode } = props
 
@@ -131,8 +127,8 @@ const Navigation = (props: Props) => {
       // when semiDark is enabled and the mode or systemMode is light
       {...(isSemiDark &&
         !isDark && {
-          'data-mui-color-scheme': 'dark'
-        })}
+        'data-mui-color-scheme': 'dark'
+      })}
     >
       {/* Nav Header including Logo & nav toggle icons  */}
       <NavHeader>

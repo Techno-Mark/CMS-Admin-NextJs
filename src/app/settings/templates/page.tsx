@@ -1,4 +1,4 @@
-import TemplateListTable from "./TemplateListTable";
+import TemplateListTable from "./TemplateListTable"
 
 const page = () => {
   return (
@@ -6,7 +6,7 @@ const page = () => {
       <TemplateListTable
       />
     </>
-  );
-};
+  )
+}
 
-export default page;
+export default page

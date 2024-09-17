@@ -1,11 +1,10 @@
-import CustomTextField from "@/@core/components/mui/TextField";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import LoadingBackdrop from "@/components/LoadingBackdrop";
-import { post } from "@/services/apiService";
-import { organization } from "@/services/endpoint/organization";
-import { createUser, updateUser } from "@/services/endpoint/users/management";
-import { getRoleList } from "@/services/endpoint/users/roles";
-import { userDetailType } from "@/types/apps/userType";
+import CustomTextField from "@/@core/components/mui/TextField"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import LoadingBackdrop from "@/components/LoadingBackdrop"
+import { post } from "@/services/apiService"
+import { organization } from "@/services/endpoint/organization"
+import { createUser, updateUser } from "@/services/endpoint/users/management"
+import { getRoleList } from "@/services/endpoint/users/roles"
 import {
   Box,
   Button,
@@ -13,11 +12,11 @@ import {
   FormControlLabel,
   Grid,
   MenuItem,
-  Switch,
-} from "@mui/material";
-import { useRouter } from "next/navigation";
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { toast } from "react-toastify";
+  Switch
+} from "@mui/material"
+import { useRouter } from "next/navigation"
+import React, { ChangeEvent, useEffect, useState } from "react"
+import { toast } from "react-toastify"
 
 type UserFormPropsTypes = {
   open: number;
@@ -25,20 +24,20 @@ type UserFormPropsTypes = {
   handleClose: Function;
 };
 
-const ADD_USER = -1;
-const EDIT_USER = 1;
+const ADD_USER = -1
+const EDIT_USER = 1
 
 const initialData = {
   userId: 0,
   userName: "",
   userEmail: "",
-  active: false,
-};
+  active: false
+}
 
 const initialErrorData = {
   userName: "",
-  userEmail: "",
-};
+  userEmail: ""
+}
 
 interface LabelValue {
   id: number;
@@ -46,32 +45,32 @@ interface LabelValue {
 }
 
 const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
-  const router = useRouter();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [formData, setFormData] = useState<typeof initialData>(initialData);
+  const router = useRouter()
+  const [loading, setLoading] = useState<boolean>(true)
+  const [formData, setFormData] = useState<typeof initialData>(initialData)
   const [formErrors, setFormErrors] =
-    useState<typeof initialErrorData>(initialErrorData);
+    useState<typeof initialErrorData>(initialErrorData)
   const [company, setCompany] = useState([
     {
       id: 0,
       organizationId: -1,
       roleId: -1,
-      roles: [] as LabelValue[],
-    },
-  ]);
+      roles: [] as LabelValue[]
+    }
+  ])
 
-  const [companyIdError, setCompanyIdError] = useState([false]);
-  const [roleIdError, setRoleIdError] = useState([false]);
-  const [deletedCompany, setDeletedCompany] = useState<number[] | []>([]);
-  const [companyList, setCompanyList] = useState<LabelValue[]>([]);
+  const [companyIdError, setCompanyIdError] = useState([false])
+  const [roleIdError, setRoleIdError] = useState([false])
+  const [deletedCompany, setDeletedCompany] = useState<number[] | []>([])
+  const [companyList, setCompanyList] = useState<LabelValue[]>([])
 
   const setRolesInCompany = async (organizationId: number, index: number) => {
-    const roles = (await fetchRoles(organizationId)) as LabelValue[];
+    const roles = (await fetchRoles(organizationId)) as LabelValue[]
 
-    const newCompany = [...company];
-    newCompany[index].roles = roles;
-    setCompany(newCompany);
-  };
+    const newCompany = [...company]
+    newCompany[index].roles = roles
+    setCompany(newCompany)
+  }
 
   const fetchRoles = async (organizationId: number) => {
     try {
@@ -79,36 +78,35 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
         page: 1,
         limit: 1000,
         search: "",
-        organizationId: organizationId,
-        active: true,
-      });
+        organizationId,
+        active: true
+      })
 
       return response.data.roles.map(
         (r: any) =>
-          new Object({
+          ({
             id: r.roleId,
-            name: r.roleName,
+            name: r.roleName
           })
-      ) as LabelValue[];
+      ) as LabelValue[]
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
   useEffect(() => {
     const fetchOrganizations = async () => {
       try {
-        const response = await post(organization.active, {});
-        const orgs = response.data.organizations as LabelValue[];
-        setCompanyList(orgs);
+        const response = await post(organization.active, {})
+        const orgs = response.data.organizations as LabelValue[]
+        setCompanyList(orgs)
       } catch (error) {
-
-        console.error("Error fetching organizations:", error);
+        console.error("Error fetching organizations:", error)
       }
-    };
+    }
 
-    fetchOrganizations();
-  }, []);
+    fetchOrganizations()
+  }, [])
 
   useEffect(() => {
     const fetchEditingRowData = async () => {
@@ -117,29 +115,28 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
           userId: editingRow.UserId,
           userName: editingRow.Username,
           userEmail: editingRow.Email,
-          active: editingRow.Status,
-        });
-
+          active: editingRow.Status
+        })
 
         const rolesOrganizations = await Promise.all(
           editingRow.RolesOrganizations.map(async (i: any) => {
-            const roles = await fetchRoles(i.organizationId);
+            const roles = await fetchRoles(i.organizationId)
             return {
               id: 0,
               organizationId: i.organizationId,
               roleId: i.roleId,
-              roles: roles,
-            };
+              roles
+            }
           })
-        );
-        setCompany(rolesOrganizations);
+        )
+        setCompany(rolesOrganizations)
       }
-      
-      setLoading(false);
-    };
 
-    fetchEditingRowData();
-  }, [open, editingRow]);
+      setLoading(false)
+    }
+
+    fetchEditingRowData()
+  }, [open, editingRow])
 
   const addCompany = () => {
     setCompany([
@@ -148,31 +145,29 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
         id: 0,
         organizationId: -1,
         roleId: -1,
-        roles: [],
-      },
-    ]);
-    setCompanyIdError([...companyIdError, false]);
-    setRoleIdError([...roleIdError, false]);
-  };
+        roles: []
+      }
+    ])
+    setCompanyIdError([...companyIdError, false])
+    setRoleIdError([...roleIdError, false])
+  }
 
   const removeCompany = (index: number) => {
     setDeletedCompany(
-      company[index].id !== 0
-        ? [...deletedCompany, company[index].id]
-        : [...deletedCompany]
-    );
+      company[index].id !== 0 ? [...deletedCompany, company[index].id] : [...deletedCompany]
+    )
 
-    const newFields = [...company];
-    newFields.splice(index, 1);
-    setCompany(newFields);
+    const newFields = [...company]
+    newFields.splice(index, 1)
+    setCompany(newFields)
 
-    const newCompanyErrors = [...companyIdError];
-    newCompanyErrors.splice(index, 1);
-    setCompanyIdError(newCompanyErrors);
+    const newCompanyErrors = [...companyIdError]
+    newCompanyErrors.splice(index, 1)
+    setCompanyIdError(newCompanyErrors)
 
-    const newRoleErrors = [...roleIdError];
-    newRoleErrors.splice(index, 1);
-    setRoleIdError(newRoleErrors);
+    const newRoleErrors = [...roleIdError]
+    newRoleErrors.splice(index, 1)
+    setRoleIdError(newRoleErrors)
 
     company.length === 1 &&
       setCompany([
@@ -180,125 +175,123 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
           id: 0,
           organizationId: -1,
           roleId: -1,
-          roles: [],
-        },
-      ]);
-    company.length === 1 && setCompanyIdError([false]);
-    company.length === 1 && setRoleIdError([false]);
-  };
+          roles: []
+        }
+      ])
+    company.length === 1 && setCompanyIdError([false])
+    company.length === 1 && setRoleIdError([false])
+  }
 
   const handleCompanyChange = (e: number, index: number) => {
-    const newFields = [...company];
-    newFields[index].organizationId = e;
-    newFields[index].roleId = -1;
-    setCompany(newFields);
+    const newFields = [...company]
+    newFields[index].organizationId = e
+    newFields[index].roleId = -1
+    setCompany(newFields)
 
-    const newErrors = [...companyIdError];
-    newErrors[index] = e <= 0;
-    setCompanyIdError(newErrors);
+    const newErrors = [...companyIdError]
+    newErrors[index] = e <= 0
+    setCompanyIdError(newErrors)
 
-    setRolesInCompany(e, index);
-  };
+    setRolesInCompany(e, index)
+  }
 
   const handleRoleChange = (e: number, index: number) => {
-    const newFields = [...company];
-    newFields[index].roleId = e;
-    setCompany(newFields);
+    const newFields = [...company]
+    newFields[index].roleId = e
+    setCompany(newFields)
 
-    const newErrors = [...roleIdError];
-    newErrors[index] = e <= 0;
-    setRoleIdError(newErrors);
-  };
+    const newErrors = [...roleIdError]
+    newErrors[index] = e <= 0
+    setRoleIdError(newErrors)
+  }
 
   const validateForm = () => {
-    let valid = true;
-    let errors = { ...initialErrorData };
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    let valid = true
+    const errors = { ...initialErrorData }
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
     if (!formData.userName) {
-      errors.userName = "Please enter user name";
-      valid = false;
+      errors.userName = "Please enter user name"
+      valid = false
     }
 
     if (!formData.userEmail) {
-      errors.userEmail = "Please enter user email";
-      valid = false;
+      errors.userEmail = "Please enter user email"
+      valid = false
     } else if (!regex.test(formData.userEmail)) {
-      errors.userEmail = "Please enter valid email";
-      valid = false;
+      errors.userEmail = "Please enter valid email"
+      valid = false
     }
 
-    const newTaskErrors = company.map((field) => field.organizationId <= 0);
-    setCompanyIdError(newTaskErrors);
-    const newSubTaskDescErrors = company.map((field) => field.roleId <= 0);
-    setRoleIdError(newSubTaskDescErrors);
+    const newTaskErrors = company.map((field) => field.organizationId <= 0)
+    setCompanyIdError(newTaskErrors)
+    const newSubTaskDescErrors = company.map((field) => field.roleId <= 0)
+    setRoleIdError(newSubTaskDescErrors)
 
     if (newTaskErrors.some((error) => error)) {
-      valid = false;
+      valid = false
     }
 
     if (newSubTaskDescErrors.some((error) => error)) {
-      valid = false;
+      valid = false
     }
 
-    setFormErrors(errors);
-    return valid;
-  };
+    setFormErrors(errors)
+    return valid
+  }
 
   const handleSubmit = async () => {
     if (validateForm()) {
       try {
-        setLoading(true);
+        setLoading(true)
 
         const param =
-          open == EDIT_USER
-            ? {
-              userId: editingRow?.UserId,
-              userName: formData.userName,
-              email: formData.userEmail,
-              active: formData.active,
-              organizations: company.map(
-                (c) =>
-                  new Object({
-                    roleId: c.roleId,
-                    organizationId: c.organizationId,
-                  })
-              ),
-            }
-            : {
-              userName: formData.userName,
-              email: formData.userEmail,
-              active: formData.active,
-              organizations: company.map(
-                (c) =>
-                  new Object({
-                    roleId: c.roleId,
-                    organizationId: c.organizationId,
-                  })
-              ),
-            };
+          open == EDIT_USER ? {
+            userId: editingRow?.UserId,
+            userName: formData.userName,
+            email: formData.userEmail,
+            active: formData.active,
+            organizations: company.map(
+              (c) =>
+                ({
+                  roleId: c.roleId,
+                  organizationId: c.organizationId
+                })
+            )
+          } : {
+            userName: formData.userName,
+            email: formData.userEmail,
+            active: formData.active,
+            organizations: company.map(
+              (c) =>
+                ({
+                  roleId: c.roleId,
+                  organizationId: c.organizationId
+                })
+            )
+          }
 
-        let result = null;
+        let result = null
         if (open == EDIT_USER) {
-          result = await post(updateUser, param);
+          result = await post(updateUser, param)
         } else {
-          result = await post(createUser, param);
+          result = await post(createUser, param)
         }
 
-        setLoading(false);
+        setLoading(false)
 
         if (result.status === "success") {
-          toast.success(result.message);
-          router.back();
+          toast.success(result.message)
+          router.back()
         } else {
-          toast.error(result.message);
+          toast.error(result.message)
         }
       } catch (error) {
-        console.error(error);
-        setLoading(false);
+        console.error(error)
+        setLoading(false)
       }
     }
-  };
+  }
 
   return (
     <>
@@ -320,11 +313,11 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                         placeholder="Enter User Name"
                         value={formData.userName}
                         onChange={(e) => {
-                          setFormErrors({ ...formErrors, userName: "" });
+                          setFormErrors({ ...formErrors, userName: "" })
                           setFormData({
                             ...formData,
-                            userName: e.target.value,
-                          });
+                            userName: e.target.value
+                          })
                         }}
                       />
                     </Grid>
@@ -338,11 +331,11 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                         placeholder="Enter User Email"
                         value={formData.userEmail}
                         onChange={(e) => {
-                          setFormErrors({ ...formErrors, userEmail: "" });
+                          setFormErrors({ ...formErrors, userEmail: "" })
                           setFormData({
                             ...formData,
-                            userEmail: e.target.value,
-                          });
+                            userEmail: e.target.value
+                          })
                         }}
                       />
                     </Grid>
@@ -355,7 +348,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                             onChange={(e) =>
                               setFormData({
                                 ...formData,
-                                active: e.target.checked,
+                                active: e.target.checked
                               })
                             }
                           />
@@ -377,9 +370,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                           <CustomTextField
                             error={!!companyIdError[index]}
                             helperText={
-                              companyIdError[index]
-                                ? "Please select company"
-                                : ""
+                              companyIdError[index] ? "Please select company" : ""
                             }
                             select
                             fullWidth
@@ -401,7 +392,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                                   <MenuItem value={company.id} key={company.id}>
                                     {company.name}
                                   </MenuItem>
-                                );
+                                )
                               })}
                           </CustomTextField>
                         </Grid>
@@ -431,7 +422,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                                     item.organizationId === field.organizationId &&
                                     item.roleId === role.id &&
                                     idx !== index // exclude the current index
-                                );
+                                )
                                 return (
                                   <MenuItem
                                     value={role.id}
@@ -440,11 +431,10 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                                   >
                                     {role.name}
                                   </MenuItem>
-                                );
+                                )
                               })}
                           </CustomTextField>
                         </Grid>
-
 
                         {/* <Grid item xs={12} sm={3}>
                           <CustomTextField
@@ -509,7 +499,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                                 </svg>
                               </span>
                             </>
-                          ) : index === 0 ? (
+                              ) : index === 0 ? (
                             <span
                               className="cursor-pointer"
                               onClick={() => addCompany()}
@@ -524,7 +514,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                                 <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                               </svg>
                             </span>
-                          ) : (
+                              ) : (
                             <span
                               className="cursor-pointer"
                               onClick={() => removeCompany(index)}
@@ -539,7 +529,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                                 <path d="M19 13H5v-2h14v2z"></path>
                               </svg>
                             </span>
-                          )}
+                              )}
                         </Grid>
                       </Grid>
                     ))}
@@ -584,7 +574,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
         </div>
       </Card>
     </>
-  );
-};
+  )
+}
 
-export default UserForm;
+export default UserForm

@@ -1,14 +1,13 @@
-"use client";
-import React from "react";
-import PagesForm from "../PagesForm";
-import { useRouter } from "next/navigation";
-import NewPopupForm from "../NewPopupForm";
-import { usePermission } from "@/utils/permissions";
+"use client"
+import React from "react"
+import { useRouter } from "next/navigation"
+import NewPopupForm from "../NewPopupForm"
+import { usePermission } from "@/utils/permissions"
 
-const ADD_PAGES = -1;
+const ADD_PAGES = -1
 
-const page = () => {
-  const router = useRouter();
+const Page = () => {
+  const router = useRouter()
   const { hasPermission } = usePermission()
   return (
     <NewPopupForm
@@ -17,7 +16,7 @@ const page = () => {
       handleClose={() => router.push("/content-management/popups")}
       permissionUser={hasPermission('Popup', 'Create')}
     />
-  );
-};
+  )
+}
 
-export default page;
+export default Page

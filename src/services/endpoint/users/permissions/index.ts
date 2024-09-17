@@ -1,9 +1,8 @@
-//redirections url
+// redirections url
 export const redirectToAddPage = "/users/permissions/add"
 export const redirectToEditPage = (id: number | string) => { return `/users/permissions/edit/${id}` }
 
-
-//api endpoints
+// api endpoints
 export const getPermissionsList = "permission/list"
 
 export const getPermissionById = (id: string | number) => { return `permission/getById/${id}` }

@@ -1,15 +1,14 @@
-"use client";
-import React, { useState } from "react";
-import { Box, Button, Card, Fab, Grid, Typography } from "@mui/material";
-import KanbanDrawer from "./KanbanDrawer";
-import LoadingBackdrop from "@/components/LoadingBackdrop";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import DraggableIcon from "../_svg/DraggableIcon";
-import { postDataToOrganizationAPIs } from "@/services/apiService";
-import { menu } from "@/services/endpoint/menu";
-import { toast } from "react-toastify";
-import ConfirmationDialog from "./ConfirmationDialog";
-import Image from "next/image";
+"use client"
+import React, { useState } from "react"
+import { Box, Button, Card, Fab, Grid, Typography } from "@mui/material"
+import KanbanDrawer from "./KanbanDrawer"
+import LoadingBackdrop from "@/components/LoadingBackdrop"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import DraggableIcon from "../_svg/DraggableIcon"
+import { postDataToOrganizationAPIs } from "@/services/apiService"
+import { menu } from "@/services/endpoint/menu"
+import { toast } from "react-toastify"
+import ConfirmationDialog from "./ConfirmationDialog"
 
 const MenuItem = ({
   menuData,
@@ -22,17 +21,17 @@ const MenuItem = ({
   handleClose: Function;
   permissionUser:Boolean
 }) => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [menuItems, setMenuItems] = useState<any[] | null>(menuData);
+  const [loading, setLoading] = useState<boolean>(false)
+  const [menuItems, setMenuItems] = useState<any[] | null>(menuData)
 
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [editDrawer, setEditDrawer] = useState(false);
-  const [editdata, setEditData] = useState<any>();
-  const [deleteDrawer, setDeleteDrawer] = useState<boolean>(false);
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [editDrawer, setEditDrawer] = useState(false)
+  const [editdata, setEditData] = useState<any>()
+  const [deleteDrawer, setDeleteDrawer] = useState<boolean>(false)
   const [deleteData, setDeleteData] = useState({
     index: -1,
-    parentId: -1,
-  });
+    parentId: -1
+  })
 
   const handleDragStart = (
     e: React.DragEvent<HTMLLIElement>,
@@ -41,41 +40,40 @@ const MenuItem = ({
   ) => {
     const data = {
       draggedIndex: index,
-      draggedItemParentIndex: parentId,
-    };
-    e.dataTransfer.setData("text/plain", JSON.stringify(data));
-  };
+      draggedItemParentIndex: parentId
+    }
+    e.dataTransfer.setData("text/plain", JSON.stringify(data))
+  }
 
   const handleDropOver = (
     event: React.DragEvent<HTMLLIElement>,
     targetIndex: number,
     parentId: number
   ) => {
-    event.preventDefault();
-  };
+    event.preventDefault()
+  }
 
   const handleDrop = (
     event: React.DragEvent<HTMLLIElement>,
     targetIndex: number,
     parentId: number
   ) => {
-    const data = JSON.parse(event.dataTransfer.getData("text/plain"));
+    const data = JSON.parse(event.dataTransfer.getData("text/plain"))
 
-    if (!menuItems) return;
+    if (!menuItems) return
 
     if (
       data.draggedItemParentIndex === -1 &&
       menuItems[data.draggedIndex].children.length > 0 &&
       parentId !== -1
     ) {
-      return;
+      return
     }
-    const newMenuItems = [...menuItems];
+    const newMenuItems = [...menuItems]
 
-    const removedItem = removeMenuItem(newMenuItems, data);
-    addMenuItem(newMenuItems, removedItem, targetIndex, parentId);
-    return;
-  };
+    const removedItem = removeMenuItem(newMenuItems, data)
+    addMenuItem(newMenuItems, removedItem, targetIndex, parentId)
+  }
 
   const addMenuItem = (
     newMenuItems: any,
@@ -84,65 +82,62 @@ const MenuItem = ({
     parentId: number
   ) => {
     if (parentId == -1) {
-      newMenuItems.splice(targetIndex, 0, removedItem);
-      setMenuItems(newMenuItems);
+      newMenuItems.splice(targetIndex, 0, removedItem)
+      setMenuItems(newMenuItems)
     } else {
-      newMenuItems[parentId].children.splice(targetIndex, 0, removedItem);
-      setMenuItems(newMenuItems);
+      newMenuItems[parentId].children.splice(targetIndex, 0, removedItem)
+      setMenuItems(newMenuItems)
     }
-  };
+  }
 
   const removeMenuItem = (newMenuItems: any, data: any) => {
-    if (!menuItems) return;
+    if (!menuItems) return
 
     if (data.draggedItemParentIndex == -1) {
-      const removedItem = menuItems[data.draggedIndex];
-      newMenuItems.splice(data.draggedIndex, 1);
-      return removedItem;
+      const removedItem = menuItems[data.draggedIndex]
+      newMenuItems.splice(data.draggedIndex, 1)
+      return removedItem
     } else {
       const removedItem =
-        newMenuItems[data.draggedItemParentIndex].children[data.draggedIndex];
+        newMenuItems[data.draggedItemParentIndex].children[data.draggedIndex]
       newMenuItems[data.draggedItemParentIndex].children.splice(
         data.draggedIndex,
         1
-      );
-      return removedItem;
+      )
+      return removedItem
     }
-  };
+  }
 
   const handleEdit = (index: number, parentId: number) => {
-    setEditDrawer(true);
-    setEditData({ index: index, parentId: parentId });
-  };
-
-  const handleDelete = () => {};
+    setEditDrawer(true)
+    setEditData({ index, parentId })
+  }
 
   const handleSubmit = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
 
-      let response = await postDataToOrganizationAPIs(
+      const response = await postDataToOrganizationAPIs(
         menu.menuItemCreateAndUpdate,
         {
-          menuId: menuId,
-          menuJSONData: menuItems,
+          menuId,
+          menuJSONData: menuItems
         }
-      );
+      )
 
-      setLoading(false);
+      setLoading(false)
 
       if (response.status === "success") {
-        toast.success(response.message);
-        handleClose();
-        return;
+        toast.success(response.message)
+        handleClose()
       } else {
-        toast.error(response.message);
+        toast.error(response.message)
       }
     } catch (error) {
-      console.error(error);
-      setLoading(false);
+      console.error(error)
+      setLoading(false)
     }
-  };
+  }
 
   const renderMenuItems = (items: any[], parentId: number): React.ReactNode => {
     return items.map((item, index) => (
@@ -172,8 +167,8 @@ const MenuItem = ({
             <div className="p-1">
               <button
                 onClick={() => {
-                  setDeleteDrawer(true);
-                  setDeleteData({ index: index, parentId: -1 });
+                  setDeleteDrawer(true)
+                  setDeleteData({ index, parentId: -1 })
                 }}
                 className="bg-white cursor-pointer"
               >
@@ -204,6 +199,7 @@ const MenuItem = ({
                 <div className="flex-1 flex items-center gap-x-2">
                   <DraggableIcon />
                   {childItem?.logo && childItem.logo !== "#" && (
+                    // eslint-disable-next-line
                     <img
                       src={childItem.logo}
                       alt="icon"
@@ -229,8 +225,8 @@ const MenuItem = ({
                   <div className="p-1">
                     <button
                       onClick={() => {
-                        setDeleteDrawer(true);
-                        setDeleteData({ index: childIndex, parentId: index });
+                        setDeleteDrawer(true)
+                        setDeleteData({ index: childIndex, parentId: index })
                       }}
                       className="bg-white cursor-pointer"
                     >
@@ -242,8 +238,8 @@ const MenuItem = ({
             </ul>
           ))}
       </ul>
-    ));
-  };
+    ))
+  }
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -330,7 +326,7 @@ const MenuItem = ({
         </Box>
       </Card>
     </>
-  );
-};
+  )
+}
 
-export default MenuItem;
+export default MenuItem

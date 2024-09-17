@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 // Next Imports
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 // MUI Imports
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -14,7 +14,6 @@ import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import Button from '@mui/material/Button'
-import { FormHelperText } from '@mui/material'
 
 // Third-party Imports
 import * as yup from 'yup'
@@ -31,7 +30,6 @@ import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { useRouter } from 'next/navigation';
 
 // Password validation schema
 const passwordSchema = yup.object().shape({
@@ -89,9 +87,9 @@ const ResetPasswordV2 = ({ mode, token }: { mode: SystemMode, token: string }) =
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
   const handleClickShowConfirmPassword = () => setIsConfirmPasswordShown(show => !show)
-  const router = useRouter();
-const API_URL = process.env.NEXT_PUBLIC_API_URL
-  
+  const router = useRouter()
+  const API_URL = process.env.NEXT_PUBLIC_API_URL
+
   const formik = useFormik({
     initialValues: {
       password: '',
@@ -101,16 +99,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
     onSubmit: async values => {
       try {
         const response = await axios.post(`${API_URL}/auth/reset-password`, {
-          token: token,
+          token,
           newPassword: values.password
         })
-        toast.success(response.data.message);
+        toast.success(response.data.message)
         router.push('/login')
       } catch (error: any) {
-        toast.error(error.message);
+        toast.error(error.message)
         console.error('Error resetting password:', error.response?.data || error.message)
       }
-      
     }
   })
 

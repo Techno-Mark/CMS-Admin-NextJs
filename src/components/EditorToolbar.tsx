@@ -1,15 +1,15 @@
-import React, { useEffect } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
-import { StarterKit } from "@tiptap/starter-kit";
-import { Underline } from "@tiptap/extension-underline";
-import { Placeholder } from "@tiptap/extension-placeholder";
-import { TextAlign } from "@tiptap/extension-text-align";
-import Divider from "@mui/material/Divider";
-import CustomIconButton from "@core/components/mui/IconButton";
+import React, { useEffect } from "react"
+import { useEditor, EditorContent } from "@tiptap/react"
+import { StarterKit } from "@tiptap/starter-kit"
+import { Underline } from "@tiptap/extension-underline"
+import { Placeholder } from "@tiptap/extension-placeholder"
+import { TextAlign } from "@tiptap/extension-text-align"
+import Divider from "@mui/material/Divider"
+import CustomIconButton from "@core/components/mui/IconButton"
 
 const EditorToolbar = ({ editor }:any) => {
   if (!editor) {
-    return null;
+    return null
   }
 
   return (
@@ -63,37 +63,37 @@ const EditorToolbar = ({ editor }:any) => {
         <i className="tabler-align-justified" />
       </CustomIconButton>
     </div>
-  );
-};
+  )
+}
 
 const EditorBasic = ({
   content,
   onContentChange,
-  error,
+  error
 }:any) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
       Placeholder.configure({
-        placeholder: "Write something here...",
+        placeholder: "Write something here..."
       }),
       TextAlign.configure({
-        types: ["heading", "paragraph"],
+        types: ["heading", "paragraph"]
       }),
-      Underline,
+      Underline
     ],
     content: content || "",
     onUpdate: ({ editor }) => {
-      const html = editor.getHTML();
-      onContentChange(html);
-    },
-  });
+      const html = editor.getHTML()
+      onContentChange(html)
+    }
+  })
 
   useEffect(() => {
     if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content || "", false);
+      editor.commands.setContent(content || "", false)
     }
-  }, [content, editor]);
+  }, [content, editor])
 
   return (
     <div className={`border ${error && "border-red-500"} rounded-md p-4`}>
@@ -104,7 +104,7 @@ const EditorBasic = ({
         className="min-h-[150px] overflow-y-auto flex-grow editor-content"
       />
     </div>
-  );
-};
+  )
+}
 
-export default EditorBasic;
+export default EditorBasic

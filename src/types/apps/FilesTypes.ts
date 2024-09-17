@@ -18,6 +18,7 @@ export type filesDetailType = {
   createdAt: Date;
   updatedAt: Date;
 };
-
-export const ADD_File = -1;
-export const EDIT_File = 1;
+// eslint-disable-next-line
+export const ADD_File = -1
+// eslint-disable-next-line
+export const EDIT_File = 1

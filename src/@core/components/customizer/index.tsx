@@ -195,9 +195,7 @@ const Customizer = ({ breakpoint = 'lg', dir = 'ltr', disableDirection = false }
           </div>
         </div>
         <ScrollWrapper
-          {...(isBelowLgScreen
-            ? { className: 'bs-full overflow-y-auto overflow-x-hidden' }
-            : { options: { wheelPropagation: false, suppressScrollX: true } })}
+          {...(isBelowLgScreen ? { className: 'bs-full overflow-y-auto overflow-x-hidden' } : { options: { wheelPropagation: false, suppressScrollX: true } })}
         >
           <div className={classnames('customizer-body flex flex-col', styles.customizerBody)}>
             <div className='theming-section flex flex-col gap-6'>
@@ -232,12 +230,8 @@ const Customizer = ({ breakpoint = 'lg', dir = 'ltr', disableDirection = false }
                     <div
                       className={classnames(styles.primaryColor, 'flex items-center justify-center')}
                       style={{
-                        backgroundColor: !isColorFromPrimaryConfig
-                          ? settings.primaryColor
-                          : 'var(--mui-palette-action-selected)',
-                        color: isColorFromPrimaryConfig
-                          ? 'var(--mui-palette-text-primary)'
-                          : 'var(--mui-palette-primary-contrastText)'
+                        backgroundColor: !isColorFromPrimaryConfig ? settings.primaryColor : 'var(--mui-palette-action-selected)',
+                        color: isColorFromPrimaryConfig ? 'var(--mui-palette-text-primary)' : 'var(--mui-palette-primary-contrastText)'
                       }}
                     >
                       <i className='tabler-color-picker text-xl' />
@@ -353,7 +347,7 @@ const Customizer = ({ breakpoint = 'lg', dir = 'ltr', disableDirection = false }
                     onChange={() => handleChange('semiDark', !settings.semiDark)}
                   />
                 </div>
-              )}
+                )}
             </div>
             <hr className={styles.hr} />
             <div className='layout-section flex flex-col gap-6'>

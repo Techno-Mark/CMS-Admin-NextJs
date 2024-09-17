@@ -16,11 +16,11 @@ export const metadata: Metadata = {
 }
 
 const LoginPage = async () => {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions)
 
-  if(session){
-    redirect('/home');
-  } 
+  if (session) {
+    redirect('/home')
+  }
   // Vars
   const mode = getServerMode()
 

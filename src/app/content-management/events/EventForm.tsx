@@ -1,34 +1,30 @@
 // React Imports
-import { ChangeEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { ChangeEvent, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 // MUI Imports
-import Button from "@mui/material/Button";
+import Button from "@mui/material/Button"
 // Component Imports
-import CustomTextField from "@core/components/mui/TextField";
+import CustomTextField from "@core/components/mui/TextField"
 import {
   Avatar,
   Box,
   Card,
   Grid,
-  IconButton,
-  MenuItem,
   Switch,
-  Typography,
-} from "@mui/material";
-import { postContentBlock } from "@/services/apiService";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import { event } from "@/services/endpoint/event";
-import LoadingBackdrop from "@/components/LoadingBackdrop";
-import AppReactDatepicker from "@/libs/styles/AppReactDatepicker";
-import dayjs from "dayjs";
-import { useDropzone } from "react-dropzone";
-import Close from "@/@menu/svg/Close";
-import EditorBasic from "@/components/EditorToolbar";
-import { toast } from "react-toastify";
-import { ADD_EVENT, EDIT_EVENT, eventDetailType } from "@/types/apps/eventType";
+  Typography
+} from "@mui/material"
+import { postContentBlock } from "@/services/apiService"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import { event } from "@/services/endpoint/event"
+import LoadingBackdrop from "@/components/LoadingBackdrop"
+import AppReactDatepicker from "@/libs/styles/AppReactDatepicker"
+import dayjs from "dayjs"
+import { useDropzone } from "react-dropzone"
+import EditorBasic from "@/components/EditorToolbar"
+import { toast } from "react-toastify"
+import { ADD_EVENT, EDIT_EVENT, eventDetailType } from "@/types/apps/eventType"
 // import { CKEditor } from "@ckeditor/ckeditor5-react";
 // import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import dynamic from 'next/dynamic';
 // Dynamic import for CKEditor
 // const CKEditor = dynamic<{ editor: any, data: string, onChange: (event: any, editor: any) => void }>(() =>
 //   import('@ckeditor/ckeditor5-react').then((mod: any) => mod.CKEditor), { ssr: false });
@@ -37,7 +33,6 @@ import dynamic from 'next/dynamic';
 //   ssr: false,
 // });
 
-
 type EventFormPropsTypes = {
   open: number;
   editingRow: eventDetailType | null;
@@ -45,7 +40,7 @@ type EventFormPropsTypes = {
   permissionUser: Boolean
 };
 
-const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
+const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
 
 const initialData = {
   eventId: 0,
@@ -61,8 +56,8 @@ const initialData = {
   organizerEmail: "",
   organizerPhone: "",
   registrationLink: "",
-  active: false,
-};
+  active: false
+}
 
 const initialErrorData = {
   title: "",
@@ -75,202 +70,188 @@ const initialErrorData = {
   featureImageUrl: "",
   organizerName: "",
   organizerEmail: "",
-  organizerPhone: "",
-};
+  organizerPhone: ""
+}
 
 const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormPropsTypes) => {
-  const router = useRouter();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [formData, setFormData] = useState<typeof initialData>(initialData);
+  const router = useRouter()
+  const [loading, setLoading] = useState<boolean>(true)
+  const [formData, setFormData] = useState<typeof initialData>(initialData)
   const [formErrors, setFormErrors] =
-    useState<typeof initialErrorData>(initialErrorData);
+    useState<typeof initialErrorData>(initialErrorData)
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] =
-    useState<boolean>(false);
-  const [featureImage, setFeatureImage] = useState<File | null>(null);
-  const [isFeatureImageTouched, setIsFeatureImageTouched] = useState(false);
+    useState<boolean>(false)
+  const [featureImage, setFeatureImage] = useState<File | null>(null)
+  const [isFeatureImageTouched, setIsFeatureImageTouched] = useState(false)
   // Custom Hooks
   const { getRootProps: getEventRootProps, getInputProps: getEventInputProps } =
     useDropzone({
       multiple: false,
       accept: {
-        "image/*": [".png", ".jpg", ".jpeg", ".gif"],
+        "image/*": [".png", ".jpg", ".jpeg", ".gif"]
       },
       onDrop: (acceptedFiles: File[]) => {
-        setIsFeatureImageTouched(true);
-        setFeatureImage(acceptedFiles[0]);
-      },
-    });
+        setIsFeatureImageTouched(true)
+        setFeatureImage(acceptedFiles[0])
+      }
+    })
 
-  //Hooks
+  // Hooks
   useEffect(() => {
     if (open === EDIT_EVENT && editingRow) {
-      setFormData({ ...editingRow });
+      setFormData({ ...editingRow })
     }
-    setLoading(false);
-  }, []);
+    setLoading(false)
+  }, [])
 
   // Methods
   const handleEventTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value;
+    const newName = e.target.value
     setFormData((prevData) => ({
       ...prevData,
       title: newName,
       slug:
-        !isSlugManuallyEdited && open === ADD_EVENT
-          ? newName
-            .replace(/[^\w\s]|_/g, "")
-            .replace(/\s+/g, "-")
-            .toLowerCase()
-          : prevData.slug,
-    }));
+        !isSlugManuallyEdited && open === ADD_EVENT ? newName
+          .replace(/[^\w\s]|_/g, "")
+          .replace(/\s+/g, "-")
+          .toLowerCase() : prevData.slug
+    }))
     if (newName?.length) {
-      setFormErrors({ ...formErrors, title: "" });
+      setFormErrors({ ...formErrors, title: "" })
     }
-  };
+  }
 
   const validateForm = () => {
-    let valid = true;
-    let errors = { ...initialErrorData };
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    let valid = true
+    const errors = { ...initialErrorData }
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
     if (!formData.title) {
-      errors.title = "Please enter event name";
-      valid = false;
+      errors.title = "Please enter event name"
+      valid = false
     }
     if (!formData.slug) {
-      errors.slug = "Please add a slug";
-      valid = false;
+      errors.slug = "Please add a slug"
+      valid = false
     } else if (formData.slug.length < 5) {
-      errors.slug = "slug must be at least 5 characters long";
-      valid = false;
+      errors.slug = "slug must be at least 5 characters long"
+      valid = false
     } else if (formData.slug.length > 255) {
-      errors.slug = "slug must be at most 255 characters long";
-      valid = false;
+      errors.slug = "slug must be at most 255 characters long"
+      valid = false
     } else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(formData.slug)) {
       errors.slug =
-        "slug must be a valid slug (only lowercase letters, numbers, and hyphens are allowed).";
-      valid = false;
+        "slug must be a valid slug (only lowercase letters, numbers, and hyphens are allowed)."
+      valid = false
     }
     if (!formData.date) {
-      errors.date = "Please select  date";
-      valid = false;
+      errors.date = "Please select  date"
+      valid = false
     }
     if (!formData.startTime) {
-      errors.startTime = "Please select start time";
-      valid = false;
+      errors.startTime = "Please select start time"
+      valid = false
     }
     if (!formData.endTime) {
-      errors.endTime = "Please select end time";
-      valid = false;
+      errors.endTime = "Please select end time"
+      valid = false
     }
     if (!formData.location) {
-      errors.location = "Please enter location";
-      valid = false;
+      errors.location = "Please enter location"
+      valid = false
     }
     if (!formData.description) {
-      errors.description = "Please enter description";
-      valid = false;
+      errors.description = "Please enter description"
+      valid = false
     }
     if (!formData.organizerName) {
-      errors.organizerName = "Please enter organizer name";
-      valid = false;
+      errors.organizerName = "Please enter organizer name"
+      valid = false
     }
     if (!formData.organizerEmail) {
-      errors.organizerEmail = "Please enter organizer email";
-      valid = false;
+      errors.organizerEmail = "Please enter organizer email"
+      valid = false
     } else if (!regex.test(formData.organizerEmail)) {
-      errors.organizerEmail = "Please enter valid email";
-      valid = false;
+      errors.organizerEmail = "Please enter valid email"
+      valid = false
     }
     if (!formData.organizerPhone) {
-      errors.organizerPhone = "Please enter organizer phone number";
-      valid = false;
+      errors.organizerPhone = "Please enter organizer phone number"
+      valid = false
     } else if (
       formData.organizerPhone.length > 10 ||
       formData.organizerPhone.length < 10
     ) {
-      errors.organizerPhone = "Please enter valid phone number";
-      valid = false;
+      errors.organizerPhone = "Please enter valid phone number"
+      valid = false
     }
 
     // Validate Feature Image
     if (open == ADD_EVENT && !featureImage) {
-      errors.featureImageUrl = "Feature Image is required";
-      valid = false;
+      errors.featureImageUrl = "Feature Image is required"
+      valid = false
     }
     if (featureImage && !validImageType.includes(featureImage.type)) {
-      errors.featureImageUrl = `Invalid file type for Feature Image. Allowed types ${validImageType.join(",")}`;
-      valid = false;
+      errors.featureImageUrl = `Invalid file type for Feature Image. Allowed types ${validImageType.join(",")}`
+      valid = false
     }
 
-    setFormErrors(errors);
-    return valid;
-  };
+    setFormErrors(errors)
+    return valid
+  }
 
   const handleSubmit = async () => {
     if (validateForm()) {
       try {
-        setLoading(true);
+        setLoading(true)
 
-        const formDataToSend = new FormData();
-        formDataToSend.set("title", formData.title);
-        formDataToSend.set("slug", formData.slug);
-        formDataToSend.set("date", String(formData.date));
-        formDataToSend.set("startTime", formData.startTime);
-        formDataToSend.set("endTime", formData.endTime);
-        formDataToSend.set("location", formData.location);
-        formDataToSend.set("description", formData.description);
-        formDataToSend.set("organizerName", formData.organizerName);
-        formDataToSend.set("organizerEmail", formData.organizerEmail);
-        formDataToSend.set("organizerPhone", formData.organizerPhone);
-        formDataToSend.set("registrationLink", formData.registrationLink);
-        formDataToSend.set("active", String(formData.active));
+        const formDataToSend = new FormData()
+        formDataToSend.set("title", formData.title)
+        formDataToSend.set("slug", formData.slug)
+        formDataToSend.set("date", String(formData.date))
+        formDataToSend.set("startTime", formData.startTime)
+        formDataToSend.set("endTime", formData.endTime)
+        formDataToSend.set("location", formData.location)
+        formDataToSend.set("description", formData.description)
+        formDataToSend.set("organizerName", formData.organizerName)
+        formDataToSend.set("organizerEmail", formData.organizerEmail)
+        formDataToSend.set("organizerPhone", formData.organizerPhone)
+        formDataToSend.set("registrationLink", formData.registrationLink)
+        formDataToSend.set("active", String(formData.active))
 
         if (featureImage) {
-          formDataToSend.append("featureImage", featureImage as Blob);
+          formDataToSend.append("featureImage", featureImage as Blob)
         }
 
-        let result = null;
+        let result = null
         if (open == EDIT_EVENT) {
-          formDataToSend.set("eventId", String(editingRow?.eventId));
-          result = await postContentBlock(event.update, formDataToSend);
+          formDataToSend.set("eventId", String(editingRow?.eventId))
+          result = await postContentBlock(event.update, formDataToSend)
         } else {
-          result = await postContentBlock(event.create, formDataToSend);
+          result = await postContentBlock(event.create, formDataToSend)
         }
 
-        setLoading(false);
+        setLoading(false)
 
         if (result.status === "success") {
-          toast.success(result.message);
-          router.back();
+          toast.success(result.message)
+          router.back()
         } else {
-          toast.error(result.message);
+          toast.error(result.message)
         }
       } catch (error) {
-        console.error(error);
-        setLoading(false);
+        console.error(error)
+        setLoading(false)
       }
     }
-  };
-  const handleEditorChange = (content: string) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      description: content
-    }));
-    if (content?.length) {
-      setFormErrors((prevFormErrors) => ({
-        ...prevFormErrors,
-        description: ""
-      }));
-    }
-  };
+  }
+
   const handleContentChange = (content: any) => {
     setFormData((prevData) => ({
       ...prevData,
-      description: content,
-    }));
-
-  };
+      description: content
+    }))
+  }
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -305,10 +286,10 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                         placeholder=""
                         value={formData.slug}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                          setFormData({ ...formData, slug: e.target.value });
-                          setIsSlugManuallyEdited(true);
+                          setFormData({ ...formData, slug: e.target.value })
+                          setIsSlugManuallyEdited(true)
                           if (e.target?.value?.length) {
-                            setFormErrors({ ...formErrors, slug: "" });
+                            setFormErrors({ ...formErrors, slug: "" })
                           }
                         }}
                       />
@@ -318,16 +299,14 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                       <AppReactDatepicker
                         showTimeSelect
                         selected={
-                          formData.startTime
-                            ? dayjs()
-                              .hour(
-                                parseInt(formData.startTime.split(":")[0])
-                              )
-                              .minute(
-                                parseInt(formData.startTime.split(":")[1])
-                              )
-                              .toDate()
-                            : null
+                          formData.startTime ? dayjs()
+                            .hour(
+                              parseInt(formData.startTime.split(":")[0])
+                            )
+                            .minute(
+                              parseInt(formData.startTime.split(":")[1])
+                            )
+                            .toDate() : null
                         }
                         timeIntervals={15}
                         showTimeSelectOnly
@@ -337,18 +316,18 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                           if (!date) {
                             setFormErrors({
                               ...formErrors,
-                              startTime: "please select start time",
-                            });
+                              startTime: "please select start time"
+                            })
                           } else {
-                            setFormErrors({ ...formErrors, startTime: "" });
+                            setFormErrors({ ...formErrors, startTime: "" })
                           }
 
-                          const formattedTime = dayjs(date).format("HH:mm");
+                          const formattedTime = dayjs(date).format("HH:mm")
 
                           setFormData({
                             ...formData,
-                            startTime: formattedTime,
-                          });
+                            startTime: formattedTime
+                          })
                         }}
                         placeholderText="Enter Start Time"
                         customInput={
@@ -366,14 +345,12 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                       <AppReactDatepicker
                         showTimeSelect
                         selected={
-                          formData.endTime
-                            ? dayjs()
-                              .hour(parseInt(formData.endTime.split(":")[0]))
-                              .minute(
-                                parseInt(formData.endTime.split(":")[1])
-                              )
-                              .toDate()
-                            : null
+                          formData.endTime ? dayjs()
+                            .hour(parseInt(formData.endTime.split(":")[0]))
+                            .minute(
+                              parseInt(formData.endTime.split(":")[1])
+                            )
+                            .toDate() : null
                         }
                         timeIntervals={15}
                         showTimeSelectOnly
@@ -383,18 +360,18 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                           if (!date) {
                             setFormErrors({
                               ...formErrors,
-                              endTime: "please select end time",
-                            });
+                              endTime: "please select end time"
+                            })
                           } else {
-                            setFormErrors({ ...formErrors, endTime: "" });
+                            setFormErrors({ ...formErrors, endTime: "" })
                           }
 
-                          const formattedTime = dayjs(date).format("HH:mm");
+                          const formattedTime = dayjs(date).format("HH:mm")
 
                           setFormData({
                             ...formData,
-                            endTime: formattedTime,
-                          });
+                            endTime: formattedTime
+                          })
                         }}
                         placeholderText="Enter End Time"
                         customInput={
@@ -411,24 +388,22 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                     <Grid item xs={6} md={6}>
                       <AppReactDatepicker
                         selected={
-                          formData.date && dayjs.isDayjs(formData.date)
-                            ? formData.date.toDate()
-                            : formData.date
+                          formData.date && dayjs.isDayjs(formData.date) ? formData.date.toDate() : formData.date
                         }
                         id="basic-input"
                         onChange={(date: Date) => {
                           if (!date) {
                             setFormErrors({
                               ...formErrors,
-                              date: "please select start date",
-                            });
+                              date: "please select start date"
+                            })
                           } else {
-                            setFormErrors({ ...formErrors, date: "" });
+                            setFormErrors({ ...formErrors, date: "" })
                           }
                           setFormData({
                             ...formData,
-                            date: new Date(dayjs(date).format("MM/DD/YYYY")),
-                          });
+                            date: new Date(dayjs(date).format("MM/DD/YYYY"))
+                          })
                         }}
                         placeholderText="Enter Start Date"
                         customInput={
@@ -453,10 +428,10 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                           setFormData({
                             ...formData,
-                            location: e.target.value,
-                          });
+                            location: e.target.value
+                          })
                           if (e.target?.value?.length) {
-                            setFormErrors({ ...formErrors, location: "" });
+                            setFormErrors({ ...formErrors, location: "" })
                           }
                         }}
                       />
@@ -466,7 +441,6 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                       <label className="text-[0.8125rem] leading-[1.153]">
                         Description *
                       </label>
-
 
                       <EditorBasic
                         content={formData.description}
@@ -522,6 +496,7 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                           <input {...getEventInputProps()} />
                           <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
                             {open == EDIT_EVENT && !isFeatureImageTouched && (
+                              // eslint-disable-next-line
                               <img
                                 className="object-contain w-full h-full"
                                 src={
@@ -532,6 +507,7 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                               />
                             )}
                             {featureImage && isFeatureImageTouched && (
+                              // eslint-disable-next-line
                               <img
                                 key={featureImage.name}
                                 alt={featureImage.name}
@@ -565,7 +541,7 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                                     through your machine
                                   </Typography>
                                 </>
-                              )}
+                            )}
                           </div>
                           {!!formErrors.featureImageUrl && (
                             <p className="text-[#ff5054]">
@@ -589,11 +565,11 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                     placeholder="Enter Organizer Name"
                     value={formData.organizerName}
                     onChange={(e) => {
-                      setFormErrors({ ...formErrors, organizerName: "" });
+                      setFormErrors({ ...formErrors, organizerName: "" })
                       setFormData({
                         ...formData,
-                        organizerName: e.target.value,
-                      });
+                        organizerName: e.target.value
+                      })
                     }}
                   />
                 </Grid>
@@ -606,11 +582,11 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                     placeholder="Enter Organizer Email"
                     value={formData.organizerEmail}
                     onChange={(e) => {
-                      setFormErrors({ ...formErrors, organizerEmail: "" });
+                      setFormErrors({ ...formErrors, organizerEmail: "" })
                       setFormData({
                         ...formData,
-                        organizerEmail: e.target.value,
-                      });
+                        organizerEmail: e.target.value
+                      })
                     }}
                   />
                 </Grid>
@@ -623,13 +599,13 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                     placeholder="Enter Organizer Phone Number"
                     value={formData.organizerPhone}
                     onChange={(e) => {
-                      setFormErrors({ ...formErrors, organizerPhone: "" });
+                      setFormErrors({ ...formErrors, organizerPhone: "" })
                       setFormData({
                         ...formData,
                         organizerPhone: e.target.value
                           .replace(/[^0-9]/g, "")
-                          .slice(0, 10),
-                      });
+                          .slice(0, 10)
+                      })
                     }}
                   />
                 </Grid>
@@ -642,8 +618,8 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                     onChange={(e) => {
                       setFormData({
                         ...formData,
-                        registrationLink: e.target.value,
-                      });
+                        registrationLink: e.target.value
+                      })
                     }}
                   />
                 </Grid>
@@ -700,7 +676,7 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
         </div>
       </Card>
     </>
-  );
-};
+  )
+}
 
-export default EventForm;
+export default EventForm

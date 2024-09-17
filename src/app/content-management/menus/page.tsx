@@ -1,7 +1,7 @@
-import MenuListTable from "./MenusListTable";
+import MenuListTable from "./MenusListTable"
 
 const KanbanPage = () => {
-  return <MenuListTable />;
-};
+  return <MenuListTable />
+}
 
-export default KanbanPage;
+export default KanbanPage

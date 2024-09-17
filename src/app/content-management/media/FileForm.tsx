@@ -1,27 +1,25 @@
+"use client"
 
-"use client";
-
-import LoadingBackdrop from "@/components/LoadingBackdrop";
+import LoadingBackdrop from "@/components/LoadingBackdrop"
 import {
-    Button,
-    Box,
-    Card,
-    Grid,
-    Typography,
-    Avatar,
-    IconButton,
-    ListItem,
-    List,
-} from "@mui/material";
-import CustomTextField from "@/@core/components/mui/TextField";
-import React, { useState } from "react";
-import { useDropzone } from "react-dropzone";
-import { toast } from "react-toastify";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import { useRouter } from "next/navigation";
-import { ADD_BLOG, blogDetailType, EDIT_BLOG } from "@/types/apps/blogsType";
-import { postContentBlock } from "@/services/apiService";
-import { media } from "@/services/endpoint/media";
+  Button,
+  Box,
+  Card,
+  Grid,
+  Typography,
+  Avatar,
+  IconButton,
+  ListItem,
+  List
+} from "@mui/material"
+import React, { useState } from "react"
+import { useDropzone } from "react-dropzone"
+import { toast } from "react-toastify"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import { useRouter } from "next/navigation"
+import { ADD_BLOG, blogDetailType } from "@/types/apps/blogsType"
+import { postContentBlock } from "@/services/apiService"
+import { media } from "@/services/endpoint/media"
 
 type blogFormPropsTypes = {
     open: number;
@@ -30,21 +28,15 @@ type blogFormPropsTypes = {
     permissionUser:Boolean
 };
 
-const validImageType = ["image/png","image/jpeg","image/jpg","image/gif","image/svg","image/svg+xml","video/mp4", "video/webm" ];  
+const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/svg", "image/svg+xml", "video/mp4", "video/webm"]
 
-const MAX_FILES = 10;
-
-const initialFormData = {
-    id: -1,
-    templateId: -1,
-    title: "",
-};
+const MAX_FILES = 10
 
 const initialErrorData = {
-    templateId: "",
-    title: "",
-    filesError: "",
-};
+  templateId: "",
+  title: "",
+  filesError: ""
+}
 
 type FileProp = {
     name: string;
@@ -52,52 +44,50 @@ type FileProp = {
     size: number;
 };
 
-function FileForm({ open, editingRow, handleClose ,permissionUser}: blogFormPropsTypes) {
-    const router = useRouter();
+function FileForm({ open, editingRow, handleClose, permissionUser }: blogFormPropsTypes) {
+  const router = useRouter()
 
-    const [formData, setFormData] = useState<typeof initialFormData>(initialFormData);
-    const [formErrors, setFormErrors] = useState<typeof initialErrorData>(initialErrorData);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [files, setFiles] = useState<File[]>([]);
+  const [formErrors, setFormErrors] = useState<typeof initialErrorData>(initialErrorData)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [files, setFiles] = useState<File[]>([])
 
-    // Hooks
-    const { getRootProps, getInputProps } = useDropzone({
-        onDrop: (acceptedFiles: File[]) => {
-            const newFiles = acceptedFiles.map((file: File) => Object.assign(file));
-            if (files.length + newFiles.length > MAX_FILES) {
-                setFormErrors({
-                    ...formErrors,
-                    filesError: `You can only upload up to ${MAX_FILES} files.`,
-                });
-                return;
-            }
-            setFiles([...files, ...newFiles]);
-        }
-    });
+  // Hooks
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop: (acceptedFiles: File[]) => {
+      const newFiles = acceptedFiles.map((file: File) => Object.assign(file))
+      if (files.length + newFiles.length > MAX_FILES) {
+        setFormErrors({
+          ...formErrors,
+          filesError: `You can only upload up to ${MAX_FILES} files.`
+        })
+        return
+      }
+      setFiles([...files, ...newFiles])
+    }
+  })
 
-    const renderFilePreview = (file: FileProp) => {
-        if (file.type.startsWith('image')) {
-            return <img width={38} height={38} alt={file.name} src={URL.createObjectURL(file as any)} />;
-        } else {
-            return <i className='tabler-file-description' />;
-        }
-    };
+  const renderFilePreview = (file: FileProp) => {
+    if (file.type.startsWith('image')) {
+      // eslint-disable-next-line
+      return <img width={38} height={38} alt={file.name} src={URL.createObjectURL(file as any)} />
+    } else {
+      return <i className='tabler-file-description' />
+    }
+  }
 
-    const handleRemoveFile = (file: FileProp) => {
-        const filtered = files.filter((i: FileProp) => i.name !== file.name);
-        setFiles([...filtered]);
-    };
+  const handleRemoveFile = (file: FileProp) => {
+    const filtered = files.filter((i: FileProp) => i.name !== file.name)
+    setFiles([...filtered])
+  }
 
-    const fileList = files.map((file: FileProp) => (
+  const fileList = files.map((file: FileProp) => (
         <ListItem key={file.name}>
             <div className='file-details'>
                 <div className='file-preview'>{renderFilePreview(file)}</div>
                 <div>
                     <Typography className='file-name'>{file.name}</Typography>
                     <Typography className='file-size' variant='body2'>
-                        {Math.round(file.size / 100) / 10 > 1000
-                            ? `${(Math.round(file.size / 100) / 10000).toFixed(1)} mb`
-                            : `${(Math.round(file.size / 100) / 10).toFixed(1)} kb`}
+                        {Math.round(file.size / 100) / 10 > 1000 ? `${(Math.round(file.size / 100) / 10000).toFixed(1)} mb` : `${(Math.round(file.size / 100) / 10).toFixed(1)} kb`}
                     </Typography>
                 </div>
             </div>
@@ -105,72 +95,70 @@ function FileForm({ open, editingRow, handleClose ,permissionUser}: blogFormProp
                 <i className='tabler-x text-xl' />
             </IconButton>
         </ListItem>
-    ));
+  ))
 
-    const handleRemoveAllFiles = () => {
-        setFiles([]);
-    };
+  const handleRemoveAllFiles = () => {
+    setFiles([])
+  }
 
-    const validateForm = () => {
-        let valid = true;
-        let errors = { ...initialErrorData };
+  const validateForm = () => {
+    let valid = true
+    const errors = { ...initialErrorData }
 
-        if (open === ADD_BLOG && files.length === 0) {
-            errors.filesError = "At least one file is required";
-            valid = false;
+    if (open === ADD_BLOG && files.length === 0) {
+      errors.filesError = "At least one file is required"
+      valid = false
+    }
+
+    if (files.some((file: any) => !validImageType.includes(file.type))) {
+      errors.filesError = `Invalid file type. Allowed types are ${validImageType.join(", ")}.`
+      valid = false
+    }
+
+    if (files.length > MAX_FILES) {
+      errors.filesError = `You can only upload up to ${MAX_FILES} files.`
+      valid = false
+    }
+
+    setFormErrors(errors)
+    return valid
+  }
+
+  const handleSubmit = async (active: boolean) => {
+    if (validateForm()) {
+      try {
+        setLoading(true)
+        const formDataToSend = new FormData()
+
+        files.forEach((file: any, index: any) => {
+          formDataToSend.append(`media`, file)
+        })
+
+        let result = null
+        // if (open === EDIT_BLOG) {
+        //     formDataToSend.set("blogId", String(editingRow?.blogId));
+        //     result = await postContentBlock(media.upload, formDataToSend);
+        // } else {
+
+        result = await postContentBlock(media.upload, formDataToSend)
+        // }
+
+        setLoading(false)
+
+        if (result.status === "success") {
+          toast.success(result.message)
+          router.back()
+        } else {
+          toast.error(result.message)
         }
+      } catch (error) {
+        console.error(error)
+        setLoading(false)
+      }
+    }
+  }
 
-        if (files.some((file: any) => !validImageType.includes(file.type))) {
-            errors.filesError = `Invalid file type. Allowed types are ${validImageType.join(", ")}.`;
-            valid = false;
-        }
-
-        if (files.length > MAX_FILES) {
-            errors.filesError = `You can only upload up to ${MAX_FILES} files.`;
-            valid = false;
-        }
-
-        setFormErrors(errors);
-        return valid;
-    };
-
-    const handleSubmit = async (active: boolean) => {
-        if (validateForm()) {
-            try {
-                setLoading(true);
-                const formDataToSend = new FormData();
-               
-              
-
-                files.forEach((file: any, index: any) => {
-                    formDataToSend.append(`media`, file);
-                });
-
-                let result = null;
-                // if (open === EDIT_BLOG) {
-                //     formDataToSend.set("blogId", String(editingRow?.blogId));
-                //     result = await postContentBlock(media.upload, formDataToSend);
-                // } else {
-
-                    result = await postContentBlock(media.upload, formDataToSend);
-                // }
-
-                setLoading(false);
-
-                if (result.status === "success") {
-                    toast.success(result.message);
-                    router.back();
-                } else {
-                    toast.error(result.message);
-                }
-            } catch (error) {
-                console.error(error);
-                setLoading(false);
-            }
-        }
-    };
-
-    return (
+  return (
         <>
             <LoadingBackdrop isLoading={loading} />
             <Box display="flex" alignItems="center">
@@ -188,7 +176,7 @@ function FileForm({ open, editingRow, handleClose ,permissionUser}: blogFormProp
             <Card className="p-4">
                 <Box display="flex" alignItems="flex-start">
                     <Grid container spacing={12} sm={12}>
-                      
+
                         <Grid item xs={12} sm={12}>
                             <p className="text-[#4e4b5a] my-2">Files *</p>
                             <div
@@ -259,7 +247,7 @@ function FileForm({ open, editingRow, handleClose ,permissionUser}: blogFormProp
                                 >
                                     Cancel
                                 </Button>
-                                {permissionUser && 
+                                {permissionUser &&
                                 <Button
                                     variant="contained"
                                     onClick={() => handleSubmit(true)}
@@ -274,7 +262,7 @@ function FileForm({ open, editingRow, handleClose ,permissionUser}: blogFormProp
                 </Box>
             </Card>
         </>
-    );
+  )
 }
 
-export default FileForm;
+export default FileForm

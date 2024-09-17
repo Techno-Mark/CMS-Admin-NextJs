@@ -21,14 +21,11 @@ import ScrollToTop from '@core/components/scroll-to-top'
 // Util Imports
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
 
-
 const Layout = async ({ children }: ChildrenType) => {
   // Vars
   const direction = 'ltr'
   const mode = getMode()
   const systemMode = getSystemMode()
-
-
 
   return (
     <Providers direction={direction}>

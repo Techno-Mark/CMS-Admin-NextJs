@@ -1,25 +1,24 @@
-import { useState, useEffect } from "react";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import Typography from "@mui/material/Typography";
-import Checkbox from "@mui/material/Checkbox";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
-import DialogCloseButton from "@components/Dialogs/DialogCloseButton";
-import CustomTextField from "@core/components/mui/TextField";
-import tableStyles from "@core/styles/table.module.css";
-import React from "react";
+import React, { useState, useEffect } from "react"
+import Dialog from "@mui/material/Dialog"
+import DialogTitle from "@mui/material/DialogTitle"
+import DialogContent from "@mui/material/DialogContent"
+import Typography from "@mui/material/Typography"
+import Checkbox from "@mui/material/Checkbox"
+import FormGroup from "@mui/material/FormGroup"
+import FormControlLabel from "@mui/material/FormControlLabel"
+import DialogActions from "@mui/material/DialogActions"
+import Button from "@mui/material/Button"
+import DialogCloseButton from "@components/Dialogs/DialogCloseButton"
+import CustomTextField from "@core/components/mui/TextField"
+import tableStyles from "@core/styles/table.module.css"
 import {
   createRole,
   getRoleById,
-  updateRole,
-} from "@/services/endpoint/users/roles";
-import { post } from "@/services/apiService";
-import { toast } from "react-toastify";
-import { Switch } from "@mui/material";
+  updateRole
+} from "@/services/endpoint/users/roles"
+import { post } from "@/services/apiService"
+import { toast } from "react-toastify"
+import { Switch } from "@mui/material"
 
 type RoleDialogProps = {
 
@@ -30,138 +29,135 @@ type RoleDialogProps = {
 };
 
 const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
-  const [selectedCheckbox, setSelectedCheckbox] = useState<number[]>([]);
+  const [selectedCheckbox, setSelectedCheckbox] = useState<number[]>([])
   const [isIndeterminateCheckbox, setIsIndeterminateCheckbox] =
-    useState<boolean>(false);
-  const [defaultData, setDefaultData] = useState<any>([]);
-  const [roleName, setRoleName] = useState("");
-  const [roleError, setRoleError] = useState(false);
-  const [active, setActive] = useState(false);
+    useState<boolean>(false)
+  const [defaultData, setDefaultData] = useState<any>([])
+  const [roleName, setRoleName] = useState("")
+  const [roleError, setRoleError] = useState(false)
+  const [active, setActive] = useState(false)
 
   const handleClose = () => {
-    setOpen(false);
-    setRoleName("");
-    setRoleError(false);
-    setActive(false);
-    setDefaultData([]);
-    setSelectedCheckbox([]);
-    setIsIndeterminateCheckbox(false);
-    
-  };
+    setOpen(false)
+    setRoleName("")
+    setRoleError(false)
+    setActive(false)
+    setDefaultData([])
+    setSelectedCheckbox([])
+    setIsIndeterminateCheckbox(false)
+  }
 
   const togglePermission = (id: number) => {
     setSelectedCheckbox((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
+    )
+  }
 
   const handleSelectAllCheckbox = () => {
     if (isIndeterminateCheckbox) {
-      setSelectedCheckbox([]);
+      setSelectedCheckbox([])
     } else {
       const allCheckboxes = defaultData.flatMap((module: any) =>
         module.permissions.map((perm: any) => perm.id)
-      );
-      setSelectedCheckbox(allCheckboxes);
+      )
+      setSelectedCheckbox(allCheckboxes)
     }
-  };
+  }
 
   const fetchRolePermissions = async (roleId: number) => {
     try {
-      const result = await post(getRoleById, { roleId });
+      const result = await post(getRoleById, { roleId })
 
       if (result.data) {
-        const data = result.data;
+        const data = result.data
         const permissions = data.permission.filter(
           (module: any) => module.moduleName !== null
-        );
+        )
 
         const selected = permissions.flatMap((perm: any) =>
           perm.permissions.filter((p: any) => p.checked).map((p: any) => p.id)
-        );
+        )
 
         if (roleId > 0) {
-          setDefaultData(permissions);
-          setSelectedCheckbox(selected);
-          setActive(data.active);
-          setRoleName(data.roleName);
+          setDefaultData(permissions)
+          setSelectedCheckbox(selected)
+          setActive(data.active)
+          setRoleName(data.roleName)
         } else {
-          setDefaultData(permissions);
-          setSelectedCheckbox(selected);
+          setDefaultData(permissions)
+          setSelectedCheckbox(selected)
         }
       }
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
   useEffect(() => {
     if (open) {
       if (editId !== 0) {
-        fetchRolePermissions(editId);
+        fetchRolePermissions(editId)
       }
     } else {
-      fetchRolePermissions(0);
+      fetchRolePermissions(0)
     }
-  }, [open, editId]);
+  }, [open, editId])
 
   useEffect(() => {
     const allPermissionsCount = defaultData.flatMap(
       (module: any) => module.permissions
-    ).length;
+    ).length
     if (
       selectedCheckbox.length > 0 &&
       selectedCheckbox.length < allPermissionsCount
     ) {
-      setIsIndeterminateCheckbox(true);
+      setIsIndeterminateCheckbox(true)
     } else {
-      setIsIndeterminateCheckbox(false);
+      setIsIndeterminateCheckbox(false)
     }
-  }, [selectedCheckbox, defaultData]);
+  }, [selectedCheckbox, defaultData])
 
   const validateForm = () => {
-    let valid = true;
+    let valid = true
 
     if (roleName.trim().length <= 0) {
-      setRoleError(true);
-      valid = false;
+      setRoleError(true)
+      valid = false
     }
 
-    return valid;
-  };
-  
+    return valid
+  }
+
   const handleSubmit = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-  
+    e.preventDefault()
+
     if (validateForm()) {
       try {
-        const orgId = localStorage.getItem("selectedOrgId");
-        const endpoint = editId > 0 ? updateRole : createRole;
+        const orgId = localStorage.getItem("selectedOrgId")
+        const endpoint = editId > 0 ? updateRole : createRole
         const payload =
-          editId > 0
-            ? {
-                organizationId: Number(orgId),
-                roleName: roleName,
-                roleId: editId,
-                roleActionMapping: selectedCheckbox,
-                active: active,
-              }
-            : {
-                organizationId: Number(orgId),
-                roleName: roleName,
-                roleActionMapping: selectedCheckbox,
-                active: active,
-              };
-        const result = await post(endpoint, payload);
-        toast.success(result.message);
-        handleClose();
+          editId > 0 ? {
+            organizationId: Number(orgId),
+            roleName,
+            roleId: editId,
+            roleActionMapping: selectedCheckbox,
+            active
+          } : {
+            organizationId: Number(orgId),
+            roleName,
+            roleActionMapping: selectedCheckbox,
+            active
+          }
+        const result = await post(endpoint, payload)
+        toast.success(result.message)
+        handleClose()
       } catch (error) {
-        console.error(error);
+        console.error(error)
       } finally {
-        handleClose();
+        handleClose()
       }
     }
-  };
+  }
 
   return (
     <Dialog
@@ -196,8 +192,8 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
             error={!!roleError}
             helperText={!!roleError && "Please enter role name"}
             onChange={(e) => {
-              setRoleName(e.target.value);
-              setRoleError(false);
+              setRoleName(e.target.value)
+              setRoleError(false)
             }}
           />
           <FormControlLabel
@@ -244,7 +240,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
                   {Array.isArray(defaultData) &&
                     defaultData.length > 0 &&
                     defaultData[0]?.permissions?.map((perm: any) => (
-                      <td className="!text-end pie-0 !pr-4">
+                      <td className="!text-end pie-0 !pr-4" key={perm.id}>
                         <FormGroup className="flex-row justify-end flex-nowrap gap-6">
                           <FormControlLabel
                             key={perm.id}
@@ -269,7 +265,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
                           </Typography>
                         </td>
                         {module.permissions.map((perm: any) => (
-                          <td className="!text-end pie-0 !pr-4">
+                          <td className="!text-end pie-0 !pr-4" key={perm?.id}>
                             <FormGroup className="flex-row justify-end flex-nowrap gap-6">
                               <FormControlLabel
                                 key={perm.id}
@@ -308,7 +304,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
         </DialogActions>
       </form>
     </Dialog>
-  );
-};
+  )
+}
 
-export default RoleDialog;
+export default RoleDialog

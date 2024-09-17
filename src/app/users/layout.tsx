@@ -31,7 +31,7 @@ const Layout = async ({ children }: ChildrenType) => {
     <Providers direction={direction}>
       <LayoutWrapper
         systemMode={systemMode}
-        
+
         verticalLayout={
           <VerticalLayout
             navigation={<Navigation mode={mode} systemMode={systemMode} />}

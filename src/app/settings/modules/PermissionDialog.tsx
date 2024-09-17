@@ -1,25 +1,21 @@
 // MUI Imports
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
+import Dialog from "@mui/material/Dialog"
+import DialogTitle from "@mui/material/DialogTitle"
+import DialogContent from "@mui/material/DialogContent"
+import DialogActions from "@mui/material/DialogActions"
+import Typography from "@mui/material/Typography"
+import Button from "@mui/material/Button"
 
 // Component Imports
-import CustomTextField from "@core/components/mui/TextField";
-import DialogCloseButton from "../../../components/Dialogs/DialogCloseButton";
-import { useEffect, useState } from "react";
-import { get, post } from "@/services/apiService";
+import CustomTextField from "@core/components/mui/TextField"
+import DialogCloseButton from "../../../components/Dialogs/DialogCloseButton"
+import { useEffect, useState } from "react"
+import { get, post } from "@/services/apiService"
 import {
-  createPermission,
-  getPermissionById,
-  updatePermission,
-} from "@/services/endpoint/users/permissions";
-import { toast } from "react-toastify";
-import { modules } from "@/services/endpoint/modules";
+  getPermissionById
+} from "@/services/endpoint/users/permissions"
+import { toast } from "react-toastify"
+import { modules } from "@/services/endpoint/modules"
 
 // Types
 type ModuleDataType = {
@@ -42,7 +38,7 @@ const PermissionForm = ({
   permissionDataErr,
   setPermissionData,
   setPermissionDataErr,
-  isEditMode,
+  isEditMode
 }: {
   handleClose: () => void;
   handleSubmit: () => void;
@@ -64,11 +60,11 @@ const PermissionForm = ({
         helperText={permissionDataErr.name}
         error={!!permissionDataErr.name}
         onChange={(e) => {
-          setPermissionDataErr({ name: "" });
+          setPermissionDataErr({ name: "" })
           setPermissionData({
             ...permissionData,
-            moduleName: e.target.value,
-          });
+            moduleName: e.target.value
+          })
         }}
       />
       {/* <FormControlLabel
@@ -100,87 +96,87 @@ const PermissionForm = ({
       </Button>
     </DialogActions>
   </>
-);
+)
 
 const PermissionDialog = ({
   open,
   setOpen,
   editId,
-  addOpen,
+  addOpen
 }: PermissionDialogProps) => {
   const initialPermissionData: ModuleDataType = {
     moduleId: 0,
     moduleName: "",
-    status: true,
-  };
+    status: true
+  }
 
   const [permissionData, setPermissionData] = useState<ModuleDataType>(
     initialPermissionData
-  );
+  )
   const [permissionDataErr, setPermissionDataErr] = useState<{ name: string }>({
-    name: "",
-  });
+    name: ""
+  })
 
   const validateIfHasErr = (data: ModuleDataType): boolean => {
     if (data.moduleName.trim().length === 0) {
-      setPermissionDataErr({ name: "This is a required field" });
-      return true;
+      setPermissionDataErr({ name: "This is a required field" })
+      return true
     }
-    setPermissionDataErr({ name: "" });
-    return false;
-  };
+    setPermissionDataErr({ name: "" })
+    return false
+  }
 
   const handleSubmit = async () => {
-    if (validateIfHasErr(permissionData)) return;
+    if (validateIfHasErr(permissionData)) return
 
     try {
-      const endpoint = modules.create;
+      const endpoint = modules.create
       const payload = {
         moduleId: editId > 0 ? permissionData.moduleId : undefined,
         moduleName: permissionData.moduleName,
-        active: permissionData.status,
-      };
-      const result = await post(endpoint, payload);
-      toast.success(result.message);
-      handleClose();
+        active: permissionData.status
+      }
+      const result = await post(endpoint, payload)
+      toast.success(result.message)
+      handleClose()
     } catch (error) {
-      console.error(error);
+      console.error(error)
     } finally {
-      resetForm();
+      resetForm()
     }
-  };
+  }
 
   const getPermissionDataById = async () => {
     try {
-      const result = await get(getPermissionById(editId));
+      const result = await get(getPermissionById(editId))
       if (result.status === "success") {
-        setPermissionData({ ...result.data, status: result.data.active });
+        setPermissionData({ ...result.data, status: result.data.active })
       } else {
-        toast.error(result.message);
+        toast.error(result.message)
       }
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
   const resetForm = () => {
-    setPermissionData(initialPermissionData);
-    setPermissionDataErr({ name: "" });
-    setOpen(false);
-  };
+    setPermissionData(initialPermissionData)
+    setPermissionDataErr({ name: "" })
+    setOpen(false)
+  }
 
   useEffect(() => {
     if (editId > 0 && open) {
-      getPermissionDataById();
+      getPermissionDataById()
     } else {
-      setPermissionData(initialPermissionData);
-      setPermissionDataErr({ name: "" });
+      setPermissionData(initialPermissionData)
+      setPermissionDataErr({ name: "" })
     }
-  }, [editId]);
+  }, [editId])
 
   const handleClose = () => {
-    resetForm();
-  };
+    resetForm()
+  }
 
   return (
     <Dialog
@@ -197,9 +193,7 @@ const PermissionDialog = ({
       >
         {editId ? "Edit Permission" : "Add New Permission"}
         <Typography component="span" className="flex flex-col text-center">
-          {editId
-            ? "Edit module as per your requirements."
-            : "Module you may use and assign to your users."}
+          {editId ? "Edit module as per your requirements." : "Module you may use and assign to your users."}
         </Typography>
       </DialogTitle>
       <PermissionForm
@@ -212,7 +206,7 @@ const PermissionDialog = ({
         isEditMode={!!editId}
       />
     </Dialog>
-  );
-};
+  )
+}
 
-export default PermissionDialog;
+export default PermissionDialog

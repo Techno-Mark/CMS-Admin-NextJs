@@ -1,70 +1,68 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { post } from "@/services/apiService";
-import { getRoleList } from "@/services/endpoint/users/roles";
-import RolesListTable from "./RolesListTable";
+import { useEffect, useState } from "react"
+import { post } from "@/services/apiService"
+import { getRoleList } from "@/services/endpoint/users/roles"
+import RolesListTable from "./RolesListTable"
 
-const page = () => {
-  const [totalCount, setTotalCount] = useState<number>(0);
-  const [rolesData, setRolesData] = useState([]);
+const Page = () => {
+  const [totalCount, setTotalCount] = useState<number>(0)
+  const [rolesData, setRolesData] = useState([])
   const [initialBody, setInitialBody] = useState({
     page: 0,
     limit: 10,
     search: "",
     organizationId: null,
-    active: null,
-  });
+    active: null
+  })
 
   const getList = async (body: any) => {
     try {
-      
-      const result = await post(getRoleList, body);
-      setTotalCount(result.data.totalRoles);
-      setRolesData(result.data.roles);
+      const result = await post(getRoleList, body)
+      setTotalCount(result.data.totalRoles)
+      setRolesData(result.data.roles)
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
   useEffect(() => {
     // Retrieve organizationId from localStorage only on the client side
-    const orgId = localStorage.getItem('selectedOrgId');
+    const orgId = localStorage.getItem('selectedOrgId')
     if (orgId) {
       setInitialBody((prevBody:any) => ({
         ...prevBody,
-        organizationId: Number(orgId),
-      }));
+        organizationId: Number(orgId)
+      }))
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     if (initialBody.organizationId) {
-      getList(initialBody);
+      getList(initialBody)
     }
-  }, [initialBody]);
+  }, [initialBody])
 
   useEffect(() => {
     const handleStorageUpdate = async () => {
-      const storedOrgName = localStorage.getItem('selectedOrgId');
       const getList = async (body: any) => {
         try {
-          const result = await post(getRoleList, body);
-          setTotalCount(result.data.totalRoles);
-          setRolesData(result.data.roles);
+          const result = await post(getRoleList, body)
+          setTotalCount(result.data.totalRoles)
+          setRolesData(result.data.roles)
         } catch (error) {
-          console.error(error);
+          console.error(error)
         }
-      };
-      getList(initialBody);
-    };
+      }
+      getList(initialBody)
+    }
 
-    window.addEventListener('localStorageUpdate', handleStorageUpdate);
+    window.addEventListener('localStorageUpdate', handleStorageUpdate)
 
     return () => {
-      window.removeEventListener('localStorageUpdate', handleStorageUpdate);
-    };
-  }, []);
+      window.removeEventListener('localStorageUpdate', handleStorageUpdate)
+    }
+  }, [])
 
   return (
     <>
@@ -72,11 +70,11 @@ const page = () => {
         totalCount={totalCount}
         tableData={rolesData}
         getList={getList}
-        //@ts-ignore
+        // @ts-ignore
         initialBody={initialBody}
       />
     </>
-  );
-};
+  )
+}
 
-export default page;
+export default Page

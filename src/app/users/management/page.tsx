@@ -1,7 +1,6 @@
-import { Grid } from "@mui/material";
-import React from "react";
-import UserListCards from "./UserListCards";
-import UserListTable from "./UserListTable";
+import { Grid } from "@mui/material"
+import React from "react"
+import UserListTable from "./UserListTable"
 
 const page = () => {
   return (
@@ -11,10 +10,10 @@ const page = () => {
       </Grid>
       <Grid item xs={12}>
         <UserListTable />
-        
+
       </Grid>
     </Grid>
-  );
-};
+  )
+}
 
-export default page;
+export default page

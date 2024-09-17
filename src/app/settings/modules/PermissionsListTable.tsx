@@ -1,15 +1,12 @@
 // React Imports
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react"
 // MUI Imports
-import Card from "@mui/material/Card";
-import Button, { ButtonProps } from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import TablePagination from "@mui/material/TablePagination";
-import type { TextFieldProps } from "@mui/material/TextField";
+import Card from "@mui/material/Card"
+import Typography from "@mui/material/Typography"
+import type { TextFieldProps } from "@mui/material/TextField"
 // Third-party Imports
-import classnames from "classnames";
-import { rankItem } from "@tanstack/match-sorter-utils";
+import classnames from "classnames"
+import { rankItem } from "@tanstack/match-sorter-utils"
 import {
   createColumnHelper,
   flexRender,
@@ -20,36 +17,21 @@ import {
   getFacetedUniqueValues,
   getFacetedMinMaxValues,
   getPaginationRowModel,
-  getSortedRowModel,
-} from "@tanstack/react-table";
-import type { ColumnDef, FilterFn } from "@tanstack/react-table";
-import type { RankingInfo } from "@tanstack/match-sorter-utils";
+  getSortedRowModel
+} from "@tanstack/react-table"
+import type { ColumnDef, FilterFn } from "@tanstack/react-table"
 // Component Imports
-import TablePaginationComponent from "@components/TablePaginationComponent";
-import CustomTextField from "@core/components/mui/TextField";
+import CustomTextField from "@core/components/mui/TextField"
 // Style Imports
-import tableStyles from "@core/styles/table.module.css";
-import ConfirmationDialog from "./ConfirmationDialog";
+import tableStyles from "@core/styles/table.module.css"
+import ConfirmationDialog from "./ConfirmationDialog"
 
-import { useRouter } from "next/navigation";
-import BreadCrumbList from "@components/BreadCrumbList";
+import BreadCrumbList from "@components/BreadCrumbList"
 // Type Imports
-import { PermissionsType } from "@/types/apps/permissionsType";
- 
- 
-import {  Chip, MenuItem } from "@mui/material";
-import OpenDialogOnElementClick from "@/components/Dialogs/OpenDialogOnElementClick";
-import PermissionDialog from "./PermissionDialog";
-import { ModulesType } from "@/types/apps/modulesType";
+import { PermissionsType } from "@/types/apps/permissionsType"
 
-declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
-}
+import PermissionDialog from "./PermissionDialog"
+import { ModulesType } from "@/types/apps/modulesType"
 
 type PermissionsTypeWithAction = ModulesType & {
   action?: string;
@@ -57,16 +39,16 @@ type PermissionsTypeWithAction = ModulesType & {
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   // Rank the item
-  const itemRank = rankItem(row.getValue(columnId), value);
+  const itemRank = rankItem(row.getValue(columnId), value)
 
   // Store the itemRank info
   addMeta({
-    itemRank,
-  });
+    itemRank
+  })
 
   // Return if the item should be filtered in/out
-  return itemRank.passed;
-};
+  return itemRank.passed
+}
 
 const DebouncedInput = ({
   value: initialValue,
@@ -79,19 +61,19 @@ const DebouncedInput = ({
   debounce?: number;
 } & Omit<TextFieldProps, "onChange">) => {
   // States
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState(initialValue)
 
   useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
+    setValue(initialValue)
+  }, [initialValue])
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      onChange(value);
-    }, debounce);
+      onChange(value)
+    }, debounce)
 
-    return () => clearTimeout(timeout);
-  }, [value]);
+    return () => clearTimeout(timeout)
+  }, [value])
 
   return (
     <CustomTextField
@@ -99,17 +81,17 @@ const DebouncedInput = ({
       value={value}
       onChange={(e) => setValue(e.target.value)}
     />
-  );
-};
+  )
+}
 
 // Column Definitions
-const columnHelper = createColumnHelper<PermissionsTypeWithAction>();
+const columnHelper = createColumnHelper<PermissionsTypeWithAction>()
 
 const PermissionsListTable = ({
   totalCount,
   tableData,
   getList,
-  initialBody,
+  initialBody
 }: {
   totalCount: number;
   tableData?: PermissionsType[];
@@ -125,24 +107,14 @@ const PermissionsListTable = ({
     search: string;
   };
 }) => {
-  const router = useRouter();
   // States
-  const [open, setOpen] = useState(false);
-  const [addOpen, setAddOpen] = useState(false);
-  const [globalFilter, setGlobalFilter] = useState("");
-  const [deletingId, setDeletingId] = useState<number>(0);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
-  const [editValue, setEditValue] = useState<number>(0);
-  const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
-
-  //vars
-  const buttonProps: ButtonProps = {
-    variant: "contained",
-    children: "Add Module",
-    onClick: () => handleAddPermission(),
-    className: "is-full sm:is-auto",
-    startIcon: <i className="tabler-plus" />,
-  };
+  const [open, setOpen] = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
+  const [globalFilter, setGlobalFilter] = useState("")
+  const [deletingId, setDeletingId] = useState<number>(0)
+  const [isDeleting, setIsDeleting] = useState<boolean>(false)
+  const [editValue] = useState<number>(0)
+  const [activeFilter] = useState<boolean | null>(null)
 
   const columns = useMemo<ColumnDef<PermissionsTypeWithAction, any>[]>(
     () => [
@@ -152,7 +124,7 @@ const PermissionsListTable = ({
           <Typography color="text.primary" className="font-medium">
             {row.original.moduleName}
           </Typography>
-        ),
+        )
       }),
       columnHelper.accessor("createdAt", {
         header: "Created At",
@@ -160,8 +132,8 @@ const PermissionsListTable = ({
           <Typography color="text.primary" className="font-medium">
             {row.original.createdAt}
           </Typography>
-        ),
-      }),
+        )
+      })
       // columnHelper.accessor("active", {
       //   header: "Status",
       //   cell: ({ row }) => (
@@ -181,7 +153,7 @@ const PermissionsListTable = ({
       //   cell: ({ row }) => {
       //     return (
       //       <div className="flex items-center">
-             
+
       //         <IconButton
       //           onClick={() => {
       //             setIsDeleting(true);
@@ -197,19 +169,19 @@ const PermissionsListTable = ({
       // }),
     ],
     []
-  );
+  )
 
   const table = useReactTable({
     data: tableData as PermissionsType[],
     columns,
     filterFns: {
-      fuzzy: fuzzyFilter,
+      fuzzy: fuzzyFilter
     },
     initialState: {
       pagination: {
         pageIndex: initialBody.page,
-        pageSize: initialBody.limit,
-      },
+        pageSize: initialBody.limit
+      }
     },
     globalFilterFn: fuzzyFilter,
     getCoreRowModel: getCoreRowModel(),
@@ -219,14 +191,8 @@ const PermissionsListTable = ({
     getPaginationRowModel: getPaginationRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
-  });
-
-  const handleAddPermission = () => {
-    setEditValue(0);
-    setOpen(true);
-    setAddOpen(true);
-  };
+    getFacetedMinMaxValues: getFacetedMinMaxValues()
+  })
 
   useEffect(() => {
     getList({
@@ -234,14 +200,14 @@ const PermissionsListTable = ({
       page: table.getState().pagination.pageIndex,
       limit: table.getState().pagination.pageSize,
       search: globalFilter,
-      active: activeFilter,
-    });
+      active: activeFilter
+    })
   }, [
     table.getState().pagination.pageSize,
     table.getState().pagination.pageIndex,
     globalFilter,
-    activeFilter,
-  ]);
+    activeFilter
+  ])
 
   useEffect(() => {
     if (deletingId === 0) {
@@ -250,10 +216,10 @@ const PermissionsListTable = ({
         page: table.getState().pagination.pageIndex,
         limit: table.getState().pagination.pageSize,
         search: globalFilter,
-        active: activeFilter,
-      });
+        active: activeFilter
+      })
     }
-  }, [deletingId]);
+  }, [deletingId])
 
   useEffect(() => {
     if (!open) {
@@ -262,10 +228,10 @@ const PermissionsListTable = ({
         page: table.getState().pagination.pageIndex,
         limit: table.getState().pagination.pageSize,
         search: globalFilter,
-        active: activeFilter,
-      });
+        active: activeFilter
+      })
     }
-  }, [addOpen, open]);
+  }, [addOpen, open])
 
   return (
     <>
@@ -330,7 +296,7 @@ const PermissionsListTable = ({
                             className={classnames({
                               "flex items-center": header.column.getIsSorted(),
                               "cursor-pointer select-none":
-                                header.column.getCanSort(),
+                                header.column.getCanSort()
                             })}
                             onClick={header.column.getToggleSortingHandler()}
                           >
@@ -342,7 +308,7 @@ const PermissionsListTable = ({
                               asc: <i className="tabler-chevron-up text-xl" />,
                               desc: (
                                 <i className="tabler-chevron-down text-xl" />
-                              ),
+                              )
                             }[header.column.getIsSorted() as "asc" | "desc"] ??
                               null}
                           </div>
@@ -374,7 +340,7 @@ const PermissionsListTable = ({
                       <tr
                         key={row.id}
                         className={classnames({
-                          selected: row.getIsSelected(),
+                          selected: row.getIsSelected()
                         })}
                       >
                         {row.getVisibleCells().map((cell) => (
@@ -386,7 +352,7 @@ const PermissionsListTable = ({
                           </td>
                         ))}
                       </tr>
-                    );
+                    )
                   })}
               </tbody>
             )}
@@ -407,20 +373,20 @@ const PermissionsListTable = ({
         setDeletingId={setDeletingId}
         setOpen={(arg1: boolean) => setIsDeleting(arg1)}
         deletePayload={{
-          permissionId: deletingId,
+          permissionId: deletingId
         }}
       />
       <PermissionDialog
         open={open}
         setOpen={(arg1: boolean) => {
-          setOpen(arg1);
-          setAddOpen(arg1);
+          setOpen(arg1)
+          setAddOpen(arg1)
         }}
         editId={editValue}
         addOpen={addOpen}
       />
     </>
-  );
-};
+  )
+}
 
-export default PermissionsListTable;
+export default PermissionsListTable

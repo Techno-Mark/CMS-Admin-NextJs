@@ -1,13 +1,12 @@
-"use client";
+"use client"
 
-import { useRouter } from "next/navigation";
-import BlogForm from "@/app/content-management/blogs/BlogForm";
-import { ADD_BLOG } from "@/types/apps/blogsType";
-import { useEffect, useState } from "react";
-import { usePermission } from "@/utils/permissions";
+import { useRouter } from "next/navigation"
+import BlogForm from "@/app/content-management/blogs/BlogForm"
+import { ADD_BLOG } from "@/types/apps/blogsType"
+import { usePermission } from "@/utils/permissions"
 
 const Page = () => {
-  const router = useRouter();
+  const router = useRouter()
 
   const { hasPermission } = usePermission()
   return (
@@ -17,7 +16,7 @@ const Page = () => {
       editingRow={null}
       permissionUser={hasPermission('Blog', 'Create')}
     />
-  );
-};
+  )
+}
 
-export default Page;
+export default Page

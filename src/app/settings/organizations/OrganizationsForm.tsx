@@ -1,23 +1,21 @@
 // components/OrganizationsForm.tsx
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"
 import {
   Box,
   Typography,
   Grid,
-  TextField,
   Switch,
   Button,
-  Divider,
-  Card,
-} from "@mui/material";
-import { OrganizationsType } from "@/types/apps/organizationsType";
-import { toast } from "react-toastify";
-import { post } from "@/services/apiService";
-import { organization } from "@/services/endpoint/organization";
-import CustomTextField from "@/@core/components/mui/TextField";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import LoadingBackdrop from "@/components/LoadingBackdrop";
+  Card
+} from "@mui/material"
+import { OrganizationsType } from "@/types/apps/organizationsType"
+import { toast } from "react-toastify"
+import { post } from "@/services/apiService"
+import { organization } from "@/services/endpoint/organization"
+import CustomTextField from "@/@core/components/mui/TextField"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import LoadingBackdrop from "@/components/LoadingBackdrop"
 
 type Props = {
   open: -1 | 0 | 1;
@@ -31,83 +29,83 @@ const initialData = {
   name: "",
   prefix: "",
   organizationURL: "",
-  active: false,
-};
+  active: false
+}
 
 const OrganizationsForm = ({
   open,
   handleClose,
   editingRow,
-  setEditingRow,
+  setEditingRow
 }: Props) => {
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true)
 
-  const [formData, setFormData] = useState<OrganizationsType>(initialData);
+  const [formData, setFormData] = useState<OrganizationsType>(initialData)
   const [formErrors, setFormErrors] = useState({
     name: "",
     prefix: "",
     active: "",
-    organizationURL: "",
-  });
+    organizationURL: ""
+  })
 
   useEffect(() => {
-    setLoading(true);
+    setLoading(true)
     if (editingRow) {
-      setFormData(editingRow);
-      setLoading(false);
+      setFormData(editingRow)
+      setLoading(false)
     } else {
-      setFormData(initialData);
-      setLoading(false);
+      setFormData(initialData)
+      setLoading(false)
     }
-  }, [editingRow]);
+  }, [editingRow])
 
   const validateFormData = (data: OrganizationsType) => {
-    let isValid = true;
-    let errors = { name: "", prefix: "", active: "", organizationURL: "" };
+    let isValid = true
+    const errors = { name: "", prefix: "", active: "", organizationURL: "" }
 
     if (data.name.trim().length < 5) {
-      errors.name = "Organization Name must be at least 5 characters long";
-      isValid = false;
+      errors.name = "Organization Name must be at least 5 characters long"
+      isValid = false
     }
     if (data.prefix.trim().length === 0) {
-      errors.prefix = "This field is required";
-      isValid = false;
+      errors.prefix = "This field is required"
+      isValid = false
     }
     if (data.organizationURL.trim().length < 7) {
-      errors.organizationURL = "Organization URL must be valid & required";
-      isValid = false;
+      errors.organizationURL = "Organization URL must be valid & required"
+      isValid = false
     }
 
-    setFormErrors(errors);
-    return isValid;
-  };
+    setFormErrors(errors)
+    return isValid
+  }
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (validateFormData(formData)) {
       try {
-        setLoading(true);
-        const endpoint = editingRow ? organization.update : organization.create;
+        setLoading(true)
+        const endpoint = editingRow ? organization.update : organization.create
 
         const payload = {
           id: editingRow ? formData.id : undefined,
           name: formData.name,
           prefix: formData.prefix,
           organizationURL: formData.organizationURL,
-          active: formData.active,
-        };
+          active: formData.active
+        }
 
-        const response = await post(endpoint, payload);
+        const response = await post(endpoint, payload)
 
-        toast.success(response.message);
-        handleClose();
-        setFormData(response);
-        setLoading(false);
+        toast.success(response.message)
+        handleClose()
+        setFormData(response)
+        setLoading(false)
       } catch (error: any) {
-        console.error("Error fetching data:", error.message);
-        setLoading(false);
+        console.error("Error fetching data:", error.message)
+        setLoading(false)
       }
     }
-  };
+  }
 
   return (
     <>
@@ -129,12 +127,12 @@ const OrganizationsForm = ({
                     onChange={(e) => {
                       setFormErrors((prevErrors) => ({
                         ...prevErrors,
-                        name: "",
-                      }));
+                        name: ""
+                      }))
                       setFormData((prevData) => ({
                         ...prevData,
-                        name: e.target.value,
-                      }));
+                        name: e.target.value
+                      }))
                     }}
                   />
                 </Grid>
@@ -149,12 +147,12 @@ const OrganizationsForm = ({
                     onChange={(e) => {
                       setFormErrors((prevErrors) => ({
                         ...prevErrors,
-                        prefix: "",
-                      }));
+                        prefix: ""
+                      }))
                       setFormData((prevData) => ({
                         ...prevData,
-                        prefix: e.target.value,
-                      }));
+                        prefix: e.target.value
+                      }))
                     }}
                   />
                 </Grid>
@@ -182,12 +180,12 @@ const OrganizationsForm = ({
                     onChange={(e) => {
                       setFormErrors((prevErrors) => ({
                         ...prevErrors,
-                        organizationURL: "",
-                      }));
+                        organizationURL: ""
+                      }))
                       setFormData((prevData) => ({
                         ...prevData,
-                        organizationURL: e.target.value,
-                      }));
+                        organizationURL: e.target.value
+                      }))
                     }}
                   />
                 </Grid>
@@ -232,7 +230,7 @@ const OrganizationsForm = ({
         </form>
       </Card>
     </>
-  );
-};
+  )
+}
 
-export default OrganizationsForm;
+export default OrganizationsForm

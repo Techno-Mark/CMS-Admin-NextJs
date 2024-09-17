@@ -11,28 +11,26 @@ const switchOverrides: Theme['components'] = {
         '&:has(.Mui-disabled)': {
           opacity: 0.45
         },
-        ...(ownerState.size !== 'small'
-          ? {
-              width: 46,
-              height: 36,
-              padding: theme.spacing(2.25, 2)
+        ...(ownerState.size !== 'small' ? {
+          width: 46,
+          height: 36,
+          padding: theme.spacing(2.25, 2)
+        } : {
+          width: 42,
+          height: 30,
+          padding: theme.spacing(1.75, 2),
+          '& .MuiSwitch-thumb': {
+            width: 12,
+            height: 12
+          },
+          '& .MuiSwitch-switchBase': {
+            padding: 7,
+            left: 3,
+            '&.Mui-checked': {
+              left: -3
             }
-          : {
-              width: 42,
-              height: 30,
-              padding: theme.spacing(1.75, 2),
-              '& .MuiSwitch-thumb': {
-                width: 12,
-                height: 12
-              },
-              '& .MuiSwitch-switchBase': {
-                padding: 7,
-                left: 3,
-                '&.Mui-checked': {
-                  left: -3
-                }
-              }
-            })
+          }
+        })
       }),
       switchBase: ({ theme, ownerState }) => ({
         top: 2,

@@ -102,7 +102,7 @@ const target = join(__dirname, 'generated-icons.css')
  * Do stuff!
  */
 
-;(async function () {
+;(async function() {
   // Create directory for output if missing
   const dir = dirname(target)
 
@@ -229,7 +229,6 @@ const target = join(__dirname, 'generated-icons.css')
 
   // Save the CSS to a file
   await fs.writeFile(target, cssContent, 'utf8')
-
 })().catch(err => {
   console.error(err)
 })

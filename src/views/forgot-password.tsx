@@ -2,7 +2,6 @@
 
 // Next Imports
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
 
 // MUI Imports
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -25,40 +24,38 @@ import CustomTextField from '@core/components/mui/TextField'
 import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
 import { useState } from 'react'
-import { withoutAuthPost } from '@/services/apiService'
 import { authnetication } from '@/services/endpoint/auth'
 import { toast } from 'react-toastify'
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL
 // API Call
 const forgotPasswordAPI = async (email: string) => {
   try {
     const response = await fetch(`${API_URL}/${authnetication.forgot_password}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ email }),
-    });
+      body: JSON.stringify({ email })
+    })
 
     if (!response.ok) {
       // Handle non-200 responses
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to send reset password email');
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Failed to send reset password email')
     }
 
     // Parse and return the response data
-    const data = await response.json();
-    return data;
+    const data = await response.json()
+    return data
   } catch (error: any) {
-    console.error('Error during forgot password API call:', error.message);
-    throw error;
+    console.error('Error during forgot password API call:', error.message)
+    throw error
   }
-};
-
+}
 
 // Validation Schema
 const validationSchema = yup.object({
-  email: yup.string().email('Invalid email format').required('Email is required'),
+  email: yup.string().email('Invalid email format').required('Email is required')
 })
 
 // Styled Custom Components
@@ -69,11 +66,11 @@ const ForgotPasswordIllustration = styled('img')(({ theme }) => ({
   maxInlineSize: '100%',
   margin: theme.spacing(12),
   [theme.breakpoints.down(1536)]: {
-    maxBlockSize: 550,
+    maxBlockSize: 550
   },
   [theme.breakpoints.down('lg')]: {
-    maxBlockSize: 450,
-  },
+    maxBlockSize: 450
+  }
 }))
 
 const MaskImg = styled('img')({
@@ -82,7 +79,7 @@ const MaskImg = styled('img')({
   inlineSize: '100%',
   position: 'absolute',
   insetBlockEnd: 0,
-  zIndex: -1,
+  zIndex: -1
 })
 
 const ForgotPassword = ({ mode }: { mode: SystemMode }) => {
@@ -93,7 +90,6 @@ const ForgotPassword = ({ mode }: { mode: SystemMode }) => {
   const lightIllustration = '/images/illustrations/auth/v2-forgot-password-light.png'
 
   // Hooks
-  const { lang: locale } = useParams()
   const { settings } = useSettings()
   const theme = useTheme()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
@@ -106,6 +102,7 @@ const ForgotPassword = ({ mode }: { mode: SystemMode }) => {
   const [status, setStatus] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // eslint-disable-next-line no-undef
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -140,7 +137,7 @@ const ForgotPassword = ({ mode }: { mode: SystemMode }) => {
         className={classnames(
           'flex bs-full items-center justify-center flex-1 min-bs-[100dvh] relative p-6 max-md:hidden',
           {
-            'border-ie': settings.skin === 'bordered',
+            'border-ie': settings.skin === 'bordered'
           }
         )}
       >
@@ -189,9 +186,6 @@ const ForgotPassword = ({ mode }: { mode: SystemMode }) => {
 
 export default ForgotPassword
 
-
-
-
 // 'use client'
 
 // // React Imports
@@ -209,11 +203,8 @@ export default ForgotPassword
 // import InputAdornment from '@mui/material/InputAdornment'
 // import Button from '@mui/material/Button'
 
-
 // import Logo from '@components/layout/shared/Logo'
 // import CustomTextField from '@core/components/mui/TextField'
-
-
 
 // // Styled Component Imports
 // import AuthIllustrationWrapper from './AuthIllustrationWrapper'

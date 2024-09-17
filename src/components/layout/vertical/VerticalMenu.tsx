@@ -11,7 +11,6 @@ import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Me
 
 // Component Imports
 import { Menu, MenuItem, SubMenu } from '@menu/vertical-menu'
-import CustomChip from '@core/components/mui/Chip'
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
@@ -24,9 +23,6 @@ import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNav
 import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 import { useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
-import { getDecryptedPermissionData } from '@/utils/storageService'
-import { Skeleton, Stack } from '@mui/material'
 
 type RenderExpandIconProps = {
   open?: boolean
@@ -44,9 +40,9 @@ const RenderExpandIcon = ({ open, transitionDuration }: RenderExpandIconProps) =
   </StyledVerticalNavExpandIcon>
 )
 
-const VerticalMenu = ({ scrollMenu,permissionData }: Props) => {
-  console.log(permissionData);
-  
+const VerticalMenu = ({ scrollMenu, permissionData }: Props) => {
+  console.log(permissionData)
+
   // Hooks
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
@@ -60,7 +56,7 @@ const VerticalMenu = ({ scrollMenu,permissionData }: Props) => {
 
   // State to hold decrypted permission data
   // const [permissionData, setPermissionData] = useState<Record<string, string[]>>({})
-  const [loading, setLoading] = useState(true) // Add loading state
+  // const [loading, setLoading] = useState(true) // Add loading state
 
   // Fetch decrypted data once on component mount
   // const fetchDecryptedData = async () => {
@@ -77,10 +73,10 @@ const VerticalMenu = ({ scrollMenu,permissionData }: Props) => {
   // }
 
   // useEffect(() => {
-    // setTimeout(() => {
+  // setTimeout(() => {
 
-      // fetchDecryptedData() // Retrieve and decrypt the permission data on initial load
-    // }, 3000);
+  // fetchDecryptedData() // Retrieve and decrypt the permission data on initial load
+  // }, 3000);
   // }, [])
 
   const hasPermission = (menuKey: string) => permissionData && permissionData[menuKey]
@@ -96,15 +92,13 @@ const VerticalMenu = ({ scrollMenu,permissionData }: Props) => {
   // }
   return (
     <ScrollWrapper
-      {...(isBreakpointReached
-        ? {
-          className: 'bs-full overflow-y-auto overflow-x-hidden',
-          onScroll: container => scrollMenu(container, false)
-        }
-        : {
-          options: { wheelPropagation: false, suppressScrollX: true },
-          onScrollY: container => scrollMenu(container, true)
-        })}
+      {...(isBreakpointReached ? {
+        className: 'bs-full overflow-y-auto overflow-x-hidden',
+        onScroll: container => scrollMenu(container, false)
+      } : {
+        options: { wheelPropagation: false, suppressScrollX: true },
+        onScrollY: container => scrollMenu(container, true)
+      })}
     >
       <Menu
         popoutMenuOffset={{ mainAxis: 23 }}
@@ -132,14 +126,12 @@ const VerticalMenu = ({ scrollMenu,permissionData }: Props) => {
           </MenuItem>
         )}
 
-
         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Page')) && (
           <MenuItem href='/content-management/pages' icon={<i className='tabler-brand-pagekit' />}>
             Pages
           </MenuItem>
         )}
-
 
         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Menu')) && (
@@ -154,7 +146,6 @@ const VerticalMenu = ({ scrollMenu,permissionData }: Props) => {
             Popup
           </MenuItem>
         )}
-
 
         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Event')) && (

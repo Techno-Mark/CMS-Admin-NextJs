@@ -6,51 +6,41 @@ const tabs: Theme['components'] = {
     styleOverrides: {
       root: ({ theme, ownerState }) => ({
         minBlockSize: 38,
-        ...(ownerState.orientation === 'horizontal'
-          ? {
-              borderBlockEnd: '1px solid var(--mui-palette-divider)'
-            }
-          : {
-              borderInlineEnd: '1px solid var(--mui-palette-divider)'
-            }),
+        ...(ownerState.orientation === 'horizontal' ? {
+          borderBlockEnd: '1px solid var(--mui-palette-divider)'
+        } : {
+          borderInlineEnd: '1px solid var(--mui-palette-divider)'
+        }),
         '& .MuiTab-root:hover': {
-          ...(ownerState.orientation === 'horizontal'
-            ? {
-                paddingBlockEnd: theme.spacing(1.5),
-                ...(ownerState.textColor === 'secondary'
-                  ? {
-                      color: 'var(--mui-palette-secondary-main)',
-                      borderBlockEnd: '2px solid var(--mui-palette-secondary-lightOpacity)'
-                    }
-                  : {
-                      color: 'var(--mui-palette-primary-main)',
-                      borderBlockEnd: '2px solid var(--mui-palette-primary-lightOpacity)'
-                    })
-              }
-            : {
-                paddingInlineEnd: theme.spacing(4.5),
-                ...(ownerState.textColor === 'secondary'
-                  ? {
-                      color: 'var(--mui-palette-secondary-main)',
-                      borderInlineEnd: '2px solid var(--mui-palette-secondary-mainOpacity)'
-                    }
-                  : {
-                      color: 'var(--mui-palette-primary-main)',
-                      borderInlineEnd: '2px solid var(--mui-palette-primary-mainOpacity)'
-                    })
-              }),
+          ...(ownerState.orientation === 'horizontal' ? {
+            paddingBlockEnd: theme.spacing(1.5),
+            ...(ownerState.textColor === 'secondary' ? {
+              color: 'var(--mui-palette-secondary-main)',
+              borderBlockEnd: '2px solid var(--mui-palette-secondary-lightOpacity)'
+            } : {
+              color: 'var(--mui-palette-primary-main)',
+              borderBlockEnd: '2px solid var(--mui-palette-primary-lightOpacity)'
+            })
+          } : {
+            paddingInlineEnd: theme.spacing(4.5),
+            ...(ownerState.textColor === 'secondary' ? {
+              color: 'var(--mui-palette-secondary-main)',
+              borderInlineEnd: '2px solid var(--mui-palette-secondary-mainOpacity)'
+            } : {
+              color: 'var(--mui-palette-primary-main)',
+              borderInlineEnd: '2px solid var(--mui-palette-primary-mainOpacity)'
+            })
+          }),
           '& .MuiTabScrollButton-root': {
             borderRadius: theme.shape.borderRadius
           }
         },
         '& ~ .MuiTabPanel-root': {
-          ...(ownerState.orientation === 'horizontal'
-            ? {
-                paddingBlockStart: theme.spacing(6)
-              }
-            : {
-                paddingInlineStart: theme.spacing(6)
-              })
+          ...(ownerState.orientation === 'horizontal' ? {
+            paddingBlockStart: theme.spacing(6)
+          } : {
+            paddingInlineStart: theme.spacing(6)
+          })
         }
       }),
       vertical: {

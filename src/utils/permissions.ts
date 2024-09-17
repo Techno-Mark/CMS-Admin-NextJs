@@ -1,33 +1,31 @@
-
-import { useEffect, useState } from "react";
-import { getDecryptedPermissionData } from "./storageService";
+import { useEffect, useState } from "react"
+import { getDecryptedPermissionData } from "./storageService"
 type PermissionData = Record<string, string[]>;
 export const usePermission = () => {
-  const [permissionData, setPermissionData] = useState<PermissionData>({});
-  const [userId, setUserId] = useState();
- 
+  const [permissionData, setPermissionData] = useState<PermissionData>({})
+  const [userId, setUserId] = useState()
+
   const fetchDecryptedData = async () => {
     try {
-      const data = await getDecryptedPermissionData(); 
+      const data = await getDecryptedPermissionData()
       if (data) {
         setUserId(data.currentUserId)
-        setPermissionData(data.moduleWisePermissions);
+        setPermissionData(data.moduleWisePermissions)
       }
     } catch (error) {
-      console.error("Error fetching decrypted data:", error);
+      console.error("Error fetching decrypted data:", error)
     }
-  };
-  
-  useEffect(() => {
+  }
 
-    fetchDecryptedData();
-  }, []);
+  useEffect(() => {
+    fetchDecryptedData()
+  }, [])
   const hasPermission = (module: string, action: string): boolean => {
     if (userId == 1) {
-      return true;
+      return true
     }
-    return permissionData[module]?.includes(action) ?? false;
-  };
+    return permissionData[module]?.includes(action) ?? false
+  }
 
-  return { hasPermission ,fetchDecryptedData};
-};
+  return { hasPermission, fetchDecryptedData }
+}

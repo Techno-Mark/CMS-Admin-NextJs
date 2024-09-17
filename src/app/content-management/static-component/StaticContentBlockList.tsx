@@ -1,13 +1,13 @@
-"use client";
+"use client"
 
-import { useEffect, useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import Card from "@mui/material/Card";
-import { TablePagination, TextFieldProps, Tooltip } from "@mui/material";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import classnames from "classnames";
-import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
+import { useEffect, useState, useMemo } from "react"
+import { useRouter } from "next/navigation"
+import Card from "@mui/material/Card"
+import { TablePagination, TextFieldProps, Tooltip } from "@mui/material"
+import Typography from "@mui/material/Typography"
+import IconButton from "@mui/material/IconButton"
+import classnames from "classnames"
+import { rankItem } from "@tanstack/match-sorter-utils"
 import {
   createColumnHelper,
   flexRender,
@@ -15,40 +15,30 @@ import {
   useReactTable,
   getFilteredRowModel,
   getPaginationRowModel,
-  getSortedRowModel,
-} from "@tanstack/react-table";
-import type { ColumnDef, FilterFn } from "@tanstack/react-table";
-import CustomTextField from "@core/components/mui/TextField";
-import tableStyles from "@core/styles/table.module.css";
+  getSortedRowModel
+} from "@tanstack/react-table"
+import type { ColumnDef, FilterFn } from "@tanstack/react-table"
+import CustomTextField from "@core/components/mui/TextField"
+import tableStyles from "@core/styles/table.module.css"
 // import ConfirmationDialog from "./ConfirmationDialog";
-import { post, postDataToOrganizationAPIs } from "@/services/apiService";
-import { TemplateType } from "@/types/apps/templateType";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import LoadingBackdrop from "@/components/LoadingBackdrop";
-import { staticContentBlock } from "@/services/endpoint/staticContentBlock";
-import { staticContentBlockType } from "@/types/apps/staticContentBlockType";
-import { authnetication } from "@/services/endpoint/auth";
-import { getDecryptedPermissionData, storePermissionData } from "@/utils/storageService";
-import { useSession } from "next-auth/react";
-
-declare module "@tanstack/table-core" {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
-}
+import { post, postDataToOrganizationAPIs } from "@/services/apiService"
+import { TemplateType } from "@/types/apps/templateType"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import LoadingBackdrop from "@/components/LoadingBackdrop"
+import { staticContentBlock } from "@/services/endpoint/staticContentBlock"
+import { staticContentBlockType } from "@/types/apps/staticContentBlockType"
+import { authnetication } from "@/services/endpoint/auth"
+import { getDecryptedPermissionData, storePermissionData } from "@/utils/storageService"
 
 type StaticComponentTypeWithAction = staticContentBlockType & {
   action?: string;
 };
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-  const itemRank = rankItem(row.getValue(columnId), value);
-  addMeta({ itemRank });
-  return itemRank.passed;
-};
+  const itemRank = rankItem(row.getValue(columnId), value)
+  addMeta({ itemRank })
+  return itemRank.passed
+}
 
 const DebouncedInput = ({
   value: initialValue,
@@ -60,18 +50,18 @@ const DebouncedInput = ({
   onChange: (value: string | number) => void;
   debounce?: number;
 } & Omit<TextFieldProps, "onChange">) => {
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState(initialValue)
 
   useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
+    setValue(initialValue)
+  }, [initialValue])
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      onChange(value);
-    }, debounce);
-    return () => clearTimeout(timeout);
-  }, [value, onChange, debounce]);
+      onChange(value)
+    }, debounce)
+    return () => clearTimeout(timeout)
+  }, [value, onChange, debounce])
 
   return (
     <CustomTextField
@@ -79,33 +69,33 @@ const DebouncedInput = ({
       value={value}
       onChange={(e) => setValue(e.target.value)}
     />
-  );
-};
+  )
+}
 
-const columnHelper = createColumnHelper<StaticComponentTypeWithAction>();
+const columnHelper = createColumnHelper<StaticComponentTypeWithAction>()
 
 const StaticContentBlockList = () => {
-  const [userIdRole, setUserIdRole] = useState();
-  const [userPermissionData, setUserPermissionData] = useState();
+  const [userIdRole, setUserIdRole] = useState()
+  const [userPermissionData, setUserPermissionData] = useState()
   const getPermissionModule = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const data = await getDecryptedPermissionData();
+      const data = await getDecryptedPermissionData()
       if (data) {
-        setUserIdRole(data.currentUserId);
+        setUserIdRole(data.currentUserId)
         setUserPermissionData(data.moduleWisePermissions)
-        await storePermissionData(data);
+        await storePermissionData(data)
       }
       if (!data) {
-        const result = await post(authnetication.user_permission_data, {});
-        setUserIdRole(result.data.currentUserId);
+        const result = await post(authnetication.user_permission_data, {})
+        setUserIdRole(result.data.currentUserId)
         setUserPermissionData(result.data.moduleWisePermissions)
-        await storePermissionData(result.data);
-        setLoading(false);
+        await storePermissionData(result.data)
+        setLoading(false)
       }
     } catch (error: any) {
-      console.error(error);
-      setLoading(false);
+      console.error(error)
+      setLoading(false)
     }
     // try {
     //   const result = await post(authnetication.user_permission_data, {});
@@ -123,58 +113,57 @@ const StaticContentBlockList = () => {
     //   console.error(error);
     //   setLoading(false);
     // }
-  };
+  }
   function hasPermission(module: string, action: string) {
     if (userIdRole == 1) {
-      return true;
+      return true
     }
     // @ts-ignore
-    return userPermissionData?.[module]?.includes(action) ?? false;
-  };
+    return userPermissionData?.[module]?.includes(action) ?? false
+  }
 
-  const hasCheckModule = (menuKey: string): boolean => !!(userPermissionData && userPermissionData[menuKey]);
-  const router = useRouter();
+  const router = useRouter()
 
-  const [rowSelection, setRowSelection] = useState({});
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [rowSelection, setRowSelection] = useState({})
+  const [globalFilter, setGlobalFilter] = useState("")
 
-  const [data, setData] = useState<TemplateType[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(10);
-  const [totalRows, setTotalRows] = useState<number>(0);
-  const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
+  const [data, setData] = useState<TemplateType[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [, setError] = useState<string | null>(null)
+  const [page, setPage] = useState<number>(0)
+  const [pageSize, setPageSize] = useState<number>(10)
+  const [totalRows, setTotalRows] = useState<number>(0)
+  const [activeFilter] = useState<boolean | null>(null)
 
   const getData = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
       const result = await postDataToOrganizationAPIs(staticContentBlock.list, {
         page: page + 1,
         limit: pageSize,
         search: globalFilter,
-        active: activeFilter,
-      });
+        active: activeFilter
+      })
       getPermissionModule()
-      setData(result.data.sections);
-      setTotalRows(result.data.totalSections);
+      setData(result.data.sections)
+      setTotalRows(result.data.totalSections)
     } catch (error: any) {
-      setError(error.message);
+      setError(error.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    getData();
+    getData()
     const handleStorageUpdate = async () => {
-      getData();
-    };
-    window.addEventListener("localStorageUpdate", handleStorageUpdate);
+      getData()
+    }
+    window.addEventListener("localStorageUpdate", handleStorageUpdate)
     return () => {
-      window.removeEventListener("localStorageUpdate", handleStorageUpdate);
-    };
-  }, [page, pageSize, globalFilter, activeFilter]);
+      window.removeEventListener("localStorageUpdate", handleStorageUpdate)
+    }
+  }, [page, pageSize, globalFilter, activeFilter])
 
   const columns = useMemo<ColumnDef<StaticComponentTypeWithAction, any>[]>(
     () => [
@@ -185,7 +174,7 @@ const StaticContentBlockList = () => {
             {row.index + 1 + page * pageSize}
           </Typography>
         ),
-        enableSorting: false,
+        enableSorting: false
       }),
 
       columnHelper.accessor("sectionName", {
@@ -194,7 +183,7 @@ const StaticContentBlockList = () => {
           <Typography color="text.primary" className="font-medium">
             {row.original.sectionName}
           </Typography>
-        ),
+        )
       }),
 
       columnHelper.accessor("sectionSlug", {
@@ -204,7 +193,7 @@ const StaticContentBlockList = () => {
             {row.original.sectionSlug}
           </Typography>
         ),
-        enableSorting: false,
+        enableSorting: false
       }),
 
       columnHelper.accessor("createdAt", {
@@ -213,7 +202,7 @@ const StaticContentBlockList = () => {
           <Typography color="text.primary" className="font-medium">
             {row.original.createdAt}
           </Typography>
-        ),
+        )
       }),
 
       columnHelper.accessor("sectionId", {
@@ -249,11 +238,11 @@ const StaticContentBlockList = () => {
               ))}
           </div>
         ),
-        enableSorting: false,
-      }),
+        enableSorting: false
+      })
     ],
     [router, page, pageSize, userPermissionData]
-  );
+  )
 
   const table = useReactTable({
     data,
@@ -262,7 +251,7 @@ const StaticContentBlockList = () => {
     state: {
       rowSelection,
       globalFilter,
-      pagination: { pageIndex: page, pageSize },
+      pagination: { pageIndex: page, pageSize }
     },
     globalFilterFn: fuzzyFilter,
     onRowSelectionChange: setRowSelection,
@@ -272,21 +261,21 @@ const StaticContentBlockList = () => {
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     manualPagination: true,
-    pageCount: Math.ceil(totalRows / pageSize),
-  });
+    pageCount: Math.ceil(totalRows / pageSize)
+  })
 
   const handlePageChange = (event: unknown, newPage: number) => {
     if (newPage !== page) {
-      setPage(newPage);
+      setPage(newPage)
     }
-  };
+  }
 
   const handleRowsPerPageChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setPageSize(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+    setPageSize(parseInt(event.target.value, 10))
+    setPage(0)
+  }
 
   return (
     <>
@@ -317,7 +306,7 @@ const StaticContentBlockList = () => {
                             className={classnames({
                               "flex items-center": header.column.getIsSorted(),
                               "cursor-pointer select-none":
-                                header.column.getCanSort(),
+                                header.column.getCanSort()
                             })}
                             onClick={header.column.getToggleSortingHandler()}
                           >
@@ -329,7 +318,7 @@ const StaticContentBlockList = () => {
                               asc: <i className="tabler-chevron-up text-xl" />,
                               desc: (
                                 <i className="tabler-chevron-down text-xl" />
-                              ),
+                              )
                             }[header.column.getIsSorted() as "asc" | "desc"] ??
                               null}
                           </div>
@@ -356,7 +345,7 @@ const StaticContentBlockList = () => {
                     <tr
                       key={row.id}
                       className={classnames({
-                        selected: row.getIsSelected(),
+                        selected: row.getIsSelected()
                       })}
                     >
                       {row.getVisibleCells().map((cell) => (
@@ -385,7 +374,7 @@ const StaticContentBlockList = () => {
 
       </div>
     </>
-  );
-};
+  )
+}
 
-export default StaticContentBlockList;
+export default StaticContentBlockList

@@ -1,19 +1,19 @@
-"use client";
+"use client"
 
-import { useRouter } from 'next/navigation';
-import OrganizationsForm from '../OrganizationsForm';
+import { useRouter } from 'next/navigation'
+import OrganizationsForm from '../OrganizationsForm'
 
-const page = ({ params }: { params: {  } }) => {
-  const router = useRouter();
+const Page = ({ params }: { params: { } }) => {
+  const router = useRouter()
 
   return (
     <OrganizationsForm
       open={-1}
       editingRow={null}
-      setEditingRow={()=>{}}
+      setEditingRow={() => {}}
       handleClose={() => router.push('/settings/organizations')}
     />
-  );
-};
+  )
+}
 
-export default page;
+export default Page

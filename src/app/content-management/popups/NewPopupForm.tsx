@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import LoadingBackdrop from "@/components/LoadingBackdrop";
+import LoadingBackdrop from "@/components/LoadingBackdrop"
 import {
   Button,
   Box,
@@ -12,24 +12,23 @@ import {
   IconButton,
   FormControlLabel,
   Checkbox,
-  Switch,
-} from "@mui/material";
-import CustomTextField from "@/@core/components/mui/TextField";
-import React, { useEffect, useState } from "react";
-import CustomAutocomplete from "@/@core/components/mui/Autocomplete";
-import { useRouter } from "next/navigation";
-import { useDropzone } from "react-dropzone";
-import { post, postContentBlock } from "@/services/apiService";
-import { toast } from "react-toastify";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import AppReactDatepicker from "@/libs/styles/AppReactDatepicker";
-import { popups } from "@/services/endpoint/popup";
-import { pages } from "@/services/endpoint/pages";
+  Switch
+} from "@mui/material"
+import CustomTextField from "@/@core/components/mui/TextField"
+import React, { useEffect, useState } from "react"
+import CustomAutocomplete from "@/@core/components/mui/Autocomplete"
+import { useDropzone } from "react-dropzone"
+import { post, postContentBlock } from "@/services/apiService"
+import { toast } from "react-toastify"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import AppReactDatepicker from "@/libs/styles/AppReactDatepicker"
+import { popups } from "@/services/endpoint/popup"
+import { pages } from "@/services/endpoint/pages"
 
 const popupActions = {
   ADD: -1,
-  EDIT: 1,
-};
+  EDIT: 1
+}
 
 const initialFormData = {
   id: -1,
@@ -47,8 +46,8 @@ const initialFormData = {
   btnText: "",
   btnLink: "",
   image: "",
-  location: "",
-};
+  location: ""
+}
 
 const initialErrorData = {
   id: -1,
@@ -65,179 +64,177 @@ const initialErrorData = {
   btnText: "",
   btnLink: "",
   image: "",
-  location: "",
-};
+  location: ""
+}
 
 function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
-  const router = useRouter();
-
-  const [popupType, setPopupType] = useState("Event");
-  const [allPages, setAllPages] = useState(false);
+  const [popupType, setPopupType] = useState("Event")
+  const [allPages, setAllPages] = useState(false)
   const [selectedPages, setSelectedPages] = useState<
     Array<{ pageName: string; pageId: number }> | []
-  >([]);
-  const [isParamanent, setIsParamanent] = useState(false);
+  >([])
+  const [isParamanent, setIsParamanent] = useState(false)
 
-  //state management hook
-  const [image, setImage] = useState<File | null>(null);
-  const [isImageTouched, setIsImageTouched] = useState(false);
+  // state management hook
+  const [image, setImage] = useState<File | null>(null)
+  const [isImageTouched, setIsImageTouched] = useState(false)
   const [formData, setFormData] =
-    useState<typeof initialFormData>(initialFormData);
+    useState<typeof initialFormData>(initialFormData)
   const [formErrors, setFormErrors] =
-    useState<typeof initialErrorData>(initialErrorData);
+    useState<typeof initialErrorData>(initialErrorData)
 
-  //page list hooks & other list apis data
+  // page list hooks & other list apis data
   const [pageList, setPageList] = useState<
     Array<{ pageName: string; pageId: number }> | []
-  >([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  >([])
+  const [loading, setLoading] = useState<boolean>(true)
 
   const { getRootProps: getImageRootProps, getInputProps: getImageInputProps } =
     useDropzone({
       multiple: false,
       accept: {
-        "image/*": [".png", ".jpg", ".jpeg", ".gif"],
+        "image/*": [".png", ".jpg", ".jpeg", ".gif"]
       },
       onDrop: (acceptedFiles: File[]) => {
-        setFormErrors({ ...formErrors, image: "" });
-        setImage(acceptedFiles[0]);
-        setIsImageTouched(true);
-      },
-    });
+        setFormErrors({ ...formErrors, image: "" })
+        setImage(acceptedFiles[0])
+        setIsImageTouched(true)
+      }
+    })
 
   useEffect(() => {
-    getRequiredData();
-  }, []);
+    getRequiredData()
+  }, [])
 
   const validateForm = () => {
-    const errors = { ...initialErrorData };
-    let isValid = true;
+    const errors = { ...initialErrorData }
+    let isValid = true
     if (!formData.title) {
-      errors.title = "title is required";
-      isValid = false;
+      errors.title = "title is required"
+      isValid = false
     }
 
     if (popupType === "Event") {
       if (!formData.eventTitle) {
-        errors.eventTitle = "event title is required";
-        isValid = false;
+        errors.eventTitle = "event title is required"
+        isValid = false
       }
       if (!formData.btnLink) {
-        errors.btnLink = "button link is required";
-        isValid = false;
+        errors.btnLink = "button link is required"
+        isValid = false
       }
     }
     if (!formData.heading) {
-      errors.heading = "heading is required";
-      isValid = false;
+      errors.heading = "heading is required"
+      isValid = false
     }
     if (!formData.supportingLine) {
-      errors.supportingLine = "supporting line is required";
-      isValid = false;
+      errors.supportingLine = "supporting line is required"
+      isValid = false
     }
     if (!formData.btnText) {
-      errors.btnText = "button text is required";
-      isValid = false;
+      errors.btnText = "button text is required"
+      isValid = false
     }
 
     if (!image && open == popupActions.ADD) {
-      errors.image = "image is required";
-      isValid = false;
+      errors.image = "image is required"
+      isValid = false
     }
 
     if (!formData.location) {
-      errors.location = "location is required";
-      isValid = false;
+      errors.location = "location is required"
+      isValid = false
     }
 
-    setFormErrors(errors);
-    return isValid;
-  };
+    setFormErrors(errors)
+    return isValid
+  }
 
   // Get Active Template List
   const getRequiredData = async () => {
     try {
-      setLoading(true);
-      const [pagesResponse] = await Promise.all([post(`${pages.active}`, {})]);
-      let pagesData = pagesResponse?.data?.pages;
-      setPageList(pagesResponse?.data?.pages);
+      setLoading(true)
+      const [pagesResponse] = await Promise.all([post(`${pages.active}`, {})])
+      const pagesData = pagesResponse?.data?.pages
+      setPageList(pagesResponse?.data?.pages)
 
-      //Update edit form
+      // Update edit form
       if (open === popupActions.EDIT) {
-        let data = {
-          ...editingRow?.data,
-        };
-        data.id = editingRow.popupId;
-        data.title = editingRow.title;
-        data.active = editingRow.active;
-        setIsParamanent(editingRow?.data.isParamanent);
-        setAllPages(editingRow?.data?.allPages);
-        setSelectedPages(editingRow?.data?.selectedPages);
+        const data = {
+          ...editingRow?.data
+        }
+        data.id = editingRow.popupId
+        data.title = editingRow.title
+        data.active = editingRow.active
+        setIsParamanent(editingRow?.data.isParamanent)
+        setAllPages(editingRow?.data?.allPages)
+        setSelectedPages(editingRow?.data?.selectedPages)
         const preSelectedOptions = pagesData.filter((option: any) =>
           editingRow?.data?.selectedPages?.includes(option.pageId)
-        );
+        )
 
-        setSelectedPages(preSelectedOptions);
+        setSelectedPages(preSelectedOptions)
 
-        setFormData(data);
+        setFormData(data)
       }
 
-      setLoading(false);
+      setLoading(false)
     } catch (error) {
-      setLoading(false);
-      console.error(error);
+      setLoading(false)
+      console.error(error)
     }
-  };
+  }
 
   const handleSubmit = async (data: any) => {
     try {
       if (!validateForm()) {
-        return;
+        return
       }
 
-      setLoading(true);
+      setLoading(true)
 
-      let data = {
+      const data = {
         ...formData,
-        popupType: popupType,
-        allPages: allPages,
-        selectedPages: selectedPages,
-        isParamanent: isParamanent,
-      };
-
-      //@ts-ignore
-      data.selectedPages = selectedPages.map((item) => item.pageId);
-
-      const finalData = new FormData();
-      finalData.append("title", formData.title);
-      finalData.append("data", JSON.stringify(data));
-      finalData.append("active", String(formData.active));
-      if (image) {
-        finalData.append("image", image as unknown as Blob);
+        popupType,
+        allPages,
+        selectedPages,
+        isParamanent
       }
-      let result;
+
+      // @ts-ignore
+      data.selectedPages = selectedPages.map((item) => item.pageId)
+
+      const finalData = new FormData()
+      finalData.append("title", formData.title)
+      finalData.append("data", JSON.stringify(data))
+      finalData.append("active", String(formData.active))
+      if (image) {
+        finalData.append("image", image as unknown as Blob)
+      }
+      let result
       if (open === popupActions.EDIT) {
-        finalData.append("popupId", formData.id.toString());
-        result = await postContentBlock(popups.update, finalData);
+        finalData.append("popupId", formData.id.toString())
+        result = await postContentBlock(popups.update, finalData)
       } else {
-        result = await postContentBlock(popups.create, finalData);
+        result = await postContentBlock(popups.create, finalData)
       }
       if (result.status === "success") {
-        toast.success(result.message);
-        handleClose();
+        toast.success(result.message)
+        handleClose()
       } else {
-        toast.error(result.message);
+        toast.error(result.message)
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleChange = (event: any, newValue: any[]) => {
-    setSelectedPages(newValue);
-  };
+    setSelectedPages(newValue)
+  }
 
   return (
     <>
@@ -268,7 +265,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                 placeholder=""
                 value={formData.title}
                 onChange={(e) => {
-                  setFormData({ ...formData, title: e.target.value });
+                  setFormData({ ...formData, title: e.target.value })
                 }}
               />
             </Grid>
@@ -356,8 +353,8 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   onChange={(e) => {
                     setFormData({
                       ...formData,
-                      frequency: Number(e.target.value),
-                    });
+                      frequency: Number(e.target.value)
+                    })
                   }}
                 />
               </Grid>
@@ -374,7 +371,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   placeholder=""
                   value={formData.delay}
                   onChange={(e) => {
-                    setFormData({ ...formData, delay: Number(e.target.value) });
+                    setFormData({ ...formData, delay: Number(e.target.value) })
                   }}
                 />
               </Grid>
@@ -422,8 +419,8 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   onChange={(date: Date) => {
                     setFormData({
                       ...formData,
-                      eventStartDate: date.toString(),
-                    });
+                      eventStartDate: date.toString()
+                    })
                   }}
                   customInput={
                     <CustomTextField label="Event Date*" fullWidth />
@@ -438,7 +435,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   selected={new Date(formData.eventEndDate)}
                   minDate={new Date()}
                   onChange={(date: Date) => {
-                    setFormData({ ...formData, eventEndDate: date.toString() });
+                    setFormData({ ...formData, eventEndDate: date.toString() })
                   }}
                   customInput={
                     <CustomTextField label="Event End Date*" fullWidth />
@@ -457,7 +454,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   placeholder="Event"
                   value={formData.eventTitle}
                   onChange={(e) => {
-                    setFormData({ ...formData, eventTitle: e.target.value });
+                    setFormData({ ...formData, eventTitle: e.target.value })
                   }}
                 />
               </Grid>
@@ -477,7 +474,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   placeholder="Heading"
                   value={formData.heading}
                   onChange={(e) => {
-                    setFormData({ ...formData, heading: e.target.value });
+                    setFormData({ ...formData, heading: e.target.value })
                   }}
                 />
               </Grid>
@@ -499,8 +496,8 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   onChange={(e) => {
                     setFormData({
                       ...formData,
-                      supportingLine: e.target.value,
-                    });
+                      supportingLine: e.target.value
+                    })
                   }}
                 />
               </Grid>
@@ -519,7 +516,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   placeholder=""
                   value={formData.btnText}
                   onChange={(e) => {
-                    setFormData({ ...formData, btnText: e.target.value });
+                    setFormData({ ...formData, btnText: e.target.value })
                   }}
                 />
               </Grid>
@@ -535,7 +532,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   placeholder=""
                   value={formData.btnLink}
                   onChange={(e) => {
-                    setFormData({ ...formData, btnLink: e.target.value });
+                    setFormData({ ...formData, btnLink: e.target.value })
                   }}
                 />
               </Grid>
@@ -551,7 +548,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   placeholder=""
                   value={formData.location}
                   onChange={(e) => {
-                    setFormData({ ...formData, location: e.target.value });
+                    setFormData({ ...formData, location: e.target.value })
                   }}
                 />
               </Grid>
@@ -585,6 +582,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   <input {...getImageInputProps()} />
                   <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
                     {open == popupActions.EDIT && !isImageTouched && (
+                      // eslint-disable-next-line
                       <img
                         className="object-contain w-full h-full"
                         src={
@@ -595,6 +593,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                       />
                     )}
                     {image && isImageTouched && (
+                      // eslint-disable-next-line
                       <img
                         key={image.name}
                         alt={image.name}
@@ -628,7 +627,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                             through your machine
                           </Typography>
                         </>
-                      )}
+                    )}
                   </div>
                 </Box>
               </div>
@@ -658,7 +657,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   color="error"
                   type="reset"
                   onClick={() => {
-                    handleClose();
+                    handleClose()
                   }}
                 >
                   Cancel
@@ -678,7 +677,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
         </Box>
       </Card>
     </>
-  );
+  )
 }
 
-export default NewPopupForm;
+export default NewPopupForm
