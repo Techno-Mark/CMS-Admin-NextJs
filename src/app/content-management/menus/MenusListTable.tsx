@@ -173,7 +173,7 @@ const MenuListTable = () => {
         enableSorting: false
       }),
       columnHelper.accessor("menuName", {
-        header: "menuName",
+        header: "Name",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
             {row.original.menuName}
@@ -181,7 +181,7 @@ const MenuListTable = () => {
         )
       }),
       columnHelper.accessor("menuLocation", {
-        header: "menuLocation",
+        header: "Location",
         cell: ({ row }) => (
           <Typography color="text.primary" className="font-medium">
             {truncateText(row.original.menuLocation, 25)}
