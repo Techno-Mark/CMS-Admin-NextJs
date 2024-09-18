@@ -151,6 +151,13 @@ const VerticalMenu = ({ scrollMenu, permissionData }: Props) => {
             Events
           </MenuItem>
         )}
+
+        {/* @ts-ignore */}
+        {(session?.user?.id === 1 || hasPermission('Career')) && (
+          <MenuItem href='/content-management/career' icon={<i className='tabler-briefcase' />}>
+            Career
+          </MenuItem>
+        )}
         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Media')) && (
           <MenuItem href={`/content-management/media`} icon={<i className='tabler-file-upload'></i>}>
