@@ -68,7 +68,7 @@ const OrganizationsForm = ({
       isValid = false
     }
     if (data.prefix.trim().length === 0) {
-      errors.prefix = "This field is required"
+      errors.prefix = "Organization prefix is required"
       isValid = false
     }
     if (data.organizationURL.trim().length < 7) {
