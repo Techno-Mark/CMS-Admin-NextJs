@@ -186,10 +186,10 @@ const ContentBlockForm = ({ open }: Props) => {
     }
 
     if (data.slug.trim().length === 0) {
-      errors.slug = 'Section Slug is required'
+      errors.slug = 'Slug is required'
       isValid = false
     } else if (!slugRegex.test(data.slug)) {
-      errors.slug = 'Section Slug must be alphanumeric with no spaces or special characters.'
+      errors.slug = 'Slug must be alphanumeric with no spaces or special characters.'
       isValid = false
     }
 
@@ -457,7 +457,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                       onClick={handleAddRow}
                                       aria-label="plus"
                                       color="success"
-                                      style={{ marginLeft: 8 }}
+                                      style={{ marginLeft: 0 }}
                                     >
                                       <i className="tabler-plus" />
                                     </IconButton>
@@ -570,7 +570,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                                       onClick={() => handleAddSubRow(index)}
                                                       aria-label="plus"
                                                       color="success"
-                                                      style={{ marginLeft: 8 }}
+                                                      style={{ marginLeft: 0 }}
                                                     >
                                                       <i className="tabler-plus" />
                                                     </IconButton>
