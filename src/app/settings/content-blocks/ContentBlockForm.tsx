@@ -39,18 +39,18 @@ const tooltipContent = {
 const fieldTypeOptions = [
   // { label: 'email', value: 'email' },
   // { label: 'file', value: 'file' },
-  { label: 'text', value: 'text' },
+  { label: "text", value: "text" },
   // { label: 'url', value: 'url' },
   // { label: 'date', value: 'date' },
   // { label: 'number', value: 'number' },
   // { label: 'textarea', value: 'textarea' },
-  { label: 'Multiple', value: 'multiple' }
+  { label: "Multiple", value: "multiple" }
 ]
 
 const fieldTypeOptionsForMultiple = [
   // { label: 'email', value: 'email' },
   // { label: 'file', value: 'file' },
-  { label: 'text', value: 'text' }
+  { label: "text", value: "text" }
   // { label: 'url', value: 'url' },
   // { label: 'date', value: 'date' },
   // { label: 'number', value: 'number' },
@@ -66,7 +66,15 @@ const initialData = {
   id: 0,
   name: "",
   slug: "",
-  jsonContent: [{ fieldType: "", fieldLabel: "", fekey: "", isRequired: false, validation: "{}" }],
+  jsonContent: [
+    {
+      fieldType: "",
+      fieldLabel: "",
+      fekey: "",
+      isRequired: false,
+      validation: "{}"
+    }
+  ],
   status: false,
   isCommon: false
 }
@@ -87,7 +95,7 @@ type FormDataType = {
   slug: string;
   jsonContent: any[];
   status: boolean;
-  isCommon:boolean
+  isCommon: boolean;
 };
 
 const ContentBlockForm = ({ open }: Props) => {
@@ -98,6 +106,7 @@ const ContentBlockForm = ({ open }: Props) => {
     slug: string;
     jsonContent: string[];
   }>(initialErrorData)
+  const [initialJSONContent, setInitialJSONContent] = useState<any>()
   const [loading, setLoading] = useState<boolean>(true)
   const query = usePathname().split("/")
   const [, setIsSlugManuallyEdited] = useState<boolean>(false)
@@ -111,17 +120,32 @@ const ContentBlockForm = ({ open }: Props) => {
   }, [])
 
   const handleAddRow = () => {
-    const newField = { fieldType: "", fieldLabel: "", isRequired: false, validation: "{}" }
-    setFormData({ ...formData, jsonContent: [...formData.jsonContent, newField] })
+    const newField = {
+      fieldType: "",
+      fieldLabel: "",
+      isRequired: false,
+      validation: "{}"
+    }
+    setFormData({
+      ...formData,
+      jsonContent: [...formData.jsonContent, newField]
+    })
   }
   const handleRemoveRow = (index: number) => {
     if (formData.jsonContent.length > 1) {
-      const updatedFields = formData.jsonContent.filter((_, idx) => idx !== index)
+      const updatedFields = formData.jsonContent.filter(
+        (_, idx) => idx !== index
+      )
       setFormData({ ...formData, jsonContent: updatedFields })
     }
   }
 
-  const handleChangeField = (index: number, field: string, value: any, subIndex?: number) => {
+  const handleChangeField = (
+    index: number,
+    field: string,
+    value: any,
+    subIndex?: number
+  ) => {
     const updatedFields = [...formData.jsonContent]
     if (subIndex !== undefined) {
       updatedFields[index].multipleData[subIndex][field] = value
@@ -150,46 +174,73 @@ const ContentBlockForm = ({ open }: Props) => {
       }
 
       if (field === "fieldType" && value === "multiple") {
-        updatedFields[index].multipleData = [{ fieldType: "", fieldLabel: "", fekey: "", isRequired: false, validation: "{}" }]
+        updatedFields[index].multipleData = [
+          {
+            fieldType: "",
+            fieldLabel: "",
+            fekey: "",
+            isRequired: false,
+            validation: "{}"
+          }
+        ]
       }
     }
 
     setFormData({ ...formData, jsonContent: updatedFields })
   }
   const handleAddSubRow = (parentIndex: number) => {
-    const newSubField = { fieldType: "", fieldLabel: "", fekey: "", isRequired: false, validation: "{}" }
-    const updatedFields = [...formData.jsonContent]
-    updatedFields[parentIndex].multipleData.push(newSubField)
+    const newSubField = {
+      fieldType: "",
+      fieldLabel: "",
+      fekey: "",
+      isRequired: false,
+      validation: "{}"
+    }
+    // const updatedFields = [...formData.jsonContent];
+    // updatedFields[parentIndex].multipleData.push(newSubField);
+    const updatedFields = formData.jsonContent.map((item, index) => {
+      if (index === parentIndex) {
+        return {
+          ...item,
+          multipleData: [...item.multipleData, newSubField]
+        }
+      }
+      return item
+    })
+
     setFormData({ ...formData, jsonContent: updatedFields })
   }
 
   const handleRemoveSubRow = (parentIndex: number, subIndex: number) => {
     const updatedFields = [...formData.jsonContent]
     if (updatedFields[parentIndex].multipleData.length > 1) {
-      updatedFields[parentIndex].multipleData = updatedFields[parentIndex].multipleData.filter((_: any, idx: any) => idx !== subIndex)
+      updatedFields[parentIndex].multipleData = updatedFields[
+        parentIndex
+      ].multipleData.filter((_: any, idx: any) => idx !== subIndex)
       setFormData({ ...formData, jsonContent: updatedFields })
     }
   }
   const validateFormData = (data: FormDataType) => {
     let isValid = true
     const errors = {
-      name: '',
-      slug: '',
-      jsonContent: data.jsonContent.map(() => '')
+      name: "",
+      slug: "",
+      jsonContent: data.jsonContent.map(() => "")
     }
 
     const slugRegex = /^[a-zA-Z0-9]+$/
 
     if (data.name.trim().length === 0) {
-      errors.name = 'Full Name is required'
+      errors.name = "Full Name is required"
       isValid = false
     }
 
     if (data.slug.trim().length === 0) {
-      errors.slug = 'Slug is required'
+      errors.slug = "Slug is required"
       isValid = false
     } else if (!slugRegex.test(data.slug)) {
-      errors.slug = 'Slug must be alphanumeric with no spaces or special characters.'
+      errors.slug =
+        "Slug must be alphanumeric with no spaces or special characters."
       isValid = false
     }
 
@@ -204,7 +255,8 @@ const ContentBlockForm = ({ open }: Props) => {
     if (validateFormData(formData)) {
       try {
         setLoading(true)
-        const endpoint = open === sectionActions.EDIT ? section.update : section.create
+        const endpoint =
+          open === sectionActions.EDIT ? section.update : section.create
 
         let sectionName = formData.name
         sectionName = sectionName?.split("_")?.join(" ")
@@ -224,7 +276,7 @@ const ContentBlockForm = ({ open }: Props) => {
         handleReset()
         setLoading(false)
       } catch (error: any) {
-        console.error('Error fetching data:', error.message)
+        console.error("Error fetching data:", error.message)
         setLoading(false)
       }
     }
@@ -249,10 +301,10 @@ const ContentBlockForm = ({ open }: Props) => {
         jsonContent: data.sectionTemplate,
         status: data.active,
         isCommon: data.isCommon
-
       })
       setIsSlugManuallyEdited(false)
       setInitialIsCommon(data.isCommon)
+      setInitialJSONContent([...data.sectionTemplate])
       setLoading(false)
     } catch (error) {
       console.error(error)
@@ -285,7 +337,10 @@ const ContentBlockForm = ({ open }: Props) => {
     const slugRegex = /^[a-zA-Z0-9]+$/
 
     if (!slugRegex.test(newSlug)) {
-      setFormErrors({ ...formErrors, slug: "Slug must be alphanumeric with no spaces, dashes, or underscores." })
+      setFormErrors({
+        ...formErrors,
+        slug: "Slug must be alphanumeric with no spaces, dashes, or underscores."
+      })
     } else {
       setFormErrors({ ...formErrors, slug: "" })
     }
@@ -309,6 +364,8 @@ const ContentBlockForm = ({ open }: Props) => {
   const handleChange = () => {
     setExpanded(!expanded)
   }
+
+  console.log("initial", initialJSONContent)
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -340,7 +397,7 @@ const ContentBlockForm = ({ open }: Props) => {
                     placeholder=""
                     value={formData.slug}
                     onChange={handleSlugChange}
-                    disabled={!!editAllow}
+                    disabled={!!editAllow || open == sectionActions.EDIT}
                   />
                 </Grid>
                 <Grid item xs={4} sm={1}>
@@ -348,7 +405,7 @@ const ContentBlockForm = ({ open }: Props) => {
                     Status
                   </Typography>
                   <Switch
-                    size='medium'
+                    size="medium"
                     checked={formData.status}
                     onChange={(e) =>
                       setFormData({ ...formData, status: e.target.checked })
@@ -361,16 +418,20 @@ const ContentBlockForm = ({ open }: Props) => {
                     is Common Content Block
                   </Typography>
                   <Switch
-                    size='medium'
+                    size="medium"
                     checked={formData.isCommon}
                     onChange={(e) =>
                       setFormData({ ...formData, isCommon: e.target.checked })
                     }
-                    disabled={!!(open == sectionActions.EDIT && !!initialIsCommon)}
+                    disabled={
+                      !!(open == sectionActions.EDIT && !!initialIsCommon)
+                    }
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <label className="text-[0.8125rem] leading-[1.153]">JSON Content *</label>
+                  <label className="text-[0.8125rem] leading-[1.153]">
+                    JSON Content *
+                  </label>
                   <TableContainer>
                     <Table>
                       <TableHead>
@@ -379,14 +440,22 @@ const ContentBlockForm = ({ open }: Props) => {
                           <TableCell>Field Label</TableCell>
                           <TableCell>Frontend side Key</TableCell>
                           <TableCell>Is Required</TableCell>
-                          <TableCell>Validation
-                            <Tooltip placement="top" title={<pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(tooltipContent, null, 2)}</pre>}>
+                          <TableCell>
+                            Validation
+                            <Tooltip
+                              placement="top"
+                              title={
+                                <pre style={{ whiteSpace: "pre-wrap" }}>
+                                  {JSON.stringify(tooltipContent, null, 2)}
+                                </pre>
+                              }
+                            >
                               <IconButton>
                                 <i className="tabler-alert-square-filled" />
                               </IconButton>
                             </Tooltip>
                           </TableCell>
-                          {!editAllow && <TableCell>Actions </TableCell> }
+                          {!editAllow && <TableCell>Actions </TableCell>}
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -398,18 +467,45 @@ const ContentBlockForm = ({ open }: Props) => {
                                   fullWidth
                                   options={fieldTypeOptions}
                                   id={`autocomplete-custom-${index}`}
-                                  getOptionLabel={(option) => option.label || ""}
-                                  renderInput={(params) => <CustomTextField {...params} placeholder="" />}
-                                  value={fieldTypeOptions.find((option) => option.value === field.fieldType) || null}
-                                  onChange={(e, newValue) => handleChangeField(index, "fieldType", newValue ? newValue.value : "")}
-                                  disabled={open == sectionActions.EDIT}
+                                  getOptionLabel={(option) =>
+                                    option.label || ""
+                                  }
+                                  renderInput={(params) => (
+                                    <CustomTextField
+                                      {...params}
+                                      placeholder=""
+                                    />
+                                  )}
+                                  value={
+                                    fieldTypeOptions.find(
+                                      (option) =>
+                                        option.value === field.fieldType
+                                    ) || null
+                                  }
+                                  onChange={(e, newValue) =>
+                                    handleChangeField(
+                                      index,
+                                      "fieldType",
+                                      newValue ? newValue.value : ""
+                                    )
+                                  }
+                                  disabled={
+                                    open == sectionActions.EDIT &&
+                                    !!initialJSONContent?.[index]?.fieldType
+                                  }
                                 />
                               </TableCell>
                               <TableCell>
                                 <CustomTextField
                                   fullWidth
                                   value={field.fieldLabel}
-                                  onChange={(e) => handleChangeField(index, "fieldLabel", e.target.value)}
+                                  onChange={(e) =>
+                                    handleChangeField(
+                                      index,
+                                      "fieldLabel",
+                                      e.target.value
+                                    )
+                                  }
                                   // disabled={editAllow ? true : false}
                                 />
                               </TableCell>
@@ -419,26 +515,50 @@ const ContentBlockForm = ({ open }: Props) => {
                                 <CustomTextField
                                   fullWidth
                                   value={field.fekey}
-                                  onChange={(e) => handleChangeField(index, "fekey", e.target.value)}
-                                  disabled={open == sectionActions.EDIT}
+                                  onChange={(e) =>
+                                    handleChangeField(
+                                      index,
+                                      "fekey",
+                                      e.target.value
+                                    )
+                                  }
+                                  disabled={
+                                    open == sectionActions.EDIT &&
+                                    !!initialJSONContent?.[index]?.fekey
+                                  }
                                 />
                               </TableCell>
 
                               <TableCell>
                                 <Switch
                                   checked={field.isRequired}
-                                  onChange={(e) => handleChangeField(index, "isRequired", e.target.checked)}
-                                  // disabled={editAllow ? true : false}
+                                  onChange={(e) =>
+                                    handleChangeField(
+                                      index,
+                                      "isRequired",
+                                      e.target.checked
+                                    )
+                                  }
+                                  // disabled={open == sectionActions.EDIT && (!!initialJSONContent?.[index]?.isRequired)}
                                 />
                               </TableCell>
                               <TableCell>
                                 <CustomTextField
                                   fullWidth
                                   value={field.validation}
-                                  onChange={(e) => handleChangeField(index, "validation", e.target.value)}
+                                  onChange={(e) =>
+                                    handleChangeField(
+                                      index,
+                                      "validation",
+                                      e.target.value
+                                    )
+                                  }
                                   error={!!formErrors.jsonContent[index]}
                                   helperText={formErrors.jsonContent[index]}
-                                  // disabled={editAllow ? true : false}
+                                  disabled={
+                                    open == sectionActions.EDIT &&
+                                    !!initialJSONContent?.[index]?.validation
+                                  }
                                 />
                               </TableCell>
                               {/* </>)} */}
@@ -446,12 +566,21 @@ const ContentBlockForm = ({ open }: Props) => {
                               {/* <TableCell>&nbsp; s</TableCell>
                                 <TableCell>&nbsp; s</TableCell>
                               </>)} */}
-                              {!editAllow &&
+                              {!editAllow && (
                                 <TableCell>
-                                  <IconButton size="small" onClick={() => handleRemoveRow(index)} aria-label="minus" color="error">
-                                    <i className="tabler-minus" />
-                                  </IconButton>
-                                  {index === formData.jsonContent.length - 1 && (
+                                  {!(initialJSONContent?.[index]?.fekey) && (
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => handleRemoveRow(index)}
+                                        aria-label="minus"
+                                        color="error"
+                                      >
+                                        <i className="tabler-minus" />
+                                      </IconButton>
+                                  )}
+
+                                  {index ===
+                                    formData.jsonContent.length - 1 && (
                                     <IconButton
                                       size="small"
                                       onClick={handleAddRow}
@@ -463,24 +592,32 @@ const ContentBlockForm = ({ open }: Props) => {
                                     </IconButton>
                                   )}
                                 </TableCell>
-                              }
+                              )}
                             </TableRow>
 
                             {field.fieldType === "multiple" && (
                               <TableRow>
                                 <TableCell colSpan={5}>
-                                  <Accordion expanded={expanded} onChange={handleChange}
+                                  <Accordion
+                                    expanded={expanded}
+                                    onChange={handleChange}
                                   >
                                     <AccordionSummary
-                                      expandIcon={<IconButton
-                                        size="small"
-                                        aria-label="plus"
-                                        color="info"
-                                        style={{ marginLeft: 8 }}
-                                      >
-                                        <i className="tabler-chevron-down" />
-                                      </IconButton>}>
-                                      <Typography variant="subtitle1">Multiple Label: {field.fieldLabel ? field.fieldLabel : 'N/A'}</Typography>
+                                      expandIcon={
+                                        <IconButton
+                                          size="small"
+                                          aria-label="plus"
+                                          color="info"
+                                          style={{ marginLeft: 8 }}
+                                        >
+                                          <i className="tabler-chevron-down" />
+                                        </IconButton>
+                                      }
+                                    >
+                                      <Typography variant="subtitle1">
+                                        Multiple Label:{" "}
+                                        {field.fieldLabel ? field.fieldLabel : "N/A"}
+                                      </Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                       <Table>
@@ -488,97 +625,219 @@ const ContentBlockForm = ({ open }: Props) => {
                                           <TableRow>
                                             <TableCell>Field Type</TableCell>
                                             <TableCell>Field Label</TableCell>
-                                            <TableCell>Frontend side Key</TableCell>
+                                            <TableCell>
+                                              Frontend side Key
+                                            </TableCell>
                                             <TableCell>Is Required</TableCell>
-                                            <TableCell>Validation
-                                              <Tooltip placement="top" title={<pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(tooltipContent, null, 2)}</pre>}>
+                                            <TableCell>
+                                              Validation
+                                              <Tooltip
+                                                placement="top"
+                                                title={
+                                                  <pre
+                                                    style={{
+                                                      whiteSpace: "pre-wrap"
+                                                    }}
+                                                  >
+                                                    {JSON.stringify(
+                                                      tooltipContent,
+                                                      null,
+                                                      2
+                                                    )}
+                                                  </pre>
+                                                }
+                                              >
                                                 <IconButton>
                                                   <i className="tabler-alert-square-filled" />
                                                 </IconButton>
                                               </Tooltip>
                                             </TableCell>
-                                            {!editAllow &&
+                                            {!editAllow && (
                                               <TableCell>Actions </TableCell>
-                                            }
+                                            )}
                                           </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                          {field.multipleData.map((subField: any, subIndex: any) => (
-                                            <TableRow key={`${index}-${subIndex}`}>
-                                              <TableCell>
-                                                <CustomAutocomplete
-                                                  fullWidth
-                                                  options={fieldTypeOptionsForMultiple}
-                                                  id={`autocomplete-custom-${index}-${subIndex}`}
-                                                  getOptionLabel={(option) => option.label || ""}
-                                                  renderInput={(params) => <CustomTextField {...params} placeholder="" />}
-                                                  value={fieldTypeOptionsForMultiple.find((option) => option.value === subField.fieldType) || null}
-                                                  onChange={(e, newValue) => handleChangeField(index, "fieldType", newValue ? newValue.value : "", subIndex)}
-                                                  disabled={open == sectionActions.EDIT}
-                                                />
-                                              </TableCell>
-                                              <TableCell>
-                                                <CustomTextField
-                                                  fullWidth
-                                                  value={subField.fieldLabel}
-                                                  onChange={(e) => handleChangeField(index, "fieldLabel", e.target.value, subIndex)}
-                                                  // disabled={editAllow ? true : false}
-                                                />
-                                              </TableCell>
-                                              {/* {field.fieldType !== "multiple" && (<> */}
+                                          {field.multipleData.map(
+                                            (subField: any, subIndex: any) => (
+                                              <TableRow
+                                                key={`${index}-${subIndex}`}
+                                              >
                                                 <TableCell>
-                                                <CustomTextField
-                                                  fullWidth
-                                                  value={subField.fekey}
-                                                  onChange={(e) => handleChangeField(index, "fekey", e.target.value, subIndex)}
-                                                  disabled={open == sectionActions.EDIT}
-                                                />
-                                              </TableCell>
-                                              <TableCell>
-                                                <Switch
-                                                  checked={subField.isRequired}
-                                                  onChange={(e) => handleChangeField(index, "isRequired", e.target.checked, subIndex)}
-                                                  // disabled={editAllow ? true : false}
-                                                />
-                                              </TableCell>
-                                              <TableCell>
-                                                <CustomTextField
-                                                  fullWidth
-                                                  value={subField.validation}
-                                                  onChange={(e) => handleChangeField(index, "validation", e.target.value, subIndex)}
-                                                  error={!!formErrors.jsonContent[index]?.[subIndex]}
-                                                  helperText={formErrors.jsonContent[index]?.[subIndex]}
-                                                  // disabled={editAllow ? true : false}
-
-                                                />
-                                              </TableCell>
-                                              {/* </>)} */}
-                                              {!editAllow &&
-                                                <TableCell>
-
-                                                  <IconButton
-                                                    size="small"
-                                                    onClick={() => handleRemoveSubRow(index, subIndex)}
-                                                    aria-label="minus"
-                                                    color="error"
-                                                  >
-                                                    <i className="tabler-minus" />
-                                                  </IconButton>
-                                                  {subIndex === field.multipleData.length - 1 && (
-                                                    <IconButton
-                                                      size="small"
-                                                      onClick={() => handleAddSubRow(index)}
-                                                      aria-label="plus"
-                                                      color="success"
-                                                      style={{ marginLeft: 0 }}
-                                                    >
-                                                      <i className="tabler-plus" />
-                                                    </IconButton>
-                                                  )}
+                                                  <CustomAutocomplete
+                                                    fullWidth
+                                                    options={
+                                                      fieldTypeOptionsForMultiple
+                                                    }
+                                                    id={`autocomplete-custom-${index}-${subIndex}`}
+                                                    getOptionLabel={(option) =>
+                                                      option.label || ""
+                                                    }
+                                                    renderInput={(params) => (
+                                                      <CustomTextField
+                                                        {...params}
+                                                        placeholder=""
+                                                      />
+                                                    )}
+                                                    value={
+                                                      fieldTypeOptionsForMultiple.find(
+                                                        (option) =>
+                                                          option.value ===
+                                                          subField.fieldType
+                                                      ) || null
+                                                    }
+                                                    onChange={(e, newValue) =>
+                                                      handleChangeField(
+                                                        index,
+                                                        "fieldType",
+                                                        newValue ? newValue.value : "",
+                                                        subIndex
+                                                      )
+                                                    }
+                                                    disabled={
+                                                      open ==
+                                                        sectionActions.EDIT &&
+                                                      !!initialJSONContent?.[
+                                                        index
+                                                      ]?.multipleData?.[
+                                                        subIndex
+                                                      ]?.fieldType
+                                                    }
+                                                  />
                                                 </TableCell>
-                                              }
-                                            </TableRow>
-                                          ))}
+                                                <TableCell>
+                                                  <CustomTextField
+                                                    fullWidth
+                                                    value={subField.fieldLabel}
+                                                    onChange={(e) =>
+                                                      handleChangeField(
+                                                        index,
+                                                        "fieldLabel",
+                                                        e.target.value,
+                                                        subIndex
+                                                      )
+                                                    }
+                                                    // disabled={editAllow ? true : false}
+                                                  />
+                                                </TableCell>
+                                                {/* {field.fieldType !== "multiple" && (<> */}
+                                                <TableCell>
+                                                  <CustomTextField
+                                                    fullWidth
+                                                    value={subField.fekey}
+                                                    onChange={(e) =>
+                                                      handleChangeField(
+                                                        index,
+                                                        "fekey",
+                                                        e.target.value,
+                                                        subIndex
+                                                      )
+                                                    }
+                                                    disabled={
+                                                      open ==
+                                                        sectionActions.EDIT &&
+                                                      !!initialJSONContent?.[
+                                                        index
+                                                      ]?.multipleData?.[
+                                                        subIndex
+                                                      ]?.fekey
+                                                    }
+                                                  />
+                                                </TableCell>
+                                                <TableCell>
+                                                  <Switch
+                                                    checked={
+                                                      subField.isRequired
+                                                    }
+                                                    onChange={(e) =>
+                                                      handleChangeField(
+                                                        index,
+                                                        "isRequired",
+                                                        e.target.checked,
+                                                        subIndex
+                                                      )
+                                                    }
+                                                    // disabled={editAllow ? true : false}
+                                                  />
+                                                </TableCell>
+                                                <TableCell>
+                                                  <CustomTextField
+                                                    fullWidth
+                                                    value={subField.validation}
+                                                    onChange={(e) =>
+                                                      handleChangeField(
+                                                        index,
+                                                        "validation",
+                                                        e.target.value,
+                                                        subIndex
+                                                      )
+                                                    }
+                                                    error={
+                                                      !!formErrors.jsonContent[
+                                                        index
+                                                      ]?.[subIndex]
+                                                    }
+                                                    helperText={
+                                                      formErrors.jsonContent[
+                                                        index
+                                                      ]?.[subIndex]
+                                                    }
+                                                    disabled={
+                                                      open ==
+                                                        sectionActions.EDIT &&
+                                                      !!initialJSONContent?.[
+                                                        index
+                                                      ]?.multipleData?.[
+                                                        subIndex
+                                                      ]?.validation
+                                                    }
+                                                  />
+                                                </TableCell>
+                                                {/* </>)} */}
+                                                {!editAllow && (
+                                                  <TableCell>
+                                                    {open !== sectionActions.EDIT &&
+                                    !(initialJSONContent?.[
+                                      index
+                                    ]?.multipleData?.[
+                                      subIndex
+                                    ]?.fekey) && <IconButton
+                                    size="small"
+                                    onClick={() =>
+                                      handleRemoveSubRow(
+                                        index,
+                                        subIndex
+                                      )
+                                    }
+                                    aria-label="minus"
+                                    color="error"
+                                  >
+                                    <i className="tabler-minus" />
+                                  </IconButton>}
+
+                                                    {subIndex ===
+                                                      field.multipleData
+                                                        .length -
+                                                        1 && (
+                                                      <IconButton
+                                                        size="small"
+                                                        onClick={() =>
+                                                          handleAddSubRow(index)
+                                                        }
+                                                        aria-label="plus"
+                                                        color="success"
+                                                        style={{
+                                                          marginLeft: 0
+                                                        }}
+                                                      >
+                                                        <i className="tabler-plus" />
+                                                      </IconButton>
+                                                    )}
+                                                  </TableCell>
+                                                )}
+                                              </TableRow>
+                                            )
+                                          )}
                                         </TableBody>
                                       </Table>
                                     </AccordionDetails>
@@ -592,7 +851,11 @@ const ContentBlockForm = ({ open }: Props) => {
                     </Table>
                   </TableContainer>
                 </Grid>
-                <Grid item xs={12} style={{ position: 'sticky', bottom: 0, zIndex: 10 }}>
+                <Grid
+                  item
+                  xs={12}
+                  style={{ position: "sticky", bottom: 0, zIndex: 10 }}
+                >
                   <Box
                     p={7}
                     display="flex"
@@ -609,14 +872,14 @@ const ContentBlockForm = ({ open }: Props) => {
                       Cancel
                     </Button>
                     <Button variant="contained" type="submit">
-                      {open === sectionActions.ADD ? "Add" : "Update"} Content Block
+                      {open === sectionActions.ADD ? "Add" : "Update"} Content
+                      Block
                     </Button>
                   </Box>
                 </Grid>
               </Grid>
             </Box>
           </form>
-
         </div>
       </Card>
     </>
