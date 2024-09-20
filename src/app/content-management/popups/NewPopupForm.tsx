@@ -362,16 +362,15 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
             {popupType !== "Exit Intent" && (
               <Grid item xs={12} sm={6}>
                 <CustomTextField
-                  // disabled={true}
                   error={!!formErrors.delay}
                   helperText={formErrors.delay}
-                  label="Delay*"
+                  label="Delay* (in second)"
                   fullWidth
                   type="number"
                   placeholder=""
                   value={formData.delay}
                   onChange={(e) => {
-                    setFormData({ ...formData, delay: Number(e.target.value) })
+                    setFormData({ ...formData, delay: parseInt(e.target.value) })
                   }}
                 />
               </Grid>

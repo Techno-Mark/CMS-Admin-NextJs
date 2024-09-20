@@ -2,5 +2,6 @@ const commonPrefix = "organization/robot-seo"
 
 export const robotSEO = {
   getDetail: `${commonPrefix}/getDetail`,
-  saveAndUpdate: `${commonPrefix}/saveAndUpdate`
+  saveAndUpdate: `${commonPrefix}/saveAndUpdate`,
+  generateSitemap: `${commonPrefix}/generate-sitemap`
 }
