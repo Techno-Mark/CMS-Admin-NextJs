@@ -13,13 +13,14 @@ import {
   IconButton
 } from "@mui/material"
 import React, { ChangeEvent, useEffect, useState } from "react"
-import { get, post } from "@/services/apiService"
+import { get, post, postDataToOrganizationAPIs } from "@/services/apiService"
 import { template } from "@/services/endpoint/template"
 import CustomTextField from "@/@core/components/mui/TextField"
 import { PagesType } from "./pagesType"
 import { pages } from "@/services/endpoint/pages"
 import { toast } from "react-toastify"
 import BreadCrumbList from "@/components/BreadCrumbList"
+import { blogPost } from "@/services/endpoint/blogpost"
 
 const initialFormData = {
   pageId: "",
@@ -270,58 +271,58 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
     }
 
     // Loop through sections to validate each field
-    sections.forEach((section) => {
-      section.sectionTemplate.forEach((field: any) => {
-        const fieldKey = field.fekey
-        const fieldLabel = field.fieldLabel
+    // sections.forEach((section) => {
+    //   section.sectionTemplate.forEach((field: any) => {
+    //     const fieldKey = field.fekey
+    //     const fieldLabel = field.fieldLabel
 
-        // Handle validation for regular fields
-        if (field.fieldType !== "multiple") {
-          const value = templateValue?.[section.uniqueSectionName]?.[fieldKey]
-          if (field.isRequired && (!value || value.trim() === "")) {
-            valid = false
-            // @ts-ignore
-            errors[section.uniqueSectionName] = {
-              // @ts-ignore
-              ...(errors[section.uniqueSectionName] || {}),
-              [fieldKey]: `${fieldLabel} is required.`
-            }
-          }
-        }
+    //     // Handle validation for regular fields
+    //     if (field.fieldType !== "multiple") {
+    //       const value = templateValue?.[section.uniqueSectionName]?.[fieldKey]
+    //       if (field.isRequired && (!value || value.trim() === "")) {
+    //         valid = false
+    //         // @ts-ignore
+    //         errors[section.uniqueSectionName] = {
+    //           // @ts-ignore
+    //           ...(errors[section.uniqueSectionName] || {}),
+    //           [fieldKey]: `${fieldLabel} is required.`
+    //         }
+    //       }
+    //     }
 
-        // Handle validation for multiple fields
-        if (field.fieldType === "multiple") {
-          const multipleEntries = templateValue?.[section.uniqueSectionName]?.[fieldKey]
-          if (Array.isArray(multipleEntries)) {
-            multipleEntries.forEach((entry: any, entryIndex: number) => {
-              field.multipleData.forEach((subField: any) => {
-                const subFieldKey = subField.fekey
-                const subFieldLabel = subField.fieldLabel
-                const subFieldValue = entry[subFieldKey]
+    //     // Handle validation for multiple fields
+    //     if (field.fieldType === "multiple") {
+    //       const multipleEntries = templateValue?.[section.uniqueSectionName]?.[fieldKey]
+    //       if (Array.isArray(multipleEntries)) {
+    //         multipleEntries.forEach((entry: any, entryIndex: number) => {
+    //           field.multipleData.forEach((subField: any) => {
+    //             const subFieldKey = subField.fekey
+    //             const subFieldLabel = subField.fieldLabel
+    //             const subFieldValue = entry[subFieldKey]
 
-                if (subField.isRequired && (!subFieldValue || subFieldValue.trim() === "")) {
-                  valid = false
-                  // @ts-ignore
-                  errors[section.uniqueSectionName] = {
-                    // @ts-ignore
-                    ...(errors[section.uniqueSectionName] || {}),
-                    [fieldKey]: {
-                      // @ts-ignore
-                      ...(errors[section.uniqueSectionName]?.[fieldKey] || {}),
-                      [entryIndex]: {
-                        // @ts-ignore
-                        ...(errors[section.uniqueSectionName]?.[fieldKey]?.[entryIndex] || {}),
-                        [subFieldKey]: `${subFieldLabel} is required.`
-                      }
-                    }
-                  }
-                }
-              })
-            })
-          }
-        }
-      })
-    })
+    //             if (subField.isRequired && (!subFieldValue || subFieldValue.trim() === "")) {
+    //               valid = false
+    //               // @ts-ignore
+    //               errors[section.uniqueSectionName] = {
+    //                 // @ts-ignore
+    //                 ...(errors[section.uniqueSectionName] || {}),
+    //                 [fieldKey]: {
+    //                   // @ts-ignore
+    //                   ...(errors[section.uniqueSectionName]?.[fieldKey] || {}),
+    //                   [entryIndex]: {
+    //                     // @ts-ignore
+    //                     ...(errors[section.uniqueSectionName]?.[fieldKey]?.[entryIndex] || {}),
+    //                     [subFieldKey]: `${subFieldLabel} is required.`
+    //                   }
+    //                 }
+    //               }
+    //             }
+    //           })
+    //         })
+    //       }
+    //     }
+    //   })
+    // })
 
     setSections(updatedSections)
     setFormErrors(errors)
@@ -563,10 +564,69 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
     })
   }
 
+    // handle Preview Generate
+    const handlePreviewGenerateAndRedirect = async () => {
+      
+      if (validateForm()) {
+        try {
+          
+          setLoading(true)
+
+           const previewDataResponse = await postDataToOrganizationAPIs(
+            pages.getPreviewFormattedData,
+            { pageId: formData.pageId, pageTemplateData: templateValue }
+          )
+          if (previewDataResponse.statusCode !== 200) {
+            toast.error(previewDataResponse.message)
+            return;
+          }
+
+          const previewData = {
+            ...formData,
+            formatData: previewDataResponse?.data?.formatData,
+            sectionData:undefined,
+            templateData:undefined
+          }
+
+          const result = await postDataToOrganizationAPIs(
+            blogPost.generatePreview,
+            { data: previewData }
+          )
+          setLoading(false)
+  
+          if (result.statusCode === 200) {
+            const redirectURL = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/${formData.slug}?preview=true&id=${result.data.hash}`
+            window.open(redirectURL, "_blank")
+          } else {
+            toast.error(result.message)
+          }
+        } catch (error) {
+          console.error(error)
+          setLoading(false)
+        }
+      }
+    }
+
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
-      <BreadCrumbList />
+      <Box display="flex" alignItems="center">
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={11}>
+            <BreadCrumbList />
+          </Grid>
+          <Grid item xs={12} sm={1}>
+            <Tooltip title="preview blog">
+              <IconButton
+                color="info"
+                onClick={() => handlePreviewGenerateAndRedirect()}
+              >
+                <i className="tabler-external-link text-textSecondary"></i>
+              </IconButton>
+            </Tooltip>
+          </Grid>
+        </Grid>
+      </Box>
       <Card>
         <div>
           <form
