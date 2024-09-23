@@ -271,58 +271,58 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
     }
 
     // Loop through sections to validate each field
-    // sections.forEach((section) => {
-    //   section.sectionTemplate.forEach((field: any) => {
-    //     const fieldKey = field.fekey
-    //     const fieldLabel = field.fieldLabel
+    sections.forEach((section) => {
+      section.sectionTemplate.forEach((field: any) => {
+        const fieldKey = field.fekey
+        const fieldLabel = field.fieldLabel
 
-    //     // Handle validation for regular fields
-    //     if (field.fieldType !== "multiple") {
-    //       const value = templateValue?.[section.uniqueSectionName]?.[fieldKey]
-    //       if (field.isRequired && (!value || value.trim() === "")) {
-    //         valid = false
-    //         // @ts-ignore
-    //         errors[section.uniqueSectionName] = {
-    //           // @ts-ignore
-    //           ...(errors[section.uniqueSectionName] || {}),
-    //           [fieldKey]: `${fieldLabel} is required.`
-    //         }
-    //       }
-    //     }
+        // Handle validation for regular fields
+        if (field.fieldType !== "multiple") {
+          const value = templateValue?.[section.uniqueSectionName]?.[fieldKey]
+          if (field.isRequired && (!value || value.trim() === "")) {
+            valid = false
+            // @ts-ignore
+            errors[section.uniqueSectionName] = {
+              // @ts-ignore
+              ...(errors[section.uniqueSectionName] || {}),
+              [fieldKey]: `${fieldLabel} is required.`
+            }
+          }
+        }
 
-    //     // Handle validation for multiple fields
-    //     if (field.fieldType === "multiple") {
-    //       const multipleEntries = templateValue?.[section.uniqueSectionName]?.[fieldKey]
-    //       if (Array.isArray(multipleEntries)) {
-    //         multipleEntries.forEach((entry: any, entryIndex: number) => {
-    //           field.multipleData.forEach((subField: any) => {
-    //             const subFieldKey = subField.fekey
-    //             const subFieldLabel = subField.fieldLabel
-    //             const subFieldValue = entry[subFieldKey]
+        // Handle validation for multiple fields
+        if (field.fieldType === "multiple") {
+          const multipleEntries = templateValue?.[section.uniqueSectionName]?.[fieldKey]
+          if (Array.isArray(multipleEntries)) {
+            multipleEntries.forEach((entry: any, entryIndex: number) => {
+              field.multipleData.forEach((subField: any) => {
+                const subFieldKey = subField.fekey
+                const subFieldLabel = subField.fieldLabel
+                const subFieldValue = entry[subFieldKey]
 
-    //             if (subField.isRequired && (!subFieldValue || subFieldValue.trim() === "")) {
-    //               valid = false
-    //               // @ts-ignore
-    //               errors[section.uniqueSectionName] = {
-    //                 // @ts-ignore
-    //                 ...(errors[section.uniqueSectionName] || {}),
-    //                 [fieldKey]: {
-    //                   // @ts-ignore
-    //                   ...(errors[section.uniqueSectionName]?.[fieldKey] || {}),
-    //                   [entryIndex]: {
-    //                     // @ts-ignore
-    //                     ...(errors[section.uniqueSectionName]?.[fieldKey]?.[entryIndex] || {}),
-    //                     [subFieldKey]: `${subFieldLabel} is required.`
-    //                   }
-    //                 }
-    //               }
-    //             }
-    //           })
-    //         })
-    //       }
-    //     }
-    //   })
-    // })
+                if (subField.isRequired && (!subFieldValue || subFieldValue.trim() === "")) {
+                  valid = false
+                  // @ts-ignore
+                  errors[section.uniqueSectionName] = {
+                    // @ts-ignore
+                    ...(errors[section.uniqueSectionName] || {}),
+                    [fieldKey]: {
+                      // @ts-ignore
+                      ...(errors[section.uniqueSectionName]?.[fieldKey] || {}),
+                      [entryIndex]: {
+                        // @ts-ignore
+                        ...(errors[section.uniqueSectionName]?.[fieldKey]?.[entryIndex] || {}),
+                        [subFieldKey]: `${subFieldLabel} is required.`
+                      }
+                    }
+                  }
+                }
+              })
+            })
+          }
+        }
+      })
+    })
 
     setSections(updatedSections)
     setFormErrors(errors)
