@@ -179,7 +179,7 @@ const OrganizationsListTable = () => {
               <i className="tabler-edit text-[22px] text-textSecondary" />
             </IconButton>
             </Tooltip>
-            <Tooltip title={'Delete'}>
+            {/* <Tooltip title={'Delete'}>
             <IconButton
               onClick={() => {
                 setIsDeleting(true)
@@ -188,7 +188,7 @@ const OrganizationsListTable = () => {
             >
               <i className="tabler-trash text-[22px] text-textSecondary" />
             </IconButton>
-            </Tooltip>
+            </Tooltip> */}
           </div>
         ),
         enableSorting: false
