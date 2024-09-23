@@ -42,6 +42,7 @@ const initialData = {
   location: "",
   subTitle: "",
   description: "",
+  slug: "",
   active: false,
 };
 
@@ -53,6 +54,7 @@ const initialErrorData = {
   location: "",
   subTitle: "",
   description: "",
+  slug: "",
 };
 
 const CareerForm = ({
@@ -83,9 +85,29 @@ const CareerForm = ({
     }));
   };
 
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSlug = e.target.value;
+    const slugRegex = /^[a-zA-Z0-9/-]+$/;
+
+    if (!slugRegex.test(newSlug)) {
+      setFormErrors({
+        ...formErrors,
+        slug: "Slug must be alphanumeric with no spaces, or underscores",
+      });
+    } else {
+      setFormErrors({ ...formErrors, slug: "" });
+    }
+
+    setFormData((prevData) => ({
+      ...prevData,
+      slug: newSlug,
+    }));
+  };
+
   const validateForm = () => {
     let valid = true;
     const errors = { ...initialErrorData };
+    const slugRegex = /^[a-zA-Z0-9/-]+$/;
 
     if (!formData.jobTitle) {
       errors.jobTitle = "Please enter Job Title";
@@ -115,6 +137,14 @@ const CareerForm = ({
       errors.description = "Please enter Description";
       valid = false;
     }
+    if (formData.slug.trim().length === 0) {
+      errors.slug = "Slug is required"
+      valid = false
+    } else if (!slugRegex.test(formData.slug)) {
+      errors.slug =
+        "Slug must be alphanumeric with no spaces or special characters."
+      valid = false
+    }
 
     setFormErrors(errors);
     return valid;
@@ -133,6 +163,7 @@ const CareerForm = ({
           location: formData.location,
           subTitle: formData.subTitle,
           description: formData.description,
+          slug: formData.slug,
           active: formData.active,
         };
 
@@ -302,6 +333,17 @@ const CareerForm = ({
                           location: e.target.value,
                         });
                       }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <CustomTextField
+                      error={!!formErrors.slug}
+                      helperText={formErrors.slug}
+                      label="Slug *"
+                      fullWidth
+                      placeholder="Enter Slug"
+                      value={formData.slug}
+                      onChange={handleSlugChange}
                     />
                   </Grid>
                   <Grid item xs={12} sm={12}>
