@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from "react"
-import { Box, Button, Card, Fab, Grid, IconButton, styled, Tooltip, Typography } from "@mui/material"
+import { Box, Button, Card, Grid, IconButton, styled, Typography } from "@mui/material"
 import KanbanDrawer from "./KanbanDrawer"
 import LoadingBackdrop from "@/components/LoadingBackdrop"
 import BreadCrumbList from "@/components/BreadCrumbList"
@@ -140,52 +140,29 @@ const MenuItem = ({
     }
   }
 
-  const MenuItemContainer = styled(Box)(({ theme }) => ({
-    padding: "0.5rem 1rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderBottom: `1px solid ${theme.palette.divider}`,
-    "&:hover": {
-      backgroundColor: theme.palette.action.hover
-    }
-  }));
-
-  const MenuItemActions = styled(Box)(({ theme }) => ({
-    display: "flex",
-    gap: "0.5rem"
-  }));
-
-  const NestedMenu = styled(Box)(({ theme }) => ({
-    marginLeft: "1.5rem",
-    paddingLeft: "1rem",
-    borderLeft: `2px solid ${theme.palette.divider}`,
-  }));
-
   const renderMenuItems = (items: any[], parentId: number): React.ReactNode => {
     const handleAddSubmenu = (parentIndex: number) => {
-      const newItems = [...items];
+      const newItems = [...items]
       const newSubItem = {
         name: 'New Subitem',
         link: '#',
         children: [],
-        logo: '#',
-      };
+        logo: '#'
+      }
 
       if (!newItems[parentIndex].children) {
-        newItems[parentIndex].children = [];
+        newItems[parentIndex].children = []
       }
-      newItems[parentIndex].children.push(newSubItem);
-      setMenuItems(newItems);
-    };
+      newItems[parentIndex].children.push(newSubItem)
+      setMenuItems(newItems)
+    }
     const NestedMenu = styled(Box)(({ theme }) => ({
       marginLeft: "1.5rem",
       borderLeft: `2px solid ${theme.palette.divider}`
-    }));
+    }))
 
     return items.map((item, index) => (
       <ul key={index + 1}>
-
 
         <li
           className="flex items-center border-b-black border-b"
@@ -210,9 +187,6 @@ const MenuItem = ({
             <Typography variant="subtitle1"> ({item.link}) </Typography>
           </div>
 
-
-
-
           <IconButton
 
             size="medium"
@@ -228,19 +202,17 @@ const MenuItem = ({
             // @ts-ignore
             color="error"
             onClick={() => {
-              setDeleteDrawer(true);
-              setDeleteData({ index, parentId: -1 });
+              setDeleteDrawer(true)
+              setDeleteData({ index, parentId: -1 })
             }}
           >
             <i className="tabler-trash mie-1" />
           </IconButton>
 
-
         </li>
 
-       
         <NestedMenu>
-         
+
           {item.children && item.children.length > 0 && (
             <ul>
               {item.children.map((childItem: any, childIndex: number) => (
@@ -272,18 +244,15 @@ const MenuItem = ({
                     <i className="tabler-edit mie-1" />
                   </IconButton>
 
-
-
                   <IconButton
                     color="error"
                     size="small"
                     onClick={() => {
-                      setDeleteDrawer(true);
-                      setDeleteData({ index: childIndex, parentId: index });
+                      setDeleteDrawer(true)
+                      setDeleteData({ index: childIndex, parentId: index })
                     }}>
                     <i className='tabler-trash' />
                   </IconButton>
-
 
                 </li>
               ))}
@@ -302,9 +271,8 @@ const MenuItem = ({
           )}
         </NestedMenu>
       </ul>
-    ));
-  };
-
+    ))
+  }
 
   // const renderMenuItems = (items: any[], parentId: number): React.ReactNode => {
   //   return items.map((item, index) => (
@@ -433,14 +401,14 @@ const MenuItem = ({
             </p>
           )}
           {permissionUser &&
-            // <Fab
-            //   variant="extended"
-            //   className="w-13 h-7 m-4"
-            //   onClick={() => setDrawerOpen(true)}
-            // >
-            //   <i className="tabler-plus mie-1" />
-            //   Add
-            // </Fab>
+          // <Fab
+          //   variant="extended"
+          //   className="w-13 h-7 m-4"
+          //   onClick={() => setDrawerOpen(true)}
+          // >
+          //   <i className="tabler-plus mie-1" />
+          //   Add
+          // </Fab>
 
             <Button color="success" size="small" variant="contained" onClick={() => setDrawerOpen(true)}>
               <i className="tabler-plus mie-1" />
