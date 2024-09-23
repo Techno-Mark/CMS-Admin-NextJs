@@ -564,48 +564,46 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
     })
   }
 
-    // handle Preview Generate
-    const handlePreviewGenerateAndRedirect = async () => {
-      
-      if (validateForm()) {
-        try {
-          
-          setLoading(true)
+  // handle Preview Generate
+  const handlePreviewGenerateAndRedirect = async () => {
+    if (validateForm()) {
+      try {
+        setLoading(true)
 
-           const previewDataResponse = await postDataToOrganizationAPIs(
-            pages.getPreviewFormattedData,
-            { pageId: formData.pageId, pageTemplateData: templateValue }
-          )
-          if (previewDataResponse.statusCode !== 200) {
-            toast.error(previewDataResponse.message)
-            return;
-          }
-
-          const previewData = {
-            ...formData,
-            formatData: previewDataResponse?.data?.formatData,
-            sectionData:undefined,
-            templateData:undefined
-          }
-
-          const result = await postDataToOrganizationAPIs(
-            blogPost.generatePreview,
-            { data: previewData }
-          )
-          setLoading(false)
-  
-          if (result.statusCode === 200) {
-            const redirectURL = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/${formData.slug}?preview=true&id=${result.data.hash}`
-            window.open(redirectURL, "_blank")
-          } else {
-            toast.error(result.message)
-          }
-        } catch (error) {
-          console.error(error)
-          setLoading(false)
+        const previewDataResponse = await postDataToOrganizationAPIs(
+          pages.getPreviewFormattedData,
+          { templateId: formData.templateId, pageTemplateData: templateValue }
+        )
+        if (previewDataResponse.statusCode !== 200) {
+          toast.error(previewDataResponse.message)
+          return
         }
+
+        const previewData = {
+          ...formData,
+          formatData: previewDataResponse?.data?.formatData,
+          sectionData: undefined,
+          templateData: undefined
+        }
+
+        const result = await postDataToOrganizationAPIs(
+          blogPost.generatePreview,
+          { data: previewData }
+        )
+        setLoading(false)
+
+        if (result.statusCode === 200) {
+          const redirectURL = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/${formData.slug}?preview=true&id=${result.data.hash}`
+          window.open(redirectURL, "_blank")
+        } else {
+          toast.error(result.message)
+        }
+      } catch (error) {
+        console.error(error)
+        setLoading(false)
       }
     }
+  }
 
   return (
     <>
