@@ -346,10 +346,10 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
     }
 
     // validate author image
-    // if (open == ADD_BLOG && !thumbnailImage) {
-    //   errors.thumbnailImageError = "Thumbnail Image is required";
-    //   valid = false;
-    // }
+    if (open == ADD_BLOG && !authorImageUrl) {
+      errors.authorImageUrl = "Author Image is required";
+      valid = false;
+    }
     if (authorImageUrl && !validImageType.includes(authorImageUrl.type)) {
       errors.authorImageUrl = `Invalid file type for Author Image. Allowed types ${validImageType.join(",")}`
       valid = false
@@ -552,7 +552,8 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                 // disabled={true}
                 error={!!formErrors.title}
                 helperText={formErrors.title}
-                label="Blog Title *"
+                label="Title *"
+                placeholder="Title"
                 fullWidth
                 value={formData.title}
                 onChange={handleBlogTitleChange}
@@ -566,6 +567,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                 maxRows={5}
                 error={!!formErrors.subTitle}
                 helperText={formErrors.subTitle}
+                placeholder="Sub title"
                 label="Sub Title *"
                 fullWidth
                 value={formData.subTitle}
@@ -588,7 +590,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                 helperText={formErrors.slug}
                 label="Slug *"
                 fullWidth
-                placeholder=""
+                placeholder="Slug"
                 value={formData.slug}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   setFormData({ ...formData, slug: e.target.value })
@@ -624,7 +626,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                 helperText={formErrors.metaTitle}
                 label="Meta Title* (maximum-character: 60 )"
                 fullWidth
-                placeholder=""
+                placeholder="Meta Title"
                 value={formData.metaTitle}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   setFormData({ ...formData, metaTitle: e.target.value })
@@ -653,7 +655,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                 helperText={formErrors.metaDescription}
                 label="Meta Description* (maximum-character: 160 )"
                 fullWidth
-                placeholder=""
+                 placeholder="Meta Description"
                 value={formData.metaDescription}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   setFormData({
@@ -685,8 +687,9 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                 error={!!formErrors.metaKeywords}
                 helperText={formErrors.metaKeywords}
                 label="Meta Keywords* (maximum-character: 160 )"
+                     placeholder="Meta Keywords"
                 fullWidth
-                placeholder=""
+                
                 value={formData.metaKeywords}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   setFormData({
@@ -714,14 +717,22 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
             <Grid item xs={12} sm={12}>
               <p className="text-[#4e4b5a] my-2"> Banner Image * </p>
               <div
-                className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md ${!!formErrors.bannerImageError && "border-red-400"}`}
-              >
+                className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md`}
+                style={{
+                  borderColor: formErrors.bannerImageError ? '#ff5054' : 'gray',
+                }}
+             
+             >
                 <Box
                   {...getBannerRootProps({ className: "dropzone" })}
                   {...bannerImage}
                 >
                   <input {...getBannerInputProps()} />
-                  <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
+                  <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2"
+                  style={{
+                    borderColor: formErrors.bannerImageError ? '#ff5054' : 'gray',
+                  }}
+                  >
                     {open == EDIT_BLOG && !isImageBannerTouched.bannerImage && (
                       // eslint-disable-next-line
                       <img
@@ -779,13 +790,21 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
             </Grid>
             <Grid item xs={12} sm={12}>
               <p className="text-[#4e4b5a] my-2"> Thumbnail Image * </p>
-              <div className="flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md">
+              <div className="flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md"
+                 style={{
+                  borderColor: formErrors.thumbnailImageError ? '#ff5054' : 'gray',
+                }}
+              >
                 <Box
                   {...getThumbnailRootProps({ className: "dropzone" })}
                   {...thumbnailImage}
                 >
                   <input {...getThumbnailInputProps()} />
-                  <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
+                  <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2"
+                  style={{
+                    borderColor: formErrors.thumbnailImageError ? '#ff5054' : 'gray',
+                  }}
+                  >
                     {open == EDIT_BLOG &&
                       !isImageBannerTouched.thumbnailImage && (
                         // eslint-disable-next-line
@@ -846,13 +865,21 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
             </Grid>
             <Grid item xs={12} sm={12}>
               <p className="text-[#4e4b5a] my-2"> Author Image * </p>
-              <div className="flex items-center flex-col w-[250px] h-[170px] border border-dashed border-gray-300 rounded-md">
+              <div className="flex items-center flex-col w-[250px] h-[170px] border border-dashed border-gray-300 rounded-md"
+              style={{
+                borderColor: formErrors.authorImageUrl ? '#ff5054' : 'gray',
+              }}
+              >
                 <Box
                   {...getAuthorRootProps({ className: "dropzone" })}
                   {...authorImageUrl}
                 >
                   <input {...getAuthorInputProps()} />
-                  <div className="flex items-center justify-center flex-col w-[250px] h-[170px] border border-dashed border-gray-300 rounded-md p-2">
+                  <div className="flex items-center justify-center flex-col w-[250px] h-[170px] border border-dashed border-gray-300 rounded-md p-2"
+                  style={{
+                    borderColor: formErrors.authorImageUrl ? '#ff5054' : 'gray',
+                  }}
+                  >
                     {open == EDIT_BLOG &&
                       !isImageBannerTouched.authorImageUrl && (
                         // eslint-disable-next-line
@@ -917,8 +944,8 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                   error={!!formErrors.authorName}
                   helperText={formErrors.authorName}
                   label="Author Name *"
+                  placeholder="Author Name"
                   fullWidth
-                  placeholder=""
                   value={formData.authorName}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     setFormData({
@@ -938,11 +965,12 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                 freeSolo
                 multiple
                 limitTags={3}
+              
                 options={tagsList}
                 value={formData.tags}
                 getOptionLabel={(option) => option || ""}
                 renderInput={(params) => (
-                  <CustomTextField {...params} label="Tags" />
+                  <CustomTextField {...params} label="Tags *" placeholder="Tags" />
                 )}
                 onChange={(e: any, newVal: string[]) => {
                   setFormData({ ...formData, tags: [...newVal] })
@@ -965,7 +993,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                 value={formData.categories}
                 getOptionLabel={(option) => option || ""}
                 renderInput={(params) => (
-                  <CustomTextField {...params} label="Categories" />
+                  <CustomTextField {...params} label="Categories *" placeholder="Categories" />
                 )}
                 onChange={(e: any, newVal: string[]) => {
                   setFormData({ ...formData, categories: [...newVal] })
@@ -986,7 +1014,8 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                 fullWidth
                 defaultValue=""
                 value={formData.templateId}
-                label="Select Template"
+                placeholder="Template"
+                label="Template *"
                 id="custom-select"
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   if (Number(e.target.value) <= 0) {

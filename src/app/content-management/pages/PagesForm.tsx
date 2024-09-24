@@ -805,7 +805,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
                     fullWidth
                     defaultValue=""
                     value={formData.templateId}
-                    label="Template"
+                    label="Template *"
                     id="custom-select"
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       const templateId = Number(e.target.value)

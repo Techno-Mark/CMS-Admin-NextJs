@@ -245,11 +245,11 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
           <Grid item xs={12} sm={11}>
             <BreadCrumbList />
           </Grid>
-          <Grid item xs={12} sm={1}>
+          {/* <Grid item xs={12} sm={1}>
             <IconButton color="info" onClick={() => {}}>
               <i className="tabler-external-link text-textSecondary"></i>
             </IconButton>
-          </Grid>
+          </Grid> */}
         </Grid>
       </Box>
       <Card className="p-4">

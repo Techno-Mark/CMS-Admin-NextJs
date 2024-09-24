@@ -6,7 +6,8 @@ import IconButton from "@mui/material/IconButton"
 
 import CustomTextField from "@/@core/components/mui/TextField"
 import { ChangeEvent, useEffect, useState } from "react"
-import { Button } from "@mui/material"
+import { Button, Tooltip } from "@mui/material"
+import { InfoIcon } from "lucide-react"
 
 type KanbanDrawerProps = {
   drawerOpen: boolean;
@@ -58,27 +59,27 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
     const errors = { ...initialErrorData }
 
     if (!formData.name) {
-      errors.name = "menu name is required"
+      errors.name = "Name is required"
       valid = false
     } else if (formData.name.length < 3) {
-      errors.name = "name must be at least 3 characters long"
+      errors.name = "Name must be at least 3 characters long"
       valid = false
     } else if (formData.name.length > 255) {
-      errors.name = "name must be at most 255 characters long"
+      errors.name = "Name must be at most 255 characters long"
       valid = false
     }
     if (!formData.link) {
-      errors.link = "link is required"
+      errors.link = "Link is required"
       valid = false
     } else if (formData.link.length > 1000) {
-      errors.link = "link must be at most 1000 characters long"
+      errors.link = "Link must be at most 1000 characters long"
       valid = false
     }
     if (!formData.logo) {
-      errors.logo = "logo link  is required"
+      errors.logo = "Logo link  is required"
       valid = false
     } else if (formData.logo.length > 1000) {
-      errors.logo = "logo link must be at most 1000 characters long"
+      errors.logo = "Logo link must be at most 1000 characters long"
       valid = false
     }
 
@@ -198,7 +199,16 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
             <CustomTextField
               error={!!formErrors.logo}
               helperText={formErrors.logo}
-              label="Logo Link *"
+              label={
+                <span>
+      Logo Link * 
+      <Tooltip title={"If you do not want to add icon. Please add '#' sign"}> 
+               <IconButton size="small" aria-label="info">
+          <InfoIcon  style={{ fontSize: '5px', marginLeft: '5px', color: 'gray' }} />
+        </IconButton>
+      </Tooltip>
+    </span>
+              }
               fullWidth
               placeholder=""
               value={formData.logo}

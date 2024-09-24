@@ -149,43 +149,42 @@ const MenuItem = ({
     "&:hover": {
       backgroundColor: theme.palette.action.hover
     }
-  }));
+  }))
 
   const MenuItemActions = styled(Box)(({ theme }) => ({
     display: "flex",
     gap: "0.5rem"
-  }));
+  }))
 
   const NestedMenu = styled(Box)(({ theme }) => ({
     marginLeft: "1.5rem",
     paddingLeft: "1rem",
-    borderLeft: `2px solid ${theme.palette.divider}`,
-  }));
+    borderLeft: `2px solid ${theme.palette.divider}`
+  }))
 
   const renderMenuItems = (items: any[], parentId: number): React.ReactNode => {
     const handleAddSubmenu = (parentIndex: number) => {
-      const newItems = [...items];
+      const newItems = [...items]
       const newSubItem = {
         name: 'New Subitem',
         link: '#',
         children: [],
-        logo: '#',
-      };
+        logo: '#'
+      }
 
       if (!newItems[parentIndex].children) {
-        newItems[parentIndex].children = [];
+        newItems[parentIndex].children = []
       }
-      newItems[parentIndex].children.push(newSubItem);
-      setMenuItems(newItems);
-    };
+      newItems[parentIndex].children.push(newSubItem)
+      setMenuItems(newItems)
+    }
     const NestedMenu = styled(Box)(({ theme }) => ({
       marginLeft: "1.5rem",
       borderLeft: `2px solid ${theme.palette.divider}`
-    }));
+    }))
 
     return items.map((item, index) => (
       <ul key={index + 1}>
-
 
         <li
           className="flex items-center border-b-black border-b"
@@ -210,9 +209,6 @@ const MenuItem = ({
             <Typography variant="subtitle1"> ({item.link}) </Typography>
           </div>
 
-
-
-
           <IconButton
 
             size="medium"
@@ -228,19 +224,17 @@ const MenuItem = ({
             // @ts-ignore
             color="error"
             onClick={() => {
-              setDeleteDrawer(true);
-              setDeleteData({ index, parentId: -1 });
+              setDeleteDrawer(true)
+              setDeleteData({ index, parentId: -1 })
             }}
           >
             <i className="tabler-trash mie-1" />
           </IconButton>
 
-
         </li>
 
-       
         <NestedMenu>
-         
+
           {item.children && item.children.length > 0 && (
             <ul>
               {item.children.map((childItem: any, childIndex: number) => (
@@ -272,18 +266,15 @@ const MenuItem = ({
                     <i className="tabler-edit mie-1" />
                   </IconButton>
 
-
-
                   <IconButton
                     color="error"
                     size="small"
                     onClick={() => {
-                      setDeleteDrawer(true);
-                      setDeleteData({ index: childIndex, parentId: index });
+                      setDeleteDrawer(true)
+                      setDeleteData({ index: childIndex, parentId: index })
                     }}>
                     <i className='tabler-trash' />
                   </IconButton>
-
 
                 </li>
               ))}
@@ -302,121 +293,9 @@ const MenuItem = ({
           )}
         </NestedMenu>
       </ul>
-    ));
-  };
+    ))
+  }
 
-
-  // const renderMenuItems = (items: any[], parentId: number): React.ReactNode => {
-  //   return items.map((item, index) => (
-  //     <ul key={index + 1}>
-
-  //       <li
-  //         className="flex items-center border-b-black border-b"
-  //         draggable
-  //         onDragStart={(e) => handleDragStart(e, index, -1)}
-  //         onDrop={(e) => handleDrop(e, index, -1)}
-  //         onDragOver={(e) => handleDropOver(e, index, -1)}
-  //       >
-
-  //         <CustomIconButton aria-label='Add Submenu' size="small" variant='contained' color="primary"
-  //           onClick={() => setDrawerOpen(true)}>
-  //           <i className="tabler-plus mie-1" />
-  //         </CustomIconButton>
-
-  //         {/* <Button color="success" size="small" variant="contained" >
-  //             <i className="tabler-plus mie-1" />
-  //           </Button> */}
-  //         <div className="flex-1 flex items-center gap-x-2">
-  //           <DraggableIcon />
-  //           {/* <img src={item.logo} alt="icon" width={30} height={30} /> */}
-  //           <Typography variant="h5"> {item.name} </Typography>
-  //           <Typography variant="subtitle1"> ({item.link}) </Typography>
-  //         </div>
-  //         <div className="flex rounded-md border cursor-pointer">
-  //           <div className=" bg-white border-r p-1">
-  //             <button
-  //               className="bg-white text-black cursor-pointer"
-  //               onClick={() => handleEdit(index, -1)}
-  //             >
-  //               Edit
-  //             </button>
-  //           </div>
-  //           <div className="p-1">
-  //             <button
-  //               onClick={() => {
-  //                 setDeleteDrawer(true)
-  //                 setDeleteData({ index, parentId: -1 })
-  //               }}
-  //               className="bg-white cursor-pointer"
-  //             >
-  //               Delete
-  //             </button>
-  //           </div>
-  //         </div>
-  //       </li>
-  //       {parentId == -1 && !item.children?.length && (
-  //         <div
-  //           className="m-2 ml-4"
-  //           onDrop={(e: any) => handleDrop(e, 0, index)}
-  //           onDragOver={(e: any) => handleDropOver(e, 0, index)}
-  //         >
-  //           Drop sub-item
-  //         </div>
-  //       )}
-  //       {item.children &&
-  //         item.children?.map((childItem: any, childIndex: number) => (
-  //           <ul key={childIndex + 1}>
-  //             <li
-  //               className="flex items-center border-b-black border-b p-1"
-  //               draggable
-  //               onDragStart={(e) => handleDragStart(e, childIndex, index)}
-  //               onDrop={(e) => handleDrop(e, childIndex, index)}
-  //               onDragOver={(e) => handleDropOver(e, childIndex, index)}
-  //             >
-  //               <div className="flex-1 flex items-center gap-x-2">
-  //                 <DraggableIcon />
-  //                 {childItem?.logo && childItem.logo !== "#" && (
-  //                   // eslint-disable-next-line
-  //                   <img
-  //                     src={childItem.logo}
-  //                     alt="icon"
-  //                     width={30}
-  //                     height={30}
-  //                   />
-  //                 )}
-  //                 <Typography variant="h5"> {childItem.name} </Typography>
-  //                 <Typography variant="subtitle1">
-  //                   {" "}
-  //                   ({childItem.link}){" "}
-  //                 </Typography>
-  //               </div>
-  //               <div className="flex rounded-md border cursor-pointer">
-  //                 <div className=" bg-white border-r p-1">
-  //                   <button
-  //                     className="bg-white text-black cursor-pointer"
-  //                     onClick={() => handleEdit(childIndex, index)}
-  //                   >
-  //                     Edit
-  //                   </button>
-  //                 </div>
-  //                 <div className="p-1">
-  //                   <button
-  //                     onClick={() => {
-  //                       setDeleteDrawer(true)
-  //                       setDeleteData({ index: childIndex, parentId: index })
-  //                     }}
-  //                     className="bg-white cursor-pointer"
-  //                   >
-  //                     Delete
-  //                   </button>
-  //                 </div>
-  //               </div>
-  //             </li>
-  //           </ul>
-  //         ))}
-  //     </ul>
-  //   ))
-  // }
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -433,14 +312,7 @@ const MenuItem = ({
             </p>
           )}
           {permissionUser &&
-            // <Fab
-            //   variant="extended"
-            //   className="w-13 h-7 m-4"
-            //   onClick={() => setDrawerOpen(true)}
-            // >
-            //   <i className="tabler-plus mie-1" />
-            //   Add
-            // </Fab>
+         
 
             <Button color="success" size="small" variant="contained" onClick={() => setDrawerOpen(true)}>
               <i className="tabler-plus mie-1" />
