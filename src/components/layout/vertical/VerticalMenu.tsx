@@ -186,7 +186,7 @@ const VerticalMenu = ({ scrollMenu, permissionData }: Props) => {
               <MenuItem href={`/settings/content-blocks`} icon={<i className='tabler-box-margin'></i>}>Content Blocks</MenuItem>
               <MenuItem href={`/settings/templates`} icon={<i className='tabler-template'></i>}>Templates</MenuItem>
               <MenuItem href={`/settings/modules`} icon={<i className='tabler-stack-middle'></i>}>Modules</MenuItem>
-              {/* <MenuItem href={`/settings/theme-setting`} icon={<i className='tabler-stack-middle'></i>}>Theme Setting</MenuItem> */}
+              <MenuItem href={`/settings/theme-setting`} icon={<i className='tabler-stack-middle'></i>}>Theme Setting</MenuItem>
             </SubMenu>
           </>
         )}
