@@ -82,13 +82,10 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
         active: true
       })
 
-      return response.data.roles.map(
-        (r: any) =>
-          ({
-            id: r.roleId,
-            name: r.roleName
-          })
-      ) as LabelValue[]
+      return response.data.roles.map((r: any) => ({
+        id: r.roleId,
+        name: r.roleName
+      })) as LabelValue[]
     } catch (error) {
       console.error(error)
     }
@@ -251,24 +248,18 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
             userName: formData.userName,
             email: formData.userEmail,
             active: formData.active,
-            organizations: company.map(
-              (c) =>
-                ({
-                  roleId: c.roleId,
-                  organizationId: c.organizationId
-                })
-            )
+            organizations: company.map((c) => ({
+              roleId: c.roleId,
+              organizationId: c.organizationId
+            }))
           } : {
             userName: formData.userName,
             email: formData.userEmail,
             active: formData.active,
-            organizations: company.map(
-              (c) =>
-                ({
-                  roleId: c.roleId,
-                  organizationId: c.organizationId
-                })
-            )
+            organizations: company.map((c) => ({
+              roleId: c.roleId,
+              organizationId: c.organizationId
+            }))
           }
 
         let result = null
@@ -412,7 +403,9 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                         <Grid item xs={12} sm={3}>
                           <CustomTextField
                             error={!!roleIdError[index]}
-                            helperText={roleIdError[index] ? "Please select role" : ""}
+                            helperText={
+                              roleIdError[index] ? "Please select role" : ""
+                            }
                             select
                             fullWidth
                             defaultValue=""
@@ -431,7 +424,8 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                                 // Check if this role has already been selected for this company
                                 const isRoleSelected = company.some(
                                   (item, idx) =>
-                                    item.organizationId === field.organizationId &&
+                                    item.organizationId ===
+                                      field.organizationId &&
                                     item.roleId === role.id &&
                                     idx !== index // exclude the current index
                                 )
@@ -479,8 +473,8 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                         </Grid> */}
                         <Grid item xs={12} sm={4}>
                           {index === 0 &&
-                            company[0].organizationId > 0 &&
-                            company[0].roleId > 0 ? (
+                          company[0].organizationId > 0 &&
+                          company[0].roleId > 0 ? (
                             <>
                               <span
                                 className="cursor-pointer"
@@ -549,42 +543,37 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                 </Box>
               </div>
             </div>
-            <Box display="flex" gap={4}>
-              <Grid container spacing={2} sm={12}>
-                <Grid
-                  item
-                  xs={12}
-                  style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-                >
-                  <Box
-                    p={7}
-                    display="flex"
-                    gap={2}
-                    justifyContent="end"
-                    bgcolor="background.paper"
-                  >
-                    <Button
-                      variant="tonal"
-                      color="error"
-                      type="reset"
-                      onClick={() => handleClose()}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      onClick={() => handleSubmit()}
-                    >
-                      {open === ADD_USER ? "Add" : "Edit"} User
-                    </Button>
-                  </Box>
-                </Grid>
-              </Grid>
-            </Box>
           </div>
         </div>
       </Card>
+
+      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
+        <Box
+          p={5}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button
+            variant="tonal"
+            color="error"
+            type="reset"
+            size="small"
+            onClick={() => handleClose()}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            type="submit"
+            size="small"
+            onClick={() => handleSubmit()}
+          >
+            {open === ADD_USER ? "Add" : "Edit"} User
+          </Button>
+        </Box>
+      </Grid>
     </>
   )
 }

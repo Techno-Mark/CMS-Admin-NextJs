@@ -1054,55 +1054,48 @@ function BlogForm({
             </Grid>
           </Grid>
         </Box>
-        <Box display="flex" gap={4}>
-          <Grid container spacing={2} sm={12}>
-            <Grid
-              item
-              xs={12}
-              style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-            >
-              <Box
-                p={7}
-                display="flex"
-                gap={2}
-                justifyContent="end"
-                bgcolor="background.paper"
-              >
-                <Button
-                  variant="contained"
-                  color="error"
-                  type="reset"
-                  onClick={() => {
-                    handleClose()
-                  }}
-                >
-                  Cancel
-                </Button>
-                {permissionUser === true && (
-                  <>
-                    <Button
-                      color="warning"
-                      variant="contained"
-                      onClick={() => handleSubmit(false)}
-                    >
-                      {/* {open === sectionActions.ADD ? "Add" : "Edit"} Content Block */}{" "}
-                      Save as Draft
-                    </Button>
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      onClick={() => handleSubmit(true)}
-                    >
-                      {/* {open === sectionActions.ADD ? "Add" : "Edit"} Content Block */}{" "}
-                      Save & Publish
-                    </Button>
-                  </>
-                )}
-              </Box>
-            </Grid>
-          </Grid>
-        </Box>
       </Card>
+      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
+        <Box
+          p={5}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button
+            variant="contained"
+            color="error"
+            type="reset"
+            size="small"
+            onClick={() => {
+              handleClose()
+            }}
+          >
+            Cancel
+          </Button>
+          {permissionUser === true && (
+            <>
+              <Button
+                color="warning"
+                variant="contained"
+                size="small"
+                onClick={() => handleSubmit(false)}
+              >
+                Save as Draft
+              </Button>
+              <Button
+                variant="contained"
+                type="submit"
+                size="small"
+                onClick={() => handleSubmit(true)}
+              >
+                Save & Publish
+              </Button>
+            </>
+          )}
+        </Box>
+      </Grid>
     </>
   )
 }
