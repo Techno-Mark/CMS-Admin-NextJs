@@ -44,6 +44,7 @@ type blogFormPropsTypes = {
   editingRow: blogDetailType | null;
   handleClose: Function;
   permissionUser: Boolean;
+  permissionUser: Boolean;
 };
 
 const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
@@ -606,7 +607,7 @@ function BlogForm({
             </Grid>
             <Grid item xs={12} sm={12}>
               <p
-                className={`${formErrors.description ? "text-red-600" : " text-[#4e4b5a]"}`}
+                className={`${formErrors.description ? "text-[#ff5054]" : " text-[#4e4b5a]"}`}
               >
                 Description *
               </p>
@@ -616,7 +617,7 @@ function BlogForm({
                 initialValue={editingRow?.description}
               />
               {!!formErrors.description && (
-                <p className="text-red-600">{formErrors.description}</p>
+                <p className="text-[#ff5054]">{formErrors.description}</p>
               )}
               {/* <div>
                 <div dangerouslySetInnerHTML={{ __html: formData.description }} />
@@ -645,7 +646,7 @@ function BlogForm({
                   {60 - formData.metaTitle.length} character left
                 </p>
               ) : (
-                <p className="text-red-500">
+                <p className="text-[#ff5054]">
                   you exceeds maximum limit of characters**
                 </p>
               )}
@@ -678,7 +679,7 @@ function BlogForm({
                   {160 - formData.metaDescription.length} character left
                 </p>
               ) : (
-                <p className="text-red-500">
+                <p className="text-[#ff5054]">
                   you exceeds maximum limit of characters**
                 </p>
               )}
@@ -711,7 +712,7 @@ function BlogForm({
                   {160 - formData.metaKeywords.length} character left
                 </p>
               ) : (
-                <p className="text-red-500">
+                <p className="text-[#ff5054]">
                   you exceeds maximum limit of characters**
                 </p>
               )}
@@ -719,16 +720,23 @@ function BlogForm({
           </Grid>
           <Grid container spacing={6} sm={5}>
             <Grid item xs={12} sm={12}>
-              <p className="text-[#4e4b5a] my-2"> Banner Image * </p>
+              <p
+                className={`${formErrors.bannerImageError ? "text-[#ff5054]" : "text-[#4e4b5a]"} text-[13px]`}
+              >
+                {" "}
+                Banner Image *{" "}
+              </p>
               <div
-                className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md ${!!formErrors.bannerImageError && "border-red-400"}`}
+                className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed  ${formErrors.bannerImageError ? "border-[#ff5054]" : "border-gray-300"} rounded-md`}
               >
                 <Box
                   {...getBannerRootProps({ className: "dropzone" })}
                   {...bannerImage}
                 >
                   <input {...getBannerInputProps()} />
-                  <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
+                  <div
+                    className={`flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed ${formErrors.bannerImageError ? "border-red-500" : "border-gray-300"} rounded-md p-2`}
+                  >
                     {open == EDIT_BLOG && !isImageBannerTouched.bannerImage && (
                       // eslint-disable-next-line
                       <img
@@ -777,7 +785,7 @@ function BlogForm({
                     )}
                   </div>
                   {!!formErrors.bannerImageError && (
-                    <p className="text-[#ff5054]">
+                    <p className="text-[#ff5054] text-[13px]">
                       {formErrors.bannerImageError}
                     </p>
                   )}
@@ -785,14 +793,23 @@ function BlogForm({
               </div>
             </Grid>
             <Grid item xs={12} sm={12}>
-              <p className="text-[#4e4b5a] my-2"> Thumbnail Image * </p>
-              <div className="flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md">
+              <p
+                className={`${formErrors.thumbnailImageError ? "text-[#ff5054]" : "text-[#4e4b5a]"} text-[13px]`}
+              >
+                {" "}
+                Thumbnail Image *{" "}
+              </p>
+              <div
+                className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed  ${formErrors.thumbnailImageError ? "border-[#ff5054]" : "border-gray-300"} rounded-md`}
+              >
                 <Box
                   {...getThumbnailRootProps({ className: "dropzone" })}
                   {...thumbnailImage}
                 >
                   <input {...getThumbnailInputProps()} />
-                  <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
+                  <div
+                    className={`flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed ${formErrors.thumbnailImageError ? "border-red-500" : "border-gray-300"} rounded-md p-2`}
+                  >
                     {open == EDIT_BLOG &&
                       !isImageBannerTouched.thumbnailImage && (
                         // eslint-disable-next-line
@@ -843,7 +860,7 @@ function BlogForm({
                     )}
                   </div>
                   {!!formErrors.thumbnailImageError && (
-                    <p className="text-[#ff5054]">
+                    <p className="text-[#ff5054] text-[13px]">
                       {" "}
                       {formErrors.thumbnailImageError}
                     </p>
@@ -852,14 +869,23 @@ function BlogForm({
               </div>
             </Grid>
             <Grid item xs={12} sm={12}>
-              <p className="text-[#4e4b5a] my-2"> Author Image * </p>
-              <div className="flex items-center flex-col w-[250px] h-[170px] border border-dashed border-gray-300 rounded-md">
+              <p
+                className={`${formErrors.thumbnailImageError ? "text-[#ff5054]" : "text-[#4e4b5a]"} text-[13px]`}
+              >
+                {" "}
+                Author Image *{" "}
+              </p>
+              <div
+                className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed  ${formErrors.thumbnailImageError ? "border-[#ff5054]" : "border-gray-300"} rounded-md`}
+              >
                 <Box
                   {...getAuthorRootProps({ className: "dropzone" })}
                   {...authorImageUrl}
                 >
                   <input {...getAuthorInputProps()} />
-                  <div className="flex items-center justify-center flex-col w-[250px] h-[170px] border border-dashed border-gray-300 rounded-md p-2">
+                  <div
+                    className={`flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed ${formErrors.thumbnailImageError ? "border-red-500" : "border-gray-300"} rounded-md p-2`}
+                  >
                     {open == EDIT_BLOG &&
                       !isImageBannerTouched.authorImageUrl && (
                         // eslint-disable-next-line
@@ -949,7 +975,7 @@ function BlogForm({
                 value={formData.tags}
                 getOptionLabel={(option) => option || ""}
                 renderInput={(params) => (
-                  <CustomTextField {...params} label="Tags" />
+                  <CustomTextField {...params} label="Tags *" error={!!formErrors.tags}/>
                 )}
                 onChange={(e: any, newVal: string[]) => {
                   setFormData({ ...formData, tags: [...newVal] })
@@ -972,7 +998,7 @@ function BlogForm({
                 value={formData.categories}
                 getOptionLabel={(option) => option || ""}
                 renderInput={(params) => (
-                  <CustomTextField {...params} label="Categories" />
+                  <CustomTextField {...params} label="Categories *" error={!!formErrors.categories}/>
                 )}
                 onChange={(e: any, newVal: string[]) => {
                   setFormData({ ...formData, categories: [...newVal] })
@@ -993,7 +1019,7 @@ function BlogForm({
                 fullWidth
                 defaultValue=""
                 value={formData.templateId}
-                label="Select Template"
+                label="Select Template *"
                 id="custom-select"
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   if (Number(e.target.value) <= 0) {

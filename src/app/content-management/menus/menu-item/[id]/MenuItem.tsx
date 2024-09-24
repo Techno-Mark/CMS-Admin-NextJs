@@ -1,23 +1,15 @@
 "use client"
-import React, { useState } from "react"
-import {
-  Box,
-  Button,
-  Card,
-  Grid,
-  IconButton,
-  styled,
-  Typography
-} from "@mui/material"
-import KanbanDrawer from "./KanbanDrawer"
-import LoadingBackdrop from "@/components/LoadingBackdrop"
 import BreadCrumbList from "@/components/BreadCrumbList"
-import DraggableIcon from "../_svg/DraggableIcon"
+import LoadingBackdrop from "@/components/LoadingBackdrop"
 import { postDataToOrganizationAPIs } from "@/services/apiService"
 import { menu } from "@/services/endpoint/menu"
+import CustomIconButton from '@core/components/mui/IconButton'
+import { Box, Button, Card, Grid, IconButton, styled, Typography } from "@mui/material"
+import React, { useState } from "react"
 import { toast } from "react-toastify"
+import DraggableIcon from "../_svg/DraggableIcon"
 import ConfirmationDialog from "./ConfirmationDialog"
-import CustomIconButton from "@core/components/mui/IconButton"
+import KanbanDrawer from "./KanbanDrawer"
 
 const MenuItem = ({
   menuData,
@@ -155,7 +147,7 @@ const MenuItem = ({
         name: "New Subitem",
         link: "#",
         children: [],
-        logo: "#"
+        logo: '#'
       }
 
       if (!newItems[parentIndex].children) {
@@ -216,6 +208,7 @@ const MenuItem = ({
           </IconButton>
         </li>
 
+
         <NestedMenu>
           {item.children && item.children.length > 0 && (
             <ul>
@@ -260,9 +253,8 @@ const MenuItem = ({
                     onClick={() => {
                       setDeleteDrawer(true)
                       setDeleteData({ index: childIndex, parentId: index })
-                    }}
-                  >
-                    <i className="tabler-trash" />
+                    }}>
+                    <i className='tabler-trash' />
                   </IconButton>
                 </li>
               ))}
@@ -409,7 +401,7 @@ const MenuItem = ({
               No Menu Created Yet, Add new Menu and save
             </p>
           )}
-          {permissionUser && (
+          {permissionUser &&
           // <Fab
           //   variant="extended"
           //   className="w-13 h-7 m-4"

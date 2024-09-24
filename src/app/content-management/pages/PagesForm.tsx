@@ -761,6 +761,7 @@ function PagesForm({
                   <CustomTextField
                     multiline
                     minRows={3}
+                    maxRows={3}
                     error={!!formErrors.robots}
                     helperText={formErrors.robots}
                     label="robots (maximum-character: 2000 )"
@@ -782,6 +783,7 @@ function PagesForm({
                   <CustomTextField
                     multiline
                     minRows={3}
+                    maxRows={3}
                     error={!!formErrors.canonical}
                     helperText={formErrors.canonical}
                     label="Canonical (maximum-character: 2000 )"
@@ -830,7 +832,7 @@ function PagesForm({
                     fullWidth
                     defaultValue=""
                     value={formData.templateId}
-                    label="Template"
+                    label="Template *"
                     id="custom-select"
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       const templateId = Number(e.target.value)

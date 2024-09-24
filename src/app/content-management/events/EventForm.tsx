@@ -63,7 +63,8 @@ const initialErrorData = {
   featureImageUrl: "",
   organizerName: "",
   organizerEmail: "",
-  organizerPhone: ""
+  organizerPhone: "",
+  registrationLink: ""
 }
 
 const EventForm = ({
@@ -122,6 +123,7 @@ const EventForm = ({
   const validateForm = () => {
     let valid = true
     const errors = { ...initialErrorData }
+    const urlPattern = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))?)/
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
     if (!formData.title) {
@@ -171,6 +173,13 @@ const EventForm = ({
       valid = false
     } else if (!regex.test(formData.organizerEmail)) {
       errors.organizerEmail = "Please enter valid email"
+      valid = false
+    }
+    if (
+      formData.registrationLink &&
+      !urlPattern.test(formData.registrationLink)
+    ) {
+      errors.registrationLink = "Please enter a valid URL"
       valid = false
     }
     if (!formData.organizerPhone) {
@@ -330,7 +339,7 @@ const EventForm = ({
                         placeholderText="Enter Start Time"
                         customInput={
                           <CustomTextField
-                            label="Event Start Time"
+                            label="Event Start Time *"
                             fullWidth
                             error={!!formErrors.startTime}
                             helperText={formErrors.startTime}
@@ -374,7 +383,7 @@ const EventForm = ({
                         placeholderText="Enter End Time"
                         customInput={
                           <CustomTextField
-                            label="Event End Time"
+                            label="Event End Time *"
                             fullWidth
                             error={!!formErrors.endTime}
                             helperText={formErrors.endTime}
@@ -406,7 +415,7 @@ const EventForm = ({
                         placeholderText="Enter Start Date"
                         customInput={
                           <CustomTextField
-                            label="Event Start Date"
+                            label="Event Start Date *"
                             fullWidth
                             error={!!formErrors.date}
                             helperText={formErrors.date}
@@ -436,7 +445,9 @@ const EventForm = ({
                     </Grid>
 
                     <Grid item xs={12} sm={12}>
-                      <label className="text-[0.8125rem] leading-[1.153]">
+                      <label
+                        className={`${formErrors.description ? "text-[#ff5054]" : "text-[#4e4b5a]"} text-[0.8125rem] leading-[1.153]`}
+                      >
                         Description *
                       </label>
 
@@ -484,14 +495,23 @@ const EventForm = ({
                   </Grid>
                   <Grid container spacing={2} sm={5}>
                     <Grid item xs={12} sm={12}>
-                      <p className="text-[#4e4b5a] my-2"> Thumbnail Image * </p>
-                      <div className="flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md">
+                      <p
+                        className={`${formErrors.featureImageUrl ? "text-[#ff5054]" : "text-[#4e4b5a]"}`}
+                      >
+                        {" "}
+                        Thumbnail Image *{" "}
+                      </p>
+                      <div
+                        className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed  ${formErrors.featureImageUrl ? "border-red-500" : "border-gray-300"} rounded-md`}
+                      >
                         <Box
                           {...getEventRootProps({ className: "dropzone" })}
                           {...featureImage}
                         >
                           <input {...getEventInputProps()} />
-                          <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
+                          <div
+                            className={`flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed ${formErrors.featureImageUrl ? "border-red-500" : "border-gray-300"} rounded-md p-2`}
+                          >
                             {open == EDIT_EVENT && !isFeatureImageTouched && (
                               // eslint-disable-next-line
                               <img
@@ -610,6 +630,8 @@ const EventForm = ({
                   <CustomTextField
                     label="Registration Link"
                     fullWidth
+                    error={!!formErrors.registrationLink}
+                    helperText={formErrors.registrationLink}
                     placeholder="Enter Registration Link"
                     value={formData.registrationLink}
                     onChange={(e) => {

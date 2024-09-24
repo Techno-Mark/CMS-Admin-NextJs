@@ -21,7 +21,6 @@ import { toast } from "react-toastify"
 import { Switch } from "@mui/material"
 
 type RoleDialogProps = {
-
   open: boolean;
   setOpen: (open: boolean) => void;
   title?: string;
@@ -176,7 +175,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
         variant="h4"
         className="flex flex-col gap-2 text-center sm:pbs-16 sm:pbe-6 sm:pli-16 mt-[-2rem]"
       >
-        {title ? "Edit Role" : "Add Role"}
+        {editId === 0 ? "Add Role" : "Edit Role"}
         <Typography component="span" className="flex flex-col text-center">
           Set Role Permissions
         </Typography>
@@ -184,7 +183,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
       <form onSubmit={handleSubmit}>
         <DialogContent className="overflow-visible flex flex-col gap-4 pbs-0 sm:pli-16 mt-[-2rem] mb-[-10px]">
           <CustomTextField
-            label="Role Name"
+            label="Role Name *"
             variant="outlined"
             fullWidth
             placeholder="Enter Role Name"
@@ -196,15 +195,17 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
               setRoleError(false)
             }}
           />
-          <FormControlLabel
-            control={
-              <Switch
-                checked={active}
-                onChange={(e) => setActive(e.target.checked)}
-              />
-            }
-            label="Status"
-          />
+          <span>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={active}
+                  onChange={(e) => setActive(e.target.checked)}
+                />
+              }
+              label="Status"
+            />
+          </span>
           <Typography variant="h5" className="min-is-[225px]">
             Role Permissions
           </Typography>
@@ -294,9 +295,9 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
             Submit
           </Button>
           <Button
-            variant="tonal"
+            variant="outlined"
+            color="error"
             type="reset"
-            color="secondary"
             onClick={handleClose}
           >
             Cancel
