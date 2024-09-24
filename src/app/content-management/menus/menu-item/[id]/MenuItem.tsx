@@ -420,7 +420,7 @@ const MenuItem = ({
               <i className="tabler-plus mie-1" />
               Add
             </Button>
-          )}
+          }
           {drawerOpen && (
             <KanbanDrawer
               drawerOpen={drawerOpen}

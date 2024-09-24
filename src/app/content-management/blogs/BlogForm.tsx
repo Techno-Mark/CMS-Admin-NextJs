@@ -44,7 +44,6 @@ type blogFormPropsTypes = {
   editingRow: blogDetailType | null;
   handleClose: Function;
   permissionUser: Boolean;
-  permissionUser: Boolean;
 };
 
 const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
