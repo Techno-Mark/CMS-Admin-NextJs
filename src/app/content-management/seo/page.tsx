@@ -42,10 +42,10 @@ function RobotSEO() {
       setLoading(true)
       const data = {
         robotText: formData.robotText,
-        googleAnalytics: {
-          beforeScript: formData.googleAnalytics.beforeScript,
-          afterScript: formData.googleAnalytics.afterScript
-        },
+        googleAnalytics: formData.googleAnalytics ? {
+          beforeScript: formData.googleAnalytics.beforeScript || "",
+          afterScript: formData.googleAnalytics.afterScript || ""
+        } : {},
         facebookScript: formData.facebookScript
       }
       const result = await post(robotSEO.getDetail, data)
@@ -65,16 +65,18 @@ function RobotSEO() {
     try {
       let isValid = true
       const errors = { ...formErrors }
-      if (!formData.robotText || formData.robotText.trim() === "") {
-        errors.robotText = "Robot text is required and cannot be empty spaces"
+      if (!formData.robotText) {
+        errors.robotText = "robot text is required"
         isValid = false
       }
       if (!formData.googleAnalytics.beforeScript) {
-        errors.googleAnalytics.beforeScript = "Google Analytics before script text is required"
+        errors.googleAnalytics.beforeScript =
+          "Head before script text is required"
         isValid = false
       }
       if (!formData.googleAnalytics.afterScript) {
-        errors.googleAnalytics.afterScript = "Google Analytics after script text is required"
+        errors.googleAnalytics.afterScript =
+          "Head after script text is required"
         isValid = false
       }
       if (!formData.facebookScript) {
@@ -111,6 +113,7 @@ function RobotSEO() {
   // handle submit
   const handleSubmit = async (active: boolean) => {
     try {
+      setFormErrors(initialErrorData)
       if (!validateForm()) {
         return
       }
@@ -179,7 +182,6 @@ function RobotSEO() {
                 value={formData.robotText}
                 onChange={(e) => {
                   const { value } = e.target
-                  setFormErrors({ ...formErrors, robotText: "" })
                   setFormData({ ...formData, robotText: value })
                 }}
               />
@@ -201,9 +203,9 @@ function RobotSEO() {
                 maxRows={15}
                 error={!!formErrors.googleAnalytics.beforeScript}
                 helperText={formErrors.googleAnalytics.beforeScript}
-                label="Google Analytics Before Script"
+                label="Head Before Script"
                 fullWidth
-                value={formData.googleAnalytics.beforeScript}
+                value={formData.googleAnalytics?.beforeScript}
                 onChange={(e) => {
                   const { value } = e.target
                   setFormData({
@@ -233,9 +235,9 @@ function RobotSEO() {
                 maxRows={15}
                 error={!!formErrors.googleAnalytics.afterScript}
                 helperText={formErrors.googleAnalytics.afterScript}
-                label="Google Analytics After Script"
+                label="Head After Script"
                 fullWidth
-                value={formData.googleAnalytics.afterScript}
+                value={formData.googleAnalytics?.afterScript}
                 onChange={(e) => {
                   const { value } = e.target
                   setFormData({
