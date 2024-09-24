@@ -5,14 +5,7 @@ import { useRouter } from "next/navigation"
 import Button from "@mui/material/Button"
 // Component Imports
 import CustomTextField from "@core/components/mui/TextField"
-import {
-  Avatar,
-  Box,
-  Card,
-  Grid,
-  Switch,
-  Typography
-} from "@mui/material"
+import { Avatar, Box, Card, Grid, Switch, Typography } from "@mui/material"
 import { postContentBlock } from "@/services/apiService"
 import BreadCrumbList from "@/components/BreadCrumbList"
 import { event } from "@/services/endpoint/event"
@@ -37,7 +30,7 @@ type EventFormPropsTypes = {
   open: number;
   editingRow: eventDetailType | null;
   handleClose: Function;
-  permissionUser: Boolean
+  permissionUser: Boolean;
 };
 
 const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
@@ -70,10 +63,16 @@ const initialErrorData = {
   featureImageUrl: "",
   organizerName: "",
   organizerEmail: "",
-  organizerPhone: ""
+  organizerPhone: "",
+  registrationLink: ""
 }
 
-const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormPropsTypes) => {
+const EventForm = ({
+  open,
+  handleClose,
+  editingRow,
+  permissionUser
+}: EventFormPropsTypes) => {
   const router = useRouter()
   const [loading, setLoading] = useState<boolean>(true)
   const [formData, setFormData] = useState<typeof initialData>(initialData)
@@ -124,6 +123,7 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
   const validateForm = () => {
     let valid = true
     const errors = { ...initialErrorData }
+    const urlPattern = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))?)/
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
     if (!formData.title) {
@@ -173,6 +173,13 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
       valid = false
     } else if (!regex.test(formData.organizerEmail)) {
       errors.organizerEmail = "Please enter valid email"
+      valid = false
+    }
+    if (
+      formData.registrationLink &&
+      !urlPattern.test(formData.registrationLink)
+    ) {
+      errors.registrationLink = "Please enter a valid URL"
       valid = false
     }
     if (!formData.organizerPhone) {
@@ -332,7 +339,7 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                         placeholderText="Enter Start Time"
                         customInput={
                           <CustomTextField
-                            label="Event Start Time"
+                            label="Event Start Time *"
                             fullWidth
                             error={!!formErrors.startTime}
                             helperText={formErrors.startTime}
@@ -376,7 +383,7 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                         placeholderText="Enter End Time"
                         customInput={
                           <CustomTextField
-                            label="Event End Time"
+                            label="Event End Time *"
                             fullWidth
                             error={!!formErrors.endTime}
                             helperText={formErrors.endTime}
@@ -408,7 +415,7 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                         placeholderText="Enter Start Date"
                         customInput={
                           <CustomTextField
-                            label="Event Start Date"
+                            label="Event Start Date *"
                             fullWidth
                             error={!!formErrors.date}
                             helperText={formErrors.date}
@@ -438,14 +445,15 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                     </Grid>
 
                     <Grid item xs={12} sm={12}>
-                      <label className="text-[0.8125rem] leading-[1.153]">
+                      <label
+                        className={`${formErrors.description ? "text-[#ff5054]" : "text-[#4e4b5a]"} text-[0.8125rem] leading-[1.153]`}
+                      >
                         Description *
                       </label>
 
                       <EditorBasic
                         content={formData.description}
                         onContentChange={handleContentChange}
-
                         error={!!formErrors.description}
                         helperText={formErrors.description}
                       />
@@ -487,14 +495,23 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                   </Grid>
                   <Grid container spacing={2} sm={5}>
                     <Grid item xs={12} sm={12}>
-                      <p className="text-[#4e4b5a] my-2"> Thumbnail Image * </p>
-                      <div className="flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md">
+                      <p
+                        className={`${formErrors.featureImageUrl ? "text-[#ff5054]" : "text-[#4e4b5a]"}`}
+                      >
+                        {" "}
+                        Thumbnail Image *{" "}
+                      </p>
+                      <div
+                        className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed  ${formErrors.featureImageUrl ? "border-red-500" : "border-gray-300"} rounded-md`}
+                      >
                         <Box
                           {...getEventRootProps({ className: "dropzone" })}
                           {...featureImage}
                         >
                           <input {...getEventInputProps()} />
-                          <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
+                          <div
+                            className={`flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed ${formErrors.featureImageUrl ? "border-red-500" : "border-gray-300"} rounded-md p-2`}
+                          >
                             {open == EDIT_EVENT && !isFeatureImageTouched && (
                               // eslint-disable-next-line
                               <img
@@ -613,6 +630,8 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                   <CustomTextField
                     label="Registration Link"
                     fullWidth
+                    error={!!formErrors.registrationLink}
+                    helperText={formErrors.registrationLink}
                     placeholder="Enter Registration Link"
                     value={formData.registrationLink}
                     onChange={(e) => {
@@ -659,7 +678,7 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                     >
                       Cancel
                     </Button>
-                    {permissionUser &&
+                    {permissionUser && (
                       <Button
                         variant="contained"
                         type="submit"
@@ -667,7 +686,7 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                       >
                         {open === ADD_EVENT ? "Add" : "Edit"} Event
                       </Button>
-                    }
+                    )}
                   </Box>
                 </Grid>
               </Grid>
