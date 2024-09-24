@@ -10,11 +10,21 @@ import CustomTextField from "@/@core/components/mui/TextField"
 import { robotSEO } from "@/services/endpoint/robotSEO"
 
 const initialFormData = {
-  robotText: ""
+  robotText: "",
+  googleAnalytics: {
+    beforeScript: "",
+    afterScript: ""
+  },
+  facebookScript: ""
 }
 
 const initialErrorData = {
-  robotText: ""
+  robotText: "",
+  googleAnalytics: {
+    beforeScript: "",
+    afterScript: ""
+  },
+  facebookScript: ""
 }
 
 function RobotSEO() {
@@ -31,7 +41,12 @@ function RobotSEO() {
     try {
       setLoading(true)
       const data = {
-        robotText: formData.robotText
+        robotText: formData.robotText,
+        googleAnalytics: {
+          beforeScript: formData.googleAnalytics.beforeScript,
+          afterScript: formData.googleAnalytics.afterScript
+        },
+        facebookScript: formData.facebookScript
       }
       const result = await post(robotSEO.getDetail, data)
 
@@ -52,6 +67,18 @@ function RobotSEO() {
       const errors = { ...formErrors }
       if (!formData.robotText || formData.robotText.trim() === "") {
         errors.robotText = "Robot text is required and cannot be empty spaces"
+        isValid = false
+      }
+      if (!formData.googleAnalytics.beforeScript) {
+        errors.googleAnalytics.beforeScript = "Google Analytics before script text is required"
+        isValid = false
+      }
+      if (!formData.googleAnalytics.afterScript) {
+        errors.googleAnalytics.afterScript = "Google Analytics after script text is required"
+        isValid = false
+      }
+      if (!formData.facebookScript) {
+        errors.facebookScript = "Facebook script text is required"
         isValid = false
       }
       setFormErrors(errors)
@@ -90,7 +117,12 @@ function RobotSEO() {
 
       setLoading(true)
       const data = {
-        robotText: formData.robotText
+        robotText: formData.robotText,
+        googleAnalytics: {
+          beforeScript: formData.googleAnalytics.beforeScript,
+          afterScript: formData.googleAnalytics.afterScript
+        },
+        facebookScript: formData.facebookScript
       }
       let result = null
 
@@ -113,7 +145,7 @@ function RobotSEO() {
     <>
       <LoadingBackdrop isLoading={loading} />
       <Box display="flex" alignItems="center">
-        <Grid container spacing={3} display={"flex"} alignItems={'center'}>
+        <Grid container spacing={3} display={"flex"} alignItems={"center"}>
           <Grid item flex={"1"}>
             <BreadCrumbList />
           </Grid>
@@ -121,7 +153,7 @@ function RobotSEO() {
             <Tooltip title="Generate Sitemap">
               <Button
                 variant="contained"
-                color='info'
+                color="info"
                 type="submit"
                 size="medium"
                 onClick={() => handleSitemapGenerate()}
@@ -154,6 +186,98 @@ function RobotSEO() {
             </Grid>
           </Grid>
         </Box>
+        <Box
+          display="flex"
+          marginTop={4}
+          rowGap={4}
+          columnGap={4}
+          alignItems="flex-start"
+        >
+          <Grid container spacing={4} sm={12}>
+            <Grid item xs={12}>
+              <CustomTextField
+                multiline
+                minRows={10}
+                maxRows={15}
+                error={!!formErrors.googleAnalytics.beforeScript}
+                helperText={formErrors.googleAnalytics.beforeScript}
+                label="Google Analytics Before Script"
+                fullWidth
+                value={formData.googleAnalytics.beforeScript}
+                onChange={(e) => {
+                  const { value } = e.target
+                  setFormData({
+                    ...formData,
+                    googleAnalytics: {
+                      ...formData.googleAnalytics,
+                      beforeScript: value
+                    }
+                  })
+                }}
+              />
+            </Grid>
+          </Grid>
+        </Box>
+        <Box
+          display="flex"
+          marginTop={4}
+          rowGap={4}
+          columnGap={4}
+          alignItems="flex-start"
+        >
+          <Grid container spacing={4} sm={12}>
+            <Grid item xs={12}>
+              <CustomTextField
+                multiline
+                minRows={10}
+                maxRows={15}
+                error={!!formErrors.googleAnalytics.afterScript}
+                helperText={formErrors.googleAnalytics.afterScript}
+                label="Google Analytics After Script"
+                fullWidth
+                value={formData.googleAnalytics.afterScript}
+                onChange={(e) => {
+                  const { value } = e.target
+                  setFormData({
+                    ...formData,
+                    googleAnalytics: {
+                      ...formData.googleAnalytics,
+                      afterScript: value
+                    }
+                  })
+                }}
+              />
+            </Grid>
+          </Grid>
+        </Box>
+
+        <Box
+          display="flex"
+          marginTop={4}
+          rowGap={4}
+          columnGap={4}
+          alignItems="flex-start"
+        >
+          <Grid container spacing={4} sm={12}>
+            <Grid item xs={12}>
+              <CustomTextField
+                multiline
+                minRows={10}
+                maxRows={15}
+                error={!!formErrors.facebookScript}
+                helperText={formErrors.facebookScript}
+                label="Facebook Script"
+                fullWidth
+                value={formData.facebookScript}
+                onChange={(e) => {
+                  const { value } = e.target
+                  setFormData({ ...formData, facebookScript: value })
+                }}
+              />
+            </Grid>
+          </Grid>
+        </Box>
+
         <Box display="flex" gap={4}>
           <Grid container spacing={2} sm={12}>
             <Grid

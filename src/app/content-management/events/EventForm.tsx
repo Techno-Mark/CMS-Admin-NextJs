@@ -123,8 +123,7 @@ const EventForm = ({
   const validateForm = () => {
     let valid = true
     const errors = { ...initialErrorData }
-    const urlPattern =
-      /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/
+    const urlPattern = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))?)/
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
     if (!formData.title) {
@@ -446,7 +445,9 @@ const EventForm = ({
                     </Grid>
 
                     <Grid item xs={12} sm={12}>
-                      <label className={`${formErrors.description ? "text-[#ff5054]" : "text-[#4e4b5a]"} text-[0.8125rem] leading-[1.153]`}>
+                      <label
+                        className={`${formErrors.description ? "text-[#ff5054]" : "text-[#4e4b5a]"} text-[0.8125rem] leading-[1.153]`}
+                      >
                         Description *
                       </label>
 
