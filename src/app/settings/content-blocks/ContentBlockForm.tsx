@@ -365,7 +365,6 @@ const ContentBlockForm = ({ open }: Props) => {
     setExpanded(!expanded)
   }
 
-  console.log("initial", initialJSONContent)
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -384,7 +383,7 @@ const ContentBlockForm = ({ open }: Props) => {
                     placeholder=""
                     value={formData.name}
                     onChange={handleSectionNameChange}
-                    disabled={open == sectionActions.EDIT}
+                    // disabled={open == sectionActions.EDIT}
                   />
                 </Grid>
                 <Grid item xs={12} sm={4}>
@@ -555,10 +554,10 @@ const ContentBlockForm = ({ open }: Props) => {
                                   }
                                   error={!!formErrors.jsonContent[index]}
                                   helperText={formErrors.jsonContent[index]}
-                                  disabled={
-                                    open == sectionActions.EDIT &&
-                                    !!initialJSONContent?.[index]?.validation
-                                  }
+                                  // disabled={
+                                  //   open == sectionActions.EDIT &&
+                                  //   !!initialJSONContent?.[index]?.validation
+                                  // }
                                 />
                               </TableCell>
                               {/* </>)} */}
@@ -568,15 +567,15 @@ const ContentBlockForm = ({ open }: Props) => {
                               </>)} */}
                               {!editAllow && (
                                 <TableCell>
-                                  {!(initialJSONContent?.[index]?.fekey) && (
-                                      <IconButton
-                                        size="small"
-                                        onClick={() => handleRemoveRow(index)}
-                                        aria-label="minus"
-                                        color="error"
-                                      >
-                                        <i className="tabler-minus" />
-                                      </IconButton>
+                                  {!initialJSONContent?.[index]?.fekey && (
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => handleRemoveRow(index)}
+                                      aria-label="minus"
+                                      color="error"
+                                    >
+                                      <i className="tabler-minus" />
+                                    </IconButton>
                                   )}
 
                                   {index ===
@@ -782,38 +781,39 @@ const ContentBlockForm = ({ open }: Props) => {
                                                         index
                                                       ]?.[subIndex]
                                                     }
-                                                    disabled={
-                                                      open ==
-                                                        sectionActions.EDIT &&
-                                                      !!initialJSONContent?.[
-                                                        index
-                                                      ]?.multipleData?.[
-                                                        subIndex
-                                                      ]?.validation
-                                                    }
+                                                    // disabled={
+                                                    //   open ==
+                                                    //     sectionActions.EDIT &&
+                                                    //   !!initialJSONContent?.[
+                                                    //     index
+                                                    //   ]?.multipleData?.[
+                                                    //     subIndex
+                                                    //   ]?.validation
+                                                    // }
                                                   />
                                                 </TableCell>
                                                 {/* </>)} */}
                                                 {!editAllow && (
                                                   <TableCell>
-                                                    {open !== sectionActions.EDIT &&
-                                    !(initialJSONContent?.[
-                                      index
-                                    ]?.multipleData?.[
-                                      subIndex
-                                    ]?.fekey) && <IconButton
-                                    size="small"
-                                    onClick={() =>
-                                      handleRemoveSubRow(
-                                        index,
-                                        subIndex
-                                      )
-                                    }
-                                    aria-label="minus"
-                                    color="error"
-                                  >
-                                    <i className="tabler-minus" />
-                                  </IconButton>}
+                                                    {!initialJSONContent?.[
+                                                      index
+                                                    ]?.multipleData?.[
+                                                      subIndex
+                                                    ]?.fekey && (
+                                                        <IconButton
+                                                          size="small"
+                                                          onClick={() =>
+                                                            handleRemoveSubRow(
+                                                              index,
+                                                              subIndex
+                                                            )
+                                                          }
+                                                          aria-label="minus"
+                                                          color="error"
+                                                        >
+                                                          <i className="tabler-minus" />
+                                                        </IconButton>
+                                                    )}
 
                                                     {subIndex ===
                                                       field.multipleData
@@ -851,37 +851,34 @@ const ContentBlockForm = ({ open }: Props) => {
                     </Table>
                   </TableContainer>
                 </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-                >
-                  <Box
-                    p={7}
-                    display="flex"
-                    gap={2}
-                    justifyContent="end"
-                    bgcolor="background.paper"
-                  >
-                    <Button
-                      variant="contained"
-                      color="error"
-                      type="reset"
-                      onClick={() => handleReset()}
-                    >
-                      Cancel
-                    </Button>
-                    <Button variant="contained" type="submit">
-                      {open === sectionActions.ADD ? "Add" : "Update"} Content
-                      Block
-                    </Button>
-                  </Box>
-                </Grid>
               </Grid>
             </Box>
           </form>
         </div>
       </Card>
+
+      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
+        <Box
+          p={5}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button
+            variant="contained"
+            color="error"
+            type="reset"
+            size="small"
+            onClick={() => handleReset()}
+          >
+            Cancel
+          </Button>
+          <Button variant="contained" type="submit" size="small">
+            {open === sectionActions.ADD ? "Add" : "Update"} Content Block
+          </Button>
+        </Box>
+      </Grid>
     </>
   )
 }

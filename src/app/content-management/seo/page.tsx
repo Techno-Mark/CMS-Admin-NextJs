@@ -70,11 +70,13 @@ function RobotSEO() {
         isValid = false
       }
       if (!formData.googleAnalytics.beforeScript) {
-        errors.googleAnalytics.beforeScript = "Google Analytics before script text is required"
+        errors.googleAnalytics.beforeScript =
+          "Google Analytics before script text is required"
         isValid = false
       }
       if (!formData.googleAnalytics.afterScript) {
-        errors.googleAnalytics.afterScript = "Google Analytics after script text is required"
+        errors.googleAnalytics.afterScript =
+          "Google Analytics after script text is required"
         isValid = false
       }
       if (!formData.facebookScript) {
@@ -303,6 +305,25 @@ function RobotSEO() {
           </Grid>
         </Box>
       </Card>
+
+      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
+        <Box
+          p={5}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button
+            variant="contained"
+            type="submit"
+            size="small"
+            onClick={() => handleSubmit(true)}
+          >
+            Save & Update
+          </Button>
+        </Box>
+      </Grid>
     </>
   )
 }

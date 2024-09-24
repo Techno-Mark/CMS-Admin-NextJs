@@ -5,14 +5,7 @@ import { useRouter } from "next/navigation"
 import Button from "@mui/material/Button"
 // Component Imports
 import CustomTextField from "@core/components/mui/TextField"
-import {
-  Avatar,
-  Box,
-  Card,
-  Grid,
-  Switch,
-  Typography
-} from "@mui/material"
+import { Avatar, Box, Card, Grid, Switch, Typography } from "@mui/material"
 import { postContentBlock } from "@/services/apiService"
 import BreadCrumbList from "@/components/BreadCrumbList"
 import { event } from "@/services/endpoint/event"
@@ -37,7 +30,7 @@ type EventFormPropsTypes = {
   open: number;
   editingRow: eventDetailType | null;
   handleClose: Function;
-  permissionUser: Boolean
+  permissionUser: Boolean;
 };
 
 const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
@@ -73,7 +66,12 @@ const initialErrorData = {
   organizerPhone: ""
 }
 
-const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormPropsTypes) => {
+const EventForm = ({
+  open,
+  handleClose,
+  editingRow,
+  permissionUser
+}: EventFormPropsTypes) => {
   const router = useRouter()
   const [loading, setLoading] = useState<boolean>(true)
   const [formData, setFormData] = useState<typeof initialData>(initialData)
@@ -445,7 +443,6 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                       <EditorBasic
                         content={formData.description}
                         onContentChange={handleContentChange}
-
                         error={!!formErrors.description}
                         helperText={formErrors.description}
                       />
@@ -637,44 +634,39 @@ const EventForm = ({ open, handleClose, editingRow, permissionUser }: EventFormP
                 </Grid>
               </Grid>
             </div>
-            <Box display="flex" gap={4}>
-              <Grid container spacing={2} sm={12}>
-                <Grid
-                  item
-                  xs={12}
-                  style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-                >
-                  <Box
-                    p={7}
-                    display="flex"
-                    gap={2}
-                    justifyContent="end"
-                    bgcolor="background.paper"
-                  >
-                    <Button
-                      variant="tonal"
-                      color="error"
-                      type="reset"
-                      onClick={() => handleClose()}
-                    >
-                      Cancel
-                    </Button>
-                    {permissionUser &&
-                      <Button
-                        variant="contained"
-                        type="submit"
-                        onClick={() => handleSubmit()}
-                      >
-                        {open === ADD_EVENT ? "Add" : "Edit"} Event
-                      </Button>
-                    }
-                  </Box>
-                </Grid>
-              </Grid>
-            </Box>
           </div>
         </div>
       </Card>
+
+      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
+        <Box
+          p={5}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button
+            variant="tonal"
+            color="error"
+            type="reset"
+            size="small"
+            onClick={() => handleClose()}
+          >
+            Cancel
+          </Button>
+          {permissionUser && (
+            <Button
+              variant="contained"
+              type="submit"
+              size="small"
+              onClick={() => handleSubmit()}
+            >
+              {open === ADD_EVENT ? "Add" : "Edit"} Event
+            </Button>
+          )}
+        </Box>
+      </Grid>
     </>
   )
 }

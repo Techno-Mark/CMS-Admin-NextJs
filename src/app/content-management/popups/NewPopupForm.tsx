@@ -370,7 +370,10 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   placeholder=""
                   value={formData.delay}
                   onChange={(e) => {
-                    setFormData({ ...formData, delay: parseInt(e.target.value) })
+                    setFormData({
+                      ...formData,
+                      delay: parseInt(e.target.value)
+                    })
                   }}
                 />
               </Grid>
@@ -636,45 +639,39 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
             </Grid>
           </Grid>
         </Box>
-
-        <Box display="flex" gap={4}>
-          <Grid container spacing={2} xs={12} sm={12}>
-            <Grid
-              item
-              xs={12}
-              style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-            >
-              <Box
-                p={7}
-                display="flex"
-                gap={2}
-                justifyContent="end"
-                bgcolor="background.paper"
-              >
-                <Button
-                  variant="contained"
-                  color="error"
-                  type="reset"
-                  onClick={() => {
-                    handleClose()
-                  }}
-                >
-                  Cancel
-                </Button>
-                {permissionUser && (
-                  <Button
-                    variant="contained"
-                    type="submit"
-                    onClick={() => handleSubmit(true)}
-                  >
-                    Save & Update
-                  </Button>
-                )}
-              </Box>
-            </Grid>
-          </Grid>
-        </Box>
       </Card>
+
+      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
+        <Box
+          p={5}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button
+            variant="contained"
+            color="error"
+            type="reset"
+            size="small"
+            onClick={() => {
+              handleClose()
+            }}
+          >
+            Cancel
+          </Button>
+          {permissionUser && (
+            <Button
+              variant="contained"
+              type="submit"
+              size="small"
+              onClick={() => handleSubmit(true)}
+            >
+              Save & Update
+            </Button>
+          )}
+        </Box>
+      </Grid>
     </>
   )
 }

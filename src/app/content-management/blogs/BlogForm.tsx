@@ -43,7 +43,7 @@ type blogFormPropsTypes = {
   open: number;
   editingRow: blogDetailType | null;
   handleClose: Function;
-  permissionUser:Boolean
+  permissionUser: Boolean;
 };
 
 const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
@@ -87,7 +87,12 @@ const initialErrorData = {
   metaKeywords: ""
 }
 
-function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPropsTypes) {
+function BlogForm({
+  open,
+  editingRow,
+  handleClose,
+  permissionUser
+}: blogFormPropsTypes) {
   const router = useRouter()
 
   // state management hook
@@ -600,17 +605,19 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
               />
             </Grid>
             <Grid item xs={12} sm={12}>
-              <p className={`${formErrors.description ? 'text-red-600' : ' text-[#4e4b5a]'}`}>Description *</p>
+              <p
+                className={`${formErrors.description ? "text-red-600" : " text-[#4e4b5a]"}`}
+              >
+                Description *
+              </p>
 
               <MyCKEditor
                 onChange={handleEditorChangeCKEditor}
                 initialValue={editingRow?.description}
               />
-              {
-                !!formErrors.description &&
+              {!!formErrors.description && (
                 <p className="text-red-600">{formErrors.description}</p>
-
-              }
+              )}
               {/* <div>
                 <div dangerouslySetInnerHTML={{ __html: formData.description }} />
               </div> */}
@@ -1022,53 +1029,48 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
             </Grid>
           </Grid>
         </Box>
-        <Box display="flex" gap={4}>
-          <Grid container spacing={2} sm={12}>
-            <Grid
-              item
-              xs={12}
-              style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-            >
-              <Box
-                p={7}
-                display="flex"
-                gap={2}
-                justifyContent="end"
-                bgcolor="background.paper"
-              >
-                <Button
-                  variant="contained"
-                  color="error"
-                  type="reset"
-                  onClick={() => {
-                    handleClose()
-                  }}
-                >
-                  Cancel
-                </Button>
-                {permissionUser === true && (<>
-                  <Button
-                    color="warning"
-                    variant="contained"
-                    onClick={() => handleSubmit(false)}
-                  >
-                    {/* {open === sectionActions.ADD ? "Add" : "Edit"} Content Block */}{" "}
-                    Save as Draft
-                  </Button>
-                  <Button
-                    variant="contained"
-                    type="submit"
-                    onClick={() => handleSubmit(true)}
-                  >
-                    {/* {open === sectionActions.ADD ? "Add" : "Edit"} Content Block */}{" "}
-                    Save & Publish
-                  </Button>
-                </>)}
-              </Box>
-            </Grid>
-          </Grid>
-        </Box>
       </Card>
+      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
+        <Box
+          p={5}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button
+            variant="contained"
+            color="error"
+            type="reset"
+            size="small"
+            onClick={() => {
+              handleClose()
+            }}
+          >
+            Cancel
+          </Button>
+          {permissionUser === true && (
+            <>
+              <Button
+                color="warning"
+                variant="contained"
+                size="small"
+                onClick={() => handleSubmit(false)}
+              >
+                Save as Draft
+              </Button>
+              <Button
+                variant="contained"
+                type="submit"
+                size="small"
+                onClick={() => handleSubmit(true)}
+              >
+                Save & Publish
+              </Button>
+            </>
+          )}
+        </Box>
+      </Grid>
     </>
   )
 }

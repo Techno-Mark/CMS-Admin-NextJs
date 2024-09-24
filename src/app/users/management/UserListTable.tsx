@@ -34,6 +34,8 @@ import CustomChip from "@/@core/components/mui/Chip"
 import classnames from "classnames"
 import { userType } from "@/types/apps/userType"
 import ConfirmationDialog from "./ConfirmationDialog"
+import CustomAvatar from "@/@core/components/mui/Avatar"
+import { getInitials } from "@/utils/getInitials"
 
 type EventTypeWithAction = userType & {
   action?: string;
@@ -165,21 +167,26 @@ const UserListTable = () => {
       columnHelper.accessor("Username", {
         header: "User",
         cell: ({ row }) => (
-          <Typography color="text.primary" className="font-medium">
-
-            {row.original.Username}
-          </Typography>
+          <div className='flex items-center gap-4'>
+          <CustomAvatar size={34}>{getInitials(row.original.Username as string)}</CustomAvatar>
+          <div className='flex flex-col'>
+            <Typography color='text.primary' className='font-medium'>
+              {row.original.Username}
+            </Typography>
+            <Typography variant='body2'>{row.original.Email}</Typography>
+          </div>
+        </div>
         )
       }),
-      // columnHelper.accessor("role", {
-      //   header: "Role",
-      //   cell: ({ row }) => (
-      //     <Typography color="text.primary" className="font-medium">
-      //       {row.original.role}
-      //     </Typography>
-      //   ),
-      //   enableSorting: false,
-      // }),
+      columnHelper.accessor("role", {
+        header: "Roles",
+        cell: ({ row }) => (
+          <Typography color="text.primary" className="font-medium">
+            {row.original.Roles}
+          </Typography>
+        ),
+        enableSorting: false
+      }),
       columnHelper.accessor("createdAt", {
         header: "Created At",
         cell: ({ row }) => (
