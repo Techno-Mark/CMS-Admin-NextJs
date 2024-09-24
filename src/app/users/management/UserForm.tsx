@@ -313,10 +313,22 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                         placeholder="Enter User Name"
                         value={formData.userName}
                         onChange={(e) => {
-                          setFormErrors({ ...formErrors, userName: "" })
+                          const value = e.target.value
+
+                          // Allow only non-blank input
+                          if (value.trim() === "" && value !== "") {
+                            setFormErrors({
+                              ...formErrors,
+                              userName: "User Name cannot contain only spaces"
+                            })
+                          } else {
+                            setFormErrors({ ...formErrors, userName: "" })
+                          }
+
+                          // Set form data with trimmed value
                           setFormData({
                             ...formData,
-                            userName: e.target.value
+                            userName: value // Replace multiple spaces with a single space
                           })
                         }}
                       />
@@ -376,7 +388,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                             fullWidth
                             defaultValue=""
                             value={field.organizationId}
-                            label="Select Company"
+                            label="Select Company *"
                             id="custom-select"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                               handleCompanyChange(Number(e.target.value), index)
@@ -405,7 +417,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                             fullWidth
                             defaultValue=""
                             value={field.roleId}
-                            label="Select Role"
+                            label="Select Role *"
                             id="custom-select"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                               handleRoleChange(Number(e.target.value), index)

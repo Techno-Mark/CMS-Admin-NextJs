@@ -7,7 +7,9 @@ export type careerType = {
   numberOfPosition: number;
   mode: string;
   location: string;
-  detailPageSlug: string;
+  subTitle: string;
+  description: string;
+  slug: string;
   active: boolean;
   createdAt: string;
   updatedAt: string;
@@ -22,6 +24,7 @@ export type careerDetailType = {
   location: string;
   subTitle: string;
   description: string;
+  slug: string;
   active: boolean;
 };
 

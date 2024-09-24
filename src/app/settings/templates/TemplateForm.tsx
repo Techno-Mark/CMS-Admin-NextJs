@@ -115,12 +115,15 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
       isValid = false
     }
     if (data.templateSlug.trim().length === 0) {
-      errors.templateSlug = 'This field is required'
+      errors.templateSlug = 'Template Slug is required'
       isValid = false
     }
     if (data.templateDescription.trim().length === 0) {
-      errors.templateDescription = 'This field is required'
+      errors.templateDescription = 'Template Description  is required'
       isValid = false
+    }
+    if (selectedSections.length == 0) {
+      setIsSectionsValid(false)
     }
 
     setFormErrors(errors)
@@ -133,12 +136,12 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
     setLoading(true)
     if (validateFormData(formData)) {
       if (selectedSections.length === 0) {
-        setIsSectionsValid(false)
+        // setIsSectionsValid(false)
         setLoading(false)
         return
       }
 
-      setIsSectionsValid(true)
+      // setIsSectionsValid(true)
       try {
         const endpoint = editingRow ? template.update : template.create
         // need to update uniqueSectionName for common component
@@ -178,6 +181,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
 
   const handleAddSection = (event: any, newValue: SectionType[]) => {
     setSelectedSections([...selectedSections, ...newValue])
+    setIsSectionsValid(true)
   }
 
   const handleRemoveSection = (index: number) => {
@@ -326,7 +330,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                     getOptionLabel={(option: SectionType) => option.sectionName || ''}
                     value={[]}
                     onChange={handleAddSection}
-                    renderInput={params => <CustomTextField placeholder="" {...params} label="Content Block *" />}
+                    renderInput={params => <CustomTextField placeholder="" {...params} label="Content Block *" error={!isSectionsValid} />}
                   />
                   {!isSectionsValid && (
                     <Typography color="error" variant="body2">

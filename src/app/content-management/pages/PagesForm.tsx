@@ -13,13 +13,14 @@ import {
   IconButton
 } from "@mui/material"
 import React, { ChangeEvent, useEffect, useState } from "react"
-import { get, post } from "@/services/apiService"
+import { get, post, postDataToOrganizationAPIs } from "@/services/apiService"
 import { template } from "@/services/endpoint/template"
 import CustomTextField from "@/@core/components/mui/TextField"
 import { PagesType } from "./pagesType"
 import { pages } from "@/services/endpoint/pages"
 import { toast } from "react-toastify"
 import BreadCrumbList from "@/components/BreadCrumbList"
+import { blogPost } from "@/services/endpoint/blogpost"
 
 const initialFormData = {
   pageId: "",
@@ -563,10 +564,67 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
     })
   }
 
+  // handle Preview Generate
+  const handlePreviewGenerateAndRedirect = async () => {
+    if (validateForm()) {
+      try {
+        setLoading(true)
+
+        const previewDataResponse = await postDataToOrganizationAPIs(
+          pages.getPreviewFormattedData,
+          { templateId: formData.templateId, pageTemplateData: templateValue }
+        )
+        if (previewDataResponse.statusCode !== 200) {
+          toast.error(previewDataResponse.message)
+          return
+        }
+
+        const previewData = {
+          ...formData,
+          formatData: previewDataResponse?.data?.formatData,
+          sectionData: undefined,
+          templateData: undefined
+        }
+
+        const result = await postDataToOrganizationAPIs(
+          blogPost.generatePreview,
+          { data: previewData }
+        )
+        setLoading(false)
+
+        if (result.statusCode === 200) {
+          const redirectURL = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/${formData.slug}?preview=true&id=${result.data.hash}`
+          window.open(redirectURL, "_blank")
+        } else {
+          toast.error(result.message)
+        }
+      } catch (error) {
+        console.error(error)
+        setLoading(false)
+      }
+    }
+  }
+
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
-      <BreadCrumbList />
+      <Box display="flex" alignItems="center">
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={11}>
+            <BreadCrumbList />
+          </Grid>
+          <Grid item xs={12} sm={1}>
+            <Tooltip title="preview blog">
+              <IconButton
+                color="info"
+                onClick={() => handlePreviewGenerateAndRedirect()}
+              >
+                <i className="tabler-external-link text-textSecondary"></i>
+              </IconButton>
+            </Tooltip>
+          </Grid>
+        </Grid>
+      </Box>
       <Card>
         <div>
           <form
@@ -678,6 +736,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
                   <CustomTextField
                     multiline
                     minRows={3}
+                    maxRows={3}
                     error={!!formErrors.robots}
                     helperText={formErrors.robots}
                     label="robots (maximum-character: 2000 )"
@@ -699,6 +758,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
                   <CustomTextField
                     multiline
                     minRows={3}
+                    maxRows={3}
                     error={!!formErrors.canonical}
                     helperText={formErrors.canonical}
                     label="Canonical (maximum-character: 2000 )"
@@ -747,7 +807,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
                     fullWidth
                     defaultValue=""
                     value={formData.templateId}
-                    label="Template"
+                    label="Template *"
                     id="custom-select"
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       const templateId = Number(e.target.value)

@@ -108,42 +108,48 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
 
   const validateForm = () => {
     const errors = { ...initialErrorData }
+    const urlPattern = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))?)/
     let isValid = true
     if (!formData.title) {
-      errors.title = "title is required"
+      errors.title = "Title is required"
       isValid = false
     }
 
     if (popupType === "Event") {
       if (!formData.eventTitle) {
-        errors.eventTitle = "event title is required"
+        errors.eventTitle = "Event title is required"
         isValid = false
       }
+
       if (!formData.btnLink) {
-        errors.btnLink = "button link is required"
+        errors.btnLink = "Button link is required"
+        isValid = false
+      } else if (!urlPattern.test(formData.btnLink)) {
+        errors.btnLink = "Please enter a valid URL"
         isValid = false
       }
     }
+
     if (!formData.heading) {
-      errors.heading = "heading is required"
+      errors.heading = "Heading is required"
       isValid = false
     }
     if (!formData.supportingLine) {
-      errors.supportingLine = "supporting line is required"
+      errors.supportingLine = "Supporting line is required"
       isValid = false
     }
     if (!formData.btnText) {
-      errors.btnText = "button text is required"
+      errors.btnText = "Button text is required"
       isValid = false
     }
 
     if (!image && open == popupActions.ADD) {
-      errors.image = "image is required"
+      errors.image = "Image is required"
       isValid = false
     }
 
     if (!formData.location) {
-      errors.location = "location is required"
+      errors.location = "Location is required"
       isValid = false
     }
 
@@ -568,18 +574,18 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
           <Grid container spacing={4} xs={4}>
             <Grid item xs={12} sm={12} className="mt-[-20px]">
               <p
-                className={`${formErrors.image ? "text-red-500" : "text-[#4e4b5a]"} my-2`}
+                className={`${formErrors.image ? "text-[#ff5054]" : "text-[#4e4b5a]"} mt-4`}
               >
                 {" "}
                 Image*{" "}
               </p>
-              <div className="flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md">
+              <div className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed  ${formErrors.image ? "border-[#ff5054]" : "border-gray-300"} rounded-md`}>
                 <Box
                   {...getImageRootProps({ className: "dropzone" })}
                   {...image}
                 >
                   <input {...getImageInputProps()} />
-                  <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2">
+                  <div className={`flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed ${formErrors.image ? "border-red-500" : "border-gray-300"} rounded-md p-2`}>
                     {open == popupActions.EDIT && !isImageTouched && (
                       // eslint-disable-next-line
                       <img
@@ -631,7 +637,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                 </Box>
               </div>
               {!!formErrors.image && (
-                <p className="text-red-500">{formErrors.image}</p>
+                <p className="text-[#ff5054]">{formErrors.image}</p>
               )}
             </Grid>
           </Grid>

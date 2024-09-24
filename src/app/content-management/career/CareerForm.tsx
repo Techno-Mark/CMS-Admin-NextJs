@@ -42,6 +42,7 @@ const initialData = {
   location: "",
   subTitle: "",
   description: "",
+  slug: "",
   active: false,
 };
 
@@ -53,6 +54,7 @@ const initialErrorData = {
   location: "",
   subTitle: "",
   description: "",
+  slug: "",
 };
 
 const CareerForm = ({
@@ -83,37 +85,65 @@ const CareerForm = ({
     }));
   };
 
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSlug = e.target.value;
+    const slugRegex = /^[a-zA-Z0-9/-]+$/;
+
+    if (!slugRegex.test(newSlug)) {
+      setFormErrors({
+        ...formErrors,
+        slug: "Slug must be alphanumeric with no spaces, or underscores",
+      });
+    } else {
+      setFormErrors({ ...formErrors, slug: "" });
+    }
+
+    setFormData((prevData) => ({
+      ...prevData,
+      slug: newSlug,
+    }));
+  };
+
   const validateForm = () => {
     let valid = true;
     const errors = { ...initialErrorData };
+    const slugRegex = /^[a-zA-Z0-9/-]+$/;
 
     if (!formData.jobTitle) {
-      errors.jobTitle = "Please enter Job Title";
+      errors.jobTitle = "Please enter job title";
       valid = false;
     }
     if (!formData.yearsOfExperience) {
-      errors.yearsOfExperience = "Please enter Years of Experience";
+      errors.yearsOfExperience = "Please enter years of experience";
       valid = false;
     }
     if (!formData.numberOfPosition) {
-      errors.numberOfPosition = "Please enter Number of Positions";
+      errors.numberOfPosition = "Please enter number of positions";
       valid = false;
     }
     if (!formData.mode) {
-      errors.mode = "Please enter Mode";
+      errors.mode = "Please enter mode";
       valid = false;
     }
     if (!formData.location) {
-      errors.location = "Please enter Location";
+      errors.location = "Please enter location";
       valid = false;
     }
     if (!formData.subTitle) {
-      errors.subTitle = "Please enter Sub Title";
+      errors.subTitle = "Please enter sub title";
       valid = false;
     }
     if (!formData.description) {
-      errors.description = "Please enter Description";
+      errors.description = "Please enter description";
       valid = false;
+    }
+    if (formData.slug.trim().length === 0) {
+      errors.slug = "Slug is required"
+      valid = false
+    } else if (!slugRegex.test(formData.slug)) {
+      errors.slug =
+        "Slug must be alphanumeric with no spaces or special characters."
+      valid = false
     }
 
     setFormErrors(errors);
@@ -133,6 +163,7 @@ const CareerForm = ({
           location: formData.location,
           subTitle: formData.subTitle,
           description: formData.description,
+          slug: formData.slug,
           active: formData.active,
         };
 
@@ -304,9 +335,20 @@ const CareerForm = ({
                       }}
                     />
                   </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <CustomTextField
+                      error={!!formErrors.slug}
+                      helperText={formErrors.slug}
+                      label="Slug *"
+                      fullWidth
+                      placeholder="Enter Slug"
+                      value={formData.slug}
+                      onChange={handleSlugChange}
+                    />
+                  </Grid>
                   <Grid item xs={12} sm={12}>
                     <p
-                      className={`${formErrors.description ? "text-red-600" : " text-[#4e4b5a]"}`}
+                      className={`${formErrors.description ? "text-[#ff5054] text-[13px]" : " text-[#4e4b5a] text-[13px]"}`}
                     >
                       Description *
                     </p>
@@ -316,7 +358,7 @@ const CareerForm = ({
                       initialValue={editingRow?.description}
                     />
                     {!!formErrors.description && (
-                      <p className="text-red-600">{formErrors.description}</p>
+                      <p className="text-[#ff5054] text-[13px]">{formErrors.description}</p>
                     )}
                     {/* <div>
                 <div dangerouslySetInnerHTML={{ __html: formData.description }} />

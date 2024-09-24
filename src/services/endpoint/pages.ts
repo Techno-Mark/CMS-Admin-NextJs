@@ -5,7 +5,8 @@ export const pages = {
   getById: `organization/page/getById`,
   delete: `organization/page/delete`,
   fileUpoad: `upload`,
-  active: `organization/page/active`
+  active: `organization/page/active`,
+  getPreviewFormattedData: `organization/page/get/page-preview-data`
 }
 
 export const redirectToEditPage = (id: number | string) => {
