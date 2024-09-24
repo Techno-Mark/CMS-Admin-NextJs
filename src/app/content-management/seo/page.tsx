@@ -50,8 +50,8 @@ function RobotSEO() {
     try {
       let isValid = true
       const errors = { ...formErrors }
-      if (!formData.robotText) {
-        errors.robotText = "robot text is required"
+      if (!formData.robotText || formData.robotText.trim() === "") {
+        errors.robotText = "Robot text is required and cannot be empty spaces"
         isValid = false
       }
       setFormErrors(errors)
@@ -147,6 +147,7 @@ function RobotSEO() {
                 value={formData.robotText}
                 onChange={(e) => {
                   const { value } = e.target
+                  setFormErrors({ ...formErrors, robotText: "" })
                   setFormData({ ...formData, robotText: value })
                 }}
               />

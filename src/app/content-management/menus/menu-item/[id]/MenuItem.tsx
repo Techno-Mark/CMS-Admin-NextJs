@@ -257,7 +257,7 @@ const MenuItem = ({
           {permissionUser &&
           <Fab
             variant="extended"
-            className="w-7 h-7 m-4"
+            className="w- h-8 m-4"
             onClick={() => setDrawerOpen(true)}
           >
             <i className="tabler-plus mie-1" />

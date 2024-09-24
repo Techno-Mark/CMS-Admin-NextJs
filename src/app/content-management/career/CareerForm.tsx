@@ -88,31 +88,31 @@ const CareerForm = ({
     const errors = { ...initialErrorData };
 
     if (!formData.jobTitle) {
-      errors.jobTitle = "Please enter Job Title";
+      errors.jobTitle = "Please enter job title";
       valid = false;
     }
     if (!formData.yearsOfExperience) {
-      errors.yearsOfExperience = "Please enter Years of Experience";
+      errors.yearsOfExperience = "Please enter years of experience";
       valid = false;
     }
     if (!formData.numberOfPosition) {
-      errors.numberOfPosition = "Please enter Number of Positions";
+      errors.numberOfPosition = "Please enter number of positions";
       valid = false;
     }
     if (!formData.mode) {
-      errors.mode = "Please enter Mode";
+      errors.mode = "Please enter mode";
       valid = false;
     }
     if (!formData.location) {
-      errors.location = "Please enter Location";
+      errors.location = "Please enter location";
       valid = false;
     }
     if (!formData.subTitle) {
-      errors.subTitle = "Please enter Sub Title";
+      errors.subTitle = "Please enter sub title";
       valid = false;
     }
     if (!formData.description) {
-      errors.description = "Please enter Description";
+      errors.description = "Please enter description";
       valid = false;
     }
 
@@ -306,7 +306,7 @@ const CareerForm = ({
                   </Grid>
                   <Grid item xs={12} sm={12}>
                     <p
-                      className={`${formErrors.description ? "text-red-600" : " text-[#4e4b5a]"}`}
+                      className={`${formErrors.description ? "text-[#ff5054] text-[13px]" : " text-[#4e4b5a] text-[13px]"}`}
                     >
                       Description *
                     </p>
@@ -316,7 +316,7 @@ const CareerForm = ({
                       initialValue={editingRow?.description}
                     />
                     {!!formErrors.description && (
-                      <p className="text-red-600">{formErrors.description}</p>
+                      <p className="text-[#ff5054] text-[13px]">{formErrors.description}</p>
                     )}
                     {/* <div>
                 <div dangerouslySetInnerHTML={{ __html: formData.description }} />
