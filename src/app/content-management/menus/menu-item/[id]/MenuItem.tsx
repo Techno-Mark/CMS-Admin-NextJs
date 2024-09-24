@@ -208,7 +208,6 @@ const MenuItem = ({
           </IconButton>
         </li>
 
-
         <NestedMenu>
           {item.children && item.children.length > 0 && (
             <ul>
