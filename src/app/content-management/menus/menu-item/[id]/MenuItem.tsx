@@ -20,7 +20,7 @@ const MenuItem = ({
   menuData: any;
   menuId: string;
   handleClose: Function;
-  permissionUser: Boolean
+  permissionUser: Boolean;
 }) => {
   const [loading, setLoading] = useState<boolean>(false)
   const [menuItems, setMenuItems] = useState<any[] | null>(menuData)
@@ -140,34 +140,12 @@ const MenuItem = ({
     }
   }
 
-  // const MenuItemContainer = styled(Box)(({ theme }) => ({
-  //   padding: "0.5rem 1rem",
-  //   display: "flex",
-  //   alignItems: "center",
-  //   justifyContent: "space-between",
-  //   borderBottom: `1px solid ${theme.palette.divider}`,
-  //   "&:hover": {
-  //     backgroundColor: theme.palette.action.hover
-  //   }
-  // }))
-
-  // const MenuItemActions = styled(Box)(({ theme }) => ({
-  //   display: "flex",
-  //   gap: "0.5rem"
-  // }))
-
-  // const NestedMenu = styled(Box)(({ theme }) => ({
-  //   marginLeft: "1.5rem",
-  //   paddingLeft: "1rem",
-  //   borderLeft: `2px solid ${theme.palette.divider}`
-  // }))
-
   const renderMenuItems = (items: any[], parentId: number): React.ReactNode => {
     const handleAddSubmenu = (parentIndex: number) => {
       const newItems = [...items]
       const newSubItem = {
-        name: 'New Subitem',
-        link: '#',
+        name: "New Subitem",
+        link: "#",
         children: [],
         logo: '#'
       }
@@ -185,7 +163,6 @@ const MenuItem = ({
 
     return items.map((item, index) => (
       <ul key={index + 1}>
-
         <li
           className="flex items-center border-b-black border-b"
           draggable
@@ -210,7 +187,6 @@ const MenuItem = ({
           </div>
 
           <IconButton
-
             size="medium"
             // @ts-ignore
             color="success"
@@ -230,11 +206,9 @@ const MenuItem = ({
           >
             <i className="tabler-trash mie-1" />
           </IconButton>
-
         </li>
 
         <NestedMenu>
-
           {item.children && item.children.length > 0 && (
             <ul>
               {item.children.map((childItem: any, childIndex: number) => (
@@ -249,16 +223,22 @@ const MenuItem = ({
                   <div className="flex-1 flex items-center gap-x-2">
                     <DraggableIcon />
                     {childItem?.logo && childItem.logo !== "#" && (
-                      <img src={childItem.logo} alt="icon" width={30} height={30} />
+                      <img
+                        src={childItem.logo}
+                        alt="icon"
+                        width={30}
+                        height={30}
+                      />
                     )}
                     <Typography variant="h5"> {childItem.name} </Typography>
-                    <Typography variant="subtitle1"> ({childItem.link}) </Typography>
+                    <Typography variant="subtitle1">
+                      {" "}
+                      ({childItem.link}){" "}
+                    </Typography>
                   </div>
 
                   <IconButton
-
                     size="small"
-
                     // @ts-ignore
                     color="success"
                     onClick={() => handleEdit(childIndex, index)}
@@ -275,7 +255,6 @@ const MenuItem = ({
                     }}>
                     <i className='tabler-trash' />
                   </IconButton>
-
                 </li>
               ))}
             </ul>
@@ -414,7 +393,6 @@ const MenuItem = ({
       <Card>
         <div className="bg-white p-1 max-w-[70%] m-auto">
           {menuItems ? (
-
             renderMenuItems(menuItems, -1)
           ) : (
             <p className="text-xl p-4">
@@ -432,7 +410,12 @@ const MenuItem = ({
           //   Add
           // </Fab>
 
-            <Button color="success" size="small" variant="contained" onClick={() => setDrawerOpen(true)}>
+            <Button
+              color="success"
+              size="small"
+              variant="contained"
+              onClick={() => setDrawerOpen(true)}
+            >
               <i className="tabler-plus mie-1" />
               Add
             </Button>
@@ -466,38 +449,53 @@ const MenuItem = ({
             />
           )}
         </div>
-        <Box display="flex" gap={2}>
-          <Grid container spacing={2}>
-            <Grid
-              item
-              xs={12}
-              style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-            >
-              <Box
-                p={2}
-                display="flex"
-                gap={2}
-                justifyContent="end"
-                bgcolor="background.paper"
-              >
-                <Button
-                  variant="contained"
-                  color="error"
-                  type="reset"
-                  onClick={() => handleClose()}
-                >
-                  Cancel
-                </Button>
-                {permissionUser &&
-                  <Button variant="contained" onClick={() => handleSubmit()}>
-                    Save
-                  </Button>
-                }
-              </Box>
-            </Grid>
-          </Grid>
-        </Box>
       </Card>
+      <Box display="flex" gap={2}>
+        <Grid container spacing={2}>
+          <Grid
+            item
+            xs={12}
+            style={{ position: "sticky", bottom: 0, zIndex: 10 }}
+          >
+            <Box
+              p={2}
+              display="flex"
+              gap={2}
+              justifyContent="end"
+              bgcolor="background.paper"
+            ></Box>
+          </Grid>
+        </Grid>
+      </Box>
+
+      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
+        <Box
+          p={5}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button
+            variant="contained"
+            color="error"
+            type="reset"
+            size="small"
+            onClick={() => handleClose()}
+          >
+            Cancel
+          </Button>
+          {permissionUser && (
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => handleSubmit()}
+            >
+              Save
+            </Button>
+          )}
+        </Box>
+      </Grid>
     </>
   )
 }

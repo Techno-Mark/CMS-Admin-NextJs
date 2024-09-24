@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react"
 import {
   Box,
   Typography,
@@ -9,23 +9,23 @@ import {
   FormControlLabel,
   Card,
   IconButton
-} from '@mui/material'
-import { toast } from 'react-toastify'
-import { post } from '@/services/apiService'
-import CustomTextField from '@/@core/components/mui/TextField'
-import { TemplateType } from '@/types/apps/templateType'
-import { template } from '@/services/endpoint/template'
-import CustomAutocomplete from '@core/components/mui/Autocomplete'
-import { section } from '@/services/endpoint/section'
-import BreadCrumbList from '@/components/BreadCrumbList'
-import LoadingBackdrop from '@/components/LoadingBackdrop'
-import { v4 as uuidv4 } from 'uuid'
+} from "@mui/material"
+import { toast } from "react-toastify"
+import { post } from "@/services/apiService"
+import CustomTextField from "@/@core/components/mui/TextField"
+import { TemplateType } from "@/types/apps/templateType"
+import { template } from "@/services/endpoint/template"
+import CustomAutocomplete from "@core/components/mui/Autocomplete"
+import { section } from "@/services/endpoint/section"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import LoadingBackdrop from "@/components/LoadingBackdrop"
+import { v4 as uuidv4 } from "uuid"
 // import DeleteIcon from '@mui/icons-material/Delete';
 
 type SectionType = {
   sectionId: number;
   sectionName: string;
-  uniqueSectionName:string;
+  uniqueSectionName: string;
   isCommon?: boolean;
 };
 
@@ -43,23 +43,28 @@ type Props = {
 
 const initialData: TemplateType = {
   templateId: 0,
-  templateName: '',
-  templateDescription: '',
+  templateName: "",
+  templateDescription: "",
   active: false,
-  templateSlug: '',
+  templateSlug: "",
   sectionIds: [],
   templateSection: [],
-  createdAt: '',
+  createdAt: "",
   uniqueSectionName: ""
 }
 
-const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditingRow }) => {
+const TemplateForm: React.FC<Props> = ({
+  open,
+  handleClose,
+  editingRow,
+  setEditingRow
+}) => {
   const [formData, setFormData] = useState<TemplateType>(initialData)
   const [formErrors, setFormErrors] = useState({
-    templateName: '',
-    templateDescription: '',
-    active: '',
-    templateSlug: ''
+    templateName: "",
+    templateDescription: "",
+    active: "",
+    templateSlug: ""
   })
   const [activeData, setActiveData] = useState<SectionType[]>([])
   const [selectedSections, setSelectedSections] = useState<SectionType[]>([])
@@ -88,7 +93,6 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
       setFormData(editingRow)
 
       const sections = editingRow.templateSection.map((section: any) => ({
-
         sectionId: section.sectionId,
         sectionName: section.sectionName,
         uniqueSectionName: section.uniqueSectionName,
@@ -104,14 +108,21 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
 
   const validateFormData = (data: TemplateType) => {
     let isValid = true
-    const errors = { templateName: '', templateDescription: '', active: '', templateSlug: '' }
+    const errors = {
+      templateName: "",
+      templateDescription: "",
+      active: "",
+      templateSlug: ""
+    }
 
     if (data.templateName.trim().length < 5) {
-      errors.templateName = 'Template Name should allow a minimum of 5 characters'
+      errors.templateName =
+        "Template Name should allow a minimum of 5 characters"
       isValid = false
     }
     if (data.templateName.trim().length > 50) {
-      errors.templateName = 'Template Name should allow a maximum of 50 character'
+      errors.templateName =
+        "Template Name should allow a maximum of 50 character"
       isValid = false
     }
     if (data.templateSlug.trim().length === 0) {
@@ -151,18 +162,18 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
           templateDescription: formData.templateDescription,
           active: formData.active,
           templateSlug: formData.templateSlug,
-          sectionIds: selectedSections.map(section => {
-            let uniqueSectionName = ''
+          sectionIds: selectedSections.map((section) => {
+            let uniqueSectionName = ""
             if (section.isCommon) {
               uniqueSectionName = section.sectionName
             } else {
               uniqueSectionName = section?.uniqueSectionName ? section.uniqueSectionName : `${section.sectionName}_${uuidv4()}`
             }
-            return ({
+            return {
               sectionId: section.sectionId,
               isCommon: !!section.isCommon,
               uniqueSectionName
-            })
+            }
           })
         }
 
@@ -173,7 +184,7 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
         setEditingRow(null)
         setLoading(false)
       } catch (error: any) {
-        console.error('Error fetching data:', error.message)
+        console.error("Error fetching data:", error.message)
         setLoading(false)
       }
     }
@@ -190,12 +201,18 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
     setSelectedSections(updatedSections)
   }
 
-  const handleDragStart = (event: React.DragEvent<HTMLDivElement>, index: number) => {
-    event.dataTransfer.setData('text/plain', index.toString())
+  const handleDragStart = (
+    event: React.DragEvent<HTMLDivElement>,
+    index: number
+  ) => {
+    event.dataTransfer.setData("text/plain", index.toString())
   }
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>, index: number) => {
-    const draggedIndex = Number(event.dataTransfer.getData('text/plain'))
+  const handleDrop = (
+    event: React.DragEvent<HTMLDivElement>,
+    index: number
+  ) => {
+    const draggedIndex = Number(event.dataTransfer.getData("text/plain"))
     const updatedSections = [...selectedSections]
     const [draggedSection] = updatedSections.splice(draggedIndex, 1)
     updatedSections.splice(index, 0, draggedSection)
@@ -214,20 +231,25 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
   //   );
   // };
   const handleSectionIsCommonChange = (index: number) => {
-    setSelectedSections(prevSections =>
+    setSelectedSections((prevSections) =>
       prevSections.map((section, i) =>
         i === index ? { ...section, isCommon: !section.isCommon } : section
       )
     )
   }
-  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState<boolean>(false)
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] =
+    useState<boolean>(false)
   const handleSectionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value
     setFormErrors({ ...formErrors, templateName: "" })
     setFormData((prevData) => ({
       ...prevData,
       templateName: newName,
-      templateSlug: !isSlugManuallyEdited && open === sectionActions.ADD ? newName.replace(/[^\w\s]|_/g, "").replace(/\s+/g, "-").toLowerCase() : prevData.templateSlug
+      templateSlug:
+        !isSlugManuallyEdited && open === sectionActions.ADD ? newName
+          .replace(/[^\w\s]|_/g, "")
+          .replace(/\s+/g, "-")
+          .toLowerCase() : prevData.templateSlug
     }))
   }
 
@@ -302,7 +324,9 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                   <Switch
                     size="medium"
                     checked={formData.active}
-                    onChange={e => setFormData({ ...formData, active: e.target.checked })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, active: e.target.checked })
+                    }
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
@@ -314,8 +338,14 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                     label="Template Description *"
                     id="validation-error-helper-text"
                     onChange={(e) => {
-                      setFormErrors(prevErrors => ({ ...prevErrors, templateDescription: '' }))
-                      setFormData(prevData => ({ ...prevData, templateDescription: e.target.value }))
+                      setFormErrors((prevErrors) => ({
+                        ...prevErrors,
+                        templateDescription: ""
+                      }))
+                      setFormData((prevData) => ({
+                        ...prevData,
+                        templateDescription: e.target.value
+                      }))
                     }}
                   />
                 </Grid>
@@ -327,7 +357,9 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                     fullWidth
                     options={activeData}
                     id="autocomplete-custom"
-                    getOptionLabel={(option: SectionType) => option.sectionName || ''}
+                    getOptionLabel={(option: SectionType) =>
+                      option.sectionName || ""
+                    }
                     value={[]}
                     onChange={handleAddSection}
                     renderInput={params => <CustomTextField placeholder="" {...params} label="Content Block *" error={!isSectionsValid} />}
@@ -346,37 +378,44 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
                         <Box
                           key={`${section.sectionId}-${index}`}
                           draggable
-                          onDragStart={event => handleDragStart(event, index)}
-                          onDrop={event => handleDrop(event, index)}
+                          onDragStart={(event) => handleDragStart(event, index)}
+                          onDrop={(event) => handleDrop(event, index)}
                           onDragOver={handleDragOver}
                           sx={{
                             p: 2,
                             mb: 1,
-                            border: '1px solid #d1d0d4',
+                            border: "1px solid #d1d0d4",
                             borderRadius: 1,
-                            cursor: 'move',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
+                            cursor: "move",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center"
                           }}
                         >
                           <Typography>
-                            <IconButton color='inherit'>
+                            <IconButton color="inherit">
                               <i className="tabler-baseline-density-medium text-[18px]" />
                             </IconButton>
                             <FormControlLabel
                               control={
                                 <Checkbox
                                   checked={section.isCommon || false}
-                                  onChange={() => handleSectionIsCommonChange(index)}
+                                  onChange={() =>
+                                    handleSectionIsCommonChange(index)
+                                  }
                                   disabled={true}
                                 />
                               }
-                              label={<Typography>{section.sectionName}</Typography>}
+                              label={
+                                <Typography>{section.sectionName}</Typography>
+                              }
                               sx={{ ml: 2 }}
                             />
                           </Typography>
-                          <IconButton onClick={() => handleRemoveSection(index)} color='error'>
+                          <IconButton
+                            onClick={() => handleRemoveSection(index)}
+                            color="error"
+                          >
                             <i className="tabler-trash text-[18px] text-textDanger" />
                           </IconButton>
                         </Box>
@@ -400,19 +439,29 @@ const TemplateForm: React.FC<Props> = ({ open, handleClose, editingRow, setEditi
           </form>
         </div>
       </Card>
-      <Grid item xs={12} style={{ position: 'sticky', bottom: 0, zIndex: 10 }} >
+      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
         <Box
-          p={7}
+          p={5}
           display="flex"
           gap={2}
           justifyContent="end"
           bgcolor="background.paper"
         >
-          <Button variant="outlined" color="error" onClick={handleClose}>
+          <Button
+            variant="outlined"
+            color="error"
+            size="small"
+            onClick={handleClose}
+          >
             Cancel
           </Button>
-          <Button variant="contained" type="submit" onClick={handleSubmit}>
-            {open === -1 ? 'Add' : 'Edit'} Template
+          <Button
+            variant="contained"
+            type="submit"
+            size="small"
+            onClick={handleSubmit}
+          >
+            {open === -1 ? "Add" : "Edit"} Template
           </Button>
         </Box>
       </Grid>

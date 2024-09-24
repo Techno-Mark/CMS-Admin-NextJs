@@ -138,12 +138,12 @@ const CareerForm = ({
       valid = false;
     }
     if (formData.slug.trim().length === 0) {
-      errors.slug = "Slug is required"
-      valid = false
+      errors.slug = "Slug is required";
+      valid = false;
     } else if (!slugRegex.test(formData.slug)) {
       errors.slug =
-        "Slug must be alphanumeric with no spaces or special characters."
-      valid = false
+        "Slug must be alphanumeric with no spaces or special characters.";
+      valid = false;
     }
 
     setFormErrors(errors);
@@ -367,44 +367,39 @@ const CareerForm = ({
                 </Grid>
               </Box>
             </div>
-            <Box display="flex" gap={4}>
-              <Grid container spacing={2} sm={12}>
-                <Grid
-                  item
-                  xs={12}
-                  style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-                >
-                  <Box
-                    p={7}
-                    display="flex"
-                    gap={2}
-                    justifyContent="end"
-                    bgcolor="background.paper"
-                  >
-                    <Button
-                      variant="tonal"
-                      color="error"
-                      type="reset"
-                      onClick={() => handleClose()}
-                    >
-                      Cancel
-                    </Button>
-                    {permissionUser && (
-                      <Button
-                        variant="contained"
-                        type="submit"
-                        onClick={() => handleSubmit()}
-                      >
-                        {open === ADD_CAREER ? "Add" : "Edit"} Career
-                      </Button>
-                    )}
-                  </Box>
-                </Grid>
-              </Grid>
-            </Box>
           </div>
         </div>
       </Card>
+
+      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
+        <Box
+          p={5}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button
+            variant="tonal"
+            color="error"
+            type="reset"
+            size="small"
+            onClick={() => handleClose()}
+          >
+            Cancel
+          </Button>
+          {permissionUser && (
+            <Button
+              variant="contained"
+              type="submit"
+              size="small"
+              onClick={() => handleSubmit()}
+            >
+              {open === ADD_CAREER ? "Add" : "Edit"} Career
+            </Button>
+          )}
+        </Box>
+      </Grid>
     </>
   );
 };

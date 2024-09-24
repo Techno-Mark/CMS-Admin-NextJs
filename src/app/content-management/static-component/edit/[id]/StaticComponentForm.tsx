@@ -14,9 +14,7 @@ import {
 } from "@mui/material"
 import React, { ChangeEvent, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import {
-  postDataToOrganizationAPIs
-} from "@/services/apiService"
+import { postDataToOrganizationAPIs } from "@/services/apiService"
 import { toast } from "react-toastify"
 import BreadCrumbList from "@/components/BreadCrumbList"
 import CustomTextField from "@/@core/components/mui/TextField"
@@ -26,7 +24,7 @@ type staticContentBlockFormPropsTypes = {
   sectionSchema: any;
   editingRow: any | null;
   handleClose: Function;
-  permissionUser: Boolean
+  permissionUser: Boolean;
 };
 
 function StaticComponentForm({
@@ -207,9 +205,7 @@ function StaticComponentForm({
                         </CardActions>
 
                         <CardContent>
-                          {templateValue?.data?.[
-                            sectionField.fekey
-                          ]?.map(
+                          {templateValue?.data?.[sectionField.fekey]?.map(
                             (
                               multipleSection: any,
                               multipleSectionIndex: any
@@ -342,19 +338,11 @@ function StaticComponentForm({
                         }
                         name={sectionField.fieldType}
                         onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                          handleInputChange(
-                            e,
-                            "data",
-                            sectionField.fekey
-                          )
+                          handleInputChange(e, "data", sectionField.fekey)
                         }
                         fullWidth
                         margin="normal"
-                        value={
-                          templateValue?.data?.[
-                            sectionField.fekey
-                          ] || ""
-                        }
+                        value={templateValue?.data?.[sectionField.fekey] || ""}
                       />
                     </Grid>
                   )}
@@ -385,44 +373,39 @@ function StaticComponentForm({
           columnGap={4}
           alignItems="flex-start"
         ></Box>
-        <Box display="flex" gap={4}>
-          <Grid container spacing={2} sm={12}>
-            <Grid
-              item
-              xs={12}
-              style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-            >
-              <Box
-                p={7}
-                display="flex"
-                gap={2}
-                justifyContent="end"
-                bgcolor="background.paper"
-              >
-                <Button
-                  variant="contained"
-                  color="error"
-                  type="reset"
-                  onClick={() => {
-                    handleClose()
-                  }}
-                >
-                  Cancel
-                </Button>
-                {permissionUser &&
-                  <Button
-                    variant="contained"
-                    type="submit"
-                    onClick={() => handleSubmit(true)}
-                  >
-                    Save & Update
-                  </Button>
-                }
-              </Box>
-            </Grid>
-          </Grid>
-        </Box>
       </Card>
+
+      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
+        <Box
+          p={5}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button
+            variant="contained"
+            color="error"
+            type="reset"
+            size="small"
+            onClick={() => {
+              handleClose()
+            }}
+          >
+            Cancel
+          </Button>
+          {permissionUser && (
+            <Button
+              variant="contained"
+              type="submit"
+              size="small"
+              onClick={() => handleSubmit(true)}
+            >
+              Save & Update
+            </Button>
+          )}
+        </Box>
+      </Grid>
     </>
   )
 }

@@ -2,6 +2,8 @@ export interface userType {
   srNo?: number;
   UserId: number;
   Username: string;
+  Email:string;
+  Roles: string;
   role: string;
   Status: string;
   createdAt: string;

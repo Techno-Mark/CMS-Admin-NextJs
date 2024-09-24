@@ -1,14 +1,7 @@
 // components/OrganizationsForm.tsx
 
 import React, { useEffect, useState } from "react"
-import {
-  Box,
-  Typography,
-  Grid,
-  Switch,
-  Button,
-  Card
-} from "@mui/material"
+import { Box, Typography, Grid, Switch, Button, Card } from "@mui/material"
 import { OrganizationsType } from "@/types/apps/organizationsType"
 import { toast } from "react-toastify"
 import { post } from "@/services/apiService"
@@ -201,34 +194,36 @@ const OrganizationsForm = ({
                 </Grid> */}
               </Grid>
             </Box>
-
-            <Grid
-              item
-              xs={12}
-              style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-            >
-              <Box
-                p={7}
-                display="flex"
-                gap={2}
-                justifyContent="end"
-                bgcolor="background.paper"
-              >
-                <Button variant="outlined" color="error" onClick={handleClose}>
-                  Cancel
-                </Button>
-                <Button
-                  variant="contained"
-                  type="submit"
-                  onSubmit={handleSubmit}
-                >
-                  {open === -1 ? "Add" : "Edit"} Organization
-                </Button>
-              </Box>
-            </Grid>
           </div>
         </form>
       </Card>
+
+      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
+        <Box
+          p={5}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button
+            variant="outlined"
+            color="error"
+            size="small"
+            onClick={handleClose}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            type="submit"
+            size="small"
+            onSubmit={handleSubmit}
+          >
+            {open === -1 ? "Add" : "Edit"} Organization
+          </Button>
+        </Box>
+      </Grid>
     </>
   )
 }
