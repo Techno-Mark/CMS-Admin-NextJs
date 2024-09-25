@@ -1,7 +1,5 @@
 "use client"
-import React, { useState } from "react"
-import { Box, Button, Card, Grid, IconButton, styled, Typography } from "@mui/material"
-import KanbanDrawer from "./KanbanDrawer"
+import BreadCrumbList from "@/components/BreadCrumbList"
 import LoadingBackdrop from "@/components/LoadingBackdrop"
 import { postDataToOrganizationAPIs } from "@/services/apiService"
 import { menu } from "@/services/endpoint/menu"
@@ -11,8 +9,7 @@ import React, { useState } from "react"
 import { toast } from "react-toastify"
 import DraggableIcon from "../_svg/DraggableIcon"
 import ConfirmationDialog from "./ConfirmationDialog"
-import CustomIconButton from '@core/components/mui/IconButton'
-import Image from 'next/image'
+import KanbanDrawer from "./KanbanDrawer"
 
 const MenuItem = ({
   menuData,
@@ -146,23 +143,16 @@ const MenuItem = ({
   const renderMenuItems = (items: any[], parentId: number): React.ReactNode => {
     const handleAddSubmenu = (parentIndex: number) => {
       const newItems = [...items]
-      const newItems = [...items]
       const newSubItem = {
         name: "New Subitem",
         link: "#",
         children: [],
         logo: '#'
       }
-        logo: '#'
-      }
 
       if (!newItems[parentIndex].children) {
         newItems[parentIndex].children = []
-        newItems[parentIndex].children = []
       }
-      newItems[parentIndex].children.push(newSubItem)
-      setMenuItems(newItems)
-    }
       newItems[parentIndex].children.push(newSubItem)
       setMenuItems(newItems)
     }
@@ -170,11 +160,9 @@ const MenuItem = ({
       marginLeft: "1.5rem",
       borderLeft: `2px solid ${theme.palette.divider}`
     }))
-    }))
 
     return items.map((item, index) => (
       <ul key={index + 1}>
-
         <li
           className="flex items-center border-b-black border-b"
           draggable
@@ -214,17 +202,13 @@ const MenuItem = ({
             onClick={() => {
               setDeleteDrawer(true)
               setDeleteData({ index, parentId: -1 })
-              setDeleteDrawer(true)
-              setDeleteData({ index, parentId: -1 })
             }}
           >
             <i className="tabler-trash mie-1" />
           </IconButton>
-
         </li>
 
         <NestedMenu>
-
           {item.children && item.children.length > 0 && (
             <ul>
               {item.children.map((childItem: any, childIndex: number) => (
@@ -239,13 +223,11 @@ const MenuItem = ({
                   <div className="flex-1 flex items-center gap-x-2">
                     <DraggableIcon />
                     {childItem?.logo && childItem.logo !== "#" && (
-                      // <img src={childItem.logo} alt="icon" width={30} height={30} />
-                      <Image
+                      <img
                         src={childItem.logo}
                         alt="icon"
                         width={30}
                         height={30}
-                        priority
                       />
                     )}
                     <Typography variant="h5"> {childItem.name} </Typography>
@@ -270,12 +252,9 @@ const MenuItem = ({
                     onClick={() => {
                       setDeleteDrawer(true)
                       setDeleteData({ index: childIndex, parentId: index })
-                      setDeleteDrawer(true)
-                      setDeleteData({ index: childIndex, parentId: index })
                     }}>
                     <i className='tabler-trash' />
                   </IconButton>
-
                 </li>
               ))}
             </ul>
@@ -293,9 +272,6 @@ const MenuItem = ({
           )}
         </NestedMenu>
       </ul>
-    ))
-  }
-
     ))
   }
 
@@ -425,6 +401,14 @@ const MenuItem = ({
             </p>
           )}
           {permissionUser &&
+          // <Fab
+          //   variant="extended"
+          //   className="w-13 h-7 m-4"
+          //   onClick={() => setDrawerOpen(true)}
+          // >
+          //   <i className="tabler-plus mie-1" />
+          //   Add
+          // </Fab>
 
             <Button
               color="success"
