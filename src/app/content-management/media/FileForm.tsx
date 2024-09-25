@@ -127,6 +127,9 @@ function FileForm({
     let valid = true
     const errors = { ...initialErrorData }
 
+    const MAX_FILE_SIZE_MB = 50
+    const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024
+
     if (open === ADD_BLOG && files.length === 0) {
       errors.filesError = "At least one file is required"
       valid = false
@@ -139,6 +142,12 @@ function FileForm({
 
     if (files.length > MAX_FILES) {
       errors.filesError = `You can only upload up to ${MAX_FILES} files.`
+      valid = false
+    }
+
+    // Add file size validation (max size 50MB)
+    if (files.some((file: any) => file.size > MAX_FILE_SIZE)) {
+      errors.filesError = `File size must not exceed ${MAX_FILE_SIZE_MB} MB.`
       valid = false
     }
 
@@ -270,15 +279,17 @@ function FileForm({
                 justifyContent="end"
                 bgcolor="background.paper"
               >
-                <Button
-                  variant="outlined"
-                  color="error"
-                  type="reset"
-                  onClick={() => handleClose()}
-                  sx={{ minWidth: 150 }}
-                >
-                  Cancel
-                </Button>
+
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => {
+                handleClose()
+              }}
+              sx={{ minWidth: 150 }}
+            >
+              Cancel
+            </Button>
                 {permissionUser && (
                   <Button
                     variant="contained"

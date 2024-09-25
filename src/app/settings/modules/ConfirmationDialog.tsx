@@ -50,14 +50,14 @@ const ConfirmationDialog = ({
           Yes
         </Button>
         <Button
-          variant="tonal"
-          color="secondary"
-          onClick={() => {
-            setOpen(false)
-          }}
-        >
-          Cancel
-        </Button>
+            variant="outlined"
+            size="small"
+            onClick={() => {
+              setOpen(false)
+            }}
+          >
+            Cancel
+          </Button>
       </DialogActions>
     </Dialog>
   )

@@ -25,9 +25,10 @@ type RoleDialogProps = {
   setOpen: (open: boolean) => void;
   title?: string;
   editId?: number;
+  setEditId: (value: number) => void;
 };
 
-const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
+const RoleDialog = ({ open, setOpen, title, editId = 0, setEditId }: RoleDialogProps) => {
   const [selectedCheckbox, setSelectedCheckbox] = useState<number[]>([])
   const [isIndeterminateCheckbox, setIsIndeterminateCheckbox] =
     useState<boolean>(false)
@@ -39,6 +40,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
 
   const handleClose = () => {
     setOpen(false)
+    setEditId(0)
     setRoleName("")
     setRoleError(false)
     setActive(false)

@@ -194,14 +194,15 @@ const RolesForm = ({ open }: Props) => {
               />
             </div>
             <div className="flex items-center justify-end gap-4">
-              <Button
-                variant="tonal"
-                color="error"
-                type="reset"
-                onClick={() => handleReset()}
-              >
-                Cancel
-              </Button>
+            <Button
+            variant="outlined"
+            size="small"
+            onClick={() => {
+              handleReset()
+            }}
+          >
+            Cancel
+          </Button>
               <Button variant="contained" type="submit">
                 {open === sectionActions.ADD ? "Add" : "Edit"} Role
               </Button>

@@ -410,6 +410,7 @@ const RolesListTable = ({
         setOpen={setOpenDialog}
         title={"Edit"}
         editId={editId}
+        setEditId={ (value:number) => setEditId(value)}
       />
     </>
   )
