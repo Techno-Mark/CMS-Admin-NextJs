@@ -12,7 +12,8 @@ import {
   FormControlLabel,
   Grid,
   MenuItem,
-  Switch
+  Switch,
+  Typography
 } from "@mui/material"
 import { useRouter } from "next/navigation"
 import React, { ChangeEvent, useEffect, useState } from "react"
@@ -435,7 +436,9 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                                     key={role.id}
                                     disabled={isRoleSelected} // Disable the option if the role is already selected
                                   >
+                                    <Typography variant="h6">
                                     {role.name}
+                                    </Typography>
                                   </MenuItem>
                                 )
                               })}

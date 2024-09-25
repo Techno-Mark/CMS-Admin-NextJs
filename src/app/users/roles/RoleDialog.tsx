@@ -31,6 +31,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
   const [selectedCheckbox, setSelectedCheckbox] = useState<number[]>([])
   const [isIndeterminateCheckbox, setIsIndeterminateCheckbox] =
     useState<boolean>(false)
+  const [isSelected, setIsSelected] = useState(false)
   const [defaultData, setDefaultData] = useState<any>([])
   const [roleName, setRoleName] = useState("")
   const [roleError, setRoleError] = useState(false)
@@ -53,7 +54,7 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
   }
 
   const handleSelectAllCheckbox = () => {
-    if (isIndeterminateCheckbox) {
+    if (isSelected) {
       setSelectedCheckbox([])
     } else {
       const allCheckboxes = defaultData.flatMap((module: any) =>
@@ -113,6 +114,11 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
       setIsIndeterminateCheckbox(true)
     } else {
       setIsIndeterminateCheckbox(false)
+    }
+    if (selectedCheckbox && selectedCheckbox.length > 0) {
+      setIsSelected(true)
+    } else {
+      setIsSelected(false)
     }
   }, [selectedCheckbox, defaultData])
 
@@ -237,7 +243,9 @@ const RoleDialog = ({ open, setOpen, title, editId = 0 }: RoleDialogProps) => {
             <table className={tableStyles.table}>
               <tbody>
                 <tr>
-                  <td></td>
+                  <td className="!p-0">
+                    <Typography variant="h5">Modules</Typography>
+                  </td>
                   {Array.isArray(defaultData) &&
                     defaultData.length > 0 &&
                     defaultData[0]?.permissions?.map((perm: any) => (
