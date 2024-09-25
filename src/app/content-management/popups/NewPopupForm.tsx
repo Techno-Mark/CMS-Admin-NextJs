@@ -268,7 +268,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                 helperText={formErrors.title}
                 label="Title*"
                 fullWidth
-                placeholder=""
+                placeholder="Enter Title"
                 value={formData.title}
                 onChange={(e) => {
                   setFormData({ ...formData, title: e.target.value })
@@ -328,7 +328,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                 onChange={(date: Date) =>
                   setFormData({ ...formData, startDate: date.toString() })
                 }
-                customInput={<CustomTextField label="Start Date" fullWidth />}
+                customInput={<CustomTextField label="Start Date" fullWidth inputProps={{ readOnly: true }}/>}
               />
             </Grid>
             {!isParamanent && (
@@ -340,7 +340,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   onChange={(date: Date) =>
                     setFormData({ ...formData, endDate: date.toString() })
                   }
-                  customInput={<CustomTextField label="End Date" fullWidth />}
+                  customInput={<CustomTextField label="End Date" fullWidth inputProps={{ readOnly: true }}/>}
                 />
               </Grid>
             )}
@@ -353,14 +353,17 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   helperText={formErrors.frequency}
                   label="Frequency*"
                   fullWidth
-                  placeholder=""
+                  placeholder="Enter Frequency"
                   type="number"
                   value={formData.frequency}
                   onChange={(e) => {
-                    setFormData({
-                      ...formData,
-                      frequency: Number(e.target.value)
-                    })
+                    const value = e.target.value
+                    if (value.length <= 20) {
+                      setFormData({
+                        ...formData,
+                        frequency: Number(value)
+                      })
+                    }
                   }}
                 />
               </Grid>
@@ -373,13 +376,16 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   label="Delay* (in second)"
                   fullWidth
                   type="number"
-                  placeholder=""
+                  placeholder="Enter Delay"
                   value={formData.delay}
                   onChange={(e) => {
-                    setFormData({
-                      ...formData,
-                      delay: parseInt(e.target.value)
-                    })
+                    const value = e.target.value
+                    if (value.length <= 20) {
+                      setFormData({
+                        ...formData,
+                        delay: parseInt(value)
+                      })
+                    }
                   }}
                 />
               </Grid>
@@ -431,7 +437,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                     })
                   }}
                   customInput={
-                    <CustomTextField label="Event Date*" fullWidth />
+                    <CustomTextField label="Event Date*" fullWidth inputProps={{ readOnly: true }}/>
                   }
                 />
               </Grid>
@@ -446,7 +452,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                     setFormData({ ...formData, eventEndDate: date.toString() })
                   }}
                   customInput={
-                    <CustomTextField label="Event End Date*" fullWidth />
+                    <CustomTextField label="Event End Date*" fullWidth inputProps={{ readOnly: true }}/>
                   }
                 />
               </Grid>
@@ -459,7 +465,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   helperText={formErrors.eventTitle}
                   label="Event Title*"
                   fullWidth
-                  placeholder="Event"
+                  placeholder="Event Title"
                   value={formData.eventTitle}
                   onChange={(e) => {
                     setFormData({ ...formData, eventTitle: e.target.value })
@@ -479,7 +485,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   helperText={formErrors.heading}
                   label="Heading*"
                   fullWidth
-                  placeholder="Heading"
+                  placeholder="Enter Heading"
                   value={formData.heading}
                   onChange={(e) => {
                     setFormData({ ...formData, heading: e.target.value })
@@ -499,7 +505,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   helperText={formErrors.supportingLine}
                   label="Supporting Line*"
                   fullWidth
-                  placeholder="Supporting Line"
+                  placeholder="Enter Supporting Line"
                   value={formData.supportingLine}
                   onChange={(e) => {
                     setFormData({
@@ -521,7 +527,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   helperText={formErrors.btnText}
                   label="Button Text*"
                   fullWidth
-                  placeholder=""
+                  placeholder="Enter Button Text"
                   value={formData.btnText}
                   onChange={(e) => {
                     setFormData({ ...formData, btnText: e.target.value })
@@ -537,7 +543,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   helperText={formErrors.btnLink}
                   label="Button Link*"
                   fullWidth
-                  placeholder=""
+                  placeholder="Enter Button Link"
                   value={formData.btnLink}
                   onChange={(e) => {
                     setFormData({ ...formData, btnLink: e.target.value })
@@ -553,7 +559,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                   helperText={formErrors.location}
                   label="Location*"
                   fullWidth
-                  placeholder=""
+                  placeholder="Enter Location"
                   value={formData.location}
                   onChange={(e) => {
                     setFormData({ ...formData, location: e.target.value })
