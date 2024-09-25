@@ -16,7 +16,6 @@ const ActiveConfirmationDialog = ({
   menuLocation,
   handleSubmit
 }: ActiveConfirmationDialogProps) => {
-
   return (
     <Dialog fullWidth maxWidth="xs" open={true} onClose={() => setOpen(false)}>
       <DialogContent className="flex items-center flex-col text-center sm:pbs-16 sm:pbe-6 sm:pli-16">
