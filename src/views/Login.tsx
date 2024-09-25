@@ -44,6 +44,7 @@ import { toast } from "react-toastify"
 import CircularProgress from "@mui/material/CircularProgress"
 import type { CircularProgressProps } from "@mui/material/CircularProgress"
 import LoadingBackdrop from "@/components/LoadingBackdrop"
+import { defaultRedirectRoute } from "@/services/app.config"
 
 // Styled Custom Components
 const LoginIllustration = styled("img")(({ theme }) => ({
@@ -158,7 +159,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
     })
 
     if (res && res.ok && res.error === null) {
-      const redirectURL = searchParams.get("redirectTo") ?? "/home"
+      const redirectURL = searchParams.get("redirectTo") ?? `${defaultRedirectRoute}`
       router.push(redirectURL)
       toast.success("Login Successfull")
       setLoading(false)

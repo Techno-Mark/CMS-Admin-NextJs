@@ -249,7 +249,7 @@ const ContentBlockForm = ({ open }: Props) => {
     return isValid
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault()
 
     if (validateFormData(formData)) {
@@ -371,7 +371,7 @@ const ContentBlockForm = ({ open }: Props) => {
       <BreadCrumbList />
       <Card>
         <div>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
+          <form className="flex flex-col gap-6 p-6">
             <Box display="flex" alignItems="center">
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={4}>
@@ -874,7 +874,7 @@ const ContentBlockForm = ({ open }: Props) => {
           >
             Cancel
           </Button>
-          <Button variant="contained" type="submit" size="small">
+          <Button variant="contained" type="submit" size="small" onClick={(e)=>handleSubmit(e)}>
             {open === sectionActions.ADD ? "Add" : "Update"} Content Block
           </Button>
         </Box>

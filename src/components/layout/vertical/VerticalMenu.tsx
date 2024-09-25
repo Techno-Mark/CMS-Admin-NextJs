@@ -105,12 +105,12 @@ const VerticalMenu = ({ scrollMenu, permissionData }: Props) => {
         renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)} >
         {/* @ts-ignore */}
-        {(session?.user?.id === 1 || hasPermission('Dashboard')) && (
+        {/* {(session?.user?.id === 1 || hasPermission('Dashboard')) && (
 
           <MenuItem href='/home' icon={<i className='tabler-dashboard' />}>
             Dashboard
           </MenuItem>
-        )}
+        )} */}
         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Blog')) && (
           <MenuItem href='/content-management/blogs' icon={<i className='tabler-brand-blogger' />}>
@@ -146,11 +146,11 @@ const VerticalMenu = ({ scrollMenu, permissionData }: Props) => {
         )}
 
         {/* @ts-ignore */}
-        {(session?.user?.id === 1 || hasPermission('Event')) && (
+        {/* {(session?.user?.id === 1 || hasPermission('Event')) && (
           <MenuItem href='/content-management/events' icon={<i className='tabler-calendar-event' />}>
             Events
           </MenuItem>
-        )}
+        )} */}
 
         {/* @ts-ignore */}
         {(session?.user?.id === 1 || hasPermission('Career')) && (
