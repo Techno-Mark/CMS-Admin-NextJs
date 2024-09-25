@@ -347,8 +347,8 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
 
     // validate author image
     if (open == ADD_BLOG && !authorImageUrl) {
-      errors.authorImageUrl = "Author Image is required";
-      valid = false;
+      errors.authorImageUrl = "Author Image is required"
+      valid = false
     }
     if (authorImageUrl && !validImageType.includes(authorImageUrl.type)) {
       errors.authorImageUrl = `Invalid file type for Author Image. Allowed types ${validImageType.join(",")}`
@@ -689,7 +689,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                 label="Meta Keywords* (maximum-character: 160 )"
                      placeholder="Meta Keywords"
                 fullWidth
-                
+
                 value={formData.metaKeywords}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   setFormData({
@@ -719,9 +719,9 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
               <div
                 className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md`}
                 style={{
-                  borderColor: formErrors.bannerImageError ? '#ff5054' : 'gray',
+                  borderColor: formErrors.bannerImageError ? '#ff5054' : 'gray'
                 }}
-             
+
              >
                 <Box
                   {...getBannerRootProps({ className: "dropzone" })}
@@ -730,7 +730,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                   <input {...getBannerInputProps()} />
                   <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2"
                   style={{
-                    borderColor: formErrors.bannerImageError ? '#ff5054' : 'gray',
+                    borderColor: formErrors.bannerImageError ? '#ff5054' : 'gray'
                   }}
                   >
                     {open == EDIT_BLOG && !isImageBannerTouched.bannerImage && (
@@ -792,8 +792,8 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
               <p className="text-[#4e4b5a] my-2"> Thumbnail Image * </p>
               <div className="flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md"
                  style={{
-                  borderColor: formErrors.thumbnailImageError ? '#ff5054' : 'gray',
-                }}
+                   borderColor: formErrors.thumbnailImageError ? '#ff5054' : 'gray'
+                 }}
               >
                 <Box
                   {...getThumbnailRootProps({ className: "dropzone" })}
@@ -802,7 +802,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                   <input {...getThumbnailInputProps()} />
                   <div className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2"
                   style={{
-                    borderColor: formErrors.thumbnailImageError ? '#ff5054' : 'gray',
+                    borderColor: formErrors.thumbnailImageError ? '#ff5054' : 'gray'
                   }}
                   >
                     {open == EDIT_BLOG &&
@@ -867,7 +867,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
               <p className="text-[#4e4b5a] my-2"> Author Image * </p>
               <div className="flex items-center flex-col w-[250px] h-[170px] border border-dashed border-gray-300 rounded-md"
               style={{
-                borderColor: formErrors.authorImageUrl ? '#ff5054' : 'gray',
+                borderColor: formErrors.authorImageUrl ? '#ff5054' : 'gray'
               }}
               >
                 <Box
@@ -877,7 +877,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                   <input {...getAuthorInputProps()} />
                   <div className="flex items-center justify-center flex-col w-[250px] h-[170px] border border-dashed border-gray-300 rounded-md p-2"
                   style={{
-                    borderColor: formErrors.authorImageUrl ? '#ff5054' : 'gray',
+                    borderColor: formErrors.authorImageUrl ? '#ff5054' : 'gray'
                   }}
                   >
                     {open == EDIT_BLOG &&
@@ -965,7 +965,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                 freeSolo
                 multiple
                 limitTags={3}
-              
+
                 options={tagsList}
                 value={formData.tags}
                 getOptionLabel={(option) => option || ""}

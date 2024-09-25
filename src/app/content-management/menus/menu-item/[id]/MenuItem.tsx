@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from "react"
-import { Box, Button, Card, Fab, Grid, IconButton, styled, Tooltip, Typography } from "@mui/material"
+import { Box, Button, Card, Grid, IconButton, styled, Typography } from "@mui/material"
 import KanbanDrawer from "./KanbanDrawer"
 import LoadingBackdrop from "@/components/LoadingBackdrop"
 import BreadCrumbList from "@/components/BreadCrumbList"
@@ -10,6 +10,7 @@ import { menu } from "@/services/endpoint/menu"
 import { toast } from "react-toastify"
 import ConfirmationDialog from "./ConfirmationDialog"
 import CustomIconButton from '@core/components/mui/IconButton'
+import Image from 'next/image'
 
 const MenuItem = ({
   menuData,
@@ -140,28 +141,6 @@ const MenuItem = ({
     }
   }
 
-  const MenuItemContainer = styled(Box)(({ theme }) => ({
-    padding: "0.5rem 1rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderBottom: `1px solid ${theme.palette.divider}`,
-    "&:hover": {
-      backgroundColor: theme.palette.action.hover
-    }
-  }))
-
-  const MenuItemActions = styled(Box)(({ theme }) => ({
-    display: "flex",
-    gap: "0.5rem"
-  }))
-
-  const NestedMenu = styled(Box)(({ theme }) => ({
-    marginLeft: "1.5rem",
-    paddingLeft: "1rem",
-    borderLeft: `2px solid ${theme.palette.divider}`
-  }))
-
   const renderMenuItems = (items: any[], parentId: number): React.ReactNode => {
     const handleAddSubmenu = (parentIndex: number) => {
       const newItems = [...items]
@@ -249,7 +228,14 @@ const MenuItem = ({
                   <div className="flex-1 flex items-center gap-x-2">
                     <DraggableIcon />
                     {childItem?.logo && childItem.logo !== "#" && (
-                      <img src={childItem.logo} alt="icon" width={30} height={30} />
+                      // <img src={childItem.logo} alt="icon" width={30} height={30} />
+                      <Image
+                        src={childItem.logo}
+                        alt="icon"
+                        width={30}
+                        height={30}
+                        priority
+                      />
                     )}
                     <Typography variant="h5"> {childItem.name} </Typography>
                     <Typography variant="subtitle1"> ({childItem.link}) </Typography>
@@ -312,7 +298,6 @@ const MenuItem = ({
             </p>
           )}
           {permissionUser &&
-         
 
             <Button color="success" size="small" variant="contained" onClick={() => setDrawerOpen(true)}>
               <i className="tabler-plus mie-1" />

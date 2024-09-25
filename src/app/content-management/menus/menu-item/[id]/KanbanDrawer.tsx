@@ -201,10 +201,10 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
               helperText={formErrors.logo}
               label={
                 <span>
-      Logo Link * 
-      <Tooltip title={"If you do not want to add icon. Please add '#' sign"}> 
+      Logo Link *
+      <Tooltip title={"If you do not want to add icon. Please add '#' sign"}>
                <IconButton size="small" aria-label="info">
-          <InfoIcon  style={{ fontSize: '5px', marginLeft: '5px', color: 'gray' }} />
+          <InfoIcon style={{ fontSize: '5px', marginLeft: '5px', color: 'gray' }} />
         </IconButton>
       </Tooltip>
     </span>
