@@ -43,7 +43,7 @@ type blogFormPropsTypes = {
   open: number;
   editingRow: blogDetailType | null;
   handleClose: Function;
-  permissionUser:Boolean
+  permissionUser: Boolean;
 };
 
 const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
@@ -87,7 +87,12 @@ const initialErrorData = {
   metaKeywords: ""
 }
 
-function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPropsTypes) {
+function BlogForm({
+  open,
+  editingRow,
+  handleClose,
+  permissionUser
+}: blogFormPropsTypes) {
   const router = useRouter()
 
   // state management hook
@@ -602,17 +607,19 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
               />
             </Grid>
             <Grid item xs={12} sm={12}>
-              <p className={`${formErrors.description ? 'text-red-600' : ' text-[#4e4b5a]'}`}>Description *</p>
+              <p
+                className={`${formErrors.description ? "text-[#ff5054]" : " text-[#4e4b5a]"}`}
+              >
+                Description *
+              </p>
 
               <MyCKEditor
                 onChange={handleEditorChangeCKEditor}
                 initialValue={editingRow?.description}
               />
-              {
-                !!formErrors.description &&
-                <p className="text-red-600">{formErrors.description}</p>
-
-              }
+              {!!formErrors.description && (
+                <p className="text-[#ff5054]">{formErrors.description}</p>
+              )}
               {/* <div>
                 <div dangerouslySetInnerHTML={{ __html: formData.description }} />
               </div> */}
@@ -640,7 +647,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                   {60 - formData.metaTitle.length} character left
                 </p>
               ) : (
-                <p className="text-red-500">
+                <p className="text-[#ff5054]">
                   you exceeds maximum limit of characters**
                 </p>
               )}
@@ -673,7 +680,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                   {160 - formData.metaDescription.length} character left
                 </p>
               ) : (
-                <p className="text-red-500">
+                <p className="text-[#ff5054]">
                   you exceeds maximum limit of characters**
                 </p>
               )}
@@ -707,7 +714,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                   {160 - formData.metaKeywords.length} character left
                 </p>
               ) : (
-                <p className="text-red-500">
+                <p className="text-[#ff5054]">
                   you exceeds maximum limit of characters**
                 </p>
               )}
@@ -715,7 +722,12 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
           </Grid>
           <Grid container spacing={6} sm={5}>
             <Grid item xs={12} sm={12}>
-              <p className="text-[#4e4b5a] my-2"> Banner Image * </p>
+              <p
+                className={`${formErrors.bannerImageError ? "text-[#ff5054]" : "text-[#4e4b5a]"} text-[13px]`}
+              >
+                {" "}
+                Banner Image *{" "}
+              </p>
               <div
                 className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md`}
                 style={{
@@ -781,7 +793,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                     )}
                   </div>
                   {!!formErrors.bannerImageError && (
-                    <p className="text-[#ff5054]">
+                    <p className="text-[#ff5054] text-[13px]">
                       {formErrors.bannerImageError}
                     </p>
                   )}
@@ -855,7 +867,7 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
                     )}
                   </div>
                   {!!formErrors.thumbnailImageError && (
-                    <p className="text-[#ff5054]">
+                    <p className="text-[#ff5054] text-[13px]">
                       {" "}
                       {formErrors.thumbnailImageError}
                     </p>
@@ -1051,53 +1063,48 @@ function BlogForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
             </Grid>
           </Grid>
         </Box>
-        <Box display="flex" gap={4}>
-          <Grid container spacing={2} sm={12}>
-            <Grid
-              item
-              xs={12}
-              style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-            >
-              <Box
-                p={7}
-                display="flex"
-                gap={2}
-                justifyContent="end"
-                bgcolor="background.paper"
-              >
-                <Button
-                  variant="contained"
-                  color="error"
-                  type="reset"
-                  onClick={() => {
-                    handleClose()
-                  }}
-                >
-                  Cancel
-                </Button>
-                {permissionUser === true && (<>
-                  <Button
-                    color="warning"
-                    variant="contained"
-                    onClick={() => handleSubmit(false)}
-                  >
-                    {/* {open === sectionActions.ADD ? "Add" : "Edit"} Content Block */}{" "}
-                    Save as Draft
-                  </Button>
-                  <Button
-                    variant="contained"
-                    type="submit"
-                    onClick={() => handleSubmit(true)}
-                  >
-                    {/* {open === sectionActions.ADD ? "Add" : "Edit"} Content Block */}{" "}
-                    Save & Publish
-                  </Button>
-                </>)}
-              </Box>
-            </Grid>
-          </Grid>
-        </Box>
       </Card>
+      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
+        <Box
+          p={5}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button
+            variant="contained"
+            color="error"
+            type="reset"
+            size="small"
+            onClick={() => {
+              handleClose()
+            }}
+          >
+            Cancel
+          </Button>
+          {permissionUser === true && (
+            <>
+              <Button
+                color="warning"
+                variant="contained"
+                size="small"
+                onClick={() => handleSubmit(false)}
+              >
+                Save as Draft
+              </Button>
+              <Button
+                variant="contained"
+                type="submit"
+                size="small"
+                onClick={() => handleSubmit(true)}
+              >
+                Save & Publish
+              </Button>
+            </>
+          )}
+        </Box>
+      </Grid>
     </>
   )
 }

@@ -22,13 +22,22 @@ import { postContentBlock } from "@/services/apiService"
 import { media } from "@/services/endpoint/media"
 
 type blogFormPropsTypes = {
-    open: number;
-    editingRow: blogDetailType | null;
-    handleClose: Function;
-    permissionUser:Boolean
+  open: number;
+  editingRow: blogDetailType | null;
+  handleClose: Function;
+  permissionUser: Boolean;
 };
 
-const validImageType = ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/svg", "image/svg+xml", "video/mp4", "video/webm"]
+const validImageType = [
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/gif",
+  "image/svg",
+  "image/svg+xml",
+  "video/mp4",
+  "video/webm"
+]
 
 const MAX_FILES = 10
 
@@ -39,15 +48,21 @@ const initialErrorData = {
 }
 
 type FileProp = {
-    name: string;
-    type: string;
-    size: number;
+  name: string;
+  type: string;
+  size: number;
 };
 
-function FileForm({ open, editingRow, handleClose, permissionUser }: blogFormPropsTypes) {
+function FileForm({
+  open,
+  editingRow,
+  handleClose,
+  permissionUser
+}: blogFormPropsTypes) {
   const router = useRouter()
 
-  const [formErrors, setFormErrors] = useState<typeof initialErrorData>(initialErrorData)
+  const [formErrors, setFormErrors] =
+    useState<typeof initialErrorData>(initialErrorData)
   const [loading, setLoading] = useState<boolean>(false)
   const [files, setFiles] = useState<File[]>([])
 
@@ -67,11 +82,18 @@ function FileForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
   })
 
   const renderFilePreview = (file: FileProp) => {
-    if (file.type.startsWith('image')) {
+    if (file.type.startsWith("image")) {
       // eslint-disable-next-line
-      return <img width={38} height={38} alt={file.name} src={URL.createObjectURL(file as any)} />
+      return (
+        <img
+          width={38}
+          height={38}
+          alt={file.name}
+          src={URL.createObjectURL(file as any)}
+        />
+      )
     } else {
-      return <i className='tabler-file-description' />
+      return <i className="tabler-file-description" />
     }
   }
 
@@ -81,20 +103,20 @@ function FileForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
   }
 
   const fileList = files.map((file: FileProp) => (
-        <ListItem key={file.name}>
-            <div className='file-details'>
-                <div className='file-preview'>{renderFilePreview(file)}</div>
-                <div>
-                    <Typography className='file-name'>{file.name}</Typography>
-                    <Typography className='file-size' variant='body2'>
-                        {Math.round(file.size / 100) / 10 > 1000 ? `${(Math.round(file.size / 100) / 10000).toFixed(1)} mb` : `${(Math.round(file.size / 100) / 10).toFixed(1)} kb`}
-                    </Typography>
-                </div>
-            </div>
-            <IconButton onClick={() => handleRemoveFile(file)}>
-                <i className='tabler-x text-xl' />
-            </IconButton>
-        </ListItem>
+    <ListItem key={file.name}>
+      <div className="file-details">
+        <div className="file-preview">{renderFilePreview(file)}</div>
+        <div>
+          <Typography className="file-name">{file.name}</Typography>
+          <Typography className="file-size" variant="body2">
+            {Math.round(file.size / 100) / 10 > 1000 ? `${(Math.round(file.size / 100) / 10000).toFixed(1)} mb` : `${(Math.round(file.size / 100) / 10).toFixed(1)} kb`}
+          </Typography>
+        </div>
+      </div>
+      <IconButton onClick={() => handleRemoveFile(file)}>
+        <i className="tabler-x text-xl" />
+      </IconButton>
+    </ListItem>
   ))
 
   const handleRemoveAllFiles = () => {
@@ -159,109 +181,119 @@ function FileForm({ open, editingRow, handleClose, permissionUser }: blogFormPro
   }
 
   return (
-        <>
-            <LoadingBackdrop isLoading={loading} />
-            <Box display="flex" alignItems="center">
-                <Grid container spacing={3}>
-                    <Grid item xs={12} sm={11}>
-                        <BreadCrumbList />
-                    </Grid>
-                    {/* <Grid item xs={12} sm={1}>
+    <>
+      <LoadingBackdrop isLoading={loading} />
+      <Box display="flex" alignItems="center">
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={11}>
+            <BreadCrumbList />
+          </Grid>
+          {/* <Grid item xs={12} sm={1}>
                         <IconButton color="info" onClick={() => { }}>
                             <i className="tabler-external-link text-textSecondary"></i>
                         </IconButton>
                     </Grid> */}
-                </Grid>
-            </Box>
-            <Card className="p-4">
-                <Box display="flex" alignItems="flex-start">
-                    <Grid container spacing={12} sm={12}>
-
-                        <Grid item xs={12} sm={12}>
-                            <p className="text-[#4e4b5a] my-2">Files *</p>
-                            <div
-                                className={`flex items-center flex-col border border-dashed border-gray-300 rounded-md ${!!formErrors.filesError && "border-red-400"
-                                    }`}
-                            >
-                                <div {...getRootProps({ className: "dropzone" })}>
-                                    <input {...getInputProps()} />
-                                    <div className="flex items-center flex-col">
-                                        <Avatar variant="rounded" className="bs-12 is-12 mbe-9">
-                                            <i className="tabler-upload" />
-                                        </Avatar>
-                                        <Typography variant="h4" className="mbe-2.5">
-                                            Drop files here or click to upload.
-                                        </Typography>
-                                        <Typography>
-                                            Drop files here or click{" "}
-                                            <a
-                                                href="/"
-                                                onClick={(e) => e.preventDefault()}
-                                                className="text-textPrimary no-underline"
-                                            >
-                                                browse
-                                            </a>{" "}
-                                            thorough your machine
-                                        </Typography>
-                                    </div>
-                                </div>
-                            </div>
-                        </Grid>
-                        <Grid item xs={12} sm={12}>
-                            {formErrors.filesError && (
-                                <Typography color="error" variant="body2">
-                                    {formErrors.filesError}
-                                </Typography>
-                            )}
-                            {files.length ? (
-                                <>
-                                    <List>{fileList}</List>
-                                    <div className="buttons">
-                                        <Button color="error" variant="outlined" onClick={handleRemoveAllFiles}>
-                                            Remove All
-                                        </Button>
-                                    </div>
-                                </>
-                            ) : null}
-                        </Grid>
-                    </Grid>
-                </Box>
-                <Box display="flex" gap={4}>
-                    <Grid container spacing={2} sm={12}>
-                        <Grid
-                            item
-                            xs={12}
-                            style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-                        >
-                            <Box
-                                p={7}
-                                display="flex"
-                                gap={2}
-                                justifyContent="end"
-                                bgcolor="background.paper"
-                            >
-                                <Button
-                                    variant="outlined"
-                                    onClick={() => handleClose()}
-                                    sx={{ minWidth: 150 }}
-                                >
-                                    Cancel
-                                </Button>
-                                {permissionUser &&
-                                <Button
-                                    variant="contained"
-                                    onClick={() => handleSubmit(true)}
-                                    sx={{ minWidth: 150 }}
-                                >
-                                    Save
-                                </Button>
-                                }
-                            </Box>
-                        </Grid>
-                    </Grid>
-                </Box>
-            </Card>
-        </>
+        </Grid>
+      </Box>
+      <Card className="p-4">
+        <Box display="flex" alignItems="flex-start">
+          <Grid container spacing={12} sm={12}>
+            <Grid item xs={12} sm={12}>
+              <p
+                className={`${formErrors.filesError ? "text-[#ff5054]" : "text-[#4e4b5a]"} my-2`}
+              >
+                Files *
+              </p>
+              <div
+                className={`flex items-center flex-col border border-dashed border-gray-300 rounded-md ${
+                  !!formErrors.filesError && "border-red-400"
+                }`}
+              >
+                <div {...getRootProps({ className: "dropzone" })}>
+                  <input {...getInputProps()} />
+                  <div className="flex items-center flex-col">
+                    <Avatar variant="rounded" className="bs-12 is-12 my-4">
+                      <i className="tabler-upload" />
+                    </Avatar>
+                    <Typography variant="h4" className="mbe-2.5">
+                      Drop files here or click to upload.
+                    </Typography>
+                    <Typography>
+                      Drop files here or click{" "}
+                      <a
+                        href="/"
+                        onClick={(e) => e.preventDefault()}
+                        className="text-textPrimary no-underline"
+                      >
+                        browse
+                      </a>{" "}
+                      thorough your machine
+                    </Typography>
+                  </div>
+                </div>
+              </div>
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              {formErrors.filesError && (
+                <Typography color="error" variant="body2">
+                  {formErrors.filesError}
+                </Typography>
+              )}
+              {files.length ? (
+                <>
+                  <List>{fileList}</List>
+                  <div className="buttons">
+                    <Button
+                      color="error"
+                      variant="outlined"
+                      onClick={handleRemoveAllFiles}
+                    >
+                      Remove All
+                    </Button>
+                  </div>
+                </>
+              ) : null}
+            </Grid>
+          </Grid>
+        </Box>
+        <Box display="flex" gap={4}>
+          <Grid container spacing={2} sm={12}>
+            <Grid
+              item
+              xs={12}
+              style={{ position: "sticky", bottom: 0, zIndex: 10 }}
+            >
+              <Box
+                p={7}
+                display="flex"
+                gap={2}
+                justifyContent="end"
+                bgcolor="background.paper"
+              >
+                <Button
+                  variant="outlined"
+                  color="error"
+                  type="reset"
+                  onClick={() => handleClose()}
+                  sx={{ minWidth: 150 }}
+                >
+                  Cancel
+                </Button>
+                {permissionUser && (
+                  <Button
+                    variant="contained"
+                    onClick={() => handleSubmit(true)}
+                    sx={{ minWidth: 150 }}
+                  >
+                    Save
+                  </Button>
+                )}
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+      </Card>
+    </>
   )
 }
 

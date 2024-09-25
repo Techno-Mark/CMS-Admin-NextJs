@@ -63,22 +63,28 @@ const KanbanDrawer = (props: KanbanDrawerProps) => {
       valid = false
     } else if (formData.name.length < 3) {
       errors.name = "Name must be at least 3 characters long"
+      errors.name = "Name must be at least 3 characters long"
       valid = false
     } else if (formData.name.length > 255) {
+      errors.name = "Name must be at most 255 characters long"
       errors.name = "Name must be at most 255 characters long"
       valid = false
     }
     if (!formData.link) {
       errors.link = "Link is required"
+      errors.link = "Link is required"
       valid = false
     } else if (formData.link.length > 1000) {
+      errors.link = "Link must be at most 1000 characters long"
       errors.link = "Link must be at most 1000 characters long"
       valid = false
     }
     if (!formData.logo) {
       errors.logo = "Logo link  is required"
+      errors.logo = "Logo link  is required"
       valid = false
     } else if (formData.logo.length > 1000) {
+      errors.logo = "Logo link must be at most 1000 characters long"
       errors.logo = "Logo link must be at most 1000 characters long"
       valid = false
     }

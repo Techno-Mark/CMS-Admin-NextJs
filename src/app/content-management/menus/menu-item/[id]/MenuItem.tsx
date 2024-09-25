@@ -3,11 +3,13 @@ import React, { useState } from "react"
 import { Box, Button, Card, Grid, IconButton, styled, Typography } from "@mui/material"
 import KanbanDrawer from "./KanbanDrawer"
 import LoadingBackdrop from "@/components/LoadingBackdrop"
-import BreadCrumbList from "@/components/BreadCrumbList"
-import DraggableIcon from "../_svg/DraggableIcon"
 import { postDataToOrganizationAPIs } from "@/services/apiService"
 import { menu } from "@/services/endpoint/menu"
+import CustomIconButton from '@core/components/mui/IconButton'
+import { Box, Button, Card, Grid, IconButton, styled, Typography } from "@mui/material"
+import React, { useState } from "react"
 import { toast } from "react-toastify"
+import DraggableIcon from "../_svg/DraggableIcon"
 import ConfirmationDialog from "./ConfirmationDialog"
 import CustomIconButton from '@core/components/mui/IconButton'
 import Image from 'next/image'
@@ -21,7 +23,7 @@ const MenuItem = ({
   menuData: any;
   menuId: string;
   handleClose: Function;
-  permissionUser: Boolean
+  permissionUser: Boolean;
 }) => {
   const [loading, setLoading] = useState<boolean>(false)
   const [menuItems, setMenuItems] = useState<any[] | null>(menuData)
@@ -144,22 +146,30 @@ const MenuItem = ({
   const renderMenuItems = (items: any[], parentId: number): React.ReactNode => {
     const handleAddSubmenu = (parentIndex: number) => {
       const newItems = [...items]
+      const newItems = [...items]
       const newSubItem = {
-        name: 'New Subitem',
-        link: '#',
+        name: "New Subitem",
+        link: "#",
         children: [],
+        logo: '#'
+      }
         logo: '#'
       }
 
       if (!newItems[parentIndex].children) {
         newItems[parentIndex].children = []
+        newItems[parentIndex].children = []
       }
+      newItems[parentIndex].children.push(newSubItem)
+      setMenuItems(newItems)
+    }
       newItems[parentIndex].children.push(newSubItem)
       setMenuItems(newItems)
     }
     const NestedMenu = styled(Box)(({ theme }) => ({
       marginLeft: "1.5rem",
       borderLeft: `2px solid ${theme.palette.divider}`
+    }))
     }))
 
     return items.map((item, index) => (
@@ -189,7 +199,6 @@ const MenuItem = ({
           </div>
 
           <IconButton
-
             size="medium"
             // @ts-ignore
             color="success"
@@ -203,6 +212,8 @@ const MenuItem = ({
             // @ts-ignore
             color="error"
             onClick={() => {
+              setDeleteDrawer(true)
+              setDeleteData({ index, parentId: -1 })
               setDeleteDrawer(true)
               setDeleteData({ index, parentId: -1 })
             }}
@@ -238,13 +249,14 @@ const MenuItem = ({
                       />
                     )}
                     <Typography variant="h5"> {childItem.name} </Typography>
-                    <Typography variant="subtitle1"> ({childItem.link}) </Typography>
+                    <Typography variant="subtitle1">
+                      {" "}
+                      ({childItem.link}){" "}
+                    </Typography>
                   </div>
 
                   <IconButton
-
                     size="small"
-
                     // @ts-ignore
                     color="success"
                     onClick={() => handleEdit(childIndex, index)}
@@ -256,6 +268,8 @@ const MenuItem = ({
                     color="error"
                     size="small"
                     onClick={() => {
+                      setDeleteDrawer(true)
+                      setDeleteData({ index: childIndex, parentId: index })
                       setDeleteDrawer(true)
                       setDeleteData({ index: childIndex, parentId: index })
                     }}>
@@ -282,6 +296,120 @@ const MenuItem = ({
     ))
   }
 
+    ))
+  }
+
+  // const renderMenuItems = (items: any[], parentId: number): React.ReactNode => {
+  //   return items.map((item, index) => (
+  //     <ul key={index + 1}>
+
+  //       <li
+  //         className="flex items-center border-b-black border-b"
+  //         draggable
+  //         onDragStart={(e) => handleDragStart(e, index, -1)}
+  //         onDrop={(e) => handleDrop(e, index, -1)}
+  //         onDragOver={(e) => handleDropOver(e, index, -1)}
+  //       >
+
+  //         <CustomIconButton aria-label='Add Submenu' size="small" variant='contained' color="primary"
+  //           onClick={() => setDrawerOpen(true)}>
+  //           <i className="tabler-plus mie-1" />
+  //         </CustomIconButton>
+
+  //         {/* <Button color="success" size="small" variant="contained" >
+  //             <i className="tabler-plus mie-1" />
+  //           </Button> */}
+  //         <div className="flex-1 flex items-center gap-x-2">
+  //           <DraggableIcon />
+  //           {/* <img src={item.logo} alt="icon" width={30} height={30} /> */}
+  //           <Typography variant="h5"> {item.name} </Typography>
+  //           <Typography variant="subtitle1"> ({item.link}) </Typography>
+  //         </div>
+  //         <div className="flex rounded-md border cursor-pointer">
+  //           <div className=" bg-white border-r p-1">
+  //             <button
+  //               className="bg-white text-black cursor-pointer"
+  //               onClick={() => handleEdit(index, -1)}
+  //             >
+  //               Edit
+  //             </button>
+  //           </div>
+  //           <div className="p-1">
+  //             <button
+  //               onClick={() => {
+  //                 setDeleteDrawer(true)
+  //                 setDeleteData({ index, parentId: -1 })
+  //               }}
+  //               className="bg-white cursor-pointer"
+  //             >
+  //               Delete
+  //             </button>
+  //           </div>
+  //         </div>
+  //       </li>
+  //       {parentId == -1 && !item.children?.length && (
+  //         <div
+  //           className="m-2 ml-4"
+  //           onDrop={(e: any) => handleDrop(e, 0, index)}
+  //           onDragOver={(e: any) => handleDropOver(e, 0, index)}
+  //         >
+  //           Drop sub-item
+  //         </div>
+  //       )}
+  //       {item.children &&
+  //         item.children?.map((childItem: any, childIndex: number) => (
+  //           <ul key={childIndex + 1}>
+  //             <li
+  //               className="flex items-center border-b-black border-b p-1"
+  //               draggable
+  //               onDragStart={(e) => handleDragStart(e, childIndex, index)}
+  //               onDrop={(e) => handleDrop(e, childIndex, index)}
+  //               onDragOver={(e) => handleDropOver(e, childIndex, index)}
+  //             >
+  //               <div className="flex-1 flex items-center gap-x-2">
+  //                 <DraggableIcon />
+  //                 {childItem?.logo && childItem.logo !== "#" && (
+  //                   // eslint-disable-next-line
+  //                   <img
+  //                     src={childItem.logo}
+  //                     alt="icon"
+  //                     width={30}
+  //                     height={30}
+  //                   />
+  //                 )}
+  //                 <Typography variant="h5"> {childItem.name} </Typography>
+  //                 <Typography variant="subtitle1">
+  //                   {" "}
+  //                   ({childItem.link}){" "}
+  //                 </Typography>
+  //               </div>
+  //               <div className="flex rounded-md border cursor-pointer">
+  //                 <div className=" bg-white border-r p-1">
+  //                   <button
+  //                     className="bg-white text-black cursor-pointer"
+  //                     onClick={() => handleEdit(childIndex, index)}
+  //                   >
+  //                     Edit
+  //                   </button>
+  //                 </div>
+  //                 <div className="p-1">
+  //                   <button
+  //                     onClick={() => {
+  //                       setDeleteDrawer(true)
+  //                       setDeleteData({ index: childIndex, parentId: index })
+  //                     }}
+  //                     className="bg-white cursor-pointer"
+  //                   >
+  //                     Delete
+  //                   </button>
+  //                 </div>
+  //               </div>
+  //             </li>
+  //           </ul>
+  //         ))}
+  //     </ul>
+  //   ))
+  // }
   return (
     <>
       <LoadingBackdrop isLoading={loading} />
@@ -289,7 +417,6 @@ const MenuItem = ({
       <Card>
         <div className="bg-white p-1 max-w-[70%] m-auto">
           {menuItems ? (
-
             renderMenuItems(menuItems, -1)
           ) : (
             <p className="text-xl p-4">
@@ -299,7 +426,12 @@ const MenuItem = ({
           )}
           {permissionUser &&
 
-            <Button color="success" size="small" variant="contained" onClick={() => setDrawerOpen(true)}>
+            <Button
+              color="success"
+              size="small"
+              variant="contained"
+              onClick={() => setDrawerOpen(true)}
+            >
               <i className="tabler-plus mie-1" />
               Add
             </Button>
@@ -333,38 +465,53 @@ const MenuItem = ({
             />
           )}
         </div>
-        <Box display="flex" gap={2}>
-          <Grid container spacing={2}>
-            <Grid
-              item
-              xs={12}
-              style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-            >
-              <Box
-                p={2}
-                display="flex"
-                gap={2}
-                justifyContent="end"
-                bgcolor="background.paper"
-              >
-                <Button
-                  variant="contained"
-                  color="error"
-                  type="reset"
-                  onClick={() => handleClose()}
-                >
-                  Cancel
-                </Button>
-                {permissionUser &&
-                  <Button variant="contained" onClick={() => handleSubmit()}>
-                    Save
-                  </Button>
-                }
-              </Box>
-            </Grid>
-          </Grid>
-        </Box>
       </Card>
+      <Box display="flex" gap={2}>
+        <Grid container spacing={2}>
+          <Grid
+            item
+            xs={12}
+            style={{ position: "sticky", bottom: 0, zIndex: 10 }}
+          >
+            <Box
+              p={2}
+              display="flex"
+              gap={2}
+              justifyContent="end"
+              bgcolor="background.paper"
+            ></Box>
+          </Grid>
+        </Grid>
+      </Box>
+
+      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
+        <Box
+          p={5}
+          display="flex"
+          gap={2}
+          justifyContent="end"
+          bgcolor="background.paper"
+        >
+          <Button
+            variant="contained"
+            color="error"
+            type="reset"
+            size="small"
+            onClick={() => handleClose()}
+          >
+            Cancel
+          </Button>
+          {permissionUser && (
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => handleSubmit()}
+            >
+              Save
+            </Button>
+          )}
+        </Box>
+      </Grid>
     </>
   )
 }

@@ -10,9 +10,12 @@ import {
   CardActions,
   ButtonGroup,
   Tooltip,
-  IconButton
+  IconButton,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
 } from "@mui/material"
-import React, { ChangeEvent, useEffect, useState } from "react"
+import React, { ChangeEvent, SyntheticEvent, useEffect, useState } from "react"
 import { get, post, postDataToOrganizationAPIs } from "@/services/apiService"
 import { template } from "@/services/endpoint/template"
 import CustomTextField from "@/@core/components/mui/TextField"
@@ -76,11 +79,27 @@ type Props = {
   handleClose: () => void;
   editingRow: PagesType | null;
   setEditingRow: React.Dispatch<React.SetStateAction<PagesType | null>>;
-  permissionUser: Boolean
+  permissionUser: Boolean;
 };
-function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUser }: Props) {
-  const [, setIsSlugManuallyEdited] =
-    useState<boolean>(false)
+function PagesForm({
+  open,
+  handleClose,
+  editingRow,
+  setEditingRow,
+  permissionUser
+}: Props) {
+  const [expanded, setExpanded] = useState<string | false>("panel1")
+
+  const handleAccordionChange =
+    (panel: string) => (event: SyntheticEvent, isExpanded: boolean) => {
+      setExpanded(isExpanded ? panel : false)
+    }
+
+  const expandIcon = (value: string) => (
+    <i className={expanded === value ? "tabler-minus rotate-90" : "tabler-plus"} />
+  )
+
+  const [, setIsSlugManuallyEdited] = useState<boolean>(false)
 
   const [formData, setFormData] =
     useState<typeof initialFormData>(initialFormData)
@@ -292,7 +311,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
 
         // Handle validation for multiple fields
         if (field.fieldType === "multiple") {
-          const multipleEntries = templateValue?.[section.uniqueSectionName]?.[fieldKey]
+          const multipleEntries =
+            templateValue?.[section.uniqueSectionName]?.[fieldKey]
           if (Array.isArray(multipleEntries)) {
             multipleEntries.forEach((entry: any, entryIndex: number) => {
               field.multipleData.forEach((subField: any) => {
@@ -300,7 +320,10 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
                 const subFieldLabel = subField.fieldLabel
                 const subFieldValue = entry[subFieldKey]
 
-                if (subField.isRequired && (!subFieldValue || subFieldValue.trim() === "")) {
+                if (
+                  subField.isRequired &&
+                  (!subFieldValue || subFieldValue.trim() === "")
+                ) {
                   valid = false
                   // @ts-ignore
                   errors[section.uniqueSectionName] = {
@@ -311,7 +334,9 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
                       ...(errors[section.uniqueSectionName]?.[fieldKey] || {}),
                       [entryIndex]: {
                         // @ts-ignore
-                        ...(errors[section.uniqueSectionName]?.[fieldKey]?.[entryIndex] || {}),
+                        ...(errors[section.uniqueSectionName]?.[fieldKey]?.[
+                          entryIndex
+                        ] || {}),
                         [subFieldKey]: `${subFieldLabel} is required.`
                       }
                     }
@@ -736,6 +761,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
                   <CustomTextField
                     multiline
                     minRows={3}
+                    maxRows={3}
                     error={!!formErrors.robots}
                     helperText={formErrors.robots}
                     label="robots (maximum-character: 2000 )"
@@ -757,6 +783,7 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
                   <CustomTextField
                     multiline
                     minRows={3}
+                    maxRows={3}
                     error={!!formErrors.canonical}
                     helperText={formErrors.canonical}
                     label="Canonical (maximum-character: 2000 )"
@@ -834,325 +861,382 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
                       style={{ marginBottom: "10px" }}
                     >
                       <CardContent>
-                        <Typography variant="h5">
-                          {section.sectionName}
-                          {!section.uniqueSectionName?.includes("_") && (
-                            <div className="flex items-center">
-                              <Typography variant="h6">
-                                Common Static Content Block
-                              </Typography>
-                              <Tooltip
-                                title={`go to static content block data`}
-                              >
-                                <IconButton
-                                  color="info"
-                                  onClick={() => {
-                                    const redirectURL = `/content-management/static-component/edit/${section.sectionId}`
-                                    window.open(redirectURL, "_blank")
-                                  }}
+                        {!section.uniqueSectionName?.includes("_") ? (
+                          <>
+                            <Typography variant="h5">
+                              {section.sectionName}
+                              <div className="flex items-center">
+                                <Typography variant="h6">
+                                  Common Static Content Block
+                                </Typography>
+                                <Tooltip
+                                  title={`go to static content block data`}
                                 >
-                                  <i className="tabler-external-link text-textSecondary"></i>
-                                </IconButton>
-                              </Tooltip>
-                            </div>
-                          )}
-                        </Typography>
-                        {section.uniqueSectionName?.includes("_") &&
-                          section.sectionTemplate.map(
-                            (sectionField: any, sectioFieldIndex: number) => (
-                              <Grid
-                                container
-                                key={`${section.uniqueSectionName}+${sectionField.fekey}`}
-                                spacing={2}
-                              >
-                                {sectionField.fieldType === "multiple" && (
-                                  <Grid
-                                    item
-                                    xs={12}
-                                    style={{ marginBottom: "10px" }}
+                                  <IconButton
+                                    color="info"
+                                    onClick={() => {
+                                      const redirectURL = `/content-management/static-component/edit/${section.sectionId}`
+                                      window.open(redirectURL, "_blank")
+                                    }}
                                   >
-                                    <Card variant="outlined">
-                                      <CardActions>
+                                    <i className="tabler-external-link text-textSecondary"></i>
+                                  </IconButton>
+                                </Tooltip>
+                              </div>
+                            </Typography>
+                          </>
+                        ) : (
+                          <Accordion
+                            expanded={expanded === section.sectionName}
+                            onChange={handleAccordionChange(
+                              section.sectionName
+                            )}
+                          >
+                            <AccordionSummary
+                              id="customized-panel-header-1"
+                              expandIcon={expandIcon(section.sectionName)}
+                              aria-controls="customized-panel-content-1"
+                            >
+                              <Typography variant="h5">
+                                {section.sectionName}
+                                {!section.uniqueSectionName?.includes("_") && (
+                                  <div className="flex items-center">
+                                    <Typography variant="h6">
+                                      Common Static Content Block
+                                    </Typography>
+                                    <Tooltip
+                                      title={`go to static content block data`}
+                                    >
+                                      <IconButton
+                                        color="info"
+                                        onClick={() => {
+                                          const redirectURL = `/content-management/static-component/edit/${section.sectionId}`
+                                          window.open(redirectURL, "_blank")
+                                        }}
+                                      >
+                                        <i className="tabler-external-link text-textSecondary"></i>
+                                      </IconButton>
+                                    </Tooltip>
+                                  </div>
+                                )}
+                              </Typography>
+                            </AccordionSummary>
+
+                            <AccordionDetails>
+                              {section.uniqueSectionName?.includes("_") &&
+                                section.sectionTemplate.map(
+                                  (
+                                    sectionField: any,
+                                    sectioFieldIndex: number
+                                  ) => (
+                                    <Grid
+                                      container
+                                      key={`${section.uniqueSectionName}+${sectionField.fekey}`}
+                                      spacing={2}
+                                    >
+                                      {sectionField.fieldType ===
+                                        "multiple" && (
                                         <Grid
-                                          container
+                                          item
                                           xs={12}
-                                          sm={12}
-                                          spacing={2}
+                                          style={{ marginBottom: "10px" }}
                                         >
-                                          <Grid item xs={10}>
-                                            <Typography
-                                              variant="h6"
-                                              component="div"
-                                            >
-                                              {sectionField.fieldLabel}
-                                            </Typography>
-                                          </Grid>
-                                          <Grid item xs={2}>
-                                            <ButtonGroup
-                                              variant="tonal"
-                                              size="small"
-                                            >
-                                              <Tooltip
-                                                title={`Add new at 1st position`}
+                                          <Card variant="outlined">
+                                            <CardActions>
+                                              <Grid
+                                                container
+                                                xs={12}
+                                                sm={12}
+                                                spacing={2}
                                               >
-                                                <Button
-                                                  size="small"
-                                                  onClick={() =>
-                                                    handleAddDuplicateForm(
-                                                      section.uniqueSectionName,
-                                                      sectionField.fekey,
-                                                      0,
-                                                      sectionField
-                                                    )
-                                                  }
-                                                >
-                                                  <i className="tabler-plus" />
-                                                </Button>
-                                              </Tooltip>
-                                            </ButtonGroup>
-                                          </Grid>
-                                        </Grid>
-                                      </CardActions>
-
-                                      <CardContent>
-                                        {templateValue?.[
-                                          section.uniqueSectionName
-                                        ]?.[sectionField.fekey]?.map(
-                                          (
-                                            multipleSection: any,
-                                            multipleSectionIndex: any
-                                          ) => (
-                                            <Card
-                                              key={`group-${multipleSectionIndex}`}
-                                              variant="outlined"
-                                              style={{ marginBottom: "16px" }}
-                                            >
-                                              <CardActions>
-                                                <Grid
-                                                  container
-                                                  xs={12}
-                                                  sm={12}
-                                                  spacing={2}
-                                                >
-                                                  <Grid item xs={10}>
-                                                    <Typography
-                                                      variant="h6"
-                                                      component="div"
-                                                    >
-                                                      <b className="text-lg">
-                                                        {" "}
-                                                        {multipleSectionIndex +
-                                                          1}{" "}
-                                                      </b>{" "}
-                                                      Entry of (
-                                                      {section.sectionName +
-                                                        " -> " +
-                                                        sectionField.fieldLabel}
-                                                      )
-                                                    </Typography>
-                                                  </Grid>
-                                                  <Grid item xs={2}>
-                                                    <ButtonGroup
-                                                      variant="tonal"
-                                                      size="small"
-                                                    >
-                                                      <Tooltip title={`Add`}>
-                                                        <Button
-                                                          size="small"
-                                                          onClick={() =>
-                                                            handleAddDuplicateForm(
-                                                              section.uniqueSectionName,
-                                                              sectionField.fekey,
-                                                              multipleSectionIndex +
-                                                              1,
-                                                              sectionField
-                                                            )
-                                                          }
-                                                        >
-                                                          <i className="tabler-plus" />
-                                                        </Button>
-                                                      </Tooltip>
-
-                                                      <Tooltip title={`Remove`}>
-                                                        <Button
-                                                          size="small"
-                                                          onClick={() =>
-                                                            handleRemoveDuplicateForm(
-                                                              section.uniqueSectionName,
-                                                              sectionField.fekey,
-                                                              multipleSectionIndex
-                                                            )
-                                                          }
-                                                        >
-                                                          <i className="tabler-minus" />
-                                                        </Button>
-                                                      </Tooltip>
-                                                    </ButtonGroup>
-                                                  </Grid>
+                                                <Grid item xs={10}>
+                                                  <Typography
+                                                    variant="h6"
+                                                    component="div"
+                                                  >
+                                                    {sectionField.fieldLabel}
+                                                  </Typography>
                                                 </Grid>
-                                              </CardActions>
-                                              <CardContent>
-                                                {sectionField.multipleData?.map(
-                                                  (
-                                                    subField: any,
-                                                    subFieldIndex: number
-                                                  ) => (
-                                                    <Box
-                                                      key={`${section.uniqueSectionName}+${section.fekey}+${subField.fekey}`}
-                                                      sx={{ mb: 2 }}
+                                                <Grid item xs={2}>
+                                                  <ButtonGroup
+                                                    variant="tonal"
+                                                    size="small"
+                                                  >
+                                                    <Tooltip
+                                                      title={`Add new at 1st position`}
                                                     >
+                                                      <Button
+                                                        size="small"
+                                                        onClick={() =>
+                                                          handleAddDuplicateForm(
+                                                            section.uniqueSectionName,
+                                                            sectionField.fekey,
+                                                            0,
+                                                            sectionField
+                                                          )
+                                                        }
+                                                      >
+                                                        <i className="tabler-plus" />
+                                                      </Button>
+                                                    </Tooltip>
+                                                  </ButtonGroup>
+                                                </Grid>
+                                              </Grid>
+                                            </CardActions>
+
+                                            <CardContent>
+                                              {templateValue?.[
+                                                section.uniqueSectionName
+                                              ]?.[sectionField.fekey]?.map(
+                                                (
+                                                  multipleSection: any,
+                                                  multipleSectionIndex: any
+                                                ) => (
+                                                  <Card
+                                                    key={`group-${multipleSectionIndex}`}
+                                                    variant="outlined"
+                                                    style={{
+                                                      marginBottom: "16px"
+                                                    }}
+                                                  >
+                                                    <CardActions>
                                                       <Grid
                                                         container
-                                                        spacing={2}
-                                                        item
                                                         xs={12}
                                                         sm={12}
+                                                        spacing={2}
                                                       >
-                                                        <CustomTextField
-                                                          multiline
-                                                          label={
-                                                            subField.isRequired ? `${subField.fieldLabel} *` : subField.fieldLabel
-                                                          }
-                                                          type={
-                                                            subField.fieldType ===
-                                                              "file" ? "text" : "text"
-                                                          }
-                                                          name={
-                                                            subField.fieldType
-                                                          }
-                                                          onChange={(e: any) =>
-                                                            handleInputChange(
-                                                              e,
-                                                              section?.uniqueSectionName,
-                                                              sectionField.fekey,
-                                                              multipleSectionIndex,
-                                                              subField.fekey
+                                                        <Grid item xs={10}>
+                                                          <Typography
+                                                            variant="h6"
+                                                            component="div"
+                                                          >
+                                                            <b className="text-lg">
+                                                              {" "}
+                                                              {multipleSectionIndex +
+                                                                1}{" "}
+                                                            </b>{" "}
+                                                            Entry of (
+                                                            {section.sectionName +
+                                                              " -> " +
+                                                              sectionField.fieldLabel}
                                                             )
-                                                          }
-                                                          fullWidth
-                                                          margin="normal"
-                                                          // error={
-                                                          //   subField.error &&
-                                                          //   subField.error
-                                                          // }
-                                                          // helperText={
-                                                          //   subField.error &&
-                                                          //   subField.error
-                                                          // }
-                                                          // inputProps={
-                                                          //   subField.validation
-                                                          //     ? JSON.parse(
-                                                          //         subField.validation
-                                                          //       )
-                                                          //     : {}
-                                                          // }
-                                                          error={
-                                                            // @ts-ignore
-                                                            !!formErrors[
-                                                              section
-                                                                .uniqueSectionName
-                                                            ]?.[
-                                                            `${sectionField.fekey}-${multipleSectionIndex}-${subField.fekey}`
-                                                            ]
-                                                          }
-                                                          helperText={
-                                                            // @ts-ignore
-                                                            formErrors[
-                                                              section
-                                                                .uniqueSectionName
-                                                            ]?.[
-                                                            `${sectionField.fekey}-${multipleSectionIndex}-${subField.fekey}`
-                                                            ] || ""
-                                                          }
-                                                          inputProps={
-                                                            subField.validation ? JSON.parse(
-                                                              subField.validation
-                                                            ) : {}
-                                                          }
-                                                          value={
-                                                            templateValue?.[
-                                                              section
-                                                                .uniqueSectionName
-                                                            ]?.[
-                                                              sectionField.fekey
-                                                            ]?.[
-                                                              multipleSectionIndex
-                                                            ]?.[
-                                                              subField.fekey
-                                                            ] || ""
-                                                          }
-                                                        />
+                                                          </Typography>
+                                                        </Grid>
+                                                        <Grid item xs={2}>
+                                                          <ButtonGroup
+                                                            variant="tonal"
+                                                            size="small"
+                                                          >
+                                                            <Tooltip
+                                                              title={`Add`}
+                                                            >
+                                                              <Button
+                                                                size="small"
+                                                                onClick={() =>
+                                                                  handleAddDuplicateForm(
+                                                                    section.uniqueSectionName,
+                                                                    sectionField.fekey,
+                                                                    multipleSectionIndex +
+                                                                      1,
+                                                                    sectionField
+                                                                  )
+                                                                }
+                                                              >
+                                                                <i className="tabler-plus" />
+                                                              </Button>
+                                                            </Tooltip>
+
+                                                            <Tooltip
+                                                              title={`Remove`}
+                                                            >
+                                                              <Button
+                                                                size="small"
+                                                                onClick={() =>
+                                                                  handleRemoveDuplicateForm(
+                                                                    section.uniqueSectionName,
+                                                                    sectionField.fekey,
+                                                                    multipleSectionIndex
+                                                                  )
+                                                                }
+                                                              >
+                                                                <i className="tabler-minus" />
+                                                              </Button>
+                                                            </Tooltip>
+                                                          </ButtonGroup>
+                                                        </Grid>
                                                       </Grid>
-                                                    </Box>
-                                                  )
-                                                )}
-                                              </CardContent>
-                                            </Card>
-                                          )
-                                        )}
-                                      </CardContent>
-                                    </Card>
-                                  </Grid>
-                                )}
+                                                    </CardActions>
+                                                    <CardContent>
+                                                      {sectionField.multipleData?.map(
+                                                        (
+                                                          subField: any,
+                                                          subFieldIndex: number
+                                                        ) => (
+                                                          <Box
+                                                            key={`${section.uniqueSectionName}+${section.fekey}+${subField.fekey}`}
+                                                            sx={{ mb: 2 }}
+                                                          >
+                                                            <Grid
+                                                              container
+                                                              spacing={2}
+                                                              item
+                                                              xs={12}
+                                                              sm={12}
+                                                            >
+                                                              <CustomTextField
+                                                                multiline
+                                                                label={
+                                                                  subField.isRequired ? `${subField.fieldLabel} *` : subField.fieldLabel
+                                                                }
+                                                                type={
+                                                                  subField.fieldType ===
+                                                                  "file" ? "text" : "text"
+                                                                }
+                                                                name={
+                                                                  subField.fieldType
+                                                                }
+                                                                onChange={(
+                                                                  e: any
+                                                                ) =>
+                                                                  handleInputChange(
+                                                                    e,
+                                                                    section?.uniqueSectionName,
+                                                                    sectionField.fekey,
+                                                                    multipleSectionIndex,
+                                                                    subField.fekey
+                                                                  )
+                                                                }
+                                                                fullWidth
+                                                                margin="normal"
+                                                                // error={
+                                                                //   subField.error &&
+                                                                //   subField.error
+                                                                // }
+                                                                // helperText={
+                                                                //   subField.error &&
+                                                                //   subField.error
+                                                                // }
+                                                                // inputProps={
+                                                                //   subField.validation
+                                                                //     ? JSON.parse(
+                                                                //         subField.validation
+                                                                //       )
+                                                                //     : {}
+                                                                // }
+                                                                error={
+                                                                  // @ts-ignore
+                                                                  !!formErrors[
+                                                                    section
+                                                                      .uniqueSectionName
+                                                                  ]?.[
+                                                                    `${sectionField.fekey}-${multipleSectionIndex}-${subField.fekey}`
+                                                                  ]
+                                                                }
+                                                                helperText={
+                                                                  // @ts-ignore
+                                                                  formErrors[
+                                                                    section
+                                                                      .uniqueSectionName
+                                                                  ]?.[
+                                                                    `${sectionField.fekey}-${multipleSectionIndex}-${subField.fekey}`
+                                                                  ] || ""
+                                                                }
+                                                                inputProps={
+                                                                  subField.validation ? JSON.parse(
+                                                                    subField.validation
+                                                                  ) : {}
+                                                                }
+                                                                value={
+                                                                  templateValue?.[
+                                                                    section
+                                                                      .uniqueSectionName
+                                                                  ]?.[
+                                                                    sectionField
+                                                                      .fekey
+                                                                  ]?.[
+                                                                    multipleSectionIndex
+                                                                  ]?.[
+                                                                    subField
+                                                                      .fekey
+                                                                  ] || ""
+                                                                }
+                                                              />
+                                                            </Grid>
+                                                          </Box>
+                                                        )
+                                                      )}
+                                                    </CardContent>
+                                                  </Card>
+                                                )
+                                              )}
+                                            </CardContent>
+                                          </Card>
+                                        </Grid>
+                                      )}
 
-                                {sectionField.fieldType !== "multiple" && (
-                                  <Grid item xs={12} sm={12}>
-                                    <CustomTextField
-                                      multiline
-                                      label={
-                                        sectionField.isRequired ? `${sectionField.fieldLabel} *` : sectionField.fieldLabel
-                                      }
-                                      type={
-                                        sectionField.fieldType === "file" ? "text" : "text"
-                                      }
-                                      name={sectionField.fieldType}
-                                      onChange={(
-                                        e: ChangeEvent<HTMLInputElement>
-                                      ) =>
-                                        handleInputChange(
-                                          e,
-                                          section.uniqueSectionName,
-                                          sectionField.fekey
-                                        )
-                                      }
-                                      fullWidth
-                                      margin="normal"
-                                      // @ts-ignore
-                                      // error={sectioFieldIndex.error && sectioFieldIndex.error}
-                                      // @ts-ignore
-                                      // helperText={field.error && field.error}
-                                      // inputProps={
-                                      //   sectionField.validation
-                                      //     ? JSON.parse(sectionField.validation)
-                                      //     : {}
-                                      // }
+                                      {sectionField.fieldType !==
+                                        "multiple" && (
+                                        <Grid item xs={12} sm={12}>
+                                          <CustomTextField
+                                            multiline
+                                            label={
+                                              sectionField.isRequired ? `${sectionField.fieldLabel} *` : sectionField.fieldLabel
+                                            }
+                                            type={
+                                              sectionField.fieldType === "file" ? "text" : "text"
+                                            }
+                                            name={sectionField.fieldType}
+                                            onChange={(
+                                              e: ChangeEvent<HTMLInputElement>
+                                            ) =>
+                                              handleInputChange(
+                                                e,
+                                                section.uniqueSectionName,
+                                                sectionField.fekey
+                                              )
+                                            }
+                                            fullWidth
+                                            margin="normal"
+                                            // @ts-ignore
+                                            // error={sectioFieldIndex.error && sectioFieldIndex.error}
+                                            // @ts-ignore
+                                            // helperText={field.error && field.error}
+                                            // inputProps={
+                                            //   sectionField.validation
+                                            //     ? JSON.parse(sectionField.validation)
+                                            //     : {}
+                                            // }
 
-                                      error={
-                                        // @ts-ignore
-                                        !!formErrors[section.uniqueSectionName]?.[
-                                          sectionField.fekey
-                                        ]
-                                      }
-                                      helperText={
-                                        // @ts-ignore
-                                        formErrors[section.uniqueSectionName]?.[
-                                          sectionField.fekey
-                                        ] || ""
-                                      }
-                                      //  inputProps={
-                                      //    sectionField.validation ? JSON.parse(sectionField.validation) : {}
-                                      //  }
-                                      value={
-                                        templateValue?.[
-                                          section.uniqueSectionName
-                                        ]?.[sectionField.fekey] || ""
-                                      }
-                                    />
-                                  </Grid>
+                                            error={
+                                              // @ts-ignore
+                                              !!formErrors[
+                                                section.uniqueSectionName
+                                              ]?.[sectionField.fekey]
+                                            }
+                                            helperText={
+                                              // @ts-ignore
+                                              formErrors[
+                                                section.uniqueSectionName
+                                              ]?.[sectionField.fekey] || ""
+                                            }
+                                            //  inputProps={
+                                            //    sectionField.validation ? JSON.parse(sectionField.validation) : {}
+                                            //  }
+                                            value={
+                                              templateValue?.[
+                                                section.uniqueSectionName
+                                              ]?.[sectionField.fekey] || ""
+                                            }
+                                          />
+                                        </Grid>
+                                      )}
+                                    </Grid>
+                                  )
                                 )}
-                              </Grid>
-                            )
-                          )}
+                            </AccordionDetails>
+                          </Accordion>
+                        )}
                       </CardContent>
                     </Card>
                   ))}
@@ -1179,18 +1263,19 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
           >
             Cancel
           </Button>
-          {permissionUser &&
-            <><Button
-              color="warning"
-              variant="contained"
-              size="small"
-              type="submit"
-              onClick={(event) => {
-                handleSubmit(event, false)
-              }}
-            >
-              Save as Draft
-            </Button>
+          {permissionUser && (
+            <>
+              <Button
+                color="warning"
+                variant="contained"
+                size="small"
+                type="submit"
+                onClick={(event) => {
+                  handleSubmit(event, false)
+                }}
+              >
+                Save as Draft
+              </Button>
               <Button
                 variant="contained"
                 type="submit"
@@ -1201,7 +1286,8 @@ function PagesForm({ open, handleClose, editingRow, setEditingRow, permissionUse
               >
                 Save & Publish
               </Button>
-            </>}
+            </>
+          )}
         </Box>
       </Grid>
     </>
