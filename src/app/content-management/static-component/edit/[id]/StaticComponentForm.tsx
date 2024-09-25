@@ -384,9 +384,7 @@ function StaticComponentForm({
           bgcolor="background.paper"
         >
           <Button
-            variant="contained"
-            color="error"
-            type="reset"
+            variant="outlined"
             size="small"
             onClick={() => {
               handleClose()

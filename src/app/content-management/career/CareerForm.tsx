@@ -356,6 +356,7 @@ const CareerForm = ({
                     <MyCKEditor
                       onChange={handleEditorChangeCKEditor}
                       initialValue={editingRow?.description}
+                      className="!h-16"
                     />
                     {!!formErrors.description && (
                       <p className="text-[#ff5054] text-[13px]">{formErrors.description}</p>
@@ -380,11 +381,11 @@ const CareerForm = ({
           bgcolor="background.paper"
         >
           <Button
-            variant="tonal"
-            color="error"
-            type="reset"
+            variant="outlined"
             size="small"
-            onClick={() => handleClose()}
+            onClick={() => {
+              handleClose();
+            }}
           >
             Cancel
           </Button>

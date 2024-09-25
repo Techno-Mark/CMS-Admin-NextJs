@@ -866,11 +866,11 @@ const ContentBlockForm = ({ open }: Props) => {
           bgcolor="background.paper"
         >
           <Button
-            variant="contained"
-            color="error"
-            type="reset"
+            variant="outlined"
             size="small"
-            onClick={() => handleReset()}
+            onClick={() => {
+              handleReset()
+            }}
           >
             Cancel
           </Button>

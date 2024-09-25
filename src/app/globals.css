@@ -142,3 +142,8 @@ code {
   outline: none !important;
   box-shadow: none !important;
 }
+
+.ck.ck-editor__main > .ck-editor__editable {
+  min-height: 70px;
+}
+

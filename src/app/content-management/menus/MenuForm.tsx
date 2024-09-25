@@ -195,7 +195,7 @@ const MenuForm = ({ open, handleClose, editingRow, permissionUser }: Props) => {
                 justifyContent="end"
                 bgcolor="background.paper"
               >
-                <Button variant="outlined" color="error" onClick={handleClose}>
+                <Button variant="outlined" onClick={handleClose}>
                   Cancel
                 </Button>
                 {permissionUser && (
