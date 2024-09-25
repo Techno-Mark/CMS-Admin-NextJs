@@ -874,7 +874,7 @@ const ContentBlockForm = ({ open }: Props) => {
           >
             Cancel
           </Button>
-          <Button variant="contained" type="submit" size="small" onClick={(e)=>handleSubmit(e)}>
+          <Button variant="contained" type="submit" size="small" onClick={(e) => handleSubmit(e)}>
             {open === sectionActions.ADD ? "Add" : "Update"} Content Block
           </Button>
         </Box>
