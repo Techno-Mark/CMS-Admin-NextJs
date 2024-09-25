@@ -300,7 +300,7 @@ export default function MyCKEditor({ onChange, initialValue }: any) {
         reversed: true
       }
     },
-    placeholder: "Type or paste your content here!",
+    placeholder: "Description",
     style: {
       definitions: [
         {
