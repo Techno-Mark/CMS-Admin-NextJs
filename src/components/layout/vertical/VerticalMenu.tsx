@@ -1,42 +1,48 @@
-'use client'
+"use client"
 
 // MUI Imports
-import { useTheme } from '@mui/material/styles'
+import { useTheme } from "@mui/material/styles"
 
 // Third-party Imports
-import PerfectScrollbar from 'react-perfect-scrollbar'
+import PerfectScrollbar from "react-perfect-scrollbar"
 
 // Type Imports
-import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
+import type { VerticalMenuContextProps } from "@menu/components/vertical-menu/Menu"
 
 // Component Imports
-import { Menu, MenuItem, SubMenu } from '@menu/vertical-menu'
+import { Menu, MenuItem, SubMenu } from "@menu/vertical-menu"
 
 // Hook Imports
-import { useSettings } from '@core/hooks/useSettings'
-import useVerticalNav from '@menu/hooks/useVerticalNav'
+import { useSettings } from "@core/hooks/useSettings"
+import useVerticalNav from "@menu/hooks/useVerticalNav"
 
 // Styled Component Imports
-import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNavExpandIcon'
+import StyledVerticalNavExpandIcon from "@menu/styles/vertical/StyledVerticalNavExpandIcon"
 
 // Style Imports
-import menuItemStyles from '@core/styles/vertical/menuItemStyles'
-import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
-import { useSession } from 'next-auth/react'
+import menuItemStyles from "@core/styles/vertical/menuItemStyles"
+import menuSectionStyles from "@core/styles/vertical/menuSectionStyles"
+import { useSession } from "next-auth/react"
 
 type RenderExpandIconProps = {
-  open?: boolean
-  transitionDuration?: VerticalMenuContextProps['transitionDuration']
-}
+  open?: boolean;
+  transitionDuration?: VerticalMenuContextProps["transitionDuration"];
+};
 
 type Props = {
-  scrollMenu: (container: any, isPerfectScrollbar: boolean) => void
-  permissionData:any
-}
+  scrollMenu: (container: any, isPerfectScrollbar: boolean) => void;
+  permissionData: any;
+};
 
-const RenderExpandIcon = ({ open, transitionDuration }: RenderExpandIconProps) => (
-  <StyledVerticalNavExpandIcon open={open} transitionDuration={transitionDuration}>
-    <i className='tabler-chevron-right' />
+const RenderExpandIcon = ({
+  open,
+  transitionDuration
+}: RenderExpandIconProps) => (
+  <StyledVerticalNavExpandIcon
+    open={open}
+    transitionDuration={transitionDuration}
+  >
+    <i className="tabler-chevron-right" />
   </StyledVerticalNavExpandIcon>
 )
 
@@ -49,7 +55,7 @@ const VerticalMenu = ({ scrollMenu, permissionData }: Props) => {
 
   // Vars
   const { transitionDuration } = verticalNavOptions
-  const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
+  const ScrollWrapper = isBreakpointReached ? "div" : PerfectScrollbar
   const { data: session } = useSession()
 
   // State to hold decrypted permission data
@@ -77,7 +83,8 @@ const VerticalMenu = ({ scrollMenu, permissionData }: Props) => {
   // }, 3000);
   // }, [])
 
-  const hasPermission = (menuKey: string) => permissionData && permissionData[menuKey]
+  const hasPermission = (menuKey: string) =>
+    permissionData && permissionData[menuKey]
 
   // if (loading) {
   //   return <div className=' ml-3'>
@@ -91,19 +98,27 @@ const VerticalMenu = ({ scrollMenu, permissionData }: Props) => {
   return (
     <ScrollWrapper
       {...(isBreakpointReached ? {
-        className: 'bs-full overflow-y-auto overflow-x-hidden',
-        onScroll: container => scrollMenu(container, false)
+        className: "bs-full overflow-y-auto overflow-x-hidden",
+        onScroll: (container) => scrollMenu(container, false)
       } : {
         options: { wheelPropagation: false, suppressScrollX: true },
-        onScrollY: container => scrollMenu(container, true)
+        onScrollY: (container) => scrollMenu(container, true)
       })}
     >
       <Menu
         popoutMenuOffset={{ mainAxis: 23 }}
         menuItemStyles={menuItemStyles(verticalNavOptions, theme, settings)}
-        renderExpandIcon={({ open }) => <RenderExpandIcon open={open} transitionDuration={transitionDuration} />}
-        renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
-        menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)} >
+        renderExpandIcon={({ open }) => (
+          <RenderExpandIcon
+            open={open}
+            transitionDuration={transitionDuration}
+          />
+        )}
+        renderExpandedMenuItemIcon={{
+          icon: <i className="tabler-circle text-xs" />
+        }}
+        menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
+      >
         {/* @ts-ignore */}
         {/* {(session?.user?.id === 1 || hasPermission('Dashboard')) && (
 
@@ -111,37 +126,84 @@ const VerticalMenu = ({ scrollMenu, permissionData }: Props) => {
             Dashboard
           </MenuItem>
         )} */}
-        {/* @ts-ignore */}
-        {(session?.user?.id === 1 || hasPermission('Blog')) && (
-          <MenuItem href='/content-management/blogs' icon={<i className='tabler-brand-blogger' />}>
-            Blogs
-          </MenuItem>
-        )}
-        {/* @ts-ignore */}
-        {(session?.user?.id === 1 || hasPermission('Contact Us')) && (
-          <MenuItem href='/content-management/contact-us' icon={<i className='tabler-address-book' />}>
-            Contact Us
-          </MenuItem>
-        )}
 
         {/* @ts-ignore */}
-        {(session?.user?.id === 1 || hasPermission('Page')) && (
-          <MenuItem href='/content-management/pages' icon={<i className='tabler-brand-pagekit' />}>
+        {(session?.user?.id === 1 || hasPermission("Page")) && (
+          <MenuItem
+            href="/content-management/pages"
+            icon={<i className="tabler-brand-pagekit" />}
+          >
             Pages
           </MenuItem>
         )}
 
         {/* @ts-ignore */}
-        {(session?.user?.id === 1 || hasPermission('Menu')) && (
-          <MenuItem href='/content-management/menus' icon={<i className='tabler-menu-2' />}>
+        {(session?.user?.id === 1 || hasPermission("Static Component")) && (
+          <MenuItem
+            href={`/content-management/static-component`}
+            icon={<i className="tabler-file-stack"></i>}
+          >
+            Static Component
+          </MenuItem>
+        )}
+
+        {/* @ts-ignore */}
+        {(session?.user?.id === 1 || hasPermission("Blog")) && (
+          <MenuItem
+            href="/content-management/blogs"
+            icon={<i className="tabler-brand-blogger" />}
+          >
+            Blogs
+          </MenuItem>
+        )}
+
+        {/* @ts-ignore */}
+        {(session?.user?.id === 1 || hasPermission("Media")) && (
+          <MenuItem
+            href={`/content-management/media`}
+            icon={<i className="tabler-file-upload"></i>}
+          >
+            Media
+          </MenuItem>
+        )}
+
+        {/* @ts-ignore */}
+        {(session?.user?.id === 1 || hasPermission("Popup")) && (
+          <MenuItem
+            href="/content-management/popups"
+            icon={<i className="tabler-box-model-2" />}
+          >
+            Popup
+          </MenuItem>
+        )}
+
+        {/* @ts-ignore */}
+        {(session?.user?.id === 1 || hasPermission("Menu")) && (
+          <MenuItem
+            href="/content-management/menus"
+            icon={<i className="tabler-menu-2" />}
+          >
             Menus
           </MenuItem>
         )}
 
         {/* @ts-ignore */}
-        {(session?.user?.id === 1 || hasPermission('Popup')) && (
-          <MenuItem href='/content-management/popups' icon={<i className='tabler-box-model-2' />}>
-            Popup
+        {(session?.user?.id === 1 || hasPermission("Contact Us")) && (
+          <MenuItem
+            href="/content-management/contact-us"
+            icon={<i className="tabler-address-book" />}
+          >
+            Contact Us
+          </MenuItem>
+        )}
+
+        {/* @ts-ignore */}
+        {(session?.user?.id === 1 || hasPermission("Career")) && (
+          <MenuItem
+            href="/content-management/career"
+            icon={<i className="tabler-briefcase" />}
+          >
+            Career
           </MenuItem>
         )}
 
@@ -153,39 +215,68 @@ const VerticalMenu = ({ scrollMenu, permissionData }: Props) => {
         )} */}
 
         {/* @ts-ignore */}
-        {(session?.user?.id === 1 || hasPermission('Career')) && (
-          <MenuItem href='/content-management/career' icon={<i className='tabler-briefcase' />}>
-            Career
+        {(session?.user?.id === 1 || hasPermission("Static Component")) && (
+          <MenuItem
+            href={`/content-management/seo`}
+            icon={<i className="tabler-seo"></i>}
+          >
+            SEO
           </MenuItem>
         )}
         {/* @ts-ignore */}
-        {(session?.user?.id === 1 || hasPermission('Media')) && (
-          <MenuItem href={`/content-management/media`} icon={<i className='tabler-file-upload'></i>}>
-            Media
-          </MenuItem>)}
-        {/* @ts-ignore */}
-        {(session?.user?.id === 1 || hasPermission('Static Component')) && (
-          <MenuItem href={`/content-management/static-component`} icon={<i className='tabler-file-stack'></i>}>
-            Static Component
-          </MenuItem>)}
-        {/* @ts-ignore */}
-        {(session?.user?.id === 1 || hasPermission('Static Component')) && (
-        <MenuItem href={`/content-management/seo`} icon={<i className='tabler-seo'></i>}>
-          SEO
-        </MenuItem>)}
-        {/* @ts-ignore */}
-        {(session?.user?.id === 1) && (
+        {session?.user?.id === 1 && (
           <>
-            <SubMenu label={"Users"} icon={<i className='tabler-users-group' />}>
-              <MenuItem href={`/users/management`} icon={<i className='tabler-users'></i>}>Users</MenuItem>
-              <MenuItem href={`/users/roles`} icon={<i className='tabler-user-cog'></i>}>Roles</MenuItem>
-              <MenuItem href={`/users/permissions`} icon={<i className='tabler-accessible'></i>}>Permissions</MenuItem>
+            <SubMenu
+              label={"Users"}
+              icon={<i className="tabler-users-group" />}
+            >
+              <MenuItem
+                href={`/users/management`}
+                icon={<i className="tabler-users"></i>}
+              >
+                Users
+              </MenuItem>
+              <MenuItem
+                href={`/users/roles`}
+                icon={<i className="tabler-user-cog"></i>}
+              >
+                Roles
+              </MenuItem>
+              <MenuItem
+                href={`/users/permissions`}
+                icon={<i className="tabler-accessible"></i>}
+              >
+                Permissions
+              </MenuItem>
             </SubMenu>
-            <SubMenu label={"Settings"} icon={<i className='tabler-settings' />}>
-              <MenuItem href={`/settings/organizations`} icon={<i className='tabler-affiliate'></i>}>Organization</MenuItem>
-              <MenuItem href={`/settings/content-blocks`} icon={<i className='tabler-box-margin'></i>}>Content Blocks</MenuItem>
-              <MenuItem href={`/settings/templates`} icon={<i className='tabler-template'></i>}>Templates</MenuItem>
-              <MenuItem href={`/settings/modules`} icon={<i className='tabler-stack-middle'></i>}>Modules</MenuItem>
+            <SubMenu
+              label={"Settings"}
+              icon={<i className="tabler-settings" />}
+            >
+              <MenuItem
+                href={`/settings/organizations`}
+                icon={<i className="tabler-affiliate"></i>}
+              >
+                Organization
+              </MenuItem>
+              <MenuItem
+                href={`/settings/content-blocks`}
+                icon={<i className="tabler-box-margin"></i>}
+              >
+                Content Blocks
+              </MenuItem>
+              <MenuItem
+                href={`/settings/templates`}
+                icon={<i className="tabler-template"></i>}
+              >
+                Templates
+              </MenuItem>
+              <MenuItem
+                href={`/settings/modules`}
+                icon={<i className="tabler-stack-middle"></i>}
+              >
+                Modules
+              </MenuItem>
               {/* <MenuItem href={`/settings/theme-setting`} icon={<i className='tabler-stack-middle'></i>}>Theme Setting</MenuItem> */}
             </SubMenu>
           </>

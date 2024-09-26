@@ -123,6 +123,7 @@ const UserListTable = () => {
         result.data.sections?.map((item: any) => ({
           id: item.sectionId,
           name: item.sectionName,
+          sectionImage: item.sectionImage,
           slug: item.sectionSlug,
           jsonContent: item.sectionTemplate,
           createdAt: item.createdAt,
@@ -157,6 +158,19 @@ const UserListTable = () => {
             {row.original.name}
           </Typography>
         )
+      }),
+      columnHelper.accessor("name", {
+        header: "Content Block Image",
+        cell: ({ row }) =>
+          <img
+            className="object-contain w-[160px] h-[90px]"
+            src={
+              process.env.NEXT_PUBLIC_BACKEND_BASE_URL +
+              "/" +
+              row.original.sectionImage
+            }
+          />
+
       }),
       columnHelper.accessor("createdAt", {
         header: "Created At",

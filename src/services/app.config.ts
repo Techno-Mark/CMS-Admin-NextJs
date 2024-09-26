@@ -1,1 +1,1 @@
-export const defaultRedirectRoute = '/content-management/blogs'
+export const defaultRedirectRoute = '/content-management/pages'
