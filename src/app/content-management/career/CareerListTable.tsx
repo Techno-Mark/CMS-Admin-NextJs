@@ -332,7 +332,7 @@ const CareerListTable = () => {
 
   return (
     <>
-      <div className="max-h-[75vh]">
+     
         <LoadingBackdrop isLoading={loading} />
         <div className="flex justify-between flex-col items-start md:flex-row md:items-center py-2 gap-4">
           <BreadCrumbList />
@@ -461,7 +461,7 @@ const CareerListTable = () => {
           setDeletingId={setDeletingId}
           setOpen={(arg1: boolean) => setIsDeleting(arg1)}
         />
-      </div>
+     
     </>
   )
 }
