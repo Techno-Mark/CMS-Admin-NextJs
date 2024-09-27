@@ -21,7 +21,7 @@ const ActiveConfirmationDialog = ({
       <DialogContent className="flex items-center flex-col text-center sm:pbs-16 sm:pbe-6 sm:pli-16">
         <i className="tabler-alert-circle text-[88px] mbe-6 text-warning" />
         <Typography variant="h5">
-          <p className="text-warning">Activating this menu will deactivate another currently active {menuLocation} menu. </p>
+          <p className="text-warning">After activating this option, the currently active {menuLocation} menu will be disabled.</p>
           <hr/>
           Are you sure you want to Active the Menu?
         </Typography>

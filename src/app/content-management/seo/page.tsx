@@ -280,31 +280,6 @@ function RobotSEO() {
           </Grid>
         </Box>
 
-        <Box display="flex" gap={4}>
-          <Grid container spacing={2} sm={12}>
-            <Grid
-              item
-              xs={12}
-              style={{ position: "sticky", bottom: 0, zIndex: 10 }}
-            >
-              <Box
-                p={7}
-                display="flex"
-                gap={2}
-                justifyContent="end"
-                bgcolor="background.paper"
-              >
-                <Button
-                  variant="contained"
-                  type="submit"
-                  onClick={() => handleSubmit(true)}
-                >
-                  Save & Update
-                </Button>
-              </Box>
-            </Grid>
-          </Grid>
-        </Box>
       </Card>
 
       <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>

@@ -9,6 +9,7 @@ import { getServerMode } from '@core/utils/serverHelpers'
 import { authOptions } from '@/libs/auth'
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
+import { defaultRedirectRoute } from '@/services/app.config'
 
 export const metadata: Metadata = {
   title: 'Login',
@@ -19,7 +20,7 @@ const LoginPage = async () => {
   const session = await getServerSession(authOptions)
 
   if (session) {
-    redirect('/home')
+    redirect(defaultRedirectRoute)
   }
   // Vars
   const mode = getServerMode()
