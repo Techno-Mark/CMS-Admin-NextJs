@@ -121,7 +121,7 @@ const CareerListTable = () => {
   const [activeFilter, setActiveFilter] = useState<boolean | null>(null)
   const [deletingId, setDeletingId] = useState<number>(0)
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
-  console.log(data)
+  
 
   const getData = async () => {
     setLoading(true)
