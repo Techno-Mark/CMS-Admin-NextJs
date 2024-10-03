@@ -4,7 +4,7 @@ import LoadingBackdrop from "@/components/LoadingBackdrop"
 import { post } from "@/services/apiService"
 import { organization } from "@/services/endpoint/organization"
 import { createUser, updateUser } from "@/services/endpoint/users/management"
-import { getRoleList } from "@/services/endpoint/users/roles"
+import { getRoleListOrgWise } from "@/services/endpoint/users/roles"
 import {
   Box,
   Button,
@@ -75,7 +75,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
 
   const fetchRoles = async (organizationId: number) => {
     try {
-      const response = await post(getRoleList, {
+      const response = await post(getRoleListOrgWise, {
         page: 1,
         limit: 1000,
         search: "",
