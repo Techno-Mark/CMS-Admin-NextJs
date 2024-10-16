@@ -9,28 +9,48 @@ import BreadCrumbList from "@/components/BreadCrumbList"
 import CustomTextField from "@/@core/components/mui/TextField"
 import { robotSEO } from "@/services/endpoint/robotSEO"
 
-const initialFormData = {
+interface GoogleAnalytics {
+  beforeScript: string[];
+  afterScript: string[];
+}
+
+interface FormData {
+  robotText: string;
+  googleAnalytics: GoogleAnalytics;
+  facebookScript: string;
+}
+
+interface FormErrors {
+  robotText: string;
+  googleAnalytics: {
+    beforeScript: string[];
+    afterScript: string[];
+  };
+  facebookScript: string;
+}
+
+const initialFormData: FormData = {
   robotText: "",
   googleAnalytics: {
-    beforeScript: "",
-    afterScript: ""
+    beforeScript: [""],
+    afterScript: [""]
   },
   facebookScript: ""
 }
 
-const initialErrorData = {
+const initialErrorData: FormErrors = {
   robotText: "",
   googleAnalytics: {
-    beforeScript: "",
-    afterScript: ""
+    beforeScript: [""],
+    afterScript: [""]
   },
   facebookScript: ""
 }
 
 function RobotSEO() {
   const [loading, setLoading] = useState(true)
-  const [formData, setFormData] = useState(initialFormData)
-  const [formErrors, setFormErrors] = useState(initialErrorData)
+  const [formData, setFormData] = useState<FormData>(initialFormData)
+  const [formErrors, setFormErrors] = useState<FormErrors>(initialErrorData)
 
   // Effects
   useEffect(() => {
@@ -40,54 +60,71 @@ function RobotSEO() {
   async function getRobotSEOData() {
     try {
       setLoading(true)
-      const data = {
-        robotText: formData.robotText,
-        googleAnalytics: formData.googleAnalytics ? {
-          beforeScript: formData.googleAnalytics.beforeScript || "",
-          afterScript: formData.googleAnalytics.afterScript || ""
-        } : {},
-        facebookScript: formData.facebookScript
-      }
-      const result = await post(robotSEO.getDetail, data)
+      const result = await post(robotSEO.getDetail, {})
 
       setLoading(false)
       if (result.status === "success") {
-        setFormData(result?.data)
+        // Ensure beforeScript and afterScript are arrays
+        const beforeScripts = Array.isArray(
+          result?.data.googleAnalytics?.beforeScript
+        ) ? result.data.googleAnalytics.beforeScript : [result.data.googleAnalytics?.beforeScript || ""]
+
+        const afterScripts = Array.isArray(
+          result?.data.googleAnalytics?.afterScript
+        ) ? result.data.googleAnalytics.afterScript : [result.data.googleAnalytics?.afterScript || ""]
+
+        // Set the state with extracted values
+        setFormData({
+          ...result.data,
+          googleAnalytics: {
+            ...result.data.googleAnalytics,
+            beforeScript: beforeScripts,
+            afterScript: afterScripts
+          }
+        })
       }
     } catch (error) {
       console.log(error)
-    } finally {
       setLoading(false)
     }
   }
 
   function validateForm() {
-    try {
-      let isValid = true
-      const errors = { ...formErrors }
-      if (!formData.robotText) {
-        errors.robotText = "robot text is required"
-        isValid = false
-      }
-      if (!formData.googleAnalytics.beforeScript) {
-        errors.googleAnalytics.beforeScript =
-          "Head before script text is required"
-        isValid = false
-      }
-      if (!formData.googleAnalytics.afterScript) {
-        errors.googleAnalytics.afterScript =
-          "Head after script text is required"
-        isValid = false
-      }
-      if (!formData.facebookScript) {
-        errors.facebookScript = "Facebook script text is required"
-        isValid = false
-      }
-      setFormErrors(errors)
-      return isValid
-    } catch (error) {
-      console.log("error at validation", error)
+    let isValid = true
+    const errors = { ...initialErrorData } // Reset errors to initial state
+
+    if (!formData.robotText.trim()) {
+      errors.robotText = "Robot text is required"
+      isValid = false
     }
+
+    // Validate beforeScript fields
+    errors.googleAnalytics.beforeScript =
+      formData.googleAnalytics.beforeScript.map((script) => {
+        if (!script.trim()) {
+          isValid = false
+          return "Before script is required"
+        }
+        return ""
+      })
+
+    // Validate afterScript fields
+    errors.googleAnalytics.afterScript =
+      formData.googleAnalytics.afterScript.map((script) => {
+        if (!script.trim()) {
+          isValid = false
+          return "After script is required"
+        }
+        return ""
+      })
+
+    if (!formData.facebookScript.trim()) {
+      errors.facebookScript = "Facebook script text is required"
+      isValid = false
+    }
+
+    setFormErrors(errors)
+    return isValid
   }
 
   const handleSitemapGenerate = async () => {
@@ -110,37 +147,76 @@ function RobotSEO() {
     }
   }
 
-  // handle submit
-  const handleSubmit = async (active: boolean) => {
-    try {
-      setFormErrors(initialErrorData)
-      if (!validateForm()) {
-        return
+  // Add new script input fields
+  const handleAddField = (type: keyof GoogleAnalytics) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      googleAnalytics: {
+        ...prevData.googleAnalytics,
+        [type]: [...prevData.googleAnalytics[type], ""] // Add empty field
+      }
+    }))
+  }
+
+  // Remove script input fields
+  const handleRemoveField = (type: keyof GoogleAnalytics, index?: number) => {
+    setFormData((prevData) => {
+      const updatedFields = [...prevData.googleAnalytics[type]]
+
+      // If index is provided, remove the specific index, otherwise remove the last one
+      const removeIndex =
+        index !== undefined ? index : updatedFields.length - 1
+
+      // Ensure at least one field remains
+      if (updatedFields.length > 1) {
+        updatedFields.splice(removeIndex, 1) // Remove the field
       }
 
-      setLoading(true)
-      const data = {
-        robotText: formData.robotText,
+      return {
+        ...prevData,
         googleAnalytics: {
-          beforeScript: formData.googleAnalytics.beforeScript,
-          afterScript: formData.googleAnalytics.afterScript
-        },
-        facebookScript: formData.facebookScript
+          ...prevData.googleAnalytics,
+          [type]: updatedFields
+        }
       }
-      let result = null
+    })
+  }
 
-      result = await postDataToOrganizationAPIs(robotSEO.saveAndUpdate, data)
+  const handleFieldChange = (
+    type: keyof GoogleAnalytics,
+    index: number,
+    value: string
+  ) => {
+    const updatedFields = [...formData.googleAnalytics[type]]
+    updatedFields[index] = value
 
-      setLoading(false)
-
-      if (result.status === "success") {
-        toast.success(result.message)
-      } else {
-        toast.error(result.message)
+    setFormData({
+      ...formData,
+      googleAnalytics: {
+        ...formData.googleAnalytics,
+        [type]: updatedFields
       }
-    } catch (error) {
-      console.error(error)
-      setLoading(false)
+    })
+  }
+
+  // Handle form submission
+  const handleSubmit = async () => {
+    setFormErrors(initialErrorData)
+    if (!validateForm()) {
+      return
+    }
+
+    setLoading(true)
+    const result = await postDataToOrganizationAPIs(
+      robotSEO.saveAndUpdate,
+      formData
+    )
+    setLoading(false)
+
+    if (result.status === "success") {
+      toast.success(result.message)
+    } else {
+      toast.error(result.message)
     }
   }
 
@@ -157,9 +233,8 @@ function RobotSEO() {
               <Button
                 variant="contained"
                 color="info"
-                type="submit"
                 size="medium"
-                onClick={() => handleSitemapGenerate()}
+                onClick={handleSitemapGenerate}
               >
                 Generate Sitemap
               </Button>
@@ -188,118 +263,110 @@ function RobotSEO() {
             </Grid>
           </Grid>
         </Box>
-        <Box
-          display="flex"
-          marginTop={4}
-          rowGap={4}
-          columnGap={4}
-          alignItems="flex-start"
-        >
+
+        {/* Google Analytics Before Script Section */}
+        <div className="flex justify-end mt-3">
+          <Box display="flex" justifyContent="center" marginTop={2}>
+            {/* Add Button */}
+            <Button size="small" onClick={() => handleAddField("beforeScript")}>
+              <i className="tabler-plus" />
+            </Button>
+
+            {/* Remove Button */}
+            <Button
+              size="small"
+              onClick={() => handleRemoveField("beforeScript")}
+              disabled={formData.googleAnalytics.beforeScript.length <= 1}
+            >
+              <i className="tabler-minus" />
+            </Button>
+          </Box>
+        </div>
+        <Box display="flex" rowGap={4} columnGap={4} alignItems="flex-start">
           <Grid container spacing={4} sm={12}>
-            <Grid item xs={12}>
-              <CustomTextField
-                multiline
-                minRows={10}
-                maxRows={15}
-                error={!!formErrors.googleAnalytics.beforeScript}
-                helperText={formErrors.googleAnalytics.beforeScript}
-                label="Head Before Script"
-                fullWidth
-                value={formData.googleAnalytics?.beforeScript}
-                onChange={(e) => {
-                  const { value } = e.target
-                  setFormData({
-                    ...formData,
-                    googleAnalytics: {
-                      ...formData.googleAnalytics,
-                      beforeScript: value
-                    }
-                  })
-                }}
-              />
-            </Grid>
-          </Grid>
-        </Box>
-        <Box
-          display="flex"
-          marginTop={4}
-          rowGap={4}
-          columnGap={4}
-          alignItems="flex-start"
-        >
-          <Grid container spacing={4} sm={12}>
-            <Grid item xs={12}>
-              <CustomTextField
-                multiline
-                minRows={10}
-                maxRows={15}
-                error={!!formErrors.googleAnalytics.afterScript}
-                helperText={formErrors.googleAnalytics.afterScript}
-                label="Head After Script"
-                fullWidth
-                value={formData.googleAnalytics?.afterScript}
-                onChange={(e) => {
-                  const { value } = e.target
-                  setFormData({
-                    ...formData,
-                    googleAnalytics: {
-                      ...formData.googleAnalytics,
-                      afterScript: value
-                    }
-                  })
-                }}
-              />
-            </Grid>
+            {formData.googleAnalytics.beforeScript.map((script, index) => (
+              <Grid item xs={12} key={index} display="flex" alignItems="center">
+                <CustomTextField
+                  multiline
+                  minRows={2}
+                  maxRows={4}
+                  error={!!formErrors.googleAnalytics.beforeScript[index]}
+                  helperText={formErrors.googleAnalytics.beforeScript[index]}
+                  label={`Head Before Script ${index + 1}`}
+                  fullWidth
+                  value={script}
+                  onChange={(e) =>
+                    handleFieldChange("beforeScript", index, e.target.value)
+                  }
+                />
+              </Grid>
+            ))}
           </Grid>
         </Box>
 
-        <Box
-          display="flex"
-          marginTop={4}
-          rowGap={4}
-          columnGap={4}
-          alignItems="flex-start"
-        >
+        {/* Google Analytics After Script Section */}
+        <div className="flex justify-end mt-3">
+          <Box display="flex" justifyContent="center" marginTop={2}>
+            {/* Add Button */}
+            <Button size="small" onClick={() => handleAddField("afterScript")}>
+              <i className="tabler-plus" />
+            </Button>
+
+            {/* Remove Button */}
+            <Button
+              size="small"
+              onClick={() => handleRemoveField("afterScript")}
+              disabled={formData.googleAnalytics.afterScript.length <= 1}
+            >
+              <i className="tabler-minus" />
+            </Button>
+          </Box>
+        </div>
+        <Box display="flex" rowGap={4} columnGap={4} alignItems="flex-start">
           <Grid container spacing={4} sm={12}>
-            <Grid item xs={12}>
-              <CustomTextField
-                multiline
-                minRows={10}
-                maxRows={15}
-                error={!!formErrors.facebookScript}
-                helperText={formErrors.facebookScript}
-                label="Facebook Script"
-                fullWidth
-                value={formData.facebookScript}
-                onChange={(e) => {
-                  const { value } = e.target
-                  setFormData({ ...formData, facebookScript: value })
-                }}
-              />
-            </Grid>
+            {formData.googleAnalytics.afterScript.map((script, index) => (
+              <Grid item xs={12} key={index} display="flex" alignItems="center">
+                <CustomTextField
+                  multiline
+                  minRows={2}
+                  maxRows={4}
+                  error={!!formErrors.googleAnalytics.afterScript[index]}
+                  helperText={formErrors.googleAnalytics.afterScript[index]}
+                  label={`Head After Script ${index + 1}`}
+                  fullWidth
+                  value={script}
+                  onChange={(e) =>
+                    handleFieldChange("afterScript", index, e.target.value)
+                  }
+                />
+              </Grid>
+            ))}
           </Grid>
         </Box>
 
-      </Card>
+        <Grid marginTop={5} item xs={12}>
+          <CustomTextField
+            multiline
+            minRows={10}
+            maxRows={15}
+            error={!!formErrors.facebookScript}
+            helperText={formErrors.facebookScript}
+            label="Facebook Script*"
+            fullWidth
+            value={formData.facebookScript}
+            onChange={(e) => {
+              const { value } = e.target
+              setFormData({ ...formData, facebookScript: value })
+            }}
+          />
+        </Grid>
 
-      <Grid item xs={12} style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
-        <Box
-          p={5}
-          display="flex"
-          gap={2}
-          justifyContent="end"
-          bgcolor="background.paper"
-        >
-          <Button
-            variant="contained"
-            type="submit"
-            size="small"
-            onClick={() => handleSubmit(true)}
-          >
-            Save & Update
+        <Box display="flex" justifyContent="flex-end" marginTop={4}>
+          <Button variant="contained" color="primary" onClick={handleSubmit}>
+            Save
           </Button>
         </Box>
-      </Grid>
+      </Card>
     </>
   )
 }
