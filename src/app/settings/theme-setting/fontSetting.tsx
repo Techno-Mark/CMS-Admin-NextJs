@@ -1,81 +1,81 @@
-"use client";
+"use client"
 
-import LoadingBackdrop from "@/components/LoadingBackdrop";
-import { Button, Box, Card, Grid } from "@mui/material";
-import { MuiColorInput } from "mui-color-input";
-import React, { useEffect, useState } from "react";
-import { post, postDataToOrganizationAPIs } from "@/services/apiService";
-import { toast } from "react-toastify";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import { themeData } from "@/services/endpoint/themeData";
+import LoadingBackdrop from "@/components/LoadingBackdrop"
+import { Button, Box, Card, Grid } from "@mui/material"
+import { MuiColorInput } from "mui-color-input"
+import React, { useEffect, useState } from "react"
+import { post, postDataToOrganizationAPIs } from "@/services/apiService"
+import { toast } from "react-toastify"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import { themeData } from "@/services/endpoint/themeData"
 
 function FontThemeSetting() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true)
 
   const [colors, setColors] = React.useState({
-    fontColor: "#ffffff",
-  });
+    fontColor: "#ffffff"
+  })
 
   // Effects
   useEffect(() => {
-    getThemeData();
-  }, []);
+    getThemeData()
+  }, [])
 
   const handleColorChange = (newColor: any, colorType: any) => {
     setColors((prevColors) => ({
       ...prevColors,
-      [colorType]: newColor,
-    }));
-  };
+      [colorType]: newColor
+    }))
+  }
 
   async function getThemeData() {
     try {
-      setLoading(true);
+      setLoading(true)
       const data = {
-        fontColor: colors.fontColor,
-      };
-      const result = await post(themeData.getThemeDetail, data);
+        fontColor: colors.fontColor
+      }
+      const result = await post(themeData.getThemeDetail, data)
 
-      setLoading(false);
+      setLoading(false)
       if (result.status === "success") {
         setColors((prevColors) => ({
           ...prevColors,
-          fontColor: result.data.fontColor || colors.fontColor,
-        }));
+          fontColor: result.data.fontColor || colors.fontColor
+        }))
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
   // handle submit
   const handleSubmit = async (active: boolean) => {
     try {
-      setLoading(true);
+      setLoading(true)
       const data = {
-        fontColor: colors.fontColor,
-      };
-      let result = null;
+        fontColor: colors.fontColor
+      }
+      let result = null
 
       result = await postDataToOrganizationAPIs(
         themeData.saveAndUpdateTheme,
         data
-      );
+      )
 
-      setLoading(false);
+      setLoading(false)
 
       if (result.status === "success") {
-        toast.success(result.message);
+        toast.success(result.message)
       } else {
-        toast.error(result.message);
+        toast.error(result.message)
       }
     } catch (error) {
-      console.error(error);
-      setLoading(false);
+      console.error(error)
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <>
@@ -129,7 +129,7 @@ function FontThemeSetting() {
         </Box>
       </Card>
     </>
-  );
+  )
 }
 
-export default FontThemeSetting;
+export default FontThemeSetting

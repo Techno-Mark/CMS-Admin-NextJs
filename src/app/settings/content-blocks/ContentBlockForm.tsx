@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Box,
@@ -16,25 +16,25 @@ import {
   Typography,
   Accordion,
   AccordionDetails,
-  AccordionSummary
-} from "@mui/material"
-import CustomTextField from "@/@core/components/mui/TextField"
-import CustomAutocomplete from "@/@core/components/mui/Autocomplete"
-import { get, post } from "@/services/apiService"
-import { usePathname, useRouter } from "next/navigation"
-import { toast } from "react-toastify"
-import { section } from "@/services/endpoint/section"
-import LoadingBackdrop from "@/components/LoadingBackdrop"
-import BreadCrumbList from "@/components/BreadCrumbList"
+  AccordionSummary,
+} from "@mui/material";
+import CustomTextField from "@/@core/components/mui/TextField";
+import CustomAutocomplete from "@/@core/components/mui/Autocomplete";
+import { get, post } from "@/services/apiService";
+import { usePathname, useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { section } from "@/services/endpoint/section";
+import LoadingBackdrop from "@/components/LoadingBackdrop";
+import BreadCrumbList from "@/components/BreadCrumbList";
 
 const tooltipContent = {
   pattern: "[A-Za-z]{3,10}",
   maxLength: 10,
-  minLength: 3
+  minLength: 3,
   // "min": "01",
   // "max": "100",
   // "accept": ".jpg, .jpeg, .png",
-}
+};
 
 const fieldTypeOptions = [
   // { label: 'email', value: 'email' },
@@ -44,23 +44,23 @@ const fieldTypeOptions = [
   // { label: 'date', value: 'date' },
   // { label: 'number', value: 'number' },
   // { label: 'textarea', value: 'textarea' },
-  { label: "Multiple", value: "multiple" }
-]
+  { label: "Multiple", value: "multiple" },
+];
 
 const fieldTypeOptionsForMultiple = [
   // { label: 'email', value: 'email' },
   // { label: 'file', value: 'file' },
-  { label: "text", value: "text" }
+  { label: "text", value: "text" },
   // { label: 'url', value: 'url' },
   // { label: 'date', value: 'date' },
   // { label: 'number', value: 'number' },
   // { label: 'textarea', value: 'textarea' }
-]
+];
 
 const sectionActions = {
   ADD: -1,
-  EDIT: 1
-}
+  EDIT: 1,
+};
 
 const initialData = {
   id: 0,
@@ -72,12 +72,12 @@ const initialData = {
       fieldLabel: "",
       fekey: "",
       isRequired: false,
-      validation: "{}"
-    }
+      validation: "{}",
+    },
   ],
   status: false,
-  isCommon: false
-}
+  isCommon: false,
+};
 
 type Props = {
   open: number;
@@ -86,8 +86,8 @@ type Props = {
 const initialErrorData = {
   name: "",
   slug: "",
-  jsonContent: []
-}
+  jsonContent: [],
+};
 
 type FormDataType = {
   id: number;
@@ -99,46 +99,46 @@ type FormDataType = {
 };
 
 const ContentBlockForm = ({ open }: Props) => {
-  const router = useRouter()
-  const [formData, setFormData] = useState<FormDataType>(initialData)
+  const router = useRouter();
+  const [formData, setFormData] = useState<FormDataType>(initialData);
   const [formErrors, setFormErrors] = useState<{
     name: string;
     slug: string;
     jsonContent: string[];
-  }>(initialErrorData)
-  const [initialJSONContent, setInitialJSONContent] = useState<any>()
-  const [loading, setLoading] = useState<boolean>(true)
-  const query = usePathname().split("/")
-  const [, setIsSlugManuallyEdited] = useState<boolean>(false)
-  const [expanded, setExpanded] = useState(true)
-  const [editAllow, setEditAllow] = useState(false)
-  const [initialIsCommon, setInitialIsCommon] = useState(false)
+  }>(initialErrorData);
+  const [initialJSONContent, setInitialJSONContent] = useState<any>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const query = usePathname().split("/");
+  const [, setIsSlugManuallyEdited] = useState<boolean>(false);
+  const [expanded, setExpanded] = useState(true);
+  const [editAllow, setEditAllow] = useState(false);
+  const [initialIsCommon, setInitialIsCommon] = useState(false);
   useEffect(() => {
     if (formData.jsonContent.length === 0) {
-      handleAddRow()
+      handleAddRow();
     }
-  }, [])
+  }, []);
 
   const handleAddRow = () => {
     const newField = {
       fieldType: "",
       fieldLabel: "",
       isRequired: false,
-      validation: "{}"
-    }
+      validation: "{}",
+    };
     setFormData({
       ...formData,
-      jsonContent: [...formData.jsonContent, newField]
-    })
-  }
+      jsonContent: [...formData.jsonContent, newField],
+    });
+  };
   const handleRemoveRow = (index: number) => {
     if (formData.jsonContent.length > 1) {
       const updatedFields = formData.jsonContent.filter(
         (_, idx) => idx !== index
-      )
-      setFormData({ ...formData, jsonContent: updatedFields })
+      );
+      setFormData({ ...formData, jsonContent: updatedFields });
     }
-  }
+  };
 
   const handleChangeField = (
     index: number,
@@ -146,30 +146,30 @@ const ContentBlockForm = ({ open }: Props) => {
     value: any,
     subIndex?: number
   ) => {
-    const updatedFields = [...formData.jsonContent]
+    const updatedFields = [...formData.jsonContent];
     if (subIndex !== undefined) {
-      updatedFields[index].multipleData[subIndex][field] = value
+      updatedFields[index].multipleData[subIndex][field] = value;
     } else {
-      updatedFields[index][field] = value
+      updatedFields[index][field] = value;
 
       if (field === "validation") {
         try {
-          JSON.parse(value)
+          JSON.parse(value);
           setFormErrors({
             ...formErrors,
             jsonContent: {
               ...formErrors.jsonContent,
-              [index]: ""
-            }
-          })
+              [index]: "",
+            },
+          });
         } catch (error) {
           setFormErrors({
             ...formErrors,
             jsonContent: {
               ...formErrors.jsonContent,
-              [index]: "Validation should be a valid JSON object."
-            }
-          })
+              [index]: "Validation should be a valid JSON object.",
+            },
+          });
         }
       }
 
@@ -180,86 +180,86 @@ const ContentBlockForm = ({ open }: Props) => {
             fieldLabel: "",
             fekey: "",
             isRequired: false,
-            validation: "{}"
-          }
-        ]
+            validation: "{}",
+          },
+        ];
       }
     }
 
-    setFormData({ ...formData, jsonContent: updatedFields })
-  }
+    setFormData({ ...formData, jsonContent: updatedFields });
+  };
   const handleAddSubRow = (parentIndex: number) => {
     const newSubField = {
       fieldType: "",
       fieldLabel: "",
       fekey: "",
       isRequired: false,
-      validation: "{}"
-    }
+      validation: "{}",
+    };
     // const updatedFields = [...formData.jsonContent];
     // updatedFields[parentIndex].multipleData.push(newSubField);
     const updatedFields = formData.jsonContent.map((item, index) => {
       if (index === parentIndex) {
         return {
           ...item,
-          multipleData: [...item.multipleData, newSubField]
-        }
+          multipleData: [...item.multipleData, newSubField],
+        };
       }
-      return item
-    })
+      return item;
+    });
 
-    setFormData({ ...formData, jsonContent: updatedFields })
-  }
+    setFormData({ ...formData, jsonContent: updatedFields });
+  };
 
   const handleRemoveSubRow = (parentIndex: number, subIndex: number) => {
-    const updatedFields = [...formData.jsonContent]
+    const updatedFields = [...formData.jsonContent];
     if (updatedFields[parentIndex].multipleData.length > 1) {
       updatedFields[parentIndex].multipleData = updatedFields[
         parentIndex
-      ].multipleData.filter((_: any, idx: any) => idx !== subIndex)
-      setFormData({ ...formData, jsonContent: updatedFields })
+      ].multipleData.filter((_: any, idx: any) => idx !== subIndex);
+      setFormData({ ...formData, jsonContent: updatedFields });
     }
-  }
+  };
   const validateFormData = (data: FormDataType) => {
-    let isValid = true
+    let isValid = true;
     const errors = {
       name: "",
       slug: "",
-      jsonContent: data.jsonContent.map(() => "")
-    }
+      jsonContent: data.jsonContent.map(() => ""),
+    };
 
-    const slugRegex = /^[a-zA-Z0-9]+$/
+    const slugRegex = /^[a-zA-Z0-9]+$/;
 
     if (data.name.trim().length === 0) {
-      errors.name = "Full Name is required"
-      isValid = false
+      errors.name = "Full Name is required";
+      isValid = false;
     }
 
     if (data.slug.trim().length === 0) {
-      errors.slug = "Slug is required"
-      isValid = false
+      errors.slug = "Slug is required";
+      isValid = false;
     } else if (!slugRegex.test(data.slug)) {
       errors.slug =
-        "Slug must be alphanumeric with no spaces or special characters."
-      isValid = false
+        "Slug must be alphanumeric with no spaces or special characters.";
+      isValid = false;
     }
 
-    setFormErrors({ ...formErrors, ...errors })
-    setLoading(false)
-    return isValid
-  }
+    setFormErrors({ ...formErrors, ...errors });
+    setLoading(false);
+    return isValid;
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (validateFormData(formData)) {
       try {
-        setLoading(true)
+        setLoading(true);
         const endpoint =
-          open === sectionActions.EDIT ? section.update : section.create
+          open === sectionActions.EDIT ? section.update : section.create;
 
-        let sectionName = formData.name
-        sectionName = sectionName?.split("_")?.join(" ")
+        let sectionName = formData.name;
+        sectionName = sectionName?.split("_")?.join(" ");
 
         const payload = {
           sectionId: open === sectionActions.EDIT ? formData.id : undefined,
@@ -267,32 +267,32 @@ const ContentBlockForm = ({ open }: Props) => {
           sectionSlug: formData.slug,
           sectionTemplate: formData.jsonContent,
           active: formData.status,
-          isCommon: formData.isCommon
-        }
+          isCommon: formData.isCommon,
+        };
 
-        const response = await post(endpoint, payload)
+        const response = await post(endpoint, payload);
 
-        toast.success(response.message)
-        handleReset()
-        setLoading(false)
+        toast.success(response.message);
+        handleReset();
+        setLoading(false);
       } catch (error: any) {
-        console.error("Error fetching data:", error.message)
-        setLoading(false)
+        console.error("Error fetching data:", error.message);
+        setLoading(false);
       }
     }
-  }
+  };
 
   const handleReset = () => {
-    setFormData(initialData)
-    setFormErrors(initialErrorData)
-    router.back()
-  }
+    setFormData(initialData);
+    setFormErrors(initialErrorData);
+    router.back();
+  };
 
   const getSectionDataById = async (slug: string | number) => {
     try {
-      const result = await get(`${section.getById}/${slug}`)
-      const { data } = result
-      setEditAllow(data.disableSection)
+      const result = await get(`${section.getById}/${slug}`);
+      const { data } = result;
+      setEditAllow(data.disableSection);
       setFormData({
         ...formData,
         id: data.sectionId,
@@ -300,57 +300,57 @@ const ContentBlockForm = ({ open }: Props) => {
         slug: data.sectionSlug,
         jsonContent: data.sectionTemplate,
         status: data.active,
-        isCommon: data.isCommon
-      })
-      setIsSlugManuallyEdited(false)
-      setInitialIsCommon(data.isCommon)
-      setInitialJSONContent([...data.sectionTemplate])
-      setLoading(false)
+        isCommon: data.isCommon,
+      });
+      setIsSlugManuallyEdited(false);
+      setInitialIsCommon(data.isCommon);
+      setInitialJSONContent([...data.sectionTemplate]);
+      setLoading(false);
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
+  };
 
   useEffect(() => {
     if (open === sectionActions.EDIT) {
-      getSectionDataById(query[query.length - 1])
+      getSectionDataById(query[query.length - 1]);
     } else {
-      setEditAllow(false)
-      setFormData(initialData)
-      setFormErrors(initialErrorData)
-      setLoading(false)
+      setEditAllow(false);
+      setFormData(initialData);
+      setFormErrors(initialErrorData);
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   const handleSectionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value
-    setFormErrors({ ...formErrors, name: "" })
+    const newName = e.target.value;
+    setFormErrors({ ...formErrors, name: "" });
     setFormData((prevData) => ({
       ...prevData,
-      name: newName
+      name: newName,
       // slug: !isSlugManuallyEdited && open === sectionActions.ADD ? newName.replace(/[^\w\s]|_/g, "").replace(/\s+/g, "-").toLowerCase() : prevData.slug,
-    }))
-  }
+    }));
+  };
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSlug = e.target.value
-    const slugRegex = /^[a-zA-Z0-9]+$/
+    const newSlug = e.target.value;
+    const slugRegex = /^[a-zA-Z0-9]+$/;
 
     if (!slugRegex.test(newSlug)) {
       setFormErrors({
         ...formErrors,
-        slug: "Slug must be alphanumeric with no spaces, dashes, or underscores."
-      })
+        slug: "Slug must be alphanumeric with no spaces, dashes, or underscores.",
+      });
     } else {
-      setFormErrors({ ...formErrors, slug: "" })
+      setFormErrors({ ...formErrors, slug: "" });
     }
 
     setFormData((prevData) => ({
       ...prevData,
-      slug: newSlug
-    }))
-    setIsSlugManuallyEdited(true)
-  }
+      slug: newSlug,
+    }));
+    setIsSlugManuallyEdited(true);
+  };
 
   // const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   const newSlug = e.target.value;
@@ -362,8 +362,8 @@ const ContentBlockForm = ({ open }: Props) => {
   //   setIsSlugManuallyEdited(true);
   // };
   const handleChange = () => {
-    setExpanded(!expanded)
-  }
+    setExpanded(!expanded);
+  };
 
   return (
     <>
@@ -615,7 +615,9 @@ const ContentBlockForm = ({ open }: Props) => {
                                     >
                                       <Typography variant="subtitle1">
                                         Multiple Label:{" "}
-                                        {field.fieldLabel ? field.fieldLabel : "N/A"}
+                                        {field.fieldLabel
+                                          ? field.fieldLabel
+                                          : "N/A"}
                                       </Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
@@ -635,7 +637,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                                 title={
                                                   <pre
                                                     style={{
-                                                      whiteSpace: "pre-wrap"
+                                                      whiteSpace: "pre-wrap",
                                                     }}
                                                   >
                                                     {JSON.stringify(
@@ -689,7 +691,9 @@ const ContentBlockForm = ({ open }: Props) => {
                                                       handleChangeField(
                                                         index,
                                                         "fieldType",
-                                                        newValue ? newValue.value : "",
+                                                        newValue
+                                                          ? newValue.value
+                                                          : "",
                                                         subIndex
                                                       )
                                                     }
@@ -797,22 +801,21 @@ const ContentBlockForm = ({ open }: Props) => {
                                                   <TableCell>
                                                     {!initialJSONContent?.[
                                                       index
-                                                    ]?.multipleData?.[
-                                                      subIndex
-                                                    ]?.fekey && (
-                                                        <IconButton
-                                                          size="small"
-                                                          onClick={() =>
-                                                            handleRemoveSubRow(
-                                                              index,
-                                                              subIndex
-                                                            )
-                                                          }
-                                                          aria-label="minus"
-                                                          color="error"
-                                                        >
-                                                          <i className="tabler-minus" />
-                                                        </IconButton>
+                                                    ]?.multipleData?.[subIndex]
+                                                      ?.fekey && (
+                                                      <IconButton
+                                                        size="small"
+                                                        onClick={() =>
+                                                          handleRemoveSubRow(
+                                                            index,
+                                                            subIndex
+                                                          )
+                                                        }
+                                                        aria-label="minus"
+                                                        color="error"
+                                                      >
+                                                        <i className="tabler-minus" />
+                                                      </IconButton>
                                                     )}
 
                                                     {subIndex ===
@@ -827,7 +830,7 @@ const ContentBlockForm = ({ open }: Props) => {
                                                         aria-label="plus"
                                                         color="success"
                                                         style={{
-                                                          marginLeft: 0
+                                                          marginLeft: 0,
                                                         }}
                                                       >
                                                         <i className="tabler-plus" />
@@ -880,7 +883,7 @@ const ContentBlockForm = ({ open }: Props) => {
         </Box>
       </Grid>
     </>
-  )
-}
+  );
+};
 
-export default ContentBlockForm
+export default ContentBlockForm;
