@@ -4,7 +4,7 @@ import LoadingBackdrop from "@/components/LoadingBackdrop"
 import { post } from "@/services/apiService"
 import { organization } from "@/services/endpoint/organization"
 import { createUser, updateUser } from "@/services/endpoint/users/management"
-import { getRoleList } from "@/services/endpoint/users/roles"
+import { getRoleListOrgWise } from "@/services/endpoint/users/roles"
 import {
   Box,
   Button,
@@ -12,7 +12,8 @@ import {
   FormControlLabel,
   Grid,
   MenuItem,
-  Switch
+  Switch,
+  Typography
 } from "@mui/material"
 import { useRouter } from "next/navigation"
 import React, { ChangeEvent, useEffect, useState } from "react"
@@ -74,7 +75,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
 
   const fetchRoles = async (organizationId: number) => {
     try {
-      const response = await post(getRoleList, {
+      const response = await post(getRoleListOrgWise, {
         page: 1,
         limit: 1000,
         search: "",
@@ -379,7 +380,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                             fullWidth
                             defaultValue=""
                             value={field.organizationId}
-                            label="Select Company *"
+                            label="Company"
                             id="custom-select"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                               handleCompanyChange(Number(e.target.value), index)
@@ -410,7 +411,7 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                             fullWidth
                             defaultValue=""
                             value={field.roleId}
-                            label="Select Role *"
+                            label="Role"
                             id="custom-select"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                               handleRoleChange(Number(e.target.value), index)
@@ -435,7 +436,9 @@ const UserForm = ({ open, handleClose, editingRow }: UserFormPropsTypes) => {
                                     key={role.id}
                                     disabled={isRoleSelected} // Disable the option if the role is already selected
                                   >
+                                    <Typography variant="h6">
                                     {role.name}
+                                    </Typography>
                                   </MenuItem>
                                 )
                               })}

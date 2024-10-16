@@ -37,6 +37,12 @@ const ModeDropdown = () => {
         const response = await post(organization.active, {})
         const orgs = response.data.organizations as Organization[]
         setOrganizations(orgs)
+        console.log(orgs.length)
+
+        // if (orgs.length === 0) {
+        //   localStorage.removeItem("encryptedPermissionData")
+        //   await signOut({ callbackUrl: '/login' })
+        // }
 
         const storedOrgId = localStorage.getItem('selectedOrgId')
 

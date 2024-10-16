@@ -1,5 +1,6 @@
 export type UsersType = {
     sectionName: any;
+    sectionImage:string;
     sectionSlug:any;
     templateSlug: any;
     templateDescription: any;

@@ -16,16 +16,18 @@ import {
   Typography,
   Accordion,
   AccordionDetails,
-  AccordionSummary
+  AccordionSummary,
+  Avatar
 } from "@mui/material"
 import CustomTextField from "@/@core/components/mui/TextField"
 import CustomAutocomplete from "@/@core/components/mui/Autocomplete"
-import { get, post } from "@/services/apiService"
+import { get, postContentBlock } from "@/services/apiService"
 import { usePathname, useRouter } from "next/navigation"
 import { toast } from "react-toastify"
 import { section } from "@/services/endpoint/section"
 import LoadingBackdrop from "@/components/LoadingBackdrop"
 import BreadCrumbList from "@/components/BreadCrumbList"
+import { useDropzone } from "react-dropzone"
 
 const tooltipContent = {
   pattern: "[A-Za-z]{3,10}",
@@ -66,6 +68,7 @@ const initialData = {
   id: 0,
   name: "",
   slug: "",
+  sectionImage: "",
   jsonContent: [
     {
       fieldType: "",
@@ -86,12 +89,14 @@ type Props = {
 const initialErrorData = {
   name: "",
   slug: "",
+  sectionImage: "",
   jsonContent: []
 }
 
 type FormDataType = {
   id: number;
   name: string;
+  sectionImage: string;
   slug: string;
   jsonContent: any[];
   status: boolean;
@@ -104,6 +109,7 @@ const ContentBlockForm = ({ open }: Props) => {
   const [formErrors, setFormErrors] = useState<{
     name: string;
     slug: string;
+    sectionImage: string;
     jsonContent: string[];
   }>(initialErrorData)
   const [initialJSONContent, setInitialJSONContent] = useState<any>()
@@ -113,6 +119,25 @@ const ContentBlockForm = ({ open }: Props) => {
   const [expanded, setExpanded] = useState(true)
   const [editAllow, setEditAllow] = useState(false)
   const [initialIsCommon, setInitialIsCommon] = useState(false)
+
+  const [sectionImage, setsectionImage] = useState<File | null>(null)
+  const [issectionImageTouched, setIsSectionImageTouched] = useState(false)
+
+  const {
+    getRootProps: getSectionImageRootProps,
+    getInputProps: getSectionImageInputProps
+  } = useDropzone({
+    multiple: false,
+    accept: {
+      "image/*": [".png", ".jpg", ".jpeg", ".gif"]
+    },
+    onDrop: (acceptedFiles: File[]) => {
+      setFormErrors({ ...formErrors, sectionImage: "" })
+      setsectionImage(acceptedFiles[0])
+      setIsSectionImageTouched(true)
+    }
+  })
+
   useEffect(() => {
     if (formData.jsonContent.length === 0) {
       handleAddRow()
@@ -249,7 +274,7 @@ const ContentBlockForm = ({ open }: Props) => {
     return isValid
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault()
 
     if (validateFormData(formData)) {
@@ -261,16 +286,29 @@ const ContentBlockForm = ({ open }: Props) => {
         let sectionName = formData.name
         sectionName = sectionName?.split("_")?.join(" ")
 
-        const payload = {
-          sectionId: open === sectionActions.EDIT ? formData.id : undefined,
-          sectionName,
-          sectionSlug: formData.slug,
-          sectionTemplate: formData.jsonContent,
-          active: formData.status,
-          isCommon: formData.isCommon
-        }
+        // const payload = {
+        //   sectionId: open === sectionActions.EDIT ? formData.id : undefined,
+        //   sectionName,
+        //   sectionSlug: formData.slug,
+        //   sectionTemplate: formData.jsonContent,
+        //   active: formData.status,
+        //   isCommon: formData.isCommon
+        // }
 
-        const response = await post(endpoint, payload)
+        const data = new FormData()
+        if (open === sectionActions.EDIT && formData.id !== undefined) {
+          data.append("sectionId", formData.id.toString())
+        }
+        if (sectionImage) {
+          data.append("sectionImage", sectionImage as Blob)
+        }
+        data.append("sectionName", sectionName)
+        data.append("sectionSlug", formData.slug)
+        data.append("sectionTemplate", JSON.stringify(formData.jsonContent))
+        data.append("active", formData.status.toString())
+        data.append("isCommon", formData.isCommon.toString())
+
+        const response = await postContentBlock(endpoint, data)
 
         toast.success(response.message)
         handleReset()
@@ -297,6 +335,7 @@ const ContentBlockForm = ({ open }: Props) => {
         ...formData,
         id: data.sectionId,
         name: data.sectionName,
+        sectionImage: data.sectionImage,
         slug: data.sectionSlug,
         jsonContent: data.sectionTemplate,
         status: data.active,
@@ -371,61 +410,160 @@ const ContentBlockForm = ({ open }: Props) => {
       <BreadCrumbList />
       <Card>
         <div>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-6">
+          <form className="flex flex-col gap-6 p-6">
             <Box display="flex" alignItems="center">
               <Grid container spacing={3}>
-                <Grid item xs={12} sm={4}>
-                  <CustomTextField
-                    error={!!formErrors.name}
-                    helperText={formErrors.name}
-                    label="Full Name *"
-                    fullWidth
-                    placeholder=""
-                    value={formData.name}
-                    onChange={handleSectionNameChange}
-                    // disabled={open == sectionActions.EDIT}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <CustomTextField
-                    // disabled={open === sectionActions.EDIT}
-                    error={!!formErrors.slug}
-                    helperText={formErrors.slug}
-                    label="Slug *"
-                    fullWidth
-                    placeholder=""
-                    value={formData.slug}
-                    onChange={handleSlugChange}
-                    disabled={!!editAllow || open == sectionActions.EDIT}
-                  />
-                </Grid>
-                <Grid item xs={4} sm={1}>
-                  <Typography variant="body2" sx={{ mr: 0 }}>
-                    Status
-                  </Typography>
-                  <Switch
-                    size="medium"
-                    checked={formData.status}
-                    onChange={(e) =>
-                      setFormData({ ...formData, status: e.target.checked })
-                    }
-                    disabled={!!editAllow}
-                  />
-                </Grid>
-                <Grid item xs={6} sm={2}>
-                  <Typography variant="body2" sx={{ mr: 0 }}>
-                    is Common Content Block
-                  </Typography>
-                  <Switch
-                    size="medium"
-                    checked={formData.isCommon}
-                    onChange={(e) =>
-                      setFormData({ ...formData, isCommon: e.target.checked })
-                    }
-                    disabled={
-                      !!(open == sectionActions.EDIT && !!initialIsCommon)
-                    }
-                  />
+                <Grid
+                  container
+                  display={"flex"}
+                  columnGap={4}
+                  margin={4}
+                  xs={12}
+                >
+                  <Grid container xs={7} spacing={3} alignItems={"flex-start"}>
+                    <Grid item xs={12} sm={6}>
+                      <CustomTextField
+                        error={!!formErrors.name}
+                        helperText={formErrors.name}
+                        label="Full Name *"
+                        fullWidth
+                        placeholder=""
+                        value={formData.name}
+                        onChange={handleSectionNameChange}
+                        // disabled={open == sectionActions.EDIT}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <CustomTextField
+                        // disabled={open === sectionActions.EDIT}
+                        error={!!formErrors.slug}
+                        helperText={formErrors.slug}
+                        label="Slug *"
+                        fullWidth
+                        placeholder=""
+                        value={formData.slug}
+                        onChange={handleSlugChange}
+                        disabled={!!editAllow || open == sectionActions.EDIT}
+                      />
+                    </Grid>
+                    <Grid item xs={6} sm={6}>
+                      <Typography variant="body2" sx={{ mr: 0 }}>
+                        Status
+                      </Typography>
+                      <Switch
+                        size="medium"
+                        checked={formData.status}
+                        onChange={(e) =>
+                          setFormData({ ...formData, status: e.target.checked })
+                        }
+                        disabled={!!editAllow}
+                      />
+                    </Grid>
+                    <Grid item xs={6} sm={6}>
+                      <Typography variant="body2" sx={{ mr: 0 }}>
+                        is Common Content Block
+                      </Typography>
+                      <Switch
+                        size="medium"
+                        checked={formData.isCommon}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            isCommon: e.target.checked
+                          })
+                        }
+                        disabled={
+                          !!(open == sectionActions.EDIT && !!initialIsCommon)
+                        }
+                      />
+                    </Grid>
+                  </Grid>
+                  <Grid container xs={4} spacing={3}>
+                    <Grid item xs={12} sm={12}>
+                      <p
+                        className={`${formErrors.sectionImage ? "text-[#ff5054]" : "text-[#4e4b5a]"} text-[13px]`}
+                      >
+                        {" "}
+                        Section Image *{" "}
+                      </p>
+                      <div
+                        className={`flex items-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md`}
+                        style={{
+                          borderColor: formErrors.sectionImage ? "#ff5054" : "gray"
+                        }}
+                      >
+                        <Box
+                          {...getSectionImageRootProps({
+                            className: "dropzone"
+                          })}
+                          {...sectionImage}
+                        >
+                          <input {...getSectionImageInputProps()} />
+                          <div
+                            className="flex items-center justify-center flex-col w-[400px] h-[300px] border border-dashed border-gray-300 rounded-md p-2"
+                            style={{
+                              borderColor: formErrors.sectionImage ? "#ff5054" : "gray"
+                            }}
+                          >
+                            {formData.sectionImage &&
+                              !issectionImageTouched && (
+                                // eslint-disable-next-line
+                                <img
+                                  className="object-contain w-full h-full"
+                                  src={
+                                    process.env.NEXT_PUBLIC_BACKEND_BASE_URL +
+                                    "/" +
+                                    formData?.sectionImage
+                                  }
+                                  key={sectionImage?.name}
+                                  alt={sectionImage?.name}
+                                />
+                            )}
+                            {sectionImage && issectionImageTouched && (
+                              // eslint-disable-next-line
+                              <img
+                                key={sectionImage.name}
+                                alt={sectionImage.name}
+                                className="object-contain w-full h-full"
+                                src={URL.createObjectURL(sectionImage)}
+                              />
+                            )}
+                            {!sectionImage &&
+                              !issectionImageTouched &&
+                              !formData.sectionImage && (
+                                <>
+                                  <Avatar
+                                    variant="rounded"
+                                    className="bs-12 is-12 mbe-9"
+                                  >
+                                    <i className="tabler-upload" />
+                                  </Avatar>
+                                  <Typography variant="h5" className="mbe-2.5">
+                                    Drop files here or click to upload.
+                                  </Typography>
+                                  <Typography>
+                                    Drop files here or click{" "}
+                                    <a
+                                      href="/"
+                                      onClick={(e) => e.preventDefault()}
+                                      className="text-textPrimary no-underline"
+                                    >
+                                      browse
+                                    </a>{" "}
+                                    through your machine
+                                  </Typography>
+                                </>
+                            )}
+                          </div>
+                          {!!formErrors.sectionImage && (
+                            <p className="text-[#ff5054] text-[13px]">
+                              {formErrors.sectionImage}
+                            </p>
+                          )}
+                        </Box>
+                      </div>
+                    </Grid>
+                  </Grid>
                 </Grid>
                 <Grid item xs={12}>
                   <label className="text-[0.8125rem] leading-[1.153]">
@@ -865,15 +1003,20 @@ const ContentBlockForm = ({ open }: Props) => {
           bgcolor="background.paper"
         >
           <Button
-            variant="contained"
-            color="error"
-            type="reset"
+            variant="outlined"
             size="small"
-            onClick={() => handleReset()}
+            onClick={() => {
+              handleReset()
+            }}
           >
             Cancel
           </Button>
-          <Button variant="contained" type="submit" size="small">
+          <Button
+            variant="contained"
+            type="submit"
+            size="small"
+            onClick={(e) => handleSubmit(e)}
+          >
             {open === sectionActions.ADD ? "Add" : "Update"} Content Block
           </Button>
         </Box>

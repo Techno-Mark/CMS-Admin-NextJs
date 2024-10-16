@@ -7,6 +7,7 @@ import { authOptions } from '@/libs/auth'
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import ResetPassword from '@/views/ResetPassword'
+import { defaultRedirectRoute } from '@/services/app.config'
 
 export const metadata: Metadata = {
   title: 'Forgot Password',
@@ -17,7 +18,7 @@ const ForgotPasswordPage = async ({ params }: { params: { token: string } }) => 
   const session = await getServerSession(authOptions)
 
   if (session) {
-    redirect('/home')
+    redirect(defaultRedirectRoute)
   }
 
   // Vars

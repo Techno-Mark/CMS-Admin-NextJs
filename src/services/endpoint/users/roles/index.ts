@@ -14,3 +14,5 @@ export const getRoleById = "role/getById"
 export const updateRole = "role/update"
 
 export const deleteRole = "role/delete"
+
+export const getRoleListOrgWise = "role/listForUserRole"

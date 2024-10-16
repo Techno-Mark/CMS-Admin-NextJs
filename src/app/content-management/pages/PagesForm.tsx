@@ -1255,11 +1255,11 @@ function PagesForm({
           bgcolor="background.paper"
         >
           <Button
-            variant="contained"
+            variant="outlined"
             size="small"
-            color="error"
-            type="reset"
-            onClick={handleClose}
+            onClick={() => {
+              handleClose()
+            }}
           >
             Cancel
           </Button>

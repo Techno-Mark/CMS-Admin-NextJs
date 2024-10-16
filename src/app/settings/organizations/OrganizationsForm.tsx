@@ -147,6 +147,7 @@ const OrganizationsForm = ({
                         prefix: e.target.value
                       }))
                     }}
+                    disabled={open !== -1}
                   />
                 </Grid>
 
@@ -208,17 +209,18 @@ const OrganizationsForm = ({
         >
           <Button
             variant="outlined"
-            color="error"
             size="small"
-            onClick={handleClose}
+            onClick={() => {
+              handleClose()
+            }}
           >
             Cancel
           </Button>
           <Button
             variant="contained"
-            type="submit"
+            // type="submit"
             size="small"
-            onSubmit={handleSubmit}
+            onClick={handleSubmit}
           >
             {open === -1 ? "Add" : "Edit"} Organization
           </Button>

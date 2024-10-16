@@ -290,7 +290,7 @@ const EventForm = ({
                         helperText={formErrors.slug}
                         label="Slug *"
                         fullWidth
-                        placeholder=""
+                        placeholder="Enter Slug"
                         value={formData.slug}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                           setFormData({ ...formData, slug: e.target.value })
@@ -343,6 +343,7 @@ const EventForm = ({
                             fullWidth
                             error={!!formErrors.startTime}
                             helperText={formErrors.startTime}
+                            inputProps={{ readOnly: true }}
                           />
                         }
                       />
@@ -387,6 +388,7 @@ const EventForm = ({
                             fullWidth
                             error={!!formErrors.endTime}
                             helperText={formErrors.endTime}
+                            inputProps={{ readOnly: true }}
                           />
                         }
                       />
@@ -419,6 +421,7 @@ const EventForm = ({
                             fullWidth
                             error={!!formErrors.date}
                             helperText={formErrors.date}
+                            inputProps={{ readOnly: true }}
                           />
                         }
                       />
@@ -669,11 +672,11 @@ const EventForm = ({
           bgcolor="background.paper"
         >
           <Button
-            variant="tonal"
-            color="error"
-            type="reset"
+            variant="outlined"
             size="small"
-            onClick={() => handleClose()}
+            onClick={() => {
+              handleClose()
+            }}
           >
             Cancel
           </Button>

@@ -449,9 +449,10 @@ const TemplateForm: React.FC<Props> = ({
         >
           <Button
             variant="outlined"
-            color="error"
             size="small"
-            onClick={handleClose}
+            onClick={() => {
+              handleClose()
+            }}
           >
             Cancel
           </Button>
