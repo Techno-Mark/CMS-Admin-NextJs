@@ -1,13 +1,13 @@
-"use client";
+"use client"
 
-import LoadingBackdrop from "@/components/LoadingBackdrop";
-import { Button, Box, Card, Grid, Tooltip } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { post, postDataToOrganizationAPIs } from "@/services/apiService";
-import { toast } from "react-toastify";
-import BreadCrumbList from "@/components/BreadCrumbList";
-import CustomTextField from "@/@core/components/mui/TextField";
-import { robotSEO } from "@/services/endpoint/robotSEO";
+import LoadingBackdrop from "@/components/LoadingBackdrop"
+import { Button, Box, Card, Grid, Tooltip } from "@mui/material"
+import React, { useEffect, useState } from "react"
+import { post, postDataToOrganizationAPIs } from "@/services/apiService"
+import { toast } from "react-toastify"
+import BreadCrumbList from "@/components/BreadCrumbList"
+import CustomTextField from "@/@core/components/mui/TextField"
+import { robotSEO } from "@/services/endpoint/robotSEO"
 
 interface GoogleAnalytics {
   beforeScript: string[];
@@ -33,49 +33,45 @@ const initialFormData: FormData = {
   robotText: "",
   googleAnalytics: {
     beforeScript: [""],
-    afterScript: [""],
+    afterScript: [""]
   },
-  facebookScript: "",
-};
+  facebookScript: ""
+}
 
 const initialErrorData: FormErrors = {
   robotText: "",
   googleAnalytics: {
     beforeScript: [""],
-    afterScript: [""],
+    afterScript: [""]
   },
-  facebookScript: "",
-};
+  facebookScript: ""
+}
 
 function RobotSEO() {
-  const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [formErrors, setFormErrors] = useState<FormErrors>(initialErrorData);
+  const [loading, setLoading] = useState(true)
+  const [formData, setFormData] = useState<FormData>(initialFormData)
+  const [formErrors, setFormErrors] = useState<FormErrors>(initialErrorData)
 
   // Effects
   useEffect(() => {
-    getRobotSEOData();
-  }, []);
+    getRobotSEOData()
+  }, [])
 
   async function getRobotSEOData() {
     try {
-      setLoading(true);
-      const result = await post(robotSEO.getDetail, {});
+      setLoading(true)
+      const result = await post(robotSEO.getDetail, {})
 
-      setLoading(false);
+      setLoading(false)
       if (result.status === "success") {
         // Ensure beforeScript and afterScript are arrays
         const beforeScripts = Array.isArray(
           result?.data.googleAnalytics?.beforeScript
-        )
-          ? result.data.googleAnalytics.beforeScript
-          : [result.data.googleAnalytics?.beforeScript || ""];
+        ) ? result.data.googleAnalytics.beforeScript : [result.data.googleAnalytics?.beforeScript || ""]
 
         const afterScripts = Array.isArray(
           result?.data.googleAnalytics?.afterScript
-        )
-          ? result.data.googleAnalytics.afterScript
-          : [result.data.googleAnalytics?.afterScript || ""];
+        ) ? result.data.googleAnalytics.afterScript : [result.data.googleAnalytics?.afterScript || ""]
 
         // Set the state with extracted values
         setFormData({
@@ -83,73 +79,73 @@ function RobotSEO() {
           googleAnalytics: {
             ...result.data.googleAnalytics,
             beforeScript: beforeScripts,
-            afterScript: afterScripts,
-          },
-        });
+            afterScript: afterScripts
+          }
+        })
       }
     } catch (error) {
-      console.log(error);
-      setLoading(false);
+      console.log(error)
+      setLoading(false)
     }
   }
 
   function validateForm() {
-    let isValid = true;
-    const errors = { ...initialErrorData }; // Reset errors to initial state
+    let isValid = true
+    const errors = { ...initialErrorData } // Reset errors to initial state
 
     if (!formData.robotText.trim()) {
-      errors.robotText = "Robot text is required";
-      isValid = false;
+      errors.robotText = "Robot text is required"
+      isValid = false
     }
 
     // Validate beforeScript fields
     errors.googleAnalytics.beforeScript =
       formData.googleAnalytics.beforeScript.map((script) => {
         if (!script.trim()) {
-          isValid = false;
-          return "Before script is required";
+          isValid = false
+          return "Before script is required"
         }
-        return "";
-      });
+        return ""
+      })
 
     // Validate afterScript fields
     errors.googleAnalytics.afterScript =
       formData.googleAnalytics.afterScript.map((script) => {
         if (!script.trim()) {
-          isValid = false;
-          return "After script is required";
+          isValid = false
+          return "After script is required"
         }
-        return "";
-      });
+        return ""
+      })
 
     if (!formData.facebookScript.trim()) {
-      errors.facebookScript = "Facebook script text is required";
-      isValid = false;
+      errors.facebookScript = "Facebook script text is required"
+      isValid = false
     }
 
-    setFormErrors(errors);
-    return isValid;
+    setFormErrors(errors)
+    return isValid
   }
 
   const handleSitemapGenerate = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
       const result = await postDataToOrganizationAPIs(
         robotSEO.generateSitemap,
         {}
-      );
-      setLoading(false);
+      )
+      setLoading(false)
 
       if (result.status === "success") {
-        toast.success(result.message);
+        toast.success(result.message)
       } else {
-        toast.error(result.message);
+        toast.error(result.message)
       }
     } catch (error) {
-      console.error(error);
-      setLoading(false);
+      console.error(error)
+      setLoading(false)
     }
-  };
+  }
 
   // Add new script input fields
   const handleAddField = (type: keyof GoogleAnalytics) => {
@@ -157,72 +153,72 @@ function RobotSEO() {
       ...prevData,
       googleAnalytics: {
         ...prevData.googleAnalytics,
-        [type]: [...prevData.googleAnalytics[type], ""], // Add empty field
-      },
-    }));
-  };
+        [type]: [...prevData.googleAnalytics[type], ""] // Add empty field
+      }
+    }))
+  }
 
   // Remove script input fields
   const handleRemoveField = (type: keyof GoogleAnalytics, index?: number) => {
     setFormData((prevData) => {
-      const updatedFields = [...prevData.googleAnalytics[type]];
+      const updatedFields = [...prevData.googleAnalytics[type]]
 
       // If index is provided, remove the specific index, otherwise remove the last one
       const removeIndex =
-        index !== undefined ? index : updatedFields.length - 1;
+        index !== undefined ? index : updatedFields.length - 1
 
       // Ensure at least one field remains
       if (updatedFields.length > 1) {
-        updatedFields.splice(removeIndex, 1); // Remove the field
+        updatedFields.splice(removeIndex, 1) // Remove the field
       }
 
       return {
         ...prevData,
         googleAnalytics: {
           ...prevData.googleAnalytics,
-          [type]: updatedFields,
-        },
-      };
-    });
-  };
+          [type]: updatedFields
+        }
+      }
+    })
+  }
 
   const handleFieldChange = (
     type: keyof GoogleAnalytics,
     index: number,
     value: string
   ) => {
-    const updatedFields = [...formData.googleAnalytics[type]];
-    updatedFields[index] = value;
+    const updatedFields = [...formData.googleAnalytics[type]]
+    updatedFields[index] = value
 
     setFormData({
       ...formData,
       googleAnalytics: {
         ...formData.googleAnalytics,
-        [type]: updatedFields,
-      },
-    });
-  };
+        [type]: updatedFields
+      }
+    })
+  }
 
   // Handle form submission
   const handleSubmit = async () => {
-    setFormErrors(initialErrorData);
+    setFormErrors(initialErrorData)
     if (!validateForm()) {
-      return;
+      return
     }
 
-    setLoading(true);
+    setLoading(true)
     const result = await postDataToOrganizationAPIs(
       robotSEO.saveAndUpdate,
       formData
-    );
-    setLoading(false);
+    )
+    setLoading(false)
 
     if (result.status === "success") {
-      toast.success(result.message);
+      toast.success(result.message)
     } else {
-      toast.error(result.message);
+      toast.error(result.message)
     }
-  };
+  }
 
   return (
     <>
@@ -260,8 +256,8 @@ function RobotSEO() {
                 fullWidth
                 value={formData.robotText}
                 onChange={(e) => {
-                  const { value } = e.target;
-                  setFormData({ ...formData, robotText: value });
+                  const { value } = e.target
+                  setFormData({ ...formData, robotText: value })
                 }}
               />
             </Grid>
@@ -359,8 +355,8 @@ function RobotSEO() {
             fullWidth
             value={formData.facebookScript}
             onChange={(e) => {
-              const { value } = e.target;
-              setFormData({ ...formData, facebookScript: value });
+              const { value } = e.target
+              setFormData({ ...formData, facebookScript: value })
             }}
           />
         </Grid>
@@ -372,7 +368,7 @@ function RobotSEO() {
         </Box>
       </Card>
     </>
-  );
+  )
 }
 
-export default RobotSEO;
+export default RobotSEO
