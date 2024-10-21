@@ -114,9 +114,9 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
       isValid = false
     }
 
-    //skip all for Normal popup type
-    if(popupType && popupType.includes("Normal")){
-      return true;
+    // skip all for Normal popup type
+    if (popupType && popupType.includes("Normal")) {
+      return true
     }
 
     if (popupType === "Event") {
