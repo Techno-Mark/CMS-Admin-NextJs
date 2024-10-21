@@ -114,6 +114,11 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
       isValid = false
     }
 
+    //skip all for Normal popup type
+    if(popupType && popupType.includes("Normal")){
+      return true;
+    }
+
     if (popupType === "Event") {
       if (!formData.eventTitle) {
         errors.eventTitle = "Event title is required"
@@ -178,6 +183,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
         const preSelectedOptions = pagesData.filter((option: any) =>
           editingRow?.data?.selectedPages?.includes(option.pageId)
         )
+        setPopupType(editingRow?.popupType)
 
         setSelectedPages(preSelectedOptions)
 
@@ -287,6 +293,7 @@ function NewPopupForm({ open, handleClose, editingRow, permissionUser }: any) {
                 <MenuItem value={"Downloadable"}>Downloadable</MenuItem>
                 <MenuItem value={"Survey"}>Survey</MenuItem> */}
                 <MenuItem value={"Exit Intent"}>Exit Intent</MenuItem>
+                <MenuItem value={"Normal"}>Normal (Only Image)</MenuItem>
               </CustomTextField>
             </Grid>
             <Grid item sm={2}>
